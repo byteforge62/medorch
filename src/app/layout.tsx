@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "MedOrch",
-  description: "Operating Theatre Management Platform",
+  title: 'MedOrch',
+  description: 'Operating Theatre Management Platform',
 };
 
 export default function RootLayout({
