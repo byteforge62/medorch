@@ -71,6 +71,18 @@ enum AlertSeverity {
   CRITICAL
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  APPROVE
+  REJECT
+  CANCEL
+  COMPLETE
+}
+
 model User {
   id           String     @id @default(uuid())
   email        String     @unique
@@ -91,6 +103,7 @@ model User {
   scheduleStaff    ScheduleStaff[]
   scheduleNotes    ScheduleNote[]
   alerts           Alert[]
+  auditLogs        AuditLog[]
 
   @@index([role])
   @@index([status])
@@ -292,5 +305,23 @@ model Alert {
   @@index([userId, isRead])
   @@index([scheduleId])
   @@index([severity])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?
+  action      AuditAction
+  entity      String
+  entityId    String
+  description String?
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([action])
   @@index([createdAt])
 }

@@ -98,3 +98,18 @@ export const AlertSeverity = {
 } as const
 
 export type AlertSeverity = (typeof AlertSeverity)[keyof typeof AlertSeverity]
+
+
+export const AuditAction = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT',
+  CANCEL: 'CANCEL',
+  COMPLETE: 'COMPLETE'
+} as const
+
+export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

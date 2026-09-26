@@ -229,6 +229,7 @@ export type UserWhereInput = {
   scheduleStaff?: Prisma.ScheduleStaffListRelationFilter
   scheduleNotes?: Prisma.ScheduleNoteListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -249,6 +250,7 @@ export type UserOrderByWithRelationInput = {
   scheduleStaff?: Prisma.ScheduleStaffOrderByRelationAggregateInput
   scheduleNotes?: Prisma.ScheduleNoteOrderByRelationAggregateInput
   alerts?: Prisma.AlertOrderByRelationAggregateInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -272,6 +274,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   scheduleStaff?: Prisma.ScheduleStaffListRelationFilter
   scheduleNotes?: Prisma.ScheduleNoteListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -324,6 +327,7 @@ export type UserCreateInput = {
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -344,6 +348,7 @@ export type UserUncheckedCreateInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -364,6 +369,7 @@ export type UserUpdateInput = {
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -384,6 +390,7 @@ export type UserUncheckedUpdateInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -598,6 +605,22 @@ export type UserUpdateOneRequiredWithoutAlertsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAlertsInput, Prisma.UserUpdateWithoutAlertsInput>, Prisma.UserUncheckedUpdateWithoutAlertsInput>
 }
 
+export type UserCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
 export type UserCreateWithoutDoctorProfileInput = {
   id?: string
   email: string
@@ -615,6 +638,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDoctorProfileInput = {
@@ -634,6 +658,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDoctorProfileInput = {
@@ -669,6 +694,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDoctorProfileInput = {
@@ -688,6 +714,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPatientInput = {
@@ -707,6 +734,7 @@ export type UserCreateWithoutPatientInput = {
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPatientInput = {
@@ -726,6 +754,7 @@ export type UserUncheckedCreateWithoutPatientInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPatientInput = {
@@ -761,6 +790,7 @@ export type UserUpdateWithoutPatientInput = {
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientInput = {
@@ -780,6 +810,7 @@ export type UserUncheckedUpdateWithoutPatientInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSurgeonSchedulesInput = {
@@ -799,6 +830,7 @@ export type UserCreateWithoutSurgeonSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSurgeonSchedulesInput = {
@@ -818,6 +850,7 @@ export type UserUncheckedCreateWithoutSurgeonSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSurgeonSchedulesInput = {
@@ -842,6 +875,7 @@ export type UserCreateWithoutCreatedSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedSchedulesInput = {
@@ -861,6 +895,7 @@ export type UserUncheckedCreateWithoutCreatedSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedSchedulesInput = {
@@ -896,6 +931,7 @@ export type UserUpdateWithoutSurgeonSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSurgeonSchedulesInput = {
@@ -915,6 +951,7 @@ export type UserUncheckedUpdateWithoutSurgeonSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedSchedulesInput = {
@@ -945,6 +982,7 @@ export type UserUpdateWithoutCreatedSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedSchedulesInput = {
@@ -964,6 +1002,7 @@ export type UserUncheckedUpdateWithoutCreatedSchedulesInput = {
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutScheduleStaffInput = {
@@ -983,6 +1022,7 @@ export type UserCreateWithoutScheduleStaffInput = {
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutScheduleStaffInput = {
@@ -1002,6 +1042,7 @@ export type UserUncheckedCreateWithoutScheduleStaffInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutScheduleStaffInput = {
@@ -1037,6 +1078,7 @@ export type UserUpdateWithoutScheduleStaffInput = {
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScheduleStaffInput = {
@@ -1056,6 +1098,7 @@ export type UserUncheckedUpdateWithoutScheduleStaffInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutScheduleNotesInput = {
@@ -1075,6 +1118,7 @@ export type UserCreateWithoutScheduleNotesInput = {
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutScheduleNotesInput = {
@@ -1094,6 +1138,7 @@ export type UserUncheckedCreateWithoutScheduleNotesInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutScheduleNotesInput = {
@@ -1129,6 +1174,7 @@ export type UserUpdateWithoutScheduleNotesInput = {
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScheduleNotesInput = {
@@ -1148,6 +1194,7 @@ export type UserUncheckedUpdateWithoutScheduleNotesInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAlertsInput = {
@@ -1167,6 +1214,7 @@ export type UserCreateWithoutAlertsInput = {
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
   scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAlertsInput = {
@@ -1186,6 +1234,7 @@ export type UserUncheckedCreateWithoutAlertsInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
   scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAlertsInput = {
@@ -1221,6 +1270,7 @@ export type UserUpdateWithoutAlertsInput = {
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
   scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAlertsInput = {
@@ -1240,6 +1290,103 @@ export type UserUncheckedUpdateWithoutAlertsInput = {
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
   scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
   scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAuditLogsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  patient?: Prisma.PatientCreateNestedOneWithoutUserInput
+  createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
+  surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
+  scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
+  scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
+  createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
+  surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
+  scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
+  scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type UserUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type UserUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
+  createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
+  surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
+  scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
+  scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
+  createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
+  surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
+  scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
+  scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1253,6 +1400,7 @@ export type UserCountOutputType = {
   scheduleStaff: number
   scheduleNotes: number
   alerts: number
+  auditLogs: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1261,6 +1409,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   scheduleStaff?: boolean | UserCountOutputTypeCountScheduleStaffArgs
   scheduleNotes?: boolean | UserCountOutputTypeCountScheduleNotesArgs
   alerts?: boolean | UserCountOutputTypeCountAlertsArgs
+  auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
 }
 
 /**
@@ -1308,6 +1457,13 @@ export type UserCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.AlertWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1327,6 +1483,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   scheduleStaff?: boolean | Prisma.User$scheduleStaffArgs<ExtArgs>
   scheduleNotes?: boolean | Prisma.User$scheduleNotesArgs<ExtArgs>
   alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1378,6 +1535,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   scheduleStaff?: boolean | Prisma.User$scheduleStaffArgs<ExtArgs>
   scheduleNotes?: boolean | Prisma.User$scheduleNotesArgs<ExtArgs>
   alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1393,6 +1551,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     scheduleStaff: Prisma.$ScheduleStaffPayload<ExtArgs>[]
     scheduleNotes: Prisma.$ScheduleNotePayload<ExtArgs>[]
     alerts: Prisma.$AlertPayload<ExtArgs>[]
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1806,6 +1965,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   scheduleStaff<T extends Prisma.User$scheduleStaffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduleStaffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduleStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scheduleNotes<T extends Prisma.User$scheduleNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduleNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduleNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alerts<T extends Prisma.User$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2393,6 +2553,30 @@ export type User$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.AlertScalarFieldEnum | Prisma.AlertScalarFieldEnum[]
+}
+
+/**
+ * User.auditLogs
+ */
+export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

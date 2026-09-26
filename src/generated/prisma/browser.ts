@@ -72,3 +72,8 @@ export type ScheduleNote = Prisma.ScheduleNoteModel
  * 
  */
 export type Alert = Prisma.AlertModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
