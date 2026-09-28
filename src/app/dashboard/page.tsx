@@ -1,9 +1,8 @@
 import { redirect } from 'next/navigation';
-
-import { auth } from '@/auth';
+import { requireAuth } from '@/lib/auth/authorization';
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await requireAuth();
 
   if (!session?.user) {
     redirect('/login');
