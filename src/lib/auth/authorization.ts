@@ -32,3 +32,22 @@ export async function requirePermission(permission: Permission){
     }
     return session;
 }
+
+
+export async function getApiSession() {
+  const session = await auth();
+  return session?.user ? session : null;
+}
+
+export async function requireApiRole(roles: UserRole | UserRole[]){
+  const session = await getApiSession();
+  if (!session) {
+    return null;
+  }
+
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+  if (!allowedRoles.includes(session.user.role)) {
+    return null;
+  }
+  return session;
+}
