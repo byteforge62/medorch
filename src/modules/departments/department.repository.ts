@@ -77,3 +77,19 @@ export async function findDepartmentById(id: string){
         }
     })
 }
+
+export async function createDepartment(data: {
+    name: string;
+    description?: string;
+    headDoctorId?: string;
+    isActive?: boolean;
+}) {
+    return prisma.department.create({
+        data:{
+            name: data.name,
+            description: data.description,
+            headDoctorId: data.headDoctorId,
+            isActive: data.isActive ?? true
+        }
+    })
+}

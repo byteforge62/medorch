@@ -7,3 +7,12 @@ export async function getDepartments() {
 export async function getDepartmentById(id: string) {
   return findDepartmentById(id);
 }
+
+export async function createDepartment(data: {
+  name: string;
+  description?: string;
+  headDoctor?: string;
+  isActive?: boolean;
+}){
+  return createDepartment(data);
+}
