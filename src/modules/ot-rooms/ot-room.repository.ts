@@ -80,3 +80,37 @@ export async function createOTRoom(data: {
     },
   });
 }
+
+export async function updateOTRoom(
+  id: string,
+  data: {
+    name?: string;
+    departmentId?: string;
+    capacity?: number | null;
+  },
+) {
+  return prisma.oTRoom.update({
+    where: {
+      id,
+    },
+    data,
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}

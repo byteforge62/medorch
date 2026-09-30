@@ -10,3 +10,9 @@ export const createOTRoomSchema = z.object({
   departmentId: z.string().uuid(),
   capacity: z.number().int().positive().optional()
 });
+
+export const updateOTRoomSchema = z.object({
+  name: z.string().trim().min(1).max(100).optional(),
+  departmentId: z.string().uuid().optional(),
+  capacity: z.number().int().positive().nullable().optional()
+});
