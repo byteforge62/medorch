@@ -1,8 +1,8 @@
 import { authorizeApiRole } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getDepartmentById } from "@/modules/departments/department.service";
-import { departmentIdSchema } from "@/modules/departments/department.validation";
+import { getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
+import { departmentIdSchema, updateDepartmentSchema } from "@/modules/departments/department.validation";
 
 type RouteContext = {
   params: Promise<{
@@ -38,5 +38,49 @@ export async function GET(
   } catch (error) {
     console.error(`[${requestId}] GET /api/departments/[id] error:`,error);
     return apiError("Failed to fetch department.",500,undefined,requestId);
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiRole("ADMIN",requestId);
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = departmentIdSchema.safeParse({ id });
+    if (!idValidation.success) {
+      return apiError("Invalid department ID.",400,idValidation.error.flatten(),requestId);
+    }
+
+    const body = await request.json();
+
+    const validation = updateDepartmentSchema.safeParse(body);
+    if (!validation.success) {
+      return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
+    }
+
+    const existingDepartment = await getDepartmentById(idValidation.data.id);
+    if (!existingDepartment) {
+      return apiError("Department not found.",404,undefined,requestId);
+    }
+
+    const department = await updateExistingDepartment(idValidation.data.id,validation.data);
+
+    return apiSuccess(department, 200);
+  } catch (error) {
+    console.error(`[${requestId}] PATCH /api/departments/[id] error:`,error);
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
+      return apiError("A department with this name already exists.",409,undefined,requestId);
+    }
+
+    return apiError("Failed to update department.",500,undefined,requestId);
   }
 }

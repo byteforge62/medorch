@@ -38,6 +38,9 @@ export async function POST(request: Request){
    return apiSuccess(department,200);
   }catch(error){
    console.error(`[${requestId}] POST /api/departments error:`,error);
+   if(error && typeof error === "object" && "code" in error && error.code === "P2002"){
+    return apiError("A department with this name already exists.",409,undefined,requestId);
+   }
    return apiError("Failed to create department.",500,undefined,requestId);
   }
 }

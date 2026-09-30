@@ -1,4 +1,4 @@
-import {findDepartmentById,findDepartments,createDepartment} from "./department.repository";
+import {findDepartmentById,findDepartments,createDepartment,updateDepartment} from "./department.repository";
 
 export async function getDepartments() {
   return findDepartments();
@@ -15,4 +15,16 @@ export async function createNewDepartment(data: {
   isActive?: boolean;
 }){
   return createDepartment(data);
+}
+
+export async function updateExistingDepartment(
+  id: string,
+  data: {
+    name?: string;
+    description?: string | null;
+    headDoctorId?: string | null;
+    isActive?: boolean;
+  },
+) {
+  return updateDepartment(id, data);
 }

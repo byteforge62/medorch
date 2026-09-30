@@ -93,3 +93,21 @@ export async function createDepartment(data: {
         }
     })
 }
+
+
+export async function updateDepartment(
+  id: string,
+  data: {
+    name?: string;
+    description?: string | null;
+    headDoctorId?: string | null;
+    isActive?: boolean;
+  },
+) {
+  return prisma.department.update({
+    where: {
+      id,
+    },
+    data,
+  });
+}
