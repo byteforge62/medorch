@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import type { OTRoomStatus } from "@/generated/prisma/client";
 
 export async function findOTRooms() {
   return prisma.oTRoom.findMany({
@@ -111,6 +112,56 @@ export async function updateOTRoom(
           name: true,
         },
       },
+    },
+  });
+}
+
+export async function updateOTRoomStatus(
+  id: string,
+  status: OTRoomStatus,
+) {
+  return prisma.oTRoom.update({
+    where: {
+      id,
+    },
+    data: {
+      status,
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function updateOTRoomActive(
+  id: string,
+  isActive: boolean,
+) {
+  return prisma.oTRoom.update({
+    where: {
+      id,
+    },
+    data: {
+      isActive,
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 }

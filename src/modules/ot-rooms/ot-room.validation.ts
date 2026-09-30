@@ -16,3 +16,16 @@ export const updateOTRoomSchema = z.object({
   departmentId: z.string().uuid().optional(),
   capacity: z.number().int().positive().nullable().optional()
 });
+
+export const updateOTRoomStatusSchema = z.object({
+  status: z.enum([
+    "AVAILABLE",
+    "OCCUPIED",
+    "MAINTENANCE",
+    "DISABLED",
+  ]),
+});
+
+export const updateOTRoomActiveSchema = z.object({
+  isActive: z.boolean(),
+});
