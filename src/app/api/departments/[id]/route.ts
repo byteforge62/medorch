@@ -1,7 +1,7 @@
 import { authorizeApiRole } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
+import { deactivateDepartment, getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
 import { departmentIdSchema, updateDepartmentSchema } from "@/modules/departments/department.validation";
 
 type RouteContext = {
@@ -82,5 +82,40 @@ export async function PATCH(
     }
 
     return apiError("Failed to update department.",500,undefined,requestId);
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  {params}: RouteContext,
+){
+  const requestId = getRequestId(request);
+  try{
+   const {session,response} = await authorizeApiRole("ADMIN",requestId);
+   if(!session){
+    return response;
+   }
+
+   const {id} = await params;
+
+   const validation = departmentIdSchema.safeParse({id});
+   if(!validation.success){
+    return apiError("Invalid department ID",400,validation.error.flatten(),requestId)
+   }
+
+   const existingDepartment = await getDepartmentById(validation.data.id);
+   if(!existingDepartment){
+    return apiError("Department not found",404,undefined,requestId)
+   }
+
+   if(!existingDepartment.isActive){
+    return apiError("Department is already inactive",409,undefined,requestId)
+   }
+
+   const department = await deactivateDepartment(validation.data.id);
+   return apiSuccess(department,200)
+  }catch(error){
+  console.error(`[${requestId}] DELETE /api/departments/[id] error:`,error);
+    return apiError("Failed to deactivate department.",500,undefined,requestId);
   }
 }

@@ -28,3 +28,9 @@ export async function updateExistingDepartment(
 ) {
   return updateDepartment(id, data);
 }
+
+export async function deactivateDepartment(id: string){
+  return updateDepartment(id,{
+    isActive: false
+  })
+}
