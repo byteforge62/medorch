@@ -1,0 +1,53 @@
+import { prisma } from "@/lib/db/prisma";
+
+export async function findOTRooms() {
+  return prisma.oTRoom.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findOTRoomById(id: string) {
+  return prisma.oTRoom.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
