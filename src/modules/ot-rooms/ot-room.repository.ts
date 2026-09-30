@@ -51,3 +51,32 @@ export async function findOTRoomById(id: string) {
     },
   });
 }
+
+export async function createOTRoom(data: {
+  name: string;
+  code: string;
+  departmentId: string;
+  capacity?: number;
+}) {
+  return prisma.oTRoom.create({
+    data,
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      departmentId: true,
+      capacity: true,
+      status: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
