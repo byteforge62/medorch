@@ -1,4 +1,4 @@
-import {findDoctorById,findDoctors,createDoctorProfile,findUserForDoctorCreation} from "./doctor.repository";
+import {findDoctorById,findDoctors,createDoctorProfile,findUserForDoctorCreation,updateDoctorProfile} from "./doctor.repository";
 
 export async function getDoctors() {
   return findDoctors();
@@ -29,4 +29,21 @@ export async function createDoctor(data: {
   }
 
   return createDoctorProfile(data);
+}
+
+export async function updateDoctor(
+  id: string,
+  data: {
+    departmentId?: string | null;
+    specialization?: string | null;
+    licenseNumber?: string | null;
+  },
+) {
+  const existingDoctor = await findDoctorById(id);
+
+  if (!existingDoctor) {
+    throw new Error("DOCTOR_NOT_FOUND");
+  }
+
+  return updateDoctorProfile(id, data);
 }

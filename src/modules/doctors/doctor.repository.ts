@@ -127,3 +127,46 @@ export async function findUserForDoctorCreation(userId: string) {
     },
   });
 }
+
+export async function updateDoctorProfile(
+  id: string,
+  data: {
+    departmentId?: string | null;
+    specialization?: string | null;
+    licenseNumber?: string | null;
+  },
+) {
+  return prisma.doctorProfile.update({
+    where: {
+      id,
+    },
+    data,
+    select: {
+      id: true,
+      userId: true,
+      departmentId: true,
+      specialization: true,
+      licenseNumber: true,
+      createdAt: true,
+      updatedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          status: true,
+        },
+      },
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
