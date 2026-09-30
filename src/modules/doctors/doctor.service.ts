@@ -1,4 +1,4 @@
-import {findDoctorById,findDoctors,createDoctorProfile,findUserForDoctorCreation,updateDoctorProfile} from "./doctor.repository";
+import {findDoctorById,findDoctors,createDoctorProfile,findUserForDoctorCreation,updateDoctorProfile,updateDoctorUserStatus} from "./doctor.repository";
 
 export async function getDoctors() {
   return findDoctors();
@@ -46,4 +46,8 @@ export async function updateDoctor(
   }
 
   return updateDoctorProfile(id, data);
+}
+
+export async function updateDoctorStatus(doctorId: string,status: "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED") {
+  return updateDoctorUserStatus(doctorId, status);
 }

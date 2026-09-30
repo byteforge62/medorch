@@ -170,3 +170,42 @@ export async function updateDoctorProfile(
     },
   });
 }
+
+export async function updateDoctorUserStatus(
+  doctorId: string,
+  status: "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED",
+) {
+  const doctor = await prisma.doctorProfile.findUnique({
+    where: {
+      id: doctorId,
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  if (!doctor) {
+    throw new Error("DOCTOR_NOT_FOUND");
+  }
+
+  return prisma.user.update({
+    where: {
+      id: doctor.userId,
+    },
+    data: {
+      status,
+      ...(status === "ACTIVE"
+        ? { approvedAt: new Date() }
+        : {}),
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      updatedAt: true,
+    },
+  });
+}
