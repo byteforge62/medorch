@@ -91,6 +91,10 @@ export async function POST(request: Request) {
           "Selected user is not a doctor.",
         SURGEON_INACTIVE:
           "Selected surgeon is not active.",
+        OT_ROOM_SCHEDULE_CONFLICT:
+          "The selected OT room is already scheduled during this time.",
+        SURGEON_SCHEDULE_CONFLICT:
+          "The selected surgeon is already scheduled during this time.",
       };
 
       const message = messages[error.message];

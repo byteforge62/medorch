@@ -8,6 +8,7 @@ import {
   findPatientById,
   findDepartmentById,
   findSurgeonById,
+  findScheduleConflicts,
 } from "./schedule.repository";
 
 export async function getSchedules() {
@@ -157,5 +158,30 @@ export async function createScheduleWithValidation(data: {
     throw new Error("SURGEON_INACTIVE");
   }
 
+  const conflicts = await findScheduleConflicts({
+  otRoomId: data.otRoomId,
+  surgeonId: data.surgeonId,
+  startTime: data.startTime,
+  endTime: data.endTime,
+});
+
+if (conflicts.length > 0) {
+  const roomConflict = conflicts.some(
+    (conflict) => conflict.otRoomId === data.otRoomId,
+  );
+
+  if (roomConflict) {
+    throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+  }
+
+  const surgeonConflict = conflicts.some(
+    (conflict) => conflict.surgeonId === data.surgeonId,
+  );
+
+  if (surgeonConflict) {
+    throw new Error("SURGEON_SCHEDULE_CONFLICT");
+  }
+}
+   
   return createScheduleRecord(data);
 }

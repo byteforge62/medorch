@@ -336,3 +336,49 @@ export async function findSurgeonById(id: string) {
     },
   });
 }
+
+export async function findScheduleConflicts(data: {
+  otRoomId: string;
+  surgeonId: string;
+  startTime: Date;
+  endTime: Date;
+  excludeScheduleId?: string;
+}) {
+  return prisma.schedule.findMany({
+    where: {
+      id: data.excludeScheduleId
+        ? { not: data.excludeScheduleId }
+        : undefined,
+
+      status: {
+        notIn: ["CANCELLED", "COMPLETED"],
+      },
+
+      startTime: {
+        lt: data.endTime,
+      },
+
+      endTime: {
+        gt: data.startTime,
+      },
+
+      OR: [
+        {
+          otRoomId: data.otRoomId,
+        },
+        {
+          surgeonId: data.surgeonId,
+        },
+      ],
+    },
+
+    select: {
+      id: true,
+      otRoomId: true,
+      surgeonId: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+    },
+  });
+}
