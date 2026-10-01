@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const doctor = await createDoctor(validation.data);
+    const doctor = await createDoctor(validation.data,session.user.id);
 
     return apiSuccess(doctor, 200);
   } catch (error) {
