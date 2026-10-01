@@ -9,6 +9,10 @@ import {
   findDepartmentById,
   findSurgeonById,
   findScheduleConflicts,
+  createScheduleStaff,
+  deleteScheduleStaff,
+  findScheduleStaff,
+  findUserForStaffAssignment
 } from "./schedule.repository";
 
 export async function getSchedules() {
@@ -347,4 +351,59 @@ export async function updateScheduleWithValidation(
   }
 
   return updateScheduleRecord(id, data);
+}
+
+export async function getScheduleStaff(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleStaff(scheduleId);
+}
+
+export async function assignScheduleStaffById(
+  scheduleId: string,
+  data: {
+    userId: string;
+    role:
+      | "SURGEON"
+      | "NURSE"
+      | "ANESTHETIST"
+      | "TECHNICIAN"
+      | "OTHER";
+  },
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const user = await findUserForStaffAssignment(
+    data.userId,
+  );
+
+  if (!user) {
+    throw new Error("STAFF_USER_NOT_FOUND");
+  }
+
+  if (user.status !== "ACTIVE") {
+    throw new Error("STAFF_USER_INACTIVE");
+  }
+
+  return createScheduleStaff({
+    scheduleId,
+    userId: data.userId,
+    role: data.role,
+  });
+}
+
+export async function removeScheduleStaffById(
+  scheduleStaffId: string,
+) {
+  return deleteScheduleStaff(scheduleStaffId);
 }

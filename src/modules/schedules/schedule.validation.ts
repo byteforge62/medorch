@@ -110,3 +110,19 @@ export const updateScheduleStatusSchema = z.object({
     "DELAYED",
   ]),
 });
+
+export const assignScheduleStaffSchema = z.object({
+  userId: z.string().uuid(),
+
+  role: z.enum([
+    "SURGEON",
+    "NURSE",
+    "ANESTHETIST",
+    "TECHNICIAN",
+    "OTHER",
+  ]),
+});
+
+export const scheduleStaffIdSchema = z.object({
+  id: z.string().uuid(),
+});

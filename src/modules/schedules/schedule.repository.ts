@@ -382,3 +382,92 @@ export async function findScheduleConflicts(data: {
     },
   });
 }
+
+export async function findScheduleStaff(
+  scheduleId: string,
+) {
+  return prisma.scheduleStaff.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      userId: true,
+      role: true,
+      assignedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findUserForStaffAssignment(
+  userId: string,
+) {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+    },
+  });
+}
+
+export async function createScheduleStaff(
+  data: {
+    scheduleId: string;
+    userId: string;
+    role:
+      | "SURGEON"
+      | "NURSE"
+      | "ANESTHETIST"
+      | "TECHNICIAN"
+      | "OTHER";
+  },
+) {
+  return prisma.scheduleStaff.create({
+    data,
+    select: {
+      id: true,
+      scheduleId: true,
+      userId: true,
+      role: true,
+      assignedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function deleteScheduleStaff(
+  id: string,
+) {
+  return prisma.scheduleStaff.delete({
+    where: {
+      id,
+    },
+  });
+}
