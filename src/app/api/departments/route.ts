@@ -34,7 +34,7 @@ export async function POST(request: Request){
      return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
    }
 
-   const department = await createNewDepartment(validation.data);
+   const department = await createNewDepartment(validation.data,session.user.id);
    return apiSuccess(department,200);
   }catch(error){
    console.error(`[${requestId}] POST /api/departments error:`,error);

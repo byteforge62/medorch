@@ -72,7 +72,7 @@ export async function PATCH(
       return apiError("Department not found.",404,undefined,requestId);
     }
 
-    const department = await updateExistingDepartment(idValidation.data.id,validation.data);
+    const department = await updateExistingDepartment(idValidation.data.id,validation.data,session.user.id);
 
     return apiSuccess(department, 200);
   } catch (error) {
@@ -103,7 +103,7 @@ export async function DELETE(
     return apiError("Invalid department ID",400,validation.error.flatten(),requestId)
    }
 
-   const existingDepartment = await getDepartmentById(validation.data.id);
+   const existingDepartment = await getDepartmentById(validation.data.id,session.user.id);
    if(!existingDepartment){
     return apiError("Department not found",404,undefined,requestId)
    }
