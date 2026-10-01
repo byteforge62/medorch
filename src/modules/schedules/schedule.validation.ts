@@ -130,3 +130,15 @@ export const scheduleStaffIdSchema = z.object({
 export const assignScheduleEquipmentSchema = z.object({
   equipmentId: z.string().uuid(),
 });
+
+export const createScheduleNoteSchema = z.object({
+  content: z.string().trim().min(1).max(5000),
+});
+
+export const updateScheduleNoteSchema = z.object({
+  content: z.string().trim().min(1).max(5000),
+});
+
+export const scheduleNoteIdSchema = z.object({
+  id: z.string().uuid(),
+});

@@ -17,6 +17,11 @@ import {
   findEquipmentForAssignment,
   findScheduleEquipment,
   releaseScheduleEquipment,
+  createScheduleNote,
+  deleteScheduleNote,
+  findScheduleNoteById,
+  findScheduleNotes,
+  updateScheduleNote,
 } from "./schedule.repository";
 
 export async function getSchedules() {
@@ -458,4 +463,69 @@ export async function releaseScheduleEquipmentById(
   return releaseScheduleEquipment(
     equipmentAssignmentId,
   );
+}
+
+export async function getScheduleNotes(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleNotes(scheduleId);
+}
+
+export async function createScheduleNoteById(
+  scheduleId: string,
+  authorId: string,
+  content: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return createScheduleNote({
+    scheduleId,
+    authorId,
+    content,
+  });
+}
+
+export async function updateScheduleNoteById(
+  noteId: string,
+  authorId: string,
+  content: string,
+) {
+  const note = await findScheduleNoteById(noteId);
+
+  if (!note) {
+    throw new Error("SCHEDULE_NOTE_NOT_FOUND");
+  }
+
+  if (note.authorId !== authorId) {
+    throw new Error("SCHEDULE_NOTE_FORBIDDEN");
+  }
+
+  return updateScheduleNote(noteId, content);
+}
+
+export async function deleteScheduleNoteById(
+  noteId: string,
+  authorId: string,
+) {
+  const note = await findScheduleNoteById(noteId);
+
+  if (!note) {
+    throw new Error("SCHEDULE_NOTE_NOT_FOUND");
+  }
+
+  if (note.authorId !== authorId) {
+    throw new Error("SCHEDULE_NOTE_FORBIDDEN");
+  }
+
+  return deleteScheduleNote(noteId);
 }

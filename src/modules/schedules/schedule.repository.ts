@@ -565,3 +565,106 @@ export async function releaseScheduleEquipment(
     },
   });
 }
+
+export async function findScheduleNotes(
+  scheduleId: string,
+) {
+  return prisma.scheduleNote.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function createScheduleNote(
+  data: {
+    scheduleId: string;
+    authorId: string;
+    content: string;
+  },
+) {
+  return prisma.scheduleNote.create({
+    data,
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updateScheduleNote(
+  id: string,
+  content: string,
+) {
+  return prisma.scheduleNote.update({
+    where: {
+      id,
+    },
+    data: {
+      content,
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function findScheduleNoteById(id: string) {
+  return prisma.scheduleNote.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function deleteScheduleNote(id: string) {
+  return prisma.scheduleNote.delete({
+    where: {
+      id,
+    },
+  });
+}
