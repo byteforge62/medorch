@@ -296,3 +296,43 @@ export async function updateScheduleStatus(
     },
   });
 }
+
+export async function findPatientById(id: string) {
+  return prisma.patient.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+}
+
+export async function findDepartmentById(id: string) {
+  return prisma.department.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      isActive: true,
+    },
+  });
+}
+
+export async function findOTRoomForSchedule(id: string) {
+  return prisma.oTRoom.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      departmentId: true,
+      status: true,
+      isActive: true,
+    },
+  });
+}
+
+export async function findSurgeonById(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+    },
+  });
+}

@@ -4,6 +4,10 @@ import {
   findSchedules,
   updateSchedule as updateScheduleRecord,
   updateScheduleStatus as updateScheduleStatusRecord,
+  findOTRoomForSchedule,
+  findPatientById,
+  findDepartmentById,
+  findSurgeonById,
 } from "./schedule.repository";
 
 export async function getSchedules() {
@@ -77,4 +81,81 @@ export async function updateScheduleStatusById(
   }
 
   return updateScheduleStatusRecord(id, status);
+}
+
+export async function createScheduleWithValidation(data: {
+  patientId: string;
+  departmentId: string;
+  otRoomId: string;
+  surgeonId: string;
+  createdById: string;
+  procedure: string;
+  scheduledDate: Date;
+  startTime: Date;
+  endTime: Date;
+  priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+  clinicalNotes?: string;
+}) {
+  const patient = await findPatientById(data.patientId);
+
+  if (!patient) {
+    throw new Error("PATIENT_NOT_FOUND");
+  }
+
+  const department = await findDepartmentById(
+    data.departmentId,
+  );
+
+  if (!department) {
+    throw new Error("DEPARTMENT_NOT_FOUND");
+  }
+
+  if (!department.isActive) {
+    throw new Error("DEPARTMENT_INACTIVE");
+  }
+
+  const otRoom = await findOTRoomForSchedule(
+    data.otRoomId,
+  );
+
+  if (!otRoom) {
+    throw new Error("OT_ROOM_NOT_FOUND");
+  }
+
+  if (!otRoom.isActive) {
+    throw new Error("OT_ROOM_INACTIVE");
+  }
+
+  if (otRoom.departmentId !== data.departmentId) {
+    throw new Error("OT_ROOM_DEPARTMENT_MISMATCH");
+  }
+
+  if (otRoom.status === "MAINTENANCE") {
+    throw new Error("OT_ROOM_MAINTENANCE");
+  }
+
+  if (otRoom.status === "DISABLED") {
+    throw new Error("OT_ROOM_DISABLED");
+  }
+
+  const surgeon = await findSurgeonById(
+    data.surgeonId,
+  );
+
+  if (!surgeon) {
+    throw new Error("SURGEON_NOT_FOUND");
+  }
+
+  if (surgeon.role !== "DOCTOR") {
+    throw new Error("INVALID_SURGEON");
+  }
+
+  if (surgeon.status !== "ACTIVE") {
+    throw new Error("SURGEON_INACTIVE");
+  }
+
+  return createScheduleRecord(data);
 }
