@@ -471,3 +471,97 @@ export async function deleteScheduleStaff(
     },
   });
 }
+
+export async function findScheduleEquipment(
+  scheduleId: string,
+) {
+  return prisma.scheduleEquipment.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      equipmentId: true,
+      assignedAt: true,
+      releasedAt: true,
+
+      equipment: {
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          serialNumber: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findEquipmentForAssignment(
+  equipmentId: string,
+) {
+  return prisma.equipment.findUnique({
+    where: {
+      id: equipmentId,
+    },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      departmentId: true,
+    },
+  });
+}
+
+export async function createScheduleEquipment(
+  data: {
+    scheduleId: string;
+    equipmentId: string;
+  },
+) {
+  return prisma.scheduleEquipment.create({
+    data,
+    select: {
+      id: true,
+      scheduleId: true,
+      equipmentId: true,
+      assignedAt: true,
+      releasedAt: true,
+
+      equipment: {
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          serialNumber: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function releaseScheduleEquipment(
+  id: string,
+) {
+  return prisma.scheduleEquipment.update({
+    where: {
+      id,
+    },
+    data: {
+      releasedAt: new Date(),
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      equipmentId: true,
+      assignedAt: true,
+      releasedAt: true,
+    },
+  });
+}

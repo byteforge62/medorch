@@ -12,7 +12,11 @@ import {
   createScheduleStaff,
   deleteScheduleStaff,
   findScheduleStaff,
-  findUserForStaffAssignment
+  findUserForStaffAssignment,
+  createScheduleEquipment,
+  findEquipmentForAssignment,
+  findScheduleEquipment,
+  releaseScheduleEquipment,
 } from "./schedule.repository";
 
 export async function getSchedules() {
@@ -34,9 +38,9 @@ export async function createSchedule(data: {
   startTime: Date;
   endTime: Date;
   priority?:
-    | "ELECTIVE"
-    | "URGENT"
-    | "EMERGENCY";
+  | "ELECTIVE"
+  | "URGENT"
+  | "EMERGENCY";
   clinicalNotes?: string;
 }) {
   return createScheduleRecord(data);
@@ -54,9 +58,9 @@ export async function updateScheduleById(
     startTime?: Date;
     endTime?: Date;
     priority?:
-      | "ELECTIVE"
-      | "URGENT"
-      | "EMERGENCY";
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
     clinicalNotes?: string | null;
   },
 ) {
@@ -136,9 +140,9 @@ export async function createScheduleWithValidation(data: {
   startTime: Date;
   endTime: Date;
   priority?:
-    | "ELECTIVE"
-    | "URGENT"
-    | "EMERGENCY";
+  | "ELECTIVE"
+  | "URGENT"
+  | "EMERGENCY";
   clinicalNotes?: string;
 }) {
   const patient = await findPatientById(data.patientId);
@@ -200,30 +204,30 @@ export async function createScheduleWithValidation(data: {
   }
 
   const conflicts = await findScheduleConflicts({
-  otRoomId: data.otRoomId,
-  surgeonId: data.surgeonId,
-  startTime: data.startTime,
-  endTime: data.endTime,
-});
+    otRoomId: data.otRoomId,
+    surgeonId: data.surgeonId,
+    startTime: data.startTime,
+    endTime: data.endTime,
+  });
 
-if (conflicts.length > 0) {
-  const roomConflict = conflicts.some(
-    (conflict) => conflict.otRoomId === data.otRoomId,
-  );
+  if (conflicts.length > 0) {
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === data.otRoomId,
+    );
 
-  if (roomConflict) {
-    throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === data.surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
   }
 
-  const surgeonConflict = conflicts.some(
-    (conflict) => conflict.surgeonId === data.surgeonId,
-  );
-
-  if (surgeonConflict) {
-    throw new Error("SURGEON_SCHEDULE_CONFLICT");
-  }
-}
-   
   return createScheduleRecord(data);
 }
 
@@ -239,9 +243,9 @@ export async function updateScheduleWithValidation(
     startTime?: Date;
     endTime?: Date;
     priority?:
-      | "ELECTIVE"
-      | "URGENT"
-      | "EMERGENCY";
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
     clinicalNotes?: string | null;
   },
 ) {
@@ -370,11 +374,11 @@ export async function assignScheduleStaffById(
   data: {
     userId: string;
     role:
-      | "SURGEON"
-      | "NURSE"
-      | "ANESTHETIST"
-      | "TECHNICIAN"
-      | "OTHER";
+    | "SURGEON"
+    | "NURSE"
+    | "ANESTHETIST"
+    | "TECHNICIAN"
+    | "OTHER";
   },
 ) {
   const schedule = await findScheduleById(scheduleId);
@@ -406,4 +410,52 @@ export async function removeScheduleStaffById(
   scheduleStaffId: string,
 ) {
   return deleteScheduleStaff(scheduleStaffId);
+}
+
+export async function getScheduleEquipment(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleEquipment(scheduleId);
+}
+
+export async function assignScheduleEquipmentById(
+  scheduleId: string,
+  equipmentId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const equipment = await findEquipmentForAssignment(
+    equipmentId,
+  );
+
+  if (!equipment) {
+    throw new Error("EQUIPMENT_NOT_FOUND");
+  }
+
+  if (equipment.status !== "AVAILABLE") {
+    throw new Error("EQUIPMENT_UNAVAILABLE");
+  }
+
+  return createScheduleEquipment({
+    scheduleId,
+    equipmentId,
+  });
+}
+
+export async function releaseScheduleEquipmentById(
+  equipmentAssignmentId: string,
+) {
+  return releaseScheduleEquipment(
+    equipmentAssignmentId,
+  );
 }
