@@ -81,6 +81,43 @@ export async function updateScheduleStatusById(
     throw new Error("SCHEDULE_NOT_FOUND");
   }
 
+  const currentStatus = existingSchedule.status;
+
+  const allowedTransitions: Record<
+    typeof currentStatus,
+    string[]
+  > = {
+    SCHEDULED: [
+      "CONFIRMED",
+      "CANCELLED",
+    ],
+
+    CONFIRMED: [
+      "IN_PROGRESS",
+      "DELAYED",
+      "CANCELLED",
+    ],
+
+    IN_PROGRESS: [
+      "COMPLETED",
+      "DELAYED",
+    ],
+
+    DELAYED: [
+      "CONFIRMED",
+      "IN_PROGRESS",
+      "CANCELLED",
+    ],
+
+    COMPLETED: [],
+
+    CANCELLED: [],
+  };
+
+  if (!allowedTransitions[currentStatus].includes(status)) {
+    throw new Error("INVALID_STATUS_TRANSITION");
+  }
+
   return updateScheduleStatusRecord(id, status);
 }
 
