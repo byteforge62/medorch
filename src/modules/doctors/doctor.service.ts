@@ -1,4 +1,13 @@
-import {findDoctorById,findDoctors,createDoctorProfile,findUserForDoctorCreation,updateDoctorProfile,updateDoctorUserStatus} from "./doctor.repository";
+import {
+  findDoctorById,
+  findDoctors,
+  createDoctorProfile,
+  findUserForDoctorCreation,
+  updateDoctorProfile,
+  updateDoctorUserStatus,
+} from "./doctor.repository";
+
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getDoctors() {
   return findDoctors();
@@ -8,12 +17,15 @@ export async function getDoctorById(id: string) {
   return findDoctorById(id);
 }
 
-export async function createDoctor(data: {
-  userId: string;
-  departmentId?: string;
-  specialization?: string;
-  licenseNumber?: string;
-}) {
+export async function createDoctor(
+  data: {
+    userId: string;
+    departmentId?: string;
+    specialization?: string;
+    licenseNumber?: string;
+  },
+  actorUserId?: string,
+) {
   const user = await findUserForDoctorCreation(data.userId);
 
   if (!user) {
@@ -28,7 +40,17 @@ export async function createDoctor(data: {
     throw new Error("DOCTOR_PROFILE_EXISTS");
   }
 
-  return createDoctorProfile(data);
+  const doctor = await createDoctorProfile(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "DoctorProfile",
+    entityId: doctor.id,
+    description: `Doctor profile was created for user ${data.userId}.`,
+  });
+
+  return doctor;
 }
 
 export async function updateDoctor(
@@ -38,6 +60,7 @@ export async function updateDoctor(
     specialization?: string | null;
     licenseNumber?: string | null;
   },
+  actorUserId?: string,
 ) {
   const existingDoctor = await findDoctorById(id);
 
@@ -45,9 +68,36 @@ export async function updateDoctor(
     throw new Error("DOCTOR_NOT_FOUND");
   }
 
-  return updateDoctorProfile(id, data);
+  const doctor = await updateDoctorProfile(id, data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "DoctorProfile",
+    entityId: doctor.id,
+    description: `Doctor profile was updated.`,
+  });
+
+  return doctor;
 }
 
-export async function updateDoctorStatus(doctorId: string,status: "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED") {
-  return updateDoctorUserStatus(doctorId, status);
+export async function updateDoctorStatus(
+  doctorId: string,
+  status: "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED",
+  actorUserId?: string,
+) {
+  const doctor = await updateDoctorUserStatus(doctorId, status);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "DoctorProfile",
+    entityId: doctorId,
+    description: `Doctor status was changed to ${status}.`,
+    metadata: {
+      status,
+    },
+  });
+
+  return doctor;
 }

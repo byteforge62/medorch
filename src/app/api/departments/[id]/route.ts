@@ -103,7 +103,7 @@ export async function DELETE(
     return apiError("Invalid department ID",400,validation.error.flatten(),requestId)
    }
 
-   const existingDepartment = await getDepartmentById(validation.data.id,session.user.id);
+   const existingDepartment = await getDepartmentById(validation.data.id);
    if(!existingDepartment){
     return apiError("Department not found",404,undefined,requestId)
    }
@@ -112,7 +112,7 @@ export async function DELETE(
     return apiError("Department is already inactive",409,undefined,requestId)
    }
 
-   const department = await deactivateDepartment(validation.data.id);
+   const department = await deactivateDepartment(validation.data.id,session.user.id);
    return apiSuccess(department,200)
   }catch(error){
   console.error(`[${requestId}] DELETE /api/departments/[id] error:`,error);
