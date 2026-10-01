@@ -1,4 +1,11 @@
-import {findDepartmentById,findDepartments,createDepartment,updateDepartment} from "./department.repository";
+import {
+  findDepartmentById,
+  findDepartments,
+  createDepartment,
+  updateDepartment,
+} from "./department.repository";
+
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getDepartments() {
   return findDepartments();
@@ -8,13 +15,26 @@ export async function getDepartmentById(id: string) {
   return findDepartmentById(id);
 }
 
-export async function createNewDepartment(data: {
-  name: string;
-  description?: string;
-  headDoctor?: string;
-  isActive?: boolean;
-}){
-  return createDepartment(data);
+export async function createNewDepartment(
+  data: {
+    name: string;
+    description?: string;
+    headDoctor?: string;
+    isActive?: boolean;
+  },
+  userId?: string,
+) {
+  const department = await createDepartment(data);
+
+  await recordAudit({
+    userId,
+    action: "CREATE",
+    entity: "Department",
+    entityId: department.id,
+    description: `Department "${department.name}" was created.`,
+  });
+
+  return department;
 }
 
 export async function updateExistingDepartment(
@@ -25,12 +45,36 @@ export async function updateExistingDepartment(
     headDoctorId?: string | null;
     isActive?: boolean;
   },
+  userId?: string,
 ) {
-  return updateDepartment(id, data);
+  const department = await updateDepartment(id, data);
+
+  await recordAudit({
+    userId,
+    action: "UPDATE",
+    entity: "Department",
+    entityId: department.id,
+    description: `Department "${department.name}" was updated.`,
+  });
+
+  return department;
 }
 
-export async function deactivateDepartment(id: string){
-  return updateDepartment(id,{
-    isActive: false
-  })
+export async function deactivateDepartment(
+  id: string,
+  userId?: string,
+) {
+  const department = await updateDepartment(id, {
+    isActive: false,
+  });
+
+  await recordAudit({
+    userId,
+    action: "UPDATE",
+    entity: "Department",
+    entityId: department.id,
+    description: `Department "${department.name}" was deactivated.`,
+  });
+
+  return department;
 }
