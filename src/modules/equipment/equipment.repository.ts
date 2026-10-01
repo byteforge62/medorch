@@ -51,3 +51,33 @@ export async function findEquipmentById(id: string) {
     },
   });
 }
+
+export async function createEquipment(data: {
+  name: string;
+  category: string;
+  serialNumber?: string;
+  departmentId?: string;
+  maintenanceDueAt?: Date;
+}) {
+  return prisma.equipment.create({
+    data,
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      serialNumber: true,
+      status: true,
+      departmentId: true,
+      maintenanceDueAt: true,
+      createdAt: true,
+      updatedAt: true,
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
