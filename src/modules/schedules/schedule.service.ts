@@ -185,3 +185,129 @@ if (conflicts.length > 0) {
    
   return createScheduleRecord(data);
 }
+
+export async function updateScheduleWithValidation(
+  id: string,
+  data: {
+    patientId?: string;
+    departmentId?: string;
+    otRoomId?: string;
+    surgeonId?: string;
+    procedure?: string;
+    scheduledDate?: Date;
+    startTime?: Date;
+    endTime?: Date;
+    priority?:
+      | "ELECTIVE"
+      | "URGENT"
+      | "EMERGENCY";
+    clinicalNotes?: string | null;
+  },
+) {
+  const existingSchedule = await findScheduleById(id);
+
+  if (!existingSchedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const patientId =
+    data.patientId ?? existingSchedule.patientId;
+
+  const departmentId =
+    data.departmentId ?? existingSchedule.departmentId;
+
+  const otRoomId =
+    data.otRoomId ?? existingSchedule.otRoomId;
+
+  const surgeonId =
+    data.surgeonId ?? existingSchedule.surgeonId;
+
+  const startTime =
+    data.startTime ?? existingSchedule.startTime;
+
+  const endTime =
+    data.endTime ?? existingSchedule.endTime;
+
+  const patient = await findPatientById(patientId);
+
+  if (!patient) {
+    throw new Error("PATIENT_NOT_FOUND");
+  }
+
+  const department = await findDepartmentById(departmentId);
+
+  if (!department) {
+    throw new Error("DEPARTMENT_NOT_FOUND");
+  }
+
+  if (!department.isActive) {
+    throw new Error("DEPARTMENT_INACTIVE");
+  }
+
+  const otRoom = await findOTRoomForSchedule(otRoomId);
+
+  if (!otRoom) {
+    throw new Error("OT_ROOM_NOT_FOUND");
+  }
+
+  if (!otRoom.isActive) {
+    throw new Error("OT_ROOM_INACTIVE");
+  }
+
+  if (otRoom.departmentId !== departmentId) {
+    throw new Error("OT_ROOM_DEPARTMENT_MISMATCH");
+  }
+
+  if (
+    otRoom.status === "MAINTENANCE" ||
+    otRoom.status === "DISABLED"
+  ) {
+    throw new Error("OT_ROOM_UNAVAILABLE");
+  }
+
+  const surgeon = await findSurgeonById(surgeonId);
+
+  if (!surgeon) {
+    throw new Error("SURGEON_NOT_FOUND");
+  }
+
+  if (surgeon.role !== "DOCTOR") {
+    throw new Error("INVALID_SURGEON");
+  }
+
+  if (surgeon.status !== "ACTIVE") {
+    throw new Error("SURGEON_INACTIVE");
+  }
+
+  if (endTime <= startTime) {
+    throw new Error("INVALID_TIME_RANGE");
+  }
+
+  const conflicts = await findScheduleConflicts({
+    otRoomId,
+    surgeonId,
+    startTime,
+    endTime,
+    excludeScheduleId: id,
+  });
+
+  if (conflicts.length > 0) {
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === otRoomId,
+    );
+
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
+  }
+
+  return updateScheduleRecord(id, data);
+}
