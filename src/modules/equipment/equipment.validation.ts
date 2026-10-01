@@ -25,3 +25,38 @@ export const createEquipmentSchema = z.object({
     .date()
     .optional(),
 });
+
+
+export const updateEquipmentSchema = z.object({
+  name: z.string().trim().min(1).max(150).optional(),
+
+  category: z.string().trim().min(1).max(100).optional(),
+
+  serialNumber: z
+    .string()
+    .trim()
+    .max(100)
+    .nullable()
+    .optional(),
+
+  departmentId: z
+    .string()
+    .uuid()
+    .nullable()
+    .optional(),
+
+  maintenanceDueAt: z
+    .coerce
+    .date()
+    .nullable()
+    .optional(),
+});
+
+export const updateEquipmentStatusSchema = z.object({
+  status: z.enum([
+    "AVAILABLE",
+    "IN_USE",
+    "MAINTENANCE",
+    "RETIRED",
+  ]),
+});
