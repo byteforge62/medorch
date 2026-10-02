@@ -112,6 +112,7 @@ export async function PATCH(
     const patient = await updatePatientById(
       idValidation.data.id,
       validation.data,
+      session.user.id
     );
 
     return apiSuccess(patient, 200);

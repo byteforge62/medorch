@@ -1,4 +1,5 @@
-import {findPatientById,findPatients,createPatientRecord,updatePatient} from "./patient.repository";
+import { findPatientById, findPatients, createPatientRecord, updatePatient } from "./patient.repository";
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getPatients() {
   return findPatients();
@@ -17,8 +18,23 @@ export async function createPatient(data: {
   dateOfBirth?: Date;
   gender?: string;
   medicalHistory?: string;
-}) {
-  return createPatientRecord(data);
+},
+  actorUserId: string
+) {
+  const patient = await createPatientRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Patient",
+    entityId: patient.id,
+    description: "Patient record created.",
+    metadata: {
+      patientCode: patient.patientCode
+    }
+  });
+
+  return patient;
 }
 
 export async function updatePatientById(
@@ -31,6 +47,7 @@ export async function updatePatientById(
     gender?: string | null;
     medicalHistory?: string | null;
   },
+  actorUserId: string
 ) {
   const existingPatient = await findPatientById(id);
 
@@ -38,5 +55,18 @@ export async function updatePatientById(
     throw new Error("PATIENT_NOT_FOUND");
   }
 
-  return updatePatient(id, data);
+  const patient = await updatePatient(id, data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "Patient",
+    entityId: patient.id,
+    description: `Patient "${patient.name}" was updated.`,
+    metadata: {
+      patientId: patient.id,
+    },
+  });
+
+  return patient;
 }

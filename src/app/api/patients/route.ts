@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const patient = await createPatient(validation.data);
+    const patient = await createPatient(validation.data,session.user.id);
 
     return apiSuccess(patient, 200);
   } catch (error) {

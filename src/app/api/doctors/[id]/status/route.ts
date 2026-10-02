@@ -44,6 +44,7 @@ export async function PATCH(
     const result = await updateDoctorStatus(
       id,
       validation.data.status,
+      session.user.id
     );
 
     return apiSuccess(result, 200);
