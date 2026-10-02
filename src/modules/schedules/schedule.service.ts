@@ -562,11 +562,25 @@ export async function createScheduleNoteById(
     throw new Error("SCHEDULE_NOT_FOUND");
   }
 
-  return createScheduleNote({
+  const note = await createScheduleNote({
     scheduleId,
     authorId,
     content,
   });
+
+  await recordAudit({
+    userId: authorId,
+    action: "CREATE",
+    entity: "ScheduleNote",
+    entityId: note.id,
+    description: `Note was added to schedule ${scheduleId}.`,
+    metadata: {
+      scheduleId,
+      authorId,
+    },
+  });
+
+  return note;
 }
 
 export async function updateScheduleNoteById(
@@ -584,7 +598,20 @@ export async function updateScheduleNoteById(
     throw new Error("SCHEDULE_NOTE_FORBIDDEN");
   }
 
-  return updateScheduleNote(noteId, content);
+  await updateScheduleNote(noteId, content);
+
+  await recordAudit({
+  userId: authorId,
+  action: "UPDATE",
+  entity: "ScheduleNote",
+  entityId: note.id,
+  description: "Schedule note was updated.",
+  metadata: {
+    scheduleId: note.scheduleId,
+  },
+});
+
+return note;
 }
 
 export async function deleteScheduleNoteById(
@@ -601,5 +628,18 @@ export async function deleteScheduleNoteById(
     throw new Error("SCHEDULE_NOTE_FORBIDDEN");
   }
 
-  return deleteScheduleNote(noteId);
+  await deleteScheduleNote(noteId);
+
+  await recordAudit({
+  userId: authorId,
+  action: "DELETE",
+  entity: "ScheduleNote",
+  entityId: note.id,
+  description: "Schedule note was deleted.",
+  metadata: {
+    scheduleId: note.scheduleId,
+  },
+});
+
+return note;
 }
