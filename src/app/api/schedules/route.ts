@@ -64,7 +64,9 @@ export async function POST(request: Request) {
     const schedule = await createScheduleWithValidation({
       ...validation.data,
       createdById: session.user.id,
-    });
+    },
+  session.user.id
+  );
 
     return apiSuccess(schedule, 200);
   } catch (error) {

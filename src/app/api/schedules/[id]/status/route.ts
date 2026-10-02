@@ -61,6 +61,7 @@ export async function PATCH(
     const schedule = await updateScheduleStatusById(
       idValidation.data.id,
       validation.data.status,
+      session.user.id
     );
 
     return apiSuccess(schedule, 200);

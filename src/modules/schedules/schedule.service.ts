@@ -23,6 +23,7 @@ import {
   findScheduleNotes,
   updateScheduleNote,
 } from "./schedule.repository";
+import {recordAudit} from "@/modules/audit/audit.service";
 
 export async function getSchedules() {
   return findSchedules();
@@ -87,6 +88,7 @@ export async function updateScheduleStatusById(
     | "COMPLETED"
     | "CANCELLED"
     | "DELAYED",
+    actorUserId?: string
 ) {
   const existingSchedule = await findScheduleById(id);
 
@@ -131,10 +133,31 @@ export async function updateScheduleStatusById(
     throw new Error("INVALID_STATUS_TRANSITION");
   }
 
-  return updateScheduleStatusRecord(id, status);
+const schedule = await updateScheduleStatusRecord(id, status);
+
+const auditAction =
+  status === "COMPLETED"
+    ? "COMPLETE"
+    : status === "CANCELLED"
+      ? "CANCEL"
+      : "UPDATE";
+
+await recordAudit({
+  userId: actorUserId,
+  action: auditAction,
+  entity: "Schedule",
+  entityId: schedule.id,
+  description: `Schedule status changed to ${status}.`,
+  metadata: {
+    status,
+  },
+});
+
+return schedule;  
 }
 
-export async function createScheduleWithValidation(data: {
+export async function createScheduleWithValidation(
+  data: {
   patientId: string;
   departmentId: string;
   otRoomId: string;
@@ -149,7 +172,9 @@ export async function createScheduleWithValidation(data: {
   | "URGENT"
   | "EMERGENCY";
   clinicalNotes?: string;
-}) {
+},
+actorUserId?: string
+) {
   const patient = await findPatientById(data.patientId);
 
   if (!patient) {
@@ -233,7 +258,24 @@ export async function createScheduleWithValidation(data: {
     }
   }
 
-  return createScheduleRecord(data);
+  const schedule = await createScheduleRecord(data);
+
+await recordAudit({
+  userId: actorUserId,
+  action: "CREATE",
+  entity: "Schedule",
+  entityId: schedule.id,
+  description: `Schedule for procedure "${schedule.procedure}" was created.`,
+  metadata: {
+    patientId: schedule.patientId,
+    departmentId: schedule.departmentId,
+    otRoomId: schedule.otRoomId,
+    surgeonId: schedule.surgeonId,
+    priority: schedule.priority,
+  },
+});
+
+return schedule;
 }
 
 export async function updateScheduleWithValidation(
