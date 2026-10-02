@@ -58,6 +58,7 @@ export async function PATCH(
     const equipment = await updateEquipmentStatusById(
       idValidation.data.id,
       validation.data.status,
+      session.user.id
     );
 
     return apiSuccess(equipment, 200);

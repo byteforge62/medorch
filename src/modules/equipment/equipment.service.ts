@@ -6,6 +6,7 @@ import {
   updateEquipment as updateEquipmentRecord,
 } from "./equipment.repository";
 import type {EquipmentStatus} from "@/generated/prisma/client";
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getEquipment() {
   return findEquipment();
@@ -34,6 +35,7 @@ export async function updateEquipmentById(
     departmentId?: string | null;
     maintenanceDueAt?: Date | null;
   },
+  actorUserId: string
 ) {
   const existingEquipment = await findEquipmentById(id);
 
@@ -41,12 +43,26 @@ export async function updateEquipmentById(
     throw new Error("EQUIPMENT_NOT_FOUND");
   }
 
-  return updateEquipmentRecord(id, data);
+const equipment = await updateEquipmentRecord(id, data);
+
+await recordAudit({
+  userId: actorUserId,
+  action: "UPDATE",
+  entity: "Equipment",
+  entityId: equipment.id,
+  description: "Equipment was updated.",
+  metadata: {
+    equipmentId: equipment.id,
+  },
+});
+
+return equipment;
 }
 
 export async function updateEquipmentStatusById(
   id: string,
   status: EquipmentStatus,
+  actorUserId: string
 ) {
   const existingEquipment = await findEquipmentById(id);
 
@@ -54,5 +70,18 @@ export async function updateEquipmentStatusById(
     throw new Error("EQUIPMENT_NOT_FOUND");
   }
 
-  return updateEquipmentStatusRecord(id, status);
+const equipment = await updateEquipmentStatusRecord(id, status);
+
+await recordAudit({
+  userId: actorUserId,
+  action: "UPDATE",
+  entity: "Equipment",
+  entityId: equipment.id,
+  description: `Equipment status was changed to ${status}.`,
+  metadata: {
+    status,
+  },
+});
+
+return equipment;
 }
