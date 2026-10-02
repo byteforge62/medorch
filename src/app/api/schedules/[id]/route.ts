@@ -113,6 +113,7 @@ export async function PATCH(
     const schedule = await updateScheduleWithValidation(
       idValidation.data.id,
       validation.data,
+      session.user.id
     );
 
     return apiSuccess(schedule, 200);

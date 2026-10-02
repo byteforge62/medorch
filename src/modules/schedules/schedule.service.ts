@@ -295,6 +295,7 @@ export async function updateScheduleWithValidation(
     | "EMERGENCY";
     clinicalNotes?: string | null;
   },
+  actorUserId?: string
 ) {
   const existingSchedule = await findScheduleById(id);
 
@@ -401,7 +402,20 @@ export async function updateScheduleWithValidation(
     }
   }
 
-  return updateScheduleRecord(id, data);
+const schedule = await updateScheduleRecord(id, data);
+
+await recordAudit({
+  userId: actorUserId,
+  action: "UPDATE",
+  entity: "Schedule",
+  entityId: schedule.id,
+  description: `Schedule for procedure "${schedule.procedure}" was updated.`,
+  metadata: {
+    scheduleId: schedule.id,
+  },
+});
+
+return schedule;  
 }
 
 export async function getScheduleStaff(
