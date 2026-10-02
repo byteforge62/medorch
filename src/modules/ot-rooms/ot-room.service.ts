@@ -1,6 +1,7 @@
-import {prisma} from "@/lib/db/prisma";
-import {findOTRoomById,findOTRooms,createOTRoom as createOTRoomRecord, updateOTRoom as updateOTRoomRecord} from "./ot-room.repository";
+import { prisma } from "@/lib/db/prisma";
+import { findOTRoomById, findOTRooms, createOTRoom as createOTRoomRecord, updateOTRoom as updateOTRoomRecord } from "./ot-room.repository";
 import type { OTRoomStatus } from "@/generated/prisma/client";
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getOTRooms() {
   return findOTRooms();
@@ -15,8 +16,24 @@ export async function createOTRoom(data: {
   code: string;
   departmentId: string;
   capacity?: number;
-}) {
-  return createOTRoomRecord(data);
+},
+  actorUserId: string
+) {
+  const otRoom = await createOTRoomRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "OTRoom",
+    entityId: otRoom.id,
+    description: `OT room "${otRoom.name}" was created.`,
+    metadata: {
+      code: otRoom.code,
+      departmentId: otRoom.departmentId,
+    },
+  });
+
+  return otRoom;
 }
 
 export async function updateOTRoomById(
@@ -26,6 +43,7 @@ export async function updateOTRoomById(
     departmentId?: string;
     capacity?: number | null;
   },
+  actorUserId: string
 ) {
   const existingRoom = await findOTRoomById(id);
 
@@ -33,7 +51,20 @@ export async function updateOTRoomById(
     throw new Error("OT_ROOM_NOT_FOUND");
   }
 
-  return updateOTRoomRecord(id, data);
+  const otRoom = await updateOTRoomRecord(id, data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "OTRoom",
+    entityId: otRoom.id,
+    description: `OT room "${otRoom.name}" was updated.`,
+    metadata: {
+      otRoomId: otRoom.id,
+    },
+  });
+
+  return otRoom;
 }
 
 export async function updateOTRoomStatus(
@@ -89,6 +120,7 @@ export async function updateOTRoomActive(
 export async function updateOTRoomStatusById(
   id: string,
   status: OTRoomStatus,
+  actorUserId?: string
 ) {
   const existingRoom = await findOTRoomById(id);
 
@@ -96,12 +128,26 @@ export async function updateOTRoomStatusById(
     throw new Error("OT_ROOM_NOT_FOUND");
   }
 
-  return updateOTRoomStatus(id, status);
+  const otRoom = await updateOTRoomStatus(id, status);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "OTRoom",
+    entityId: otRoom.id,
+    description: `OT room status changed to ${status}.`,
+    metadata: {
+      status,
+    },
+  });
+
+  return otRoom;
 }
 
 export async function updateOTRoomActiveById(
   id: string,
   isActive: boolean,
+  actorUserId?: string,
 ) {
   const existingRoom = await findOTRoomById(id);
 
@@ -109,5 +155,18 @@ export async function updateOTRoomActiveById(
     throw new Error("OT_ROOM_NOT_FOUND");
   }
 
-  return updateOTRoomActive(id, isActive);
+  const otRoom = await updateOTRoomActive(id, isActive);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "OTRoom",
+    entityId: otRoom.id,
+    description: `OT room active state changed to ${isActive}.`,
+    metadata: {
+      isActive,
+    },
+  });
+
+  return otRoom;
 }

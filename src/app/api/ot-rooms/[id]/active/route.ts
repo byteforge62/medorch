@@ -60,6 +60,7 @@ export async function PATCH(
     const otRoom = await updateOTRoomActiveById(
       idValidation.data.id,
       validation.data.isActive,
+      session.user.id
     );
 
     return apiSuccess(otRoom, 200);

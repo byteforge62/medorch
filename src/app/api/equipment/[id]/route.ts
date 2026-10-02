@@ -1,9 +1,8 @@
 import { authorizeApiRole } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getEquipmentById } from "@/modules/equipment/equipment.service";
 import { equipmentIdSchema, updateEquipmentSchema } from "@/modules/equipment/equipment.validation";
-import { updateEquipmentById } from "@/modules/equipment/equipment.service";
+import { getEquipmentById,updateEquipmentById } from "@/modules/equipment/equipment.service";
 
 type RouteContext = {
   params: Promise<{

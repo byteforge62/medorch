@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const otRoom = await createOTRoom(validation.data);
+    const otRoom = await createOTRoom(validation.data,session.user.id);
 
     return apiSuccess(otRoom, 200);
   } catch (error) {

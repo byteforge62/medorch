@@ -124,6 +124,7 @@ export async function POST(
       await assignScheduleEquipmentById(
         idValidation.data.id,
         validation.data.equipmentId,
+        session.user.id
       );
 
     return apiSuccess(equipment, 200);

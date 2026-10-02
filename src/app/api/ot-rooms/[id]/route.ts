@@ -111,6 +111,7 @@ export async function PATCH(
     const otRoom = await updateOTRoomById(
       idValidation.data.id,
       validation.data,
+      session.user.id
     );
 
     return apiSuccess(otRoom, 200);
