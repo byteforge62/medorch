@@ -520,6 +520,7 @@ export async function getScheduleEquipment(
 export async function assignScheduleEquipmentById(
   scheduleId: string,
   equipmentId: string,
+  actorUserId?: string
 ) {
   const schedule = await findScheduleById(scheduleId);
 
@@ -539,18 +540,47 @@ export async function assignScheduleEquipmentById(
     throw new Error("EQUIPMENT_UNAVAILABLE");
   }
 
-  return createScheduleEquipment({
+  const assignment = await createScheduleEquipment({
     scheduleId,
     equipmentId,
   });
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity:"ScheduleEquipment",
+    entityId: assignment.id,
+    description: "Equipment assigned to schedule.",
+    metadata:{
+      scheduleId,
+      equipmentId
+    }
+  })
+
+  return assignment;
 }
 
 export async function releaseScheduleEquipmentById(
   equipmentAssignmentId: string,
+  actorUserId?: string
 ) {
-  return releaseScheduleEquipment(
+  const assignment= await releaseScheduleEquipment(
     equipmentAssignmentId,
   );
+
+  await recordAudit({
+    userId: actorUserId,
+    action:"UPDATE",
+    entity:"ScheduleEquipment",
+    entityId: assignment.id,
+    description: "Equipment released from schedule.",
+    metadata:{
+      scheduleId: assignment.scheduleId,
+      equipmentId: assignment.equipmentId
+    }
+  })
+
+  return assignment;
 }
 
 export async function getScheduleNotes(
