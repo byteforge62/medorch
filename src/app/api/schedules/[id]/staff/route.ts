@@ -123,6 +123,7 @@ export async function POST(
     const staff = await assignScheduleStaffById(
       idValidation.data.id,
       validation.data,
+      session.user.id
     );
 
     return apiSuccess(staff, 200);

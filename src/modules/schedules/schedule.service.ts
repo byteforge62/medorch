@@ -427,6 +427,7 @@ export async function assignScheduleStaffById(
     | "TECHNICIAN"
     | "OTHER";
   },
+  actorUserId? : string
 ) {
   const schedule = await findScheduleById(scheduleId);
 
@@ -446,17 +447,48 @@ export async function assignScheduleStaffById(
     throw new Error("STAFF_USER_INACTIVE");
   }
 
-  return createScheduleStaff({
+  const staff = await createScheduleStaff({
+  scheduleId,
+  userId: data.userId,
+  role: data.role,
+});
+
+await recordAudit({
+  userId: actorUserId,
+  action: "CREATE",
+  entity: "ScheduleStaff",
+  entityId: staff.id,
+  description: `Staff member was assigned to schedule ${scheduleId}.`,
+  metadata: {
     scheduleId,
-    userId: data.userId,
+    staffUserId: data.userId,
     role: data.role,
-  });
+  },
+});
+
+return staff;
 }
 
 export async function removeScheduleStaffById(
   scheduleStaffId: string,
+  actorUserId?: string,
 ) {
-  return deleteScheduleStaff(scheduleStaffId);
+  const staff = await deleteScheduleStaff(scheduleStaffId);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "DELETE",
+    entity: "ScheduleStaff",
+    entityId: staff.id,
+    description: "Staff member was removed from a schedule.",
+    metadata: {
+      scheduleId: staff.scheduleId,
+      staffUserId: staff.userId,
+      role: staff.role,
+    },
+  });
+
+  return staff;
 }
 
 export async function getScheduleEquipment(
