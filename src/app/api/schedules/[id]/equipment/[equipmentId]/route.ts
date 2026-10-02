@@ -58,6 +58,7 @@ export async function PATCH(
     const assignment =
       await releaseScheduleEquipmentById(
         equipmentValidation.data.id,
+        session.user.id
       );
 
     return apiSuccess(assignment, 200);
