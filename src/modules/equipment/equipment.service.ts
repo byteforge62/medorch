@@ -22,8 +22,20 @@ export async function createEquipment(data: {
   serialNumber?: string;
   departmentId?: string;
   maintenanceDueAt?: Date;
-}) {
-  return createEquipmentRecord(data);
+},
+ actorUserId?: string
+) {
+  const equipment = await createEquipmentRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Equipment",
+    entityId: equipment.id,
+    description: `Equipment "${equipment.name}" was created.`
+  });
+
+  return equipment
 }
 
 export async function updateEquipmentById(

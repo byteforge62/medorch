@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const equipment = await createEquipment(validation.data);
+    const equipment = await createEquipment(validation.data,session.user.id);
 
     return apiSuccess(equipment, 200);
   } catch (error) {
