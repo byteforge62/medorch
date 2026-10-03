@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { SessionProvider } from '@/providers/SessionProvider';
 
 export const metadata: Metadata = {
-  title: 'MedOrch',
-  description: 'Operating Theatre Management Platform',
+  title: 'MedOrch - OT Orchestration Platform',
+  description: 'Operating Theatre Management & Resource Orchestration Platform',
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="antialiased font-sans">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
