@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { LandingMobileNav } from '@/components/landing/LandingMobileNav';
-
 
 function IconCalendar({ className = 'h-6 w-6' }: { className?: string }) {
   return (
@@ -255,6 +253,12 @@ function IconCheck({ className = 'h-4 w-4' }: { className?: string }) {
     </svg>
   );
 }
+
+/* ─── Mobile Nav Toggle (client island) ─── */
+
+import { LandingMobileNav } from '@/components/landing/LandingMobileNav';
+
+/* ─── Hero Dashboard Mock ─── */
 
 function HeroDashboardMock() {
   return (
@@ -613,54 +617,69 @@ export default function Home() {
 
       <main>
         {/* ─── HERO ─── */}
-
-        <section className="border-border bg-surface-subtle relative overflow-hidden border-b">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-              {/* Left: Copy */}
-
-              <div>
-                <div className="border-border bg-surface text-foreground-secondary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
+        <section className="border-border bg-surface relative overflow-hidden border-b">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+            <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,1.1fr)] lg:gap-16">
+              {/* Left: Product positioning */}
+              <div className="max-w-2xl">
+                <div className="border-primary text-foreground-secondary mb-5 inline-flex items-center gap-2 border-l-2 pl-3 text-xs font-semibold tracking-[0.16em] uppercase">
                   <span className="bg-success h-1.5 w-1.5 rounded-full" />
-                  Operating Theatre Orchestration
+                  Operating Theatre Operations
                 </div>
 
-                <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Smarter Operating{' '}
-                  <span className="text-primary">Theatre Management</span>
+                <h1 className="text-foreground max-w-2xl text-4xl font-bold tracking-[-0.03em] sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
+                  One system for the
+                  <span className="text-primary block">operating theatre.</span>
                 </h1>
 
-                <p className="text-foreground-secondary mt-4 max-w-xl text-base leading-relaxed sm:text-lg">
-                  MedOrch centralizes surgical scheduling, operating room
-                  management, equipment tracking, staff coordination, and
-                  operational alerts into one unified platform — giving
-                  healthcare teams the clarity to operate efficiently.
+                <p className="text-foreground-secondary mt-6 max-w-xl text-base leading-7 sm:text-lg sm:leading-8">
+                  Coordinate rooms, surgical schedules, clinical teams,
+                  equipment, patients, and operational alerts from a single
+                  source of truth.
                 </p>
 
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/login"
-
-                    className="bg-primary text-foreground-inverse hover:bg-primary-hover focus:ring-ring/20 active:bg-primary-active inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-none transition-colors focus:ring-2 focus:outline-none"
+                    className="bg-primary text-foreground-inverse hover:bg-primary-hover focus-visible:ring-ring active:bg-primary-active inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
                     Get Started
                     <IconArrowRight className="h-4 w-4" />
                   </Link>
 
-                  <Link
-                    href="/login"
-
-                    className="border-border-strong bg-surface text-foreground-secondary hover:bg-surface-subtle focus:ring-ring/20 inline-flex items-center rounded-lg border px-5 py-2.5 text-sm font-medium shadow-none transition-colors focus:ring-2 focus:outline-none"
+                  <a
+                    href="#capabilities"
+                    className="border-border-strong bg-surface text-foreground-secondary hover:bg-surface-subtle hover:text-foreground focus-visible:ring-ring inline-flex min-h-11 items-center justify-center rounded-[var(--radius-control)] border px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
-                    Sign In
-                  </Link>
+                    Explore Platform
+                  </a>
+                </div>
+
+                <div className="text-foreground-muted mt-8 flex flex-wrap gap-x-5 gap-y-2 text-xs">
+                  <span className="inline-flex items-center gap-2">
+                    <IconCheck className="text-success h-3.5 w-3.5" />
+                    Scheduling
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <IconCheck className="text-success h-3.5 w-3.5" />
+                    Resource coordination
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <IconCheck className="text-success h-3.5 w-3.5" />
+                    Operational visibility
+                  </span>
                 </div>
               </div>
 
-              {/* Right: Dashboard mock */}
-
-              <div className="hidden lg:block" aria-hidden="true">
-                <HeroDashboardMock />
+              {/* Right: Product interface */}
+              <div className="w-full">
+                <div className="relative">
+                  <div
+                    className="bg-primary-soft/50 absolute -inset-4 -z-10 blur-2xl"
+                    aria-hidden="true"
+                  />
+                  <HeroDashboardMock />
+                </div>
               </div>
             </div>
           </div>
