@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "MedOrch Application Architecture",
+    "output": ".archify/architecture-medorch-20261005-103322/medorch-architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/byteforge62/medorch.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "60f52729794502fd125010ac5b9d3fa712917aba"
+    },
+    "views": [
+      {
+        "id": "request-path",
+        "label": "Request path",
+        "focus": ["browser", "web-ui", "route-handlers", "authz", "domain-services"],
+        "note": "Follow page/API requests through role checks and domain logic."
+      },
+      {
+        "id": "identity",
+        "label": "Identity and access",
+        "focus": ["browser", "route-handlers", "authz", "prisma", "postgres"],
+        "note": "Credentials, JWT session claims, and role gates."
+      },
+      {
+        "id": "persistence",
+        "label": "Data and audit",
+        "focus": ["domain-services", "audit-writer", "prisma", "postgres"],
+        "note": "Domain persistence, audit records, and PostgreSQL."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "People",
+      "sublabel": "Browser users",
+      "pos": [40, 255],
+      "size": [150, 72],
+      "sources": [
+        { "path": "src/app/login/page.tsx", "line": 1, "end_line": 25, "label": "Login entry" },
+        { "path": "src/app/dashboard/page.tsx", "line": 11, "end_line": 21, "label": "Dashboard entry" }
+      ]
+    },
+    {
+      "id": "web-ui",
+      "type": "frontend",
+      "label": "Next.js UI",
+      "sublabel": "App Router pages + client components",
+      "pos": [260, 255],
+      "size": [190, 82],
+      "sources": [
+        { "path": "src/app/layout.tsx", "line": 1, "end_line": 18, "label": "Root layout" },
+        { "path": "src/app/schedules/page.tsx", "line": 1, "end_line": 18, "label": "Schedule page" },
+        { "path": "src/components/schedules/SchedulePage.tsx", "line": 42, "end_line": 95, "label": "UI data loading" }
+      ]
+    },
+    {
+      "id": "route-handlers",
+      "type": "backend",
+      "label": "Route Handlers",
+      "sublabel": "JSON API + NextAuth GET/POST",
+      "pos": [545, 255],
+      "size": [205, 88],
+      "sources": [
+        { "path": "src/app/api/schedules/route.ts", "line": 1, "end_line": 73, "label": "Schedule API" },
+        { "path": "src/app/api/auth/[...nextauth]/route.ts", "line": 1, "end_line": 3, "label": "NextAuth endpoint" },
+        { "path": "src/lib/api/response.ts", "line": 1, "end_line": 28, "label": "API envelope" }
+      ]
+    },
+    {
+      "id": "authz",
+      "type": "security",
+      "label": "Auth + role guards",
+      "sublabel": "NextAuth Credentials / JWT / RBAC",
+      "pos": [545, 55],
+      "size": [205, 90],
+      "sources": [
+        { "path": "src/auth.ts", "line": 7, "end_line": 80, "label": "Credentials + session" },
+        { "path": "src/lib/auth/authorization.ts", "line": 8, "end_line": 50, "label": "Page/API guards" },
+        { "path": "src/lib/api/auth.ts", "line": 1, "end_line": 19, "label": "API role adapter" }
+      ]
+    },
+    {
+      "id": "domain-services",
+      "type": "backend",
+      "label": "Domain services",
+      "sublabel": "Schedules, resources, users, alerts",
+      "pos": [880, 255],
+      "size": [195, 88],
+      "sources": [
+        { "path": "src/modules/schedules/schedule.service.ts", "line": 82, "end_line": 278, "label": "Schedule rules" },
+        { "path": "src/modules/alerts/alerts.service.ts", "line": 14, "end_line": 56, "label": "Alert ownership" },
+        { "path": "src/modules/departments/department.service.ts", "line": 16, "end_line": 57, "label": "Department use cases" }
+      ]
+    },
+    {
+      "id": "audit-writer",
+      "type": "backend",
+      "label": "Audit writer",
+      "sublabel": "Audit service + repository",
+      "pos": [880, 475],
+      "size": [195, 72],
+      "sources": [
+        { "path": "src/modules/audit/audit.service.ts", "line": 1, "end_line": 17, "label": "Audit service" },
+        { "path": "src/modules/audit/audit.repository.ts", "line": 1, "end_line": 26, "label": "Audit insert" }
+      ]
+    },
+    {
+      "id": "prisma",
+      "type": "backend",
+      "label": "Prisma data access",
+      "sublabel": "Generated client + PostgreSQL adapter",
+      "pos": [1215, 255],
+      "size": [205, 86],
+      "sources": [
+        { "path": "src/lib/db/prisma.ts", "line": 1, "end_line": 20, "label": "Server singleton" },
+        { "path": "src/modules/schedules/schedule.repository.ts", "line": 347, "end_line": 384, "label": "Schedule queries" },
+        { "path": "src/modules/audit/audit.repository.ts", "line": 13, "end_line": 26, "label": "Audit persistence" }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Relational source of truth",
+      "pos": [1540, 255],
+      "size": [180, 78],
+      "sources": [
+        { "path": "prisma/schema.prisma", "line": 1, "end_line": 8, "label": "Datasource + client" },
+        { "path": "prisma/schema.prisma", "line": 206, "end_line": 233, "label": "Schedule relations" },
+        { "path": "docker-compose.yml", "line": 1, "end_line": 24, "label": "Local database" }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "browser-ui",
+      "from": "browser",
+      "to": "web-ui",
+      "label": "Pages",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ui-api",
+      "from": "web-ui",
+      "to": "route-handlers",
+      "label": "REST API",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-auth",
+      "from": "route-handlers",
+      "to": "authz",
+      "label": "Role check",
+      "variant": "security"
+    },
+    {
+      "id": "auth-prisma",
+      "from": "authz",
+      "to": "prisma",
+      "label": "Credentials read User",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "top",
+      "via": [[785, 100], [1317.5, 100]]
+    },
+    {
+      "id": "api-domain",
+      "from": "route-handlers",
+      "to": "domain-services",
+      "label": "Service dispatch"
+    },
+    {
+      "id": "domain-audit",
+      "from": "domain-services",
+      "to": "audit-writer",
+      "label": "Await audit on mutations"
+    },
+    {
+      "id": "domain-prisma",
+      "from": "domain-services",
+      "to": "prisma",
+      "label": "Prisma queries"
+    },
+    {
+      "id": "audit-prisma",
+      "from": "audit-writer",
+      "to": "prisma",
+      "label": "Insert AuditLog",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "via": [[1110, 511], [1317.5, 511]]
+    },
+    {
+      "id": "prisma-postgres",
+      "from": "prisma",
+      "to": "postgres",
+      "label": "PostgreSQL",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Application shape",
+      "items": [
+        "One Next.js App Router application; pages and API handlers share the TypeScript runtime.",
+        "Domain code is grouped under src/modules/<domain> with service, repository, and validation files.",
+        "Start with PROJECT_CONTEXT.md for the route matrix, schema relations, conventions, and data flows."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Scheduling controls",
+      "items": [
+        "Schedule create/update checks active department, compatible room, active doctor, time range, and room/surgeon overlap.",
+        "Status transitions and resource assignment checks live in schedule.service.ts, not only in request schemas."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Identity and persistence",
+      "items": [
+        "Credentials reject non-ACTIVE accounts; JWT sessions carry user ID, role, and status.",
+        "Route handlers use explicit role allowlists; alerts and schedule notes add service-level ownership checks.",
+        "Mutating domain services await AuditLog writes through a separate audit service/repository."
+      ]
+    }
+  ]
+}
