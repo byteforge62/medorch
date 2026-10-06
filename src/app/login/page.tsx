@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
@@ -6,9 +7,9 @@ export default function LoginPage() {
       <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.8fr)]">
         <section className="hidden border-r border-border px-8 py-8 lg:flex lg:flex-col lg:justify-between lg:px-12 xl:px-16">
           <div>
-            <a href="/" className="text-sm font-bold tracking-[0.18em] text-foreground" aria-label="MedOrch home" >
+            <Link href="/" className="text-sm font-bold tracking-[0.18em] text-foreground" aria-label="MedOrch home" >
               MEDORCH
-            </a>
+            </Link>
           </div>
 
           <div className="max-w-xl py-16">
@@ -44,9 +45,9 @@ export default function LoginPage() {
         <section className="flex min-h-screen items-center px-5 py-8 sm:px-8 lg:px-12 xl:px-16">
           <div className="mx-auto w-full max-w-md">
             <div className="mb-8 lg:hidden">
-              <a href="/" className="text-sm font-bold tracking-[0.18em] text-foreground" aria-label="MedOrch home">
+              <Link href="/" className="text-sm font-bold tracking-[0.18em] text-foreground" aria-label="MedOrch home">
                 MEDORCH
-              </a>
+              </Link>
             </div>
 
             <div className="mb-8">
