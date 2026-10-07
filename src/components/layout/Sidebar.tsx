@@ -74,6 +74,32 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+  {
+    name: 'Audit Trails',
+    href: '/audit',
+    roles: ['ADMIN'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h4m2-10H9a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V8.414a2 2 0 00-.586-1.414l-2.414-2.414A2 2 0 0012.586 4H11"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 4v4h6"
+        />
+      </svg>
+    ),
+  },
 ];
 
 interface SidebarProps {
@@ -102,10 +128,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ) : null}
 
       <aside
-          aria-label="Primary navigation"
-        className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-[var(--color-border)] bg-[var(--color-surface)] transition-transform duration-200 lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        aria-label="Primary navigation"
+        className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-[var(--color-border)] bg-[var(--color-surface)] transition-transform duration-200 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex h-full flex-col justify-between p-4">
           <div className="space-y-1">
@@ -122,11 +147,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2.5 text-xs font-semibold transition-colors ${
-                      isActive
+                    className={`flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2.5 text-xs font-semibold transition-colors ${isActive
                         ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
                         : 'text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)]'
-                    }`}
+                      }`}
                   >
                     <span
                       className={
