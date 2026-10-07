@@ -649,7 +649,7 @@ export async function updateScheduleNoteById(
     throw new Error("SCHEDULE_NOTE_FORBIDDEN");
   }
 
-  await updateScheduleNote(noteId, content);
+  const updatedNote = await updateScheduleNote(noteId, content);
 
   await recordAudit({
   userId: authorId,
@@ -662,7 +662,7 @@ export async function updateScheduleNoteById(
   },
 });
 
-return note;
+return updatedNote;
 }
 
 export async function deleteScheduleNoteById(
