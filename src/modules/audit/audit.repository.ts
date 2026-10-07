@@ -24,3 +24,57 @@ export async function createAuditLog(
     },
   });
 }
+
+export interface FindAuditLogsOptions {
+  userId?: string;
+  action?: AuditAction;
+  entity?: string;
+  entityId?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export async function findAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  const {
+    userId,
+    action,
+    entity,
+    entityId,
+    limit = 50,
+    offset = 0,
+  } = options;
+
+  return prisma.auditLog.findMany({
+    where: {
+      ...(userId ? { userId } : {}),
+      ...(action ? { action } : {}),
+      ...(entity ? { entity } : {}),
+      ...(entityId ? { entityId } : {}),
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    skip: offset,
+    take: Math.min(limit, 100),
+    select: {
+      id: true,
+      userId: true,
+      action: true,
+      entity: true,
+      entityId: true,
+      description: true,
+      metadata: true,
+      createdAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}

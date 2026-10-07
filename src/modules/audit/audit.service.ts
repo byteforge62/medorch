@@ -1,5 +1,6 @@
 import type { AuditAction, Prisma } from "@/generated/prisma/client";
-import { createAuditLog } from "./audit.repository";
+import { createAuditLog, findAuditLogs } from "./audit.repository";
+import type { FindAuditLogsOptions } from "./audit.repository";
 
 type RecordAuditData = {
   userId?: string;
@@ -14,4 +15,10 @@ export async function recordAudit(
   data: RecordAuditData,
 ) {
   return createAuditLog(data);
+}
+
+export async function getAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  return findAuditLogs(options);
 }
