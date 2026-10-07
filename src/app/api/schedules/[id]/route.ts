@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission, authorizeApiRole } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getScheduleById, updateScheduleWithValidation } from "@/modules/schedules/schedule.service";
@@ -75,8 +75,8 @@ export async function PATCH(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      "ADMIN",
+    const { session, response } = await authorizeApiPermission(
+      "schedules:manage",
       requestId,
     );
 
@@ -126,6 +126,8 @@ export async function PATCH(
     if (error instanceof Error) {
       const messages: Record<string, string> = {
         SCHEDULE_NOT_FOUND: "Schedule not found.",
+        SCHEDULE_IMMUTABLE:
+          "Completed or cancelled schedules cannot be updated.",
         PATIENT_NOT_FOUND: "Patient not found.",
         DEPARTMENT_NOT_FOUND: "Department not found.",
         DEPARTMENT_INACTIVE: "Department is inactive.",
@@ -155,7 +157,9 @@ export async function PATCH(
           message,
           error.message === "SCHEDULE_NOT_FOUND"
             ? 404
-            : 400,
+            : error.message === "SCHEDULE_IMMUTABLE"
+              ? 409
+              : 400,
           undefined,
           requestId,
         );

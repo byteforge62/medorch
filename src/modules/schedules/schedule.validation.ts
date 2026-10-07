@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+const scheduleDateSchema = z.iso
+  .date()
+  .transform((date) => new Date(`${date}T00:00:00.000Z`));
+
 export const scheduleIdSchema = z.object({
   id: z.string().uuid(),
 });
@@ -20,7 +24,7 @@ export const createScheduleSchema = z
       .min(1)
       .max(200),
 
-    scheduledDate: z.coerce.date(),
+    scheduledDate: scheduleDateSchema,
 
     startTime: z.coerce.date(),
 
@@ -65,7 +69,7 @@ export const updateScheduleSchema = z
       .max(200)
       .optional(),
 
-    scheduledDate: z.coerce.date().optional(),
+    scheduledDate: scheduleDateSchema.optional(),
 
     startTime: z.coerce.date().optional(),
 
