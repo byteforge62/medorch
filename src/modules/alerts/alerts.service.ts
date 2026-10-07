@@ -101,7 +101,10 @@ export async function updateAlertById(
     throw new Error("ALERT_NOT_FOUND");
   }
 
-  if (requestingUser.role !== "ADMIN" && alert.userId !== requestingUser.id) {
+  if (
+    requestingUser.role !== "ADMIN" &&
+    alert.userId !== requestingUser.id
+  ) {
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
@@ -123,6 +126,18 @@ export async function updateAlertById(
 
   const updatedAlert = await updateAlertRecord(id, updateData);
 
+  await recordAudit({
+    userId: requestingUser.id,
+    action: "UPDATE",
+    entity: "Alert",
+    entityId: updatedAlert.id,
+    description: `Alert "${updatedAlert.title}" was updated.`,
+    metadata: {
+      alertId: updatedAlert.id,
+      changes: data,
+    },
+  });
+
   return updatedAlert;
 }
 
@@ -136,7 +151,10 @@ export async function markAlertAsReadById(
     throw new Error("ALERT_NOT_FOUND");
   }
 
-  if (requestingUser.role !== "ADMIN" && alert.userId !== requestingUser.id) {
+  if (
+    requestingUser.role !== "ADMIN" &&
+    alert.userId !== requestingUser.id
+  ) {
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
@@ -144,18 +162,50 @@ export async function markAlertAsReadById(
     return alert;
   }
 
-  return markAlertAsReadRecord(id);
+  const updatedAlert = await markAlertAsReadRecord(id);
+
+  await recordAudit({
+    userId: requestingUser.id,
+    action: "UPDATE",
+    entity: "Alert",
+    entityId: updatedAlert.id,
+    description: `Alert "${updatedAlert.title}" was marked as read.`,
+    metadata: {
+      alertId: updatedAlert.id,
+      read: true,
+    },
+  });
+
+  return updatedAlert;
 }
 
 export async function markAllAlertsAsRead(
   targetUserId: string,
   requestingUser: { id: string; role: UserRole },
 ) {
-  if (requestingUser.role !== "ADMIN" && targetUserId !== requestingUser.id) {
+  if (
+    requestingUser.role !== "ADMIN" &&
+    targetUserId !== requestingUser.id
+  ) {
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
   const result = await markAllAlertsAsReadForUser(targetUserId);
+
+  if (result.count > 0) {
+    await recordAudit({
+      userId: requestingUser.id,
+      action: "UPDATE",
+      entity: "Alert",
+      entityId: targetUserId,
+      description: `${result.count} alert(s) were marked as read.`,
+      metadata: {
+        targetUserId,
+        affectedCount: result.count,
+        operation: "MARK_ALL_READ",
+      },
+    });
+  }
 
   return result;
 }
