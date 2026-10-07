@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const doctor = await createDoctor(validation.data,session.user.id);
+    const doctor = await createDoctor(validation.data, session.user.id);
 
     return apiSuccess(doctor, 200);
   } catch (error) {
@@ -78,6 +78,27 @@ export async function POST(request: Request) {
           requestId,
         );
       }
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        (error as { code?: unknown }).code === "P2002"
+      ) {
+        return apiError(
+          "A doctor profile with this unique value already exists.",
+          409,
+          undefined,
+          requestId
+        );
+      }
+
+      return apiError(
+        "Failed to create doctor.",
+        500,
+        undefined,
+        requestId
+      );
     }
   }
 }
