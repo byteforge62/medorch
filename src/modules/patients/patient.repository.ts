@@ -8,6 +8,11 @@ export async function findPatients() {
     select: {
       id: true,
       patientCode: true,
+      name:true,
+      email:true,
+      phone:true,
+      dateOfBirth:true,
+      gender:true,
       createdAt: true,
       updatedAt: true,
 
@@ -32,6 +37,11 @@ export async function findPatientById(id: string) {
     select: {
       id: true,
       patientCode: true,
+      name:true,
+      email:true,
+      phone:true,
+      dateOfBirth:true,
+      gender:true,
       createdAt: true,
       updatedAt: true,
 
