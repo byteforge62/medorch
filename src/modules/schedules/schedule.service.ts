@@ -303,6 +303,13 @@ export async function updateScheduleWithValidation(
     throw new Error("SCHEDULE_NOT_FOUND");
   }
 
+  if (
+    existingSchedule.status === "COMPLETED" ||
+    existingSchedule.status === "CANCELLED"
+  ) {
+    throw new Error("SCHEDULE_IMMUTABLE");
+  }
+
   const patientId =
     data.patientId ?? existingSchedule.patientId;
 
