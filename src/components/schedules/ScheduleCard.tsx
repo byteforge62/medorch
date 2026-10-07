@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import {
@@ -91,9 +91,9 @@ export function ScheduleCard({
   };
 
   return (
-    <Card className="hover:border-slate-300 transition-all dark:hover:border-slate-700">
+    <Card className="transition-all hover:border-slate-300 dark:hover:border-slate-700">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-3 flex-1">
+        <div className="flex-1 space-y-3">
           {/* Header row: Procedure + Badges */}
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -104,15 +104,17 @@ export function ScheduleCard({
           </div>
 
           {/* Details grid */}
-          <div className="grid grid-cols-1 gap-y-2 gap-x-4 sm:grid-cols-2 lg:grid-cols-3 text-xs text-slate-600 dark:text-slate-300">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-xs text-slate-600 sm:grid-cols-2 lg:grid-cols-3 dark:text-slate-300">
             {/* Patient */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Patient:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Patient:
+              </span>
               <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.patient?.name || "N/A"}
+                {schedule.patient?.name || 'N/A'}
               </span>
               {schedule.patient?.patientCode && (
-                <span className="text-slate-400 text-[11px]">
+                <span className="text-[11px] text-slate-400">
                   ({schedule.patient.patientCode})
                 </span>
               )}
@@ -120,28 +122,34 @@ export function ScheduleCard({
 
             {/* Surgeon */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Surgeon:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Surgeon:
+              </span>
               <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.surgeon?.name || "Unassigned"}
+                {schedule.surgeon?.name || 'Unassigned'}
               </span>
             </div>
 
             {/* Department */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Department:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Department:
+              </span>
               <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.department?.name || "N/A"}
+                {schedule.department?.name || 'N/A'}
               </span>
             </div>
 
             {/* OT Room */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">OT Room:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                OT Room:
+              </span>
               <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.otRoom?.name || "N/A"}
+                {schedule.otRoom?.name || 'N/A'}
               </span>
               {schedule.otRoom?.code && (
-                <span className="text-slate-400 text-[11px]">
+                <span className="text-[11px] text-slate-400">
                   [{schedule.otRoom.code}]
                 </span>
               )}
@@ -149,7 +157,9 @@ export function ScheduleCard({
 
             {/* Date */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Date:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Date:
+              </span>
               <span className="font-mono text-slate-700 dark:text-slate-300">
                 {formatDate(schedule.scheduledDate)}
               </span>
@@ -157,17 +167,20 @@ export function ScheduleCard({
 
             {/* Timing */}
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Time:</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Time:
+              </span>
               <span className="font-mono text-slate-700 dark:text-slate-300">
-                {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
+                {formatTime(schedule.startTime)} -{' '}
+                {formatTime(schedule.endTime)}
               </span>
             </div>
           </div>
 
           {/* Clinical notes if present */}
           {schedule.clinicalNotes && (
-            <div className="rounded-lg bg-slate-50 p-2.5 text-xs border border-slate-100 dark:bg-slate-800/60 dark:border-slate-800">
-              <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1.5">
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5 text-xs dark:border-slate-800 dark:bg-slate-800/60">
+              <span className="mr-1.5 font-semibold text-slate-500 dark:text-slate-400">
                 Notes:
               </span>
               <span className="text-slate-700 dark:text-slate-300">
@@ -178,8 +191,8 @@ export function ScheduleCard({
 
           {/* Status lifecycle actions — only for ADMIN users */}
           {isAdmin && onStatusUpdated && (
-            <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="border-t border-slate-100 pt-1 dark:border-slate-800">
+              <p className="mb-1.5 text-[11px] font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                 Status Actions
               </p>
               <ScheduleStatusActions
@@ -192,8 +205,16 @@ export function ScheduleCard({
         </div>
 
         {/* Edit action — only for ADMIN users */}
-        {isAdmin && onEdit && (
-          <div className="pt-2 sm:pt-0 sm:pl-4 flex justify-end">
+        <div className="flex flex-wrap justify-end gap-2 pt-2 sm:pt-0 sm:pl-4">
+          <Link
+            href={`/schedules/${schedule.id}`}
+            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+          >
+            View details
+          </Link>
+
+          {/* Edit action — only for ADMIN users */}
+          {isAdmin && onEdit && (
             <Button
               variant="outline"
               size="sm"
@@ -202,8 +223,8 @@ export function ScheduleCard({
             >
               Edit
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Card>
   );
