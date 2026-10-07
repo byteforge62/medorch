@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
 
 type AuditAction =
@@ -49,11 +49,12 @@ export function AuditLogViewer() {
   const [action, setAction] = useState('');
   const [entity, setEntity] = useState('');
   const [offset, setOffset] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadLogs = useCallback(async () => {
+  useEffect(() => {
     const params = new URLSearchParams({
       limit: String(PAGE_SIZE),
       offset: String(offset),
@@ -67,25 +68,37 @@ export function AuditLogViewer() {
       params.set('entity', entity.trim());
     }
 
-    try {
-      const response = await apiClient.get<AuditLog[]>(
-        `/api/audit?${params.toString()}`,
-      );
+    let cancelled = false;
 
-      setLogs(response ?? []);
-      setError(null);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load audit logs.',
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [action, entity, offset]);
+    void apiClient
+      .get<AuditLog[]>(`/api/audit?${params.toString()}`)
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
 
-  useEffect(() => {
-    void loadLogs();
-  }, [loadLogs]);
+        setLogs(response ?? []);
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) {
+          return;
+        }
+
+        setError(
+          err instanceof Error ? err.message : 'Failed to load audit logs.',
+        );
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [action, entity, offset, refreshKey]);
 
   const handleActionChange = (value: string) => {
     setLoading(true);
@@ -160,7 +173,7 @@ export function AuditLogViewer() {
               onClick={() => {
                 setLoading(true);
                 setError(null);
-                void loadLogs();
+                setRefreshKey((current) => current + 1);
               }}
               disabled={loading}
               className="h-10 rounded-md border border-slate-300 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
