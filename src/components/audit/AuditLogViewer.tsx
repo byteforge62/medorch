@@ -54,28 +54,26 @@ export function AuditLogViewer() {
   const [error, setError] = useState<string | null>(null);
 
   const loadLogs = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    const params = new URLSearchParams({
+      limit: String(PAGE_SIZE),
+      offset: String(offset),
+    });
+
+    if (action) {
+      params.set('action', action);
+    }
+
+    if (entity.trim()) {
+      params.set('entity', entity.trim());
+    }
 
     try {
-      const params = new URLSearchParams({
-        limit: String(PAGE_SIZE),
-        offset: String(offset),
-      });
-
-      if (action) {
-        params.set('action', action);
-      }
-
-      if (entity.trim()) {
-        params.set('entity', entity.trim());
-      }
-
       const response = await apiClient.get<AuditLog[]>(
         `/api/audit?${params.toString()}`,
       );
 
       setLogs(response ?? []);
+      setError(null);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to load audit logs.',
@@ -90,11 +88,15 @@ export function AuditLogViewer() {
   }, [loadLogs]);
 
   const handleActionChange = (value: string) => {
+    setLoading(true);
+    setError(null);
     setAction(value);
     setOffset(0);
   };
 
   const handleEntityChange = (value: string) => {
+    setLoading(true);
+    setError(null);
     setEntity(value);
     setOffset(0);
   };
@@ -155,7 +157,11 @@ export function AuditLogViewer() {
           <div className="flex items-end">
             <button
               type="button"
-              onClick={() => void loadLogs()}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                void loadLogs();
+              }}
               disabled={loading}
               className="h-10 rounded-md border border-slate-300 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
             >
@@ -277,9 +283,11 @@ export function AuditLogViewer() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() =>
-                setOffset((current) => Math.max(0, current - PAGE_SIZE))
-              }
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setOffset((current) => Math.max(0, current - PAGE_SIZE));
+              }}
               disabled={offset === 0 || loading}
               className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-200"
             >
@@ -288,7 +296,11 @@ export function AuditLogViewer() {
 
             <button
               type="button"
-              onClick={() => setOffset((current) => current + PAGE_SIZE)}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setOffset((current) => current + PAGE_SIZE);
+              }}
               disabled={loading || logs.length < PAGE_SIZE}
               className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-200"
             >
