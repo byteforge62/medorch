@@ -20,7 +20,7 @@ export async function authorizeApiRole(roles: UserRole | UserRole[],requestId: s
 }
 
 export async function authorizeApiPermission(
-  permission: Permission,
+  permission: Permission | Permission[],
   requestId: string,
 ) {
   const session = await getApiSession();
@@ -32,7 +32,10 @@ export async function authorizeApiPermission(
     };
   }
 
-  if (!hasPermission(session.user.role, permission)) {
+  const requiredPermissions = Array.isArray(permission) ? permission : [permission];
+  const hasRequiredPermission = requiredPermissions.some((permission) => hasPermission(session.user.role, permission))
+
+  if (!hasRequiredPermission) {
     return {
       session: null,
       response: apiError("Forbidden", 403, undefined, requestId),

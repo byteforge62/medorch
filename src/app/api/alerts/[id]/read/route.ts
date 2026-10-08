@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { markAlertAsReadById } from "@/modules/alerts/alerts.service";
@@ -17,8 +17,8 @@ export async function PATCH(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      ["ADMIN", "DOCTOR", "OT_STAFF", "PATIENT"],
+    const { session, response } = await authorizeApiPermission(
+      ["alerts:update","alerts:update:own"],
       requestId,
     );
 
