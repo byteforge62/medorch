@@ -16,6 +16,9 @@ export const ROLE_PERMISSIONS = {
     "patients:manage",
     "alerts:read",
     "alerts:manage",
+    "alerts:create",
+    "alerts:update",
+    "alerts:delete",
   ],
 
   DOCTOR: [
@@ -26,6 +29,10 @@ export const ROLE_PERMISSIONS = {
     "schedules:manage",
     "patients:read",
     "alerts:read",
+    "alerts:create",
+    "alerts:update:own",
+    "alerts:delete:own",
+
   ],
 
   OT_STAFF: [
@@ -35,11 +42,16 @@ export const ROLE_PERMISSIONS = {
     "schedules:read",
     "schedules:manage",
     "alerts:read",
+    "alerts:create",
+    "alerts:update:own",
+    "alerts:delete:own",
   ],
 
   PATIENT: [
     "schedules:read:own",
     "alerts:read",
+    "alerts:update:own",
+    "alerts:delete:own",
   ],
 } as const satisfies Record<UserRole, readonly string[]>;
 
