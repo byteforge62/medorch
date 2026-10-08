@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { createNewDepartment, getDepartments } from "@/modules/departments/department.service";
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(["ADMIN", "DOCTOR", "OT_STAFF"],requestId,);
+    const { session, response } = await authorizeApiPermission("departments:read",requestId);
     if (!session) {
       return response;
     }
@@ -24,7 +24,7 @@ export async function POST(request: Request){
   const requestId = getRequestId(request);
 
   try{
-   const {session,response} = await authorizeApiRole("ADMIN",requestId);
+   const {session,response} = await authorizeApiPermission("departments:manage",requestId);
    if(!session){
     return response;
    }
