@@ -1,12 +1,12 @@
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getRequestId } from "@/lib/api/request-id";
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getUsers } from "@/modules/users/user.service";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
   try {
-    const { session, response } = await authorizeApiRole("ADMIN",requestId);
+    const { session, response } = await authorizeApiPermission("users:read",requestId);
     if (!session) {
       return response;
     }

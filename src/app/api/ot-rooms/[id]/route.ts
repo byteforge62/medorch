@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getOTRoomById, updateOTRoomById } from "@/modules/ot-rooms/ot-room.service";
@@ -17,8 +17,8 @@ export async function GET(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      ["ADMIN", "DOCTOR", "OT_STAFF"],
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:read",
       requestId,
     );
 
@@ -73,8 +73,8 @@ export async function PATCH(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      "ADMIN",
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:manage",
       requestId,
     );
 
