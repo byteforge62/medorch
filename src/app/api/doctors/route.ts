@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getDoctors } from "@/modules/doctors/doctor.service";
@@ -8,7 +8,7 @@ import { createDoctorSchema } from "@/modules/doctors/doctor.validation";
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
   try {
-    const { session, response } = await authorizeApiRole(["ADMIN", "DOCTOR", "OT_STAFF"], requestId);
+    const { session, response } = await authorizeApiPermission("doctors:read", requestId);
     if (!session) {
       return response;
     }
@@ -25,8 +25,8 @@ export async function POST(request: Request) {
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      "ADMIN",
+    const { session, response } = await authorizeApiPermission(
+      "doctors:manage",
       requestId,
     );
 
