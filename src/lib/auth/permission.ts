@@ -13,6 +13,7 @@ export const ROLE_PERMISSIONS = {
     "equipment:read",
     "equipment:manage",
     "schedules:read",
+    "schedules:create",
     "schedules:manage",
     "patients:read",
     "patients:manage",
