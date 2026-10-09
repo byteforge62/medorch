@@ -1,17 +1,23 @@
 "use client";
-
-import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { apiClient, ApiClientError } from "@/lib/api/client";
+
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingState } from "@/components/ui/LoadingState";
-import { apiClient, ApiClientError } from "@/lib/api/client";
 
 type DoctorStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED";
 
+const STATUS_OPTIONS: DoctorStatus[] = [
+    'PENDING',
+    'ACTIVE',
+    'SUSPENDED',
+    'REJECTED',
+];
 interface DoctorCandidate {
     id: string;
     name: string | null;
@@ -32,12 +38,6 @@ interface CreateDoctorForm {
     licenseNumber: string;
 }
 
-const EMPTY_DOCTOR_FORM: CreateDoctorForm = {
-    userId: '',
-    departmentId: '',
-    specialization: '',
-    licenseNumber: '',
-};
 interface Doctor {
     id: string;
     userId: string;
@@ -58,12 +58,14 @@ interface Doctor {
     } | null;
 }
 
-const STATUS_OPTIONS: DoctorStatus[] = [
-    "PENDING",
-    "ACTIVE",
-    "SUSPENDED",
-    "REJECTED",
-];
+const EMPTY_DOCTOR_FORM: CreateDoctorForm = {
+    userId: '',
+    departmentId: '',
+    specialization: '',
+    licenseNumber: '',
+};
+
+
 
 function formatStatus(status: DoctorStatus) {
     return status.replaceAll("_", " ");
@@ -80,6 +82,9 @@ function formatDate(value: string) {
         dateStyle: "medium",
     }).format(date);
 }
+
+
+
 
 export function DoctorDirectory() {
     const { data: session } = useSession();
@@ -106,6 +111,17 @@ export function DoctorDirectory() {
 
     const [createForm, setCreateForm] =
         useState<CreateDoctorForm>(EMPTY_DOCTOR_FORM);
+
+    const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+
+    const [editForm, setEditForm] = useState({
+        departmentId: '',
+        specialization: '',
+        licenseNumber: '',
+    });
+
+    const [savingEdit, setSavingEdit] = useState(false);
+    const [editError, setEditError] = useState('');
 
     useEffect(() => {
         let cancelled = false;
@@ -175,6 +191,18 @@ export function DoctorDirectory() {
         };
     }, [session?.user?.role]);
 
+
+    function startEditingDoctor(doctor: Doctor) {
+        setEditingDoctor(doctor);
+        setEditError('');
+
+        setEditForm({
+            departmentId: doctor.departmentId ?? '',
+            specialization: doctor.specialization ?? '',
+            licenseNumber: doctor.licenseNumber ?? '',
+        });
+    }
+
     const filteredDoctors = useMemo(() => {
         const query = search.trim().toLowerCase();
 
@@ -205,6 +233,8 @@ export function DoctorDirectory() {
             ),
         [doctorCandidates],
     );
+
+
 
     const counts = useMemo(
         () => ({
@@ -338,6 +368,57 @@ export function DoctorDirectory() {
         }
     }
 
+    async function handleUpdateDoctor(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        if (session?.user?.role !== 'ADMIN' || !editingDoctor) {
+            return;
+        }
+
+        setSavingEdit(true);
+        setEditError('');
+
+        const departmentId = editForm.departmentId || null;
+        const specialization = editForm.specialization.trim() || null;
+        const licenseNumber = editForm.licenseNumber.trim() || null;
+
+        try {
+            await apiClient.patch<unknown>(`/api/doctors/${editingDoctor.id}`, {
+                departmentId,
+                specialization,
+                licenseNumber,
+            });
+
+            const selectedDepartment =
+                departments.find((department) => department.id === departmentId) ?? null;
+
+            setDoctors((current) =>
+                current.map((doctor) =>
+                    doctor.id === editingDoctor.id
+                        ? {
+                            ...doctor,
+                            departmentId,
+                            specialization,
+                            licenseNumber,
+                            department: selectedDepartment,
+                        }
+                        : doctor,
+                ),
+            );
+
+            setEditingDoctor(null);
+            setEditError('');
+        } catch (updateError) {
+            setEditError(
+                updateError instanceof ApiClientError
+                    ? updateError.message
+                    : 'Failed to update the doctor profile.',
+            );
+        } finally {
+            setSavingEdit(false);
+        }
+    }
+
     if (loading) {
         return <LoadingState />;
     }
@@ -363,18 +444,18 @@ export function DoctorDirectory() {
                 </p>
             </section>
 
-            {session?.user?.role === "ADMIN" && (
+            {session?.user?.role === 'ADMIN' && (
                 <section className="space-y-3">
                     <div className="flex justify-end">
                         <button
                             type="button"
                             onClick={() => {
-                                setCreateError("");
+                                setCreateError('');
                                 setCreateOpen((current) => !current);
                             }}
                             className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
                         >
-                            {createOpen ? "Cancel" : "Create doctor profile"}
+                            {createOpen ? 'Cancel' : 'Create doctor profile'}
                         </button>
                     </div>
 
@@ -384,7 +465,8 @@ export function DoctorDirectory() {
                                 <div>
                                     <h2 className="font-semibold">Create doctor profile</h2>
                                     <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                                        Associate an existing doctor account with a clinical profile.
+                                        Associate an existing doctor account with a clinical
+                                        profile.
                                     </p>
                                 </div>
 
@@ -422,7 +504,8 @@ export function DoctorDirectory() {
 
                                             {eligibleDoctorUsers.map((candidate) => (
                                                 <option key={candidate.id} value={candidate.id}>
-                                                    {candidate.name || "Unnamed doctor"} — {candidate.email}
+                                                    {candidate.name || 'Unnamed doctor'} —{' '}
+                                                    {candidate.email}
                                                 </option>
                                             ))}
                                         </select>
@@ -515,16 +598,141 @@ export function DoctorDirectory() {
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        disabled={savingDoctor || eligibleDoctorUsers.length === 0}
+                                        disabled={
+                                            savingDoctor || eligibleDoctorUsers.length === 0
+                                        }
                                         className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                                     >
-                                        {savingDoctor ? "Creating profile..." : "Create profile"}
+                                        {savingDoctor ? 'Creating profile...' : 'Create profile'}
                                     </button>
                                 </div>
                             </form>
                         </Card>
                     )}
                 </section>
+            )}
+
+            {session?.user?.role === 'ADMIN' && editingDoctor && (
+                <Card>
+                    <form onSubmit={handleUpdateDoctor} className="space-y-5">
+                        <div>
+                            <h2 className="font-semibold">Edit doctor profile</h2>
+                            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                                {editingDoctor.user.name || editingDoctor.user.email}
+                            </p>
+                        </div>
+
+                        {editError && (
+                            <div
+                                role="alert"
+                                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                            >
+                                {editError}
+                            </div>
+                        )}
+
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div>
+                                <label
+                                    htmlFor="edit-doctor-department"
+                                    className="mb-2 block text-sm font-medium"
+                                >
+                                    Department
+                                </label>
+
+                                <select
+                                    id="edit-doctor-department"
+                                    value={editForm.departmentId}
+                                    onChange={(event) =>
+                                        setEditForm((current) => ({
+                                            ...current,
+                                            departmentId: event.target.value,
+                                        }))
+                                    }
+                                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                                >
+                                    <option value="">No department assigned</option>
+
+                                    {departments.map((department) => (
+                                        <option key={department.id} value={department.id}>
+                                            {department.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="edit-doctor-specialization"
+                                    className="mb-2 block text-sm font-medium"
+                                >
+                                    Specialization
+                                </label>
+
+                                <input
+                                    id="edit-doctor-specialization"
+                                    type="text"
+                                    maxLength={150}
+                                    value={editForm.specialization}
+                                    onChange={(event) =>
+                                        setEditForm((current) => ({
+                                            ...current,
+                                            specialization: event.target.value,
+                                        }))
+                                    }
+                                    placeholder="e.g. General Surgery"
+                                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="edit-doctor-license"
+                                    className="mb-2 block text-sm font-medium"
+                                >
+                                    License number
+                                </label>
+
+                                <input
+                                    id="edit-doctor-license"
+                                    type="text"
+                                    maxLength={100}
+                                    value={editForm.licenseNumber}
+                                    onChange={(event) =>
+                                        setEditForm((current) => ({
+                                            ...current,
+                                            licenseNumber: event.target.value,
+                                        }))
+                                    }
+                                    placeholder="Enter license number"
+                                    className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                type="button"
+                                disabled={savingEdit}
+                                onClick={() => {
+                                    setEditingDoctor(null);
+                                    setEditError('');
+                                }}
+                                className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                disabled={savingEdit}
+                                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {savingEdit ? 'Saving changes...' : 'Save changes'}
+                            </button>
+                        </div>
+                    </form>
+                </Card>
             )}
 
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -646,6 +854,9 @@ export function DoctorDirectory() {
                                     <th className="px-3 py-3 font-medium">License number</th>
                                     <th className="px-3 py-3 font-medium">Status</th>
                                     <th className="px-3 py-3 font-medium">Profile created</th>
+                                    {session?.user?.role === 'ADMIN' && (
+                                        <th className="px-3 py-3 font-medium">Actions</th>
+                                    )}
                                 </tr>
                             </thead>
 
@@ -704,6 +915,18 @@ export function DoctorDirectory() {
                                         <td className="px-3 py-4 whitespace-nowrap">
                                             {formatDate(doctor.createdAt)}
                                         </td>
+
+                                        {session?.user?.role === "ADMIN" && (
+                                            <td className="px-3 py-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => startEditingDoctor(doctor)}
+                                                    className="font-medium text-[var(--color-primary)] hover:underline"
+                                                >
+                                                    Edit profile
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
