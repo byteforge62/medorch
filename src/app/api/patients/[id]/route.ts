@@ -19,7 +19,7 @@ export async function GET(
 
   try {
     const { session, response } = await authorizeApiPermission(
-      "patients:read",
+      "patients:clinical:read",
       requestId,
     );
 

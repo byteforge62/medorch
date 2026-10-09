@@ -42,6 +42,7 @@ export async function findPatientById(id: string) {
       phone:true,
       dateOfBirth:true,
       gender:true,
+      medicalHistory:true,
       createdAt: true,
       updatedAt: true,
 

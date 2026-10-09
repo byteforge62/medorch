@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { apiClient, ApiClientError } from "@/lib/api/client";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -262,7 +263,7 @@ export function PatientRegistry() {
               setCreateOpen((current) => !current);
               setEditingPatient(null);
               setForm(EMPTY_PATIENT_FORM);
-              setFormError("");
+              setFormError('');
             }}
             className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
@@ -634,9 +635,10 @@ export function PatientRegistry() {
                   <th className="px-3 py-3 font-medium">Patient</th>
                   <th className="px-3 py-3 font-medium">Contact</th>
                   <th className="px-3 py-3 font-medium">Date of birth</th>
-                  {session?.user?.role === 'ADMIN' && (
-                    <th className="px-3 py-3 font-medium">Actions</th>
-                  )}
+                  {(session?.user?.role === 'ADMIN' ||
+                    session?.user?.role === 'DOCTOR') && (
+                      <th className="px-3 py-3 font-medium">Actions</th>
+                    )}
                   <th className="px-3 py-3 font-medium">Gender</th>
                 </tr>
               </thead>
@@ -668,17 +670,29 @@ export function PatientRegistry() {
                     <td className="px-3 py-4">
                       {patient.gender ? <Badge>{patient.gender}</Badge> : '—'}
                     </td>
-                    {session?.user?.role === 'ADMIN' && (
-                      <td className="px-3 py-4">
-                        <button
-                          type="button"
-                          onClick={() => openEditForm(patient)}
-                          className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-surface)]"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    )}
+                    {(session?.user?.role === 'ADMIN' ||
+                      session?.user?.role === 'DOCTOR') && (
+                        <td className="px-3 py-4">
+                          <div className="flex flex-wrap gap-2">
+                            <Link
+                              href={`/patients/${patient.id}`}
+                              className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
+                            >
+                              Details
+                            </Link>
+
+                            {session.user.role === 'ADMIN' && (
+                              <button
+                                type="button"
+                                onClick={() => openEditForm(patient)}
+                                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
+                              >
+                                Edit
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      )}
                   </tr>
                 ))}
               </tbody>
