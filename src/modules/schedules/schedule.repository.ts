@@ -518,51 +518,103 @@ export async function findEquipmentForAssignment(
   });
 }
 
-export async function createScheduleEquipment(
-  data: {
-    scheduleId: string;
-    equipmentId: string;
-  },
-) {
-  return prisma.scheduleEquipment.create({
-    data,
-    select: {
-      id: true,
-      scheduleId: true,
-      equipmentId: true,
-      assignedAt: true,
-      releasedAt: true,
+export async function createScheduleEquipment(data: {
+  scheduleId: string;
+  equipmentId: string;
+}) {
+  return prisma.$transaction(async (tx) => {
+    // Claim the equipment only if it is still available.
+    const claim = await tx.equipment.updateMany({
+      where: {
+        id: data.equipmentId,
+        status: "AVAILABLE",
+      },
+      data: {
+        status: "IN_USE",
+      },
+    });
 
-      equipment: {
+    if (claim.count !== 1) {
+      const equipment = await tx.equipment.findUnique({
+        where: {
+          id: data.equipmentId,
+        },
         select: {
           id: true,
-          name: true,
-          category: true,
-          serialNumber: true,
-          status: true,
+        },
+      });
+
+      if (!equipment) {
+        throw new Error("EQUIPMENT_NOT_FOUND");
+      }
+
+      throw new Error("EQUIPMENT_UNAVAILABLE");
+    }
+
+    // Create the assignment in the same transaction.
+    return tx.scheduleEquipment.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        equipmentId: true,
+        assignedAt: true,
+        releasedAt: true,
+        equipment: {
+          select: {
+            id: true,
+            name: true,
+            category: true,
+            serialNumber: true,
+            status: true,
+          },
         },
       },
-    },
+    });
   });
 }
 
-export async function releaseScheduleEquipment(
-  id: string,
-) {
-  return prisma.scheduleEquipment.update({
-    where: {
-      id,
-    },
-    data: {
-      releasedAt: new Date(),
-    },
-    select: {
-      id: true,
-      scheduleId: true,
-      equipmentId: true,
-      assignedAt: true,
-      releasedAt: true,
-    },
+export async function releaseScheduleEquipment(id: string) {
+  return prisma.$transaction(async (tx) => {
+    const assignment = await tx.scheduleEquipment.update({
+      where: {
+        id,
+      },
+      data: {
+        releasedAt: new Date(),
+      },
+      select: {
+        id: true,
+        scheduleId: true,
+        equipmentId: true,
+        assignedAt: true,
+        releasedAt: true,
+      },
+    });
+
+    // Do not mark equipment available while another active
+    // assignment still references it.
+    const activeAssignments = await tx.scheduleEquipment.count({
+      where: {
+        equipmentId: assignment.equipmentId,
+        releasedAt: null,
+      },
+    });
+
+    if (activeAssignments === 0) {
+      // Preserve MAINTENANCE or RETIRED status.
+      await tx.equipment.updateMany({
+        where: {
+          id: assignment.equipmentId,
+          status: "IN_USE",
+        },
+        data: {
+          status: "AVAILABLE",
+        },
+      });
+    }
+
+    return assignment;
   });
 }
 

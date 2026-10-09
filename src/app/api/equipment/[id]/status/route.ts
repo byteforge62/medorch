@@ -80,6 +80,23 @@ export async function PATCH(
       );
     }
 
+    if (error instanceof Error) {
+      const messages: Record<string, string> = {
+        EQUIPMENT_HAS_ACTIVE_ASSIGNMENTS:
+          "Equipment with an active schedule assignment cannot be moved out of IN_USE.",
+        EQUIPMENT_STATUS_REQUIRES_ASSIGNMENT:
+          "Equipment can only be marked IN_USE through a schedule assignment.",
+        EQUIPMENT_STATUS_CONFLICT:
+          "Equipment status changed concurrently. Refresh and retry.",
+      };
+
+      const message = messages[error.message];
+
+      if (message) {
+        return apiError(message, 409, undefined, requestId);
+      }
+    }
+
     return apiError(
       "Failed to update equipment status.",
       500,
