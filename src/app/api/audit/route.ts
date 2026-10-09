@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getAuditLogs } from "@/modules/audit/audit.service";
@@ -29,8 +29,8 @@ const auditQuerySchema = z.object({
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
 
-  const { response } = await authorizeApiRole(
-    ["ADMIN"],
+  const { response } = await authorizeApiPermission(
+    "audit:read",
     requestId,
   );
 

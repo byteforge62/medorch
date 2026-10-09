@@ -20,6 +20,7 @@ export const ROLE_PERMISSIONS = {
     "schedules:notes:manage",
     "patients:read",
     "patients:manage",
+    "audit:read",
     "alerts:read",
     "alerts:manage",
     "alerts:create",
