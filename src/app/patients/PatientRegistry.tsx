@@ -57,6 +57,7 @@ export function PatientRegistry() {
 
   const { data: session } = useSession();
 
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
@@ -165,6 +166,69 @@ export function PatientRegistry() {
     }
   }
 
+  function openEditForm(patient: Patient) {
+    setCreateOpen(false);
+    setEditingPatient(patient);
+    setFormError('');
+
+    setForm({
+      patientCode: patient.patientCode,
+      name: patient.name,
+      email: patient.email ?? '',
+      phone: patient.phone ?? '',
+      dateOfBirth: patient.dateOfBirth
+        ? new Date(patient.dateOfBirth).toISOString().slice(0, 10)
+        : '',
+      gender: patient.gender ?? '',
+      medicalHistory: '',
+    });
+  }
+
+  async function handleUpdatePatient(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingPatient) {
+      return;
+    }
+
+    setSaving(true);
+    setFormError('');
+
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim() || null,
+      phone: form.phone.trim() || null,
+      dateOfBirth: form.dateOfBirth || null,
+      gender: form.gender.trim() || null,
+    };
+
+    try {
+      const updatedPatient = await apiClient.patch<Patient>(
+        `/api/patients/${editingPatient.id}`,
+        payload,
+      );
+
+      setPatients((current) =>
+        current.map((patient) =>
+          patient.id === updatedPatient.id
+            ? { ...patient, ...updatedPatient }
+            : patient,
+        ),
+      );
+
+      setEditingPatient(null);
+      setForm(EMPTY_PATIENT_FORM);
+    } catch (submitError) {
+      setFormError(
+        submitError instanceof ApiClientError
+          ? submitError.message
+          : 'Failed to update patient.',
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) {
     return <LoadingState />;
   }
@@ -196,7 +260,9 @@ export function PatientRegistry() {
             type="button"
             onClick={() => {
               setCreateOpen((current) => !current);
-              setFormError('');
+              setEditingPatient(null);
+              setForm(EMPTY_PATIENT_FORM);
+              setFormError("");
             }}
             className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
@@ -211,7 +277,7 @@ export function PatientRegistry() {
             <div>
               <h2 className="text-lg font-semibold">Add patient</h2>
               <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                Enter the patient's registration and contact details.
+                Enter the patient&apos;s registration and contact details.
               </p>
             </div>
 
@@ -372,6 +438,136 @@ export function PatientRegistry() {
           </form>
         </Card>
       )}
+      {editingPatient && session?.user?.role === 'ADMIN' && (
+        <Card>
+          <form onSubmit={handleUpdatePatient} className="space-y-5">
+            <div>
+              <h2 className="text-lg font-semibold">Edit patient</h2>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                Patient code: {editingPatient.patientCode}
+              </p>
+            </div>
+
+            {formError && (
+              <div
+                role="alert"
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
+                {formError}
+              </div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="edit-patient-name"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  Full name *
+                </label>
+                <input
+                  id="edit-patient-name"
+                  required
+                  maxLength={150}
+                  value={form.name}
+                  onChange={(event) => updateForm('name', event.target.value)}
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="edit-patient-email"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  Email
+                </label>
+                <input
+                  id="edit-patient-email"
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => updateForm('email', event.target.value)}
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="edit-patient-phone"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  Phone
+                </label>
+                <input
+                  id="edit-patient-phone"
+                  type="tel"
+                  maxLength={30}
+                  value={form.phone}
+                  onChange={(event) => updateForm('phone', event.target.value)}
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="edit-patient-dob"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  Date of birth
+                </label>
+                <input
+                  id="edit-patient-dob"
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={(event) =>
+                    updateForm('dateOfBirth', event.target.value)
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="edit-patient-gender"
+                  className="mb-2 block text-sm font-medium"
+                >
+                  Gender
+                </label>
+                <input
+                  id="edit-patient-gender"
+                  maxLength={30}
+                  value={form.gender}
+                  onChange={(event) => updateForm('gender', event.target.value)}
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => {
+                  setEditingPatient(null);
+                  setForm(EMPTY_PATIENT_FORM);
+                  setFormError('');
+                }}
+                className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save changes'}
+              </button>
+            </div>
+          </form>
+        </Card>
+      )}
 
       <section className="grid gap-4 sm:grid-cols-2">
         <Card>
@@ -438,6 +634,9 @@ export function PatientRegistry() {
                   <th className="px-3 py-3 font-medium">Patient</th>
                   <th className="px-3 py-3 font-medium">Contact</th>
                   <th className="px-3 py-3 font-medium">Date of birth</th>
+                  {session?.user?.role === 'ADMIN' && (
+                    <th className="px-3 py-3 font-medium">Actions</th>
+                  )}
                   <th className="px-3 py-3 font-medium">Gender</th>
                 </tr>
               </thead>
@@ -469,6 +668,17 @@ export function PatientRegistry() {
                     <td className="px-3 py-4">
                       {patient.gender ? <Badge>{patient.gender}</Badge> : '—'}
                     </td>
+                    {session?.user?.role === 'ADMIN' && (
+                      <td className="px-3 py-4">
+                        <button
+                          type="button"
+                          onClick={() => openEditForm(patient)}
+                          className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-surface)]"
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
