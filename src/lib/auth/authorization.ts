@@ -6,48 +6,43 @@ import type { UserRole } from "@/generated/prisma/client";
 import { hasPermission, type Permission } from "./permission";
 
 export async function requireAuth() {
-    const session = await auth();
+  const session = await auth();
 
-    if(!session?.user){
-        redirect("/login")
-    }
-    return session;
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  return session;
 }
 
-export async function requireRole(roles: UserRole | UserRole[]){
-   const session = await requireAuth();
+export async function requireRole(
+  roles: UserRole | UserRole[],
+) {
+  const session = await requireAuth();
 
-   const allowedRoles = Array.isArray(roles) ? roles : [roles];
-   if(!allowedRoles.includes(session.user.role)){
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+  if (!allowedRoles.includes(session.user.role)) {
     redirect("/unauthorized");
-   }
+  }
 
-   return session;
+  return session;
 }
 
-export async function requirePermission(permission: Permission){
-    const session = await requireAuth();
-    if(!hasPermission(session.user.role,permission)){
-        redirect("/unauthorized");
-    }
-    return session;
-}
+export async function requirePermission(
+  permission: Permission,
+) {
+  const session = await requireAuth();
 
+  if (!hasPermission(session.user.role, permission)) {
+    redirect("/unauthorized");
+  }
+
+  return session;
+}
 
 export async function getApiSession() {
   const session = await auth();
+
   return session?.user ? session : null;
-}
-
-export async function requireApiRole(roles: UserRole | UserRole[]){
-  const session = await getApiSession();
-  if (!session) {
-    return null;
-  }
-
-  const allowedRoles = Array.isArray(roles) ? roles : [roles];
-  if (!allowedRoles.includes(session.user.role)) {
-    return null;
-  }
-  return session;
 }
