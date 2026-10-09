@@ -1,4 +1,4 @@
-import { authorizeApiRole } from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import {
@@ -23,8 +23,8 @@ export async function GET(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      ["ADMIN", "DOCTOR", "OT_STAFF"],
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
       requestId,
     );
 
@@ -84,8 +84,8 @@ export async function POST(
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiRole(
-      "ADMIN",
+    const { session, response } = await authorizeApiPermission(
+      "schedules:staff:manage",
       requestId,
     );
 
