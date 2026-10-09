@@ -9,9 +9,27 @@ import { Card } from '@/components/ui/Card';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
 
+
+interface PatientSchedule {
+  id: string;
+  procedure: string;
+  scheduledDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  priority: string;
+  department: {
+    name: string;
+  };
+  otRoom: {
+    name: string;
+    code: string;
+  };
+}
 interface PatientDetailRecord {
   id: string;
   patientCode: string;
+  schedules: PatientSchedule[];
   name: string;
   email: string | null;
   phone: string | null;
@@ -42,6 +60,19 @@ function formatDate(value: string | null) {
 
   return new Intl.DateTimeFormat('en-IN', {
     dateStyle: 'medium',
+  }).format(date);
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '—';
+  }
+
+  return new Intl.DateTimeFormat('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   }).format(date);
 }
 
@@ -177,6 +208,85 @@ export function PatientDetail({ patientId }: { patientId: string }) {
               'No medical history has been recorded.'}
           </p>
         </div>
+      </Card>
+
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Schedule history</h2>
+          <span className="text-sm text-[var(--color-text-muted)]">
+            {patient.schedules.length}{' '}
+            {patient.schedules.length === 1 ? 'schedule' : 'schedules'}
+          </span>
+        </div>
+
+        {patient.schedules.length === 0 ? (
+          <p className="mt-4 text-sm text-[var(--color-text-muted)]">
+            No schedules have been recorded for this patient.
+          </p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {patient.schedules.map((schedule) => (
+              <article
+                key={schedule.id}
+                className="rounded-lg border border-[var(--color-border)] p-4"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <h3 className="font-medium">{schedule.procedure}</h3>
+                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                      {schedule.department.name}
+                    </p>
+                  </div>
+
+                  <Badge>{schedule.status.replaceAll('_', ' ')}</Badge>
+                </div>
+
+                <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                  <div>
+                    <dt className="text-[var(--color-text-muted)]">
+                      Scheduled date
+                    </dt>
+                    <dd className="mt-1 font-medium">
+                      {formatDate(schedule.scheduledDate)}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-[var(--color-text-muted)]">
+                      Start time
+                    </dt>
+                    <dd className="mt-1 font-medium">
+                      {formatDateTime(schedule.startTime)}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-[var(--color-text-muted)]">End time</dt>
+                    <dd className="mt-1 font-medium">
+                      {formatDateTime(schedule.endTime)}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-[var(--color-text-muted)]">
+                      Operating theatre
+                    </dt>
+                    <dd className="mt-1 font-medium">
+                      {schedule.otRoom.name} ({schedule.otRoom.code})
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-[var(--color-text-muted)]">Priority</dt>
+                    <dd className="mt-1 font-medium">
+                      {schedule.priority.replaceAll('_', ' ')}
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
       </Card>
 
       <Card>

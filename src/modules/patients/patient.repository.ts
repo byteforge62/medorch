@@ -55,6 +55,32 @@ export async function findPatientById(id: string) {
           status: true,
         },
       },
+
+      schedules: {
+  orderBy: {
+    scheduledDate: "desc",
+  },
+  select: {
+    id: true,
+    procedure: true,
+    scheduledDate: true,
+    startTime: true,
+    endTime: true,
+    status: true,
+    priority: true,
+    department: {
+      select: {
+        name: true,
+      },
+    },
+    otRoom: {
+      select: {
+        name: true,
+        code: true,
+      },
+    },
+  },
+},
     },
   });
 }
