@@ -19,7 +19,7 @@ export async function createNewDepartment(
   data: {
     name: string;
     description?: string;
-    headDoctor?: string;
+    headDoctorId?: string;
     isActive?: boolean;
   },
   userId?: string,
