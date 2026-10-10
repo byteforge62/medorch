@@ -244,23 +244,30 @@ export async function createScheduleWithValidation(
   });
 
   if (conflicts.length > 0) {
-    const roomConflict = conflicts.some(
-      (conflict) => conflict.otRoomId === data.otRoomId,
-    );
+  const roomConflict = conflicts.some(
+    (conflict) => conflict.otRoomId === data.otRoomId,
+  );
 
-    if (roomConflict) {
-      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
-    }
-
-    const surgeonConflict = conflicts.some(
-      (conflict) => conflict.surgeonId === data.surgeonId,
-    );
-
-    if (surgeonConflict) {
-      throw new Error("SURGEON_SCHEDULE_CONFLICT");
-    }
+  if (roomConflict) {
+    throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
   }
 
+  const surgeonConflict = conflicts.some(
+    (conflict) => conflict.surgeonId === data.surgeonId,
+  );
+
+  if (surgeonConflict) {
+    throw new Error("SURGEON_SCHEDULE_CONFLICT");
+  }
+
+  const patientConflict = conflicts.some(
+    (conflict) => conflict.patientId === data.patientId,
+  );
+
+  if (patientConflict) {
+    throw new Error("PATIENT_SCHEDULE_CONFLICT");
+  }
+}
   const schedule = await createScheduleRecord(data);
 
   await recordAudit({
