@@ -382,14 +382,6 @@ export async function updateScheduleWithValidation(
     throw new Error("SURGEON_INACTIVE");
   }
 
-  const patientConflict = conflicts.some(
-    (conflict) => conflict.patientId === patientId,
-  );
-
-  if (patientConflict) {
-    throw new Error("PATIENT_SCHEDULE_CONFLICT");
-  }
-
   if (endTime <= startTime) {
     throw new Error("INVALID_TIME_RANGE");
   }
@@ -419,6 +411,14 @@ export async function updateScheduleWithValidation(
     if (surgeonConflict) {
       throw new Error("SURGEON_SCHEDULE_CONFLICT");
     }
+  }
+
+  const patientConflict = conflicts.some(
+    (conflict) => conflict.patientId === patientId,
+  );
+
+  if (patientConflict) {
+    throw new Error("PATIENT_SCHEDULE_CONFLICT");
   }
 
   const schedule = await updateScheduleRecord(id, data);
