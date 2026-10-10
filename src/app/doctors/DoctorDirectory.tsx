@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { apiClient, ApiClientError } from "@/lib/api/client";
-
+import Link from 'next/link';
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -873,6 +873,12 @@ export function DoctorDirectory() {
                                             <p className="mt-1 text-xs text-[var(--color-text-muted)]">
                                                 {doctor.user.email}
                                             </p>
+                                            <Link
+                                                href={`/doctors/${doctor.id}`}
+                                                className="mt-2 inline-block text-xs font-medium text-[var(--color-primary)] hover:underline"
+                                            >
+                                                View details
+                                            </Link>
                                         </td>
 
                                         <td className="px-3 py-4">
