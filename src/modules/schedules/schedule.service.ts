@@ -23,7 +23,7 @@ import {
   findScheduleNotes,
   updateScheduleNote,
 } from "./schedule.repository";
-import {recordAudit} from "@/modules/audit/audit.service";
+import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getSchedules() {
   return findSchedules();
@@ -88,7 +88,7 @@ export async function updateScheduleStatusById(
     | "COMPLETED"
     | "CANCELLED"
     | "DELAYED",
-    actorUserId?: string
+  actorUserId?: string
 ) {
   const existingSchedule = await findScheduleById(id);
 
@@ -133,47 +133,47 @@ export async function updateScheduleStatusById(
     throw new Error("INVALID_STATUS_TRANSITION");
   }
 
-const schedule = await updateScheduleStatusRecord(id, status);
+  const schedule = await updateScheduleStatusRecord(id, status);
 
-const auditAction =
-  status === "COMPLETED"
-    ? "COMPLETE"
-    : status === "CANCELLED"
-      ? "CANCEL"
-      : "UPDATE";
+  const auditAction =
+    status === "COMPLETED"
+      ? "COMPLETE"
+      : status === "CANCELLED"
+        ? "CANCEL"
+        : "UPDATE";
 
-await recordAudit({
-  userId: actorUserId,
-  action: auditAction,
-  entity: "Schedule",
-  entityId: schedule.id,
-  description: `Schedule status changed to ${status}.`,
-  metadata: {
-    status,
-  },
-});
+  await recordAudit({
+    userId: actorUserId,
+    action: auditAction,
+    entity: "Schedule",
+    entityId: schedule.id,
+    description: `Schedule status changed to ${status}.`,
+    metadata: {
+      status,
+    },
+  });
 
-return schedule;  
+  return schedule;
 }
 
 export async function createScheduleWithValidation(
   data: {
-  patientId: string;
-  departmentId: string;
-  otRoomId: string;
-  surgeonId: string;
-  createdById: string;
-  procedure: string;
-  scheduledDate: Date;
-  startTime: Date;
-  endTime: Date;
-  priority?:
-  | "ELECTIVE"
-  | "URGENT"
-  | "EMERGENCY";
-  clinicalNotes?: string;
-},
-actorUserId?: string
+    patientId: string;
+    departmentId: string;
+    otRoomId: string;
+    surgeonId: string;
+    createdById: string;
+    procedure: string;
+    scheduledDate: Date;
+    startTime: Date;
+    endTime: Date;
+    priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+    clinicalNotes?: string;
+  },
+  actorUserId?: string
 ) {
   const patient = await findPatientById(data.patientId);
 
@@ -233,7 +233,10 @@ actorUserId?: string
     throw new Error("SURGEON_INACTIVE");
   }
 
+
+
   const conflicts = await findScheduleConflicts({
+    patientId: data.patientId,
     otRoomId: data.otRoomId,
     surgeonId: data.surgeonId,
     startTime: data.startTime,
@@ -260,22 +263,22 @@ actorUserId?: string
 
   const schedule = await createScheduleRecord(data);
 
-await recordAudit({
-  userId: actorUserId,
-  action: "CREATE",
-  entity: "Schedule",
-  entityId: schedule.id,
-  description: `Schedule for procedure "${schedule.procedure}" was created.`,
-  metadata: {
-    patientId: schedule.patientId,
-    departmentId: schedule.departmentId,
-    otRoomId: schedule.otRoomId,
-    surgeonId: schedule.surgeonId,
-    priority: schedule.priority,
-  },
-});
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Schedule",
+    entityId: schedule.id,
+    description: `Schedule for procedure "${schedule.procedure}" was created.`,
+    metadata: {
+      patientId: schedule.patientId,
+      departmentId: schedule.departmentId,
+      otRoomId: schedule.otRoomId,
+      surgeonId: schedule.surgeonId,
+      priority: schedule.priority,
+    },
+  });
 
-return schedule;
+  return schedule;
 }
 
 export async function updateScheduleWithValidation(
@@ -379,11 +382,20 @@ export async function updateScheduleWithValidation(
     throw new Error("SURGEON_INACTIVE");
   }
 
+  const patientConflict = conflicts.some(
+    (conflict) => conflict.patientId === patientId,
+  );
+
+  if (patientConflict) {
+    throw new Error("PATIENT_SCHEDULE_CONFLICT");
+  }
+
   if (endTime <= startTime) {
     throw new Error("INVALID_TIME_RANGE");
   }
 
   const conflicts = await findScheduleConflicts({
+    patientId,
     otRoomId,
     surgeonId,
     startTime,
@@ -409,20 +421,20 @@ export async function updateScheduleWithValidation(
     }
   }
 
-const schedule = await updateScheduleRecord(id, data);
+  const schedule = await updateScheduleRecord(id, data);
 
-await recordAudit({
-  userId: actorUserId,
-  action: "UPDATE",
-  entity: "Schedule",
-  entityId: schedule.id,
-  description: `Schedule for procedure "${schedule.procedure}" was updated.`,
-  metadata: {
-    scheduleId: schedule.id,
-  },
-});
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "Schedule",
+    entityId: schedule.id,
+    description: `Schedule for procedure "${schedule.procedure}" was updated.`,
+    metadata: {
+      scheduleId: schedule.id,
+    },
+  });
 
-return schedule;  
+  return schedule;
 }
 
 export async function getScheduleStaff(
@@ -448,7 +460,7 @@ export async function assignScheduleStaffById(
     | "TECHNICIAN"
     | "OTHER";
   },
-  actorUserId? : string
+  actorUserId?: string
 ) {
   const schedule = await findScheduleById(scheduleId);
 
@@ -469,25 +481,25 @@ export async function assignScheduleStaffById(
   }
 
   const staff = await createScheduleStaff({
-  scheduleId,
-  userId: data.userId,
-  role: data.role,
-});
-
-await recordAudit({
-  userId: actorUserId,
-  action: "CREATE",
-  entity: "ScheduleStaff",
-  entityId: staff.id,
-  description: `Staff member was assigned to schedule ${scheduleId}.`,
-  metadata: {
     scheduleId,
-    staffUserId: data.userId,
+    userId: data.userId,
     role: data.role,
-  },
-});
+  });
 
-return staff;
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "ScheduleStaff",
+    entityId: staff.id,
+    description: `Staff member was assigned to schedule ${scheduleId}.`,
+    metadata: {
+      scheduleId,
+      staffUserId: data.userId,
+      role: data.role,
+    },
+  });
+
+  return staff;
 }
 
 export async function removeScheduleStaffById(
@@ -555,10 +567,10 @@ export async function assignScheduleEquipmentById(
   await recordAudit({
     userId: actorUserId,
     action: "CREATE",
-    entity:"ScheduleEquipment",
+    entity: "ScheduleEquipment",
     entityId: assignment.id,
     description: "Equipment assigned to schedule.",
-    metadata:{
+    metadata: {
       scheduleId,
       equipmentId
     }
@@ -571,17 +583,17 @@ export async function releaseScheduleEquipmentById(
   equipmentAssignmentId: string,
   actorUserId?: string
 ) {
-  const assignment= await releaseScheduleEquipment(
+  const assignment = await releaseScheduleEquipment(
     equipmentAssignmentId,
   );
 
   await recordAudit({
     userId: actorUserId,
-    action:"UPDATE",
-    entity:"ScheduleEquipment",
+    action: "UPDATE",
+    entity: "ScheduleEquipment",
     entityId: assignment.id,
     description: "Equipment released from schedule.",
-    metadata:{
+    metadata: {
       scheduleId: assignment.scheduleId,
       equipmentId: assignment.equipmentId
     }
@@ -652,17 +664,17 @@ export async function updateScheduleNoteById(
   const updatedNote = await updateScheduleNote(noteId, content);
 
   await recordAudit({
-  userId: authorId,
-  action: "UPDATE",
-  entity: "ScheduleNote",
-  entityId: note.id,
-  description: "Schedule note was updated.",
-  metadata: {
-    scheduleId: note.scheduleId,
-  },
-});
+    userId: authorId,
+    action: "UPDATE",
+    entity: "ScheduleNote",
+    entityId: note.id,
+    description: "Schedule note was updated.",
+    metadata: {
+      scheduleId: note.scheduleId,
+    },
+  });
 
-return updatedNote;
+  return updatedNote;
 }
 
 export async function deleteScheduleNoteById(
@@ -682,15 +694,15 @@ export async function deleteScheduleNoteById(
   await deleteScheduleNote(noteId);
 
   await recordAudit({
-  userId: authorId,
-  action: "DELETE",
-  entity: "ScheduleNote",
-  entityId: note.id,
-  description: "Schedule note was deleted.",
-  metadata: {
-    scheduleId: note.scheduleId,
-  },
-});
+    userId: authorId,
+    action: "DELETE",
+    entity: "ScheduleNote",
+    entityId: note.id,
+    description: "Schedule note was deleted.",
+    metadata: {
+      scheduleId: note.scheduleId,
+    },
+  });
 
-return note;
+  return note;
 }

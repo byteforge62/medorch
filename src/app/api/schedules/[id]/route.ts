@@ -166,6 +166,18 @@ export async function PATCH(
       }
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "PATIENT_SCHEDULE_CONFLICT"
+    ) {
+      return apiError(
+        "This patient already has a procedure scheduled during the selected time.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
     return apiError(
       "Failed to update schedule.",
       500,

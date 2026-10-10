@@ -338,6 +338,7 @@ export async function findSurgeonById(id: string) {
 }
 
 export async function findScheduleConflicts(data: {
+  patientId: string;
   otRoomId: string;
   surgeonId: string;
   startTime: Date;
@@ -369,6 +370,9 @@ export async function findScheduleConflicts(data: {
         {
           surgeonId: data.surgeonId,
         },
+        {
+          patientId: data.patientId,
+        }
       ],
     },
 
@@ -376,6 +380,7 @@ export async function findScheduleConflicts(data: {
       id: true,
       otRoomId: true,
       surgeonId: true,
+      patientId: true,
       startTime: true,
       endTime: true,
       status: true,

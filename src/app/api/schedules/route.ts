@@ -1,8 +1,8 @@
-import { authorizeApiPermission} from "@/lib/api/auth";
+import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getSchedules,createScheduleWithValidation } from "@/modules/schedules/schedule.service";
-import {createScheduleSchema} from "@/modules/schedules/schedule.validation";
+import { getSchedules, createScheduleWithValidation } from "@/modules/schedules/schedule.service";
+import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -65,8 +65,8 @@ export async function POST(request: Request) {
       ...validation.data,
       createdById: session.user.id,
     },
-  session.user.id
-  );
+      session.user.id
+    );
 
     return apiSuccess(schedule, 200);
   } catch (error) {
@@ -109,6 +109,18 @@ export async function POST(request: Request) {
           requestId,
         );
       }
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "PATIENT_SCHEDULE_CONFLICT"
+    ) {
+      return apiError(
+        "This patient already has a procedure scheduled during the selected time.",
+        409,
+        undefined,
+        requestId,
+      );
     }
 
     return apiError(
