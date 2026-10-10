@@ -5,6 +5,7 @@ import {
   findUserForDoctorCreation,
   updateDoctorProfile,
   updateDoctorUserStatus,
+  findDoctorScheduleHistory,
 } from "./doctor.repository";
 
 import { recordAudit } from "@/modules/audit/audit.service";
@@ -14,7 +15,18 @@ export async function getDoctors() {
 }
 
 export async function getDoctorById(id: string) {
-  return findDoctorById(id);
+  const doctor = await findDoctorById(id);
+
+  if (!doctor) {
+    return null;
+  }
+
+  const schedules = await findDoctorScheduleHistory(doctor.userId);
+
+  return {
+    ...doctor,
+    schedules,
+  };
 }
 
 export async function createDoctor(

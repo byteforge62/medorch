@@ -209,3 +209,37 @@ export async function updateDoctorUserStatus(
     },
   });
 }
+
+export async function findDoctorScheduleHistory(userId: string) {
+  return prisma.schedule.findMany({
+    where: {
+      surgeonId: userId,
+    },
+    orderBy: [
+      { scheduledDate: "desc" },
+      { startTime: "desc" },
+    ],
+    select: {
+      id: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      otRoom: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+        },
+      },
+    },
+  });
+}
