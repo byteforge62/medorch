@@ -16,6 +16,7 @@ import {
   OTRoomOption,
   DoctorOption,
 } from "./ScheduleForm";
+import { ScheduleCalendar } from './ScheduleCalendar';
 
 export function SchedulePage() {
   const { data: session } = useSession();
@@ -33,6 +34,7 @@ export function SchedulePage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
 
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const initialFilters: FilterState = {
     status: "",
     priority: "",
@@ -167,11 +169,6 @@ export function SchedulePage() {
     setFilters(initialFilters);
   };
 
-  /**
-   * Optimistically update the status in local state so the UI reflects the
-   * change immediately, then do a background refetch to sync server state.
-   * Filters and search state are preserved.
-   */
   const handleStatusUpdated = useCallback(
     (scheduleId: string, newStatus: ScheduleStatus) => {
       setSchedules((prev) =>
@@ -195,7 +192,7 @@ export function SchedulePage() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -204,11 +201,41 @@ export function SchedulePage() {
             <Badge variant="purple">{schedules.length} Total</Badge>
           </div>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            View, schedule, and manage operating theatre procedures and room allocations.
+            View, schedule, and manage operating theatre procedures and room
+            allocations.
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
+          <div
+            role="group"
+            aria-label="Schedule view"
+            className="inline-flex rounded-lg border border-slate-200 p-1 dark:border-slate-700"
+          >
+            <button
+              type="button"
+              aria-pressed={viewMode === 'list'}
+              onClick={() => setViewMode('list')}
+              className={`rounded-md px-3 py-2 text-sm font-medium transition ${viewMode === 'list'
+                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+            >
+              List
+            </button>
+
+            <button
+              type="button"
+              aria-pressed={viewMode === 'calendar'}
+              onClick={() => setViewMode('calendar')}
+              className={`rounded-md px-3 py-2 text-sm font-medium transition ${viewMode === 'calendar'
+                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+            >
+              Calendar
+            </button>
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -236,19 +263,28 @@ export function SchedulePage() {
       />
 
       {/* Schedules List */}
-      <ScheduleList
-        schedules={filteredSchedules}
-        isLoading={isLoading}
-        error={error}
-        onRetry={fetchSchedules}
-        isAdmin={isAdmin}
-        onEdit={handleOpenEdit}
-        onStatusUpdated={handleStatusUpdated}
-      />
+      {viewMode === "calendar" ? (
+        <ScheduleCalendar
+          schedules={filteredSchedules}
+          isLoading={isLoading}
+          error={error}
+          onRetry={fetchSchedules}
+        />
+      ) : (
+        <ScheduleList
+          schedules={filteredSchedules}
+          isLoading={isLoading}
+          error={error}
+          onRetry={fetchSchedules}
+          isAdmin={isAdmin}
+          onEdit={handleOpenEdit}
+          onStatusUpdated={handleStatusUpdated}
+        />
+      )}
 
       {/* Schedule Form Modal */}
       <ScheduleForm
-        key={editingSchedule?.id || (isFormOpen ? "open" : "closed")}
+        key={editingSchedule?.id || (isFormOpen ? 'open' : 'closed')}
         initialSchedule={editingSchedule}
         patients={patients}
         departments={departments}
