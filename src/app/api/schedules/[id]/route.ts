@@ -1,3 +1,4 @@
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
@@ -123,6 +124,17 @@ export async function PATCH(
       error,
     );
 
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
     if (error instanceof Error) {
       const messages: Record<string, string> = {
         SCHEDULE_NOT_FOUND: "Schedule not found.",
@@ -157,7 +169,11 @@ export async function PATCH(
           message,
           error.message === "SCHEDULE_NOT_FOUND"
             ? 404
-            : error.message === "SCHEDULE_IMMUTABLE"
+            : error.message === "SCHEDULE_IMMUTABLE" ||
+              [
+                "OT_ROOM_SCHEDULE_CONFLICT",
+                "SURGEON_SCHEDULE_CONFLICT",
+              ].includes(error.message)
               ? 409
               : 400,
           undefined,

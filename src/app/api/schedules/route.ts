@@ -1,3 +1,4 @@
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
@@ -75,6 +76,17 @@ export async function POST(request: Request) {
       error,
     );
 
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
     if (error instanceof Error) {
       const messages: Record<string, string> = {
         PATIENT_NOT_FOUND: "Patient not found.",
@@ -104,7 +116,12 @@ export async function POST(request: Request) {
       if (message) {
         return apiError(
           message,
-          400,
+          [
+            "OT_ROOM_SCHEDULE_CONFLICT",
+            "SURGEON_SCHEDULE_CONFLICT",
+          ].includes(error.message)
+            ? 409
+            : 400,
           undefined,
           requestId,
         );
