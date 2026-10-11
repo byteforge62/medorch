@@ -7,6 +7,7 @@ import { RecentSchedulesList } from '@/components/dashboard/RecentSchedulesList'
 import { AlertsSummaryWidget } from '@/components/dashboard/AlertsSummaryWidget';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Badge } from '@/components/ui/Badge';
+import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -16,6 +17,14 @@ export default async function DashboardPage() {
   }
 
   const user = session.user;
+
+  if (user.role === 'PATIENT') {
+  return (
+    <AppShell>
+      <PatientDashboard userName={user.name || user.email || 'there'} />
+    </AppShell>
+  );
+}
 
   return (
     <AppShell>

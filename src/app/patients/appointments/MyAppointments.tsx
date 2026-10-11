@@ -39,6 +39,7 @@ interface PatientAppointmentsResponse {
   patientCode: string;
   name: string;
   schedules: Appointment[];
+  currentTime: number;
 }
 
 type AppointmentFilter = 'ALL' | 'UPCOMING' | 'PAST';
@@ -80,11 +81,7 @@ export function MyAppointments() {
   const [filter, setFilter] = useState<AppointmentFilter>('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [currentTime, setCurrentTime] = useState<number | null>(null);
 
-useEffect(() => {
-  setCurrentTime(Date.now());
-}, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,9 +119,9 @@ useEffect(() => {
 
   const appointments = useMemo(() => {
     const schedules = patient?.schedules ?? [];
-if (currentTime === null) return [];
+    if (currentTime === null) return [];
 
-const now = currentTime;
+    const now = currentTime;
     return schedules.filter((appointment) => {
       const isPast =
         new Date(appointment.endTime).getTime() < now ||
@@ -141,7 +138,7 @@ const now = currentTime;
 
       return true;
     });
-  }, [patient, filter,currentTime]);
+  }, [patient, filter, currentTime]);
 
   if (loading) {
     return <LoadingState message="Loading your appointments..." />;
@@ -164,10 +161,10 @@ const now = currentTime;
     label: string;
     value: AppointmentFilter;
   }[] = [
-    { label: 'All', value: 'ALL' },
-    { label: 'Upcoming', value: 'UPCOMING' },
-    { label: 'Past', value: 'PAST' },
-  ];
+      { label: 'All', value: 'ALL' },
+      { label: 'Upcoming', value: 'UPCOMING' },
+      { label: 'Past', value: 'PAST' },
+    ];
 
   return (
     <main className="space-y-6">
@@ -207,7 +204,7 @@ const now = currentTime;
               patient.schedules.filter(
                 (appointment) =>
                   currentTime !== null &&
-new Date(appointment.endTime).getTime() >= currentTime &&
+                  new Date(appointment.endTime).getTime() >= currentTime &&
                   appointment.status !== 'CANCELLED' &&
                   appointment.status !== 'COMPLETED',
               ).length
@@ -238,11 +235,10 @@ new Date(appointment.endTime).getTime() >= currentTime &&
             type="button"
             aria-pressed={filter === option.value}
             onClick={() => setFilter(option.value)}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-              filter === option.value
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${filter === option.value
                 ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
                 : 'border-[var(--color-border)] hover:bg-[var(--color-surface)]'
-            }`}
+              }`}
           >
             {option.label}
           </button>

@@ -27,7 +27,19 @@ export async function GET(request: Request) {
       );
     }
 
-    return apiSuccess(patient, 200);
+if (!patient) {
+  return apiError(
+    "No patient record is linked to this account.",
+    404,
+    undefined,
+    requestId,
+  );
+}
+
+return apiSuccess({
+  ...patient,
+  currentTime: Date.now(),
+},200);
   } catch (error) {
     console.error(
       `[${requestId}] GET /api/me/appointments error:`,
