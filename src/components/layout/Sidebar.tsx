@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   {
     name: 'Schedules',
     href: '/schedules',
-    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF', 'PATIENT'],
+    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
     icon: (
       <svg
         className="h-4 w-4"
