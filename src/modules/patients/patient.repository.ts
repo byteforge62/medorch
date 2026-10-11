@@ -166,3 +166,42 @@ export async function updatePatient(
     },
   });
 }
+
+export async function findPatientPortalDataByUserId(userId: string) {
+  return prisma.patient.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+      patientCode: true,
+      name: true,
+      schedules: {
+        orderBy: [
+          { scheduledDate: "asc" },
+          { startTime: "asc" },
+        ],
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          startTime: true,
+          endTime: true,
+          status: true,
+          priority: true,
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          otRoom: {
+            select: {
+              name: true,
+              code: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}

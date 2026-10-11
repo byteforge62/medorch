@@ -1,4 +1,4 @@
-import { findPatientById, findPatients, createPatientRecord, updatePatient } from "./patient.repository";
+import { findPatientById, findPatients, createPatientRecord, updatePatient, findPatientPortalDataByUserId } from "./patient.repository";
 import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getPatients() {
@@ -69,4 +69,8 @@ export async function updatePatientById(
   });
 
   return patient;
+}
+
+export async function getPatientPortalData(userId: string) {
+  return findPatientPortalDataByUserId(userId);
 }
