@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
@@ -316,7 +317,16 @@ export function MyAppointments() {
                   </div>
                 </div>
 
-                <Badge>{formatLabel(appointment.status)}</Badge>
+                <div className="flex flex-wrap items-center gap-3">
+  <Badge>{formatLabel(appointment.status)}</Badge>
+
+  <Link
+    href={`/patients/appointments/${appointment.id}`}
+    className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+  >
+    View Details →
+  </Link>
+</div>
               </div>
             </Card>
           ))}
