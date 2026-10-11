@@ -1,3 +1,4 @@
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
@@ -70,6 +71,17 @@ export async function PATCH(
       `[${requestId}] PATCH /api/schedules/[id]/status error:`,
       error,
     );
+
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
 
     if (error instanceof Error) {
       if (error.message === "SCHEDULE_NOT_FOUND") {
