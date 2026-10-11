@@ -118,10 +118,10 @@ export function MyAppointments() {
   }, []);
 
   const appointments = useMemo(() => {
-    const schedules = patient?.schedules ?? [];
-    if (currentTime === null) return [];
+    if (!patient) return [];
 
-    const now = currentTime;
+    const schedules = patient.schedules;
+    const now = patient.currentTime;
     return schedules.filter((appointment) => {
       const isPast =
         new Date(appointment.endTime).getTime() < now ||
@@ -138,7 +138,7 @@ export function MyAppointments() {
 
       return true;
     });
-  }, [patient, filter, currentTime]);
+  }, [patient, filter]);
 
   if (loading) {
     return <LoadingState message="Loading your appointments..." />;
@@ -203,8 +203,8 @@ export function MyAppointments() {
             {
               patient.schedules.filter(
                 (appointment) =>
-                  currentTime !== null &&
-                  new Date(appointment.endTime).getTime() >= currentTime &&
+                  new Date(appointment.endTime).getTime() >=
+                    patient.currentTime &&
                   appointment.status !== 'CANCELLED' &&
                   appointment.status !== 'COMPLETED',
               ).length
@@ -235,10 +235,11 @@ export function MyAppointments() {
             type="button"
             aria-pressed={filter === option.value}
             onClick={() => setFilter(option.value)}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${filter === option.value
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              filter === option.value
                 ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
                 : 'border-[var(--color-border)] hover:bg-[var(--color-surface)]'
-              }`}
+            }`}
           >
             {option.label}
           </button>

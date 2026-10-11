@@ -30,6 +30,7 @@ interface PatientAppointmentsResponse {
   patientCode: string;
   name: string;
   schedules: Appointment[];
+  currentTime: number;
 }
 
 function formatDate(value: string) {
@@ -83,11 +84,7 @@ export function PatientDashboard({
     useState<PatientAppointmentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [currentTime, setCurrentTime] = useState<number | null>(null);
-
-  useEffect(() => {
-    setCurrentTime(Date.now());
-  }, []);
+  
 
   useEffect(() => {
     let cancelled = false;
@@ -154,40 +151,35 @@ export function PatientDashboard({
     );
   }
 
-  const appointments = patient.schedules;
+const appointments = patient.schedules;
+const currentTime = patient.currentTime;
 
-  const upcoming =
-    currentTime === null
-      ? []
-      : appointments
-          .filter(
-            (appointment) =>
-              Date.parse(appointment.endTime) >= currentTime &&
-              appointment.status !== "CANCELLED" &&
-              appointment.status !== "COMPLETED",
-          )
-          .sort(
-            (a, b) =>
-              Date.parse(a.startTime) - Date.parse(b.startTime),
-          );
+const upcoming = appointments
+  .filter(
+    (appointment) =>
+      Date.parse(appointment.endTime) >= currentTime &&
+      appointment.status !== "CANCELLED" &&
+      appointment.status !== "COMPLETED",
+  )
+  .sort(
+    (a, b) =>
+      Date.parse(a.startTime) - Date.parse(b.startTime),
+  );
 
-  const recentAppointments =
-    currentTime === null
-      ? []
-      : appointments
-          .filter(
-            (appointment) =>
-              Date.parse(appointment.endTime) < currentTime ||
-              appointment.status === "COMPLETED" ||
-              appointment.status === "CANCELLED",
-          )
-          .sort(
-            (a, b) =>
-              Date.parse(b.startTime) - Date.parse(a.startTime),
-          )
-          .slice(0, 3);
+const recentAppointments = appointments
+  .filter(
+    (appointment) =>
+      Date.parse(appointment.endTime) < currentTime ||
+      appointment.status === "COMPLETED" ||
+      appointment.status === "CANCELLED",
+  )
+  .sort(
+    (a, b) =>
+      Date.parse(b.startTime) - Date.parse(a.startTime),
+  )
+  .slice(0, 3);
 
-  const nextAppointment = upcoming[0];
+const nextAppointment = upcoming[0];
 
   const metrics = [
     {
