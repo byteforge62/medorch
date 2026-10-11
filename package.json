@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev":"prisma db seed",
+    "db:seed:demo":"prisma db seed",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
