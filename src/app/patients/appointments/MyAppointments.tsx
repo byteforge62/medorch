@@ -80,6 +80,11 @@ export function MyAppointments() {
   const [filter, setFilter] = useState<AppointmentFilter>('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+useEffect(() => {
+  setCurrentTime(Date.now());
+}, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -117,8 +122,9 @@ export function MyAppointments() {
 
   const appointments = useMemo(() => {
     const schedules = patient?.schedules ?? [];
-    const now = Date.now();
+if (currentTime === null) return [];
 
+const now = currentTime;
     return schedules.filter((appointment) => {
       const isPast =
         new Date(appointment.endTime).getTime() < now ||
@@ -135,7 +141,7 @@ export function MyAppointments() {
 
       return true;
     });
-  }, [patient, filter]);
+  }, [patient, filter,currentTime]);
 
   if (loading) {
     return <LoadingState message="Loading your appointments..." />;
@@ -200,7 +206,8 @@ export function MyAppointments() {
             {
               patient.schedules.filter(
                 (appointment) =>
-                  new Date(appointment.endTime).getTime() >= Date.now() &&
+                  currentTime !== null &&
+new Date(appointment.endTime).getTime() >= currentTime &&
                   appointment.status !== 'CANCELLED' &&
                   appointment.status !== 'COMPLETED',
               ).length

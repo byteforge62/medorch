@@ -54,6 +54,28 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+
+  {
+    name: 'My Appointments',
+    href: '/patients/appointments',
+    roles: ['PATIENT'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"
+        />
+      </svg>
+    ),
+  },
+
   {
     name: 'Users',
     href: '/users',
@@ -148,8 +170,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     href={item.href}
                     onClick={onClose}
                     className={`flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2.5 text-xs font-semibold transition-colors ${isActive
-                        ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
-                        : 'text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)]'
+                      ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
+                      : 'text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)]'
                       }`}
                   >
                     <span
