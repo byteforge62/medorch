@@ -8,6 +8,7 @@ import { AlertsSummaryWidget } from '@/components/dashboard/AlertsSummaryWidget'
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Badge } from '@/components/ui/Badge';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
+import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -25,6 +26,16 @@ export default async function DashboardPage() {
     </AppShell>
   );
 }
+
+if (user.role === 'DOCTOR') {
+  return (
+    <AppShell>
+      <DoctorDashboard userName={user.name || user.email || 'Doctor'} />
+    </AppShell>
+  );
+}
+
+
 
   return (
     <AppShell>
