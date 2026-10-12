@@ -20,7 +20,15 @@ export async function GET(request: Request) {
 
     const schedules = await getSchedules();
 
-    return apiSuccess(schedules, 200);
+    const responseSchedules =
+      session.user.role === "OT_STAFF"
+        ? schedules.map((schedule) => ({
+          ...schedule,
+          clinicalNotes: null,
+        }))
+        : schedules;
+
+    return apiSuccess(responseSchedules, 200);
   } catch (error) {
     console.error(
       `[${requestId}] GET /api/schedules error:`,

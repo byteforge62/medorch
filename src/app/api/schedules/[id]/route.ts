@@ -53,6 +53,16 @@ export async function GET(
       );
     }
 
+    if (session.user.role === "OT_STAFF") {
+      return apiSuccess(
+        {
+          ...schedule,
+          clinicalNotes: null,
+        },
+        200,
+      );
+    }
+
     return apiSuccess(schedule, 200);
   } catch (error) {
     console.error(

@@ -140,6 +140,7 @@ function formatDateTime(value: string) {
 export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'ADMIN';
+  const canManageNotes = isAdmin || session?.user?.role === "DOCTOR";
 
   const [schedule, setSchedule] = useState<Schedule | null>(null);
   const [users, setUsers] = useState<UserOption[]>([]);
@@ -665,26 +666,28 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           )}
         </div>
 
-        <div className="mt-5 space-y-3">
-          <textarea
-            value={noteContent}
-            onChange={(event) => setNoteContent(event.target.value)}
-            rows={4}
-            placeholder="Add a clinical or operational note..."
-            className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
-          />
+        {canManageNotes && (
+          <div className="mt-5 space-y-3">
+            <textarea
+              value={noteContent}
+              onChange={(event) => setNoteContent(event.target.value)}
+              rows={4}
+              placeholder="Add a clinical or operational note..."
+              className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+            />
 
-          <div className="flex justify-end">
-            <button
-              type="button"
-              disabled={!noteContent.trim() || actionLoading}
-              onClick={() => void handleAddNote()}
-              className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-            >
-              Add note
-            </button>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                disabled={!noteContent.trim() || actionLoading}
+                onClick={() => void handleAddNote()}
+                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+              >
+                Add note
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
     </main>
   );
