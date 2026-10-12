@@ -9,6 +9,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Badge } from '@/components/ui/Badge';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
+import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -31,6 +32,16 @@ if (user.role === 'DOCTOR') {
   return (
     <AppShell>
       <DoctorDashboard userName={user.name || user.email || 'Doctor'} />
+    </AppShell>
+  );
+}
+
+if (user.role === "OT_STAFF") {
+  return (
+    <AppShell>
+      <OTStaffDashboard
+        userName={user.name || user.email || "OT Staff"}
+      />
     </AppShell>
   );
 }
