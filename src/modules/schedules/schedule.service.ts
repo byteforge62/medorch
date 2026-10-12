@@ -2,6 +2,7 @@ import {
   createSchedule as createScheduleRecord,
   findScheduleById,
   findSchedules,
+  findSchedulesForSurgeon,
   updateSchedule as updateScheduleRecord,
   updateScheduleStatus as updateScheduleStatusRecord,
   findOTRoomForSchedule,
@@ -27,6 +28,10 @@ import { recordAudit } from "@/modules/audit/audit.service";
 
 export async function getSchedules() {
   return findSchedules();
+}
+
+export async function getSchedulesForSurgeon(userId: string) {
+  return findSchedulesForSurgeon(userId);
 }
 
 export async function getScheduleById(id: string) {

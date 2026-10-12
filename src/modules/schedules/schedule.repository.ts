@@ -58,6 +58,44 @@ export async function findSchedules() {
   });
 }
 
+export async function findSchedulesForSurgeon(userId: string) {
+  return prisma.schedule.findMany({
+    where: {
+      surgeonId: userId,
+    },
+    orderBy: [
+      { scheduledDate: "asc" },
+      { startTime: "asc" },
+    ],
+    select: {
+      id: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      patient: {
+        select: {
+          name: true,
+          patientCode: true,
+        },
+      },
+      department: {
+        select: {
+          name: true,
+        },
+      },
+      otRoom: {
+        select: {
+          name: true,
+          code: true,
+        },
+      },
+    },
+  });
+}
+
 export async function findScheduleById(id: string) {
   return prisma.schedule.findUnique({
     where: {
