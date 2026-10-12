@@ -426,6 +426,52 @@ export async function findScheduleConflicts(data: {
   });
 }
 
+
+export async function findSchedulesForStaff(userId: string) {
+  return prisma.scheduleStaff.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      role: true,
+      assignedAt: true,
+      schedule: {
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          startTime: true,
+          endTime: true,
+          status: true,
+          priority: true,
+          patient: {
+            select: {
+              name: true,
+              patientCode: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          otRoom: {
+            select: {
+              name: true,
+              code: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+
 export async function findScheduleStaff(
   scheduleId: string,
 ) {

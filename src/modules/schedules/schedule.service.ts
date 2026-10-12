@@ -13,6 +13,7 @@ import {
   createScheduleStaff,
   deleteScheduleStaff,
   findScheduleStaff,
+  findSchedulesForStaff,
   findUserForStaffAssignment,
   createScheduleEquipment,
   findEquipmentForAssignment,
@@ -32,6 +33,10 @@ export async function getSchedules() {
 
 export async function getSchedulesForSurgeon(userId: string) {
   return findSchedulesForSurgeon(userId);
+}
+
+export async function getSchedulesForStaff(userId: string) {
+  return findSchedulesForStaff(userId);
 }
 
 export async function getScheduleById(id: string) {
