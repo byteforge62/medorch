@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -317,9 +318,16 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                     <PriorityBadge priority={schedule.priority} />
                     <StatusBadge status={schedule.status} />
+
+                    <Link
+                      href={`/schedules/${schedule.id}`}
+                      className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+                    >
+                      View Schedule →
+                    </Link>
                   </div>
                 </div>
               </Card>
