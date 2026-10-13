@@ -73,3 +73,35 @@ test("PATIENT is restricted to own schedule access", () => {
     false,
   );
 });
+
+test("schedule mutation permissions are role-restricted", () => {
+  // Schedule creation
+  assert.equal(
+    hasPermission(UserRole.ADMIN, "schedules:create"),
+    true
+  );
+  assert.equal(
+    hasPermission(UserRole.DOCTOR, "schedules:create"),
+    false
+  );
+
+  // Schedule notes
+  assert.equal(
+    hasPermission(UserRole.DOCTOR, "schedules:notes:manage"),
+    true
+  );
+  assert.equal(
+    hasPermission(UserRole.OT_STAFF, "schedules:notes:manage"),
+    false
+  );
+
+  // Equipment assignment
+  assert.equal(
+    hasPermission(UserRole.ADMIN, "schedules:equipment:manage"),
+    true
+  );
+  assert.equal(
+    hasPermission(UserRole.DOCTOR, "schedules:equipment:manage"),
+    false
+  );
+});
