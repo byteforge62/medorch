@@ -50,15 +50,10 @@ export async function POST(request: Request) {
     const doctor = await createDoctor(validation.data, session.user.id);
 
     return apiSuccess(doctor, 200);
-  } catch (error) {
+  }  catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "USER_NOT_FOUND") {
-        return apiError(
-          "User not found.",
-          404,
-          undefined,
-          requestId,
-        );
+        return apiError("User not found.", 404, undefined, requestId);
       }
 
       if (error.message === "USER_NOT_DOCTOR") {
@@ -78,27 +73,30 @@ export async function POST(request: Request) {
           requestId,
         );
       }
+    }
 
-      if (
-        error &&
-        typeof error === "object" &&
-        "code" in error &&
-        (error as { code?: unknown }).code === "P2002"
-      ) {
-        return apiError(
-          "A doctor profile with this unique value already exists.",
-          409,
-          undefined,
-          requestId
-        );
-      }
-
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
       return apiError(
-        "Failed to create doctor.",
-        500,
+        "A doctor profile with this unique value already exists.",
+        409,
         undefined,
-        requestId
+        requestId,
       );
     }
+
+    console.error(`[${requestId}] POST /api/doctors error`, error);
+
+    return apiError(
+      "Failed to create doctor.",
+      500,
+      undefined,
+      requestId,
+    );
   }
+
 }
