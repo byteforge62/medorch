@@ -68,16 +68,7 @@ function buildAuditLogWhere(
 export async function findAuditLogs(
   options: FindAuditLogsOptions = {},
 ) {
-  const {
-    userId,
-    action,
-    entity,
-    entityId,
-    fromDate,
-    toDate,
-    limit = 50,
-    offset = 0,
-  } = options;
+  const { limit = 50, offset = 0 } = options;
 
   return prisma.auditLog.findMany({
     where: buildAuditLogWhere(options),
