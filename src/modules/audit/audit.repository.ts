@@ -36,6 +36,35 @@ export interface FindAuditLogsOptions {
   offset?: number;
 }
 
+
+function buildAuditLogWhere(
+  options: FindAuditLogsOptions = {},
+): Prisma.AuditLogWhereInput {
+  const {
+    userId,
+    action,
+    entity,
+    entityId,
+    fromDate,
+    toDate,
+  } = options;
+
+  return {
+    ...(userId ? { userId } : {}),
+    ...(action ? { action } : {}),
+    ...(entity ? { entity } : {}),
+    ...(entityId ? { entityId } : {}),
+    ...(fromDate || toDate
+      ? {
+          createdAt: {
+            ...(fromDate ? { gte: fromDate } : {}),
+            ...(toDate ? { lte: toDate } : {}),
+          },
+        }
+      : {}),
+  };
+}
+
 export async function findAuditLogs(
   options: FindAuditLogsOptions = {},
 ) {
@@ -51,20 +80,7 @@ export async function findAuditLogs(
   } = options;
 
   return prisma.auditLog.findMany({
-    where: {
-      ...(userId ? { userId } : {}),
-      ...(action ? { action } : {}),
-      ...(entity ? { entity } : {}),
-      ...(entityId ? { entityId } : {}),
-      ...(fromDate || toDate
-  ? {
-      createdAt: {
-        ...(fromDate ? { gte: fromDate } : {}),
-        ...(toDate ? { lte: toDate } : {}),
-      },
-    }
-  : {}),
-    },
+    where: buildAuditLogWhere(options),
     orderBy: {
       createdAt: "desc",
     },
@@ -88,5 +104,13 @@ export async function findAuditLogs(
         },
       },
     },
+  });
+}
+
+export async function countAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  return prisma.auditLog.count({
+    where: buildAuditLogWhere(options),
   });
 }

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getAuditLogs } from "@/modules/audit/audit.service";
+import { getAuditLogs, getAuditLogCount } from "@/modules/audit/audit.service";
 import type { AuditAction } from "@/generated/prisma/client";
 
 const auditQuerySchema = z.object({
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const auditLogs = await getAuditLogs({
+    const options = {
   ...parsed.data,
   fromDate: parsed.data.fromDate
     ? new Date(`${parsed.data.fromDate}T00:00:00.000Z`)
@@ -81,9 +81,25 @@ export async function GET(request: Request) {
     ? new Date(`${parsed.data.toDate}T23:59:59.999Z`)
     : undefined,
   action: parsed.data.action as AuditAction | undefined,
-});
+};
 
-    return apiSuccess(auditLogs, 200);
+const [auditLogs, total] = await Promise.all([
+  getAuditLogs(options),
+  getAuditLogCount(options),
+]);
+
+return apiSuccess(
+  {
+    items: auditLogs,
+    pagination: {
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+      total,
+      hasMore: parsed.data.offset + auditLogs.length < total,
+    },
+  },
+  200,
+);
   } catch (error) {
     console.error(
       `[${requestId}] Failed to fetch audit logs:`,

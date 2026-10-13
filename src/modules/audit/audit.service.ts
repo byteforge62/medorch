@@ -1,5 +1,5 @@
 import type { AuditAction, Prisma } from "@/generated/prisma/client";
-import { createAuditLog, findAuditLogs } from "./audit.repository";
+import { createAuditLog, findAuditLogs, countAuditLogs } from "./audit.repository";
 import type { FindAuditLogsOptions } from "./audit.repository";
 
 type RecordAuditData = {
@@ -21,4 +21,10 @@ export async function getAuditLogs(
   options: FindAuditLogsOptions = {},
 ) {
   return findAuditLogs(options);
+}
+
+export async function getAuditLogCount(
+  options: FindAuditLogsOptions = {},
+) {
+  return countAuditLogs(options);
 }
