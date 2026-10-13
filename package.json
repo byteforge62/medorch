@@ -11,7 +11,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:schedule-constraints": "node --import tsx --test tests/schedule-constraints.test.ts"
+    "test:schedule-constraints": "node --import tsx --test tests/schedule-constraints.test.ts",
+    "test:permissions": "node --import tsx --test tests/permissions.test.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
