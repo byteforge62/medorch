@@ -453,13 +453,15 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           </dl>
         </Card>
 
-        <Card>
-          <h2 className="font-semibold">Clinical notes</h2>
+        {(isAdmin || session?.user?.role === 'DOCTOR') && (
+          <Card>
+            <h2 className="font-semibold">Clinical notes</h2>
 
-          <p className="mt-4 text-sm whitespace-pre-wrap text-[var(--color-text-muted)]">
-            {schedule.clinicalNotes || 'No clinical notes recorded.'}
-          </p>
-        </Card>
+            <p className="mt-4 text-sm whitespace-pre-wrap text-[var(--color-text-muted)]">
+              {schedule.clinicalNotes || 'No clinical notes recorded.'}
+            </p>
+          </Card>
+        )}
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
