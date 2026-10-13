@@ -22,9 +22,20 @@ const auditQuerySchema = z.object({
     .optional(),
   entity: z.string().trim().min(1).max(100).optional(),
   entityId: z.string().trim().min(1).max(100).optional(),
+  fromDate: z.iso.date().optional(),
+  toDate: z.iso.date().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
-});
+}).refine(
+  (data) => 
+    !data.fromDate ||
+  !data.toDate || 
+  data.fromDate <= data.toDate,
+  {
+    message: "fromDate must be on or before toDate",
+    path:["toDate"]
+  }
+);
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -45,6 +56,8 @@ export async function GET(request: Request) {
     action: url.searchParams.get("action") ?? undefined,
     entity: url.searchParams.get("entity") ?? undefined,
     entityId: url.searchParams.get("entityId") ?? undefined,
+    fromDate: url.searchParams.get("fromDate") ?? undefined,
+    toDate: url.searchParams.get("toDate") ?? undefined,
     limit: url.searchParams.get("limit") ?? undefined,
     offset: url.searchParams.get("offset") ?? undefined,
   });
@@ -60,9 +73,15 @@ export async function GET(request: Request) {
 
   try {
     const auditLogs = await getAuditLogs({
-      ...parsed.data,
-      action: parsed.data.action as AuditAction | undefined,
-    });
+  ...parsed.data,
+  fromDate: parsed.data.fromDate
+    ? new Date(`${parsed.data.fromDate}T00:00:00.000Z`)
+    : undefined,
+  toDate: parsed.data.toDate
+    ? new Date(`${parsed.data.toDate}T23:59:59.999Z`)
+    : undefined,
+  action: parsed.data.action as AuditAction | undefined,
+});
 
     return apiSuccess(auditLogs, 200);
   } catch (error) {

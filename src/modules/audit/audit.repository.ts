@@ -30,6 +30,8 @@ export interface FindAuditLogsOptions {
   action?: AuditAction;
   entity?: string;
   entityId?: string;
+  fromDate?: Date;
+  toDate?:Date;
   limit?: number;
   offset?: number;
 }
@@ -42,6 +44,8 @@ export async function findAuditLogs(
     action,
     entity,
     entityId,
+    fromDate,
+    toDate,
     limit = 50,
     offset = 0,
   } = options;
@@ -52,6 +56,14 @@ export async function findAuditLogs(
       ...(action ? { action } : {}),
       ...(entity ? { entity } : {}),
       ...(entityId ? { entityId } : {}),
+      ...(fromDate || toDate
+  ? {
+      createdAt: {
+        ...(fromDate ? { gte: fromDate } : {}),
+        ...(toDate ? { lte: toDate } : {}),
+      },
+    }
+  : {}),
     },
     orderBy: {
       createdAt: "desc",
