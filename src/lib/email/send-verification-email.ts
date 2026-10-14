@@ -1,54 +1,56 @@
 
-import { Resend } from "resend";
+import "server-only";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const VERIFICATION_EXPIRY_MINUTES = 30;
 
 export async function sendVerificationEmail(
   email: string,
   name: string,
-  token: string,
+  token: string
 ): Promise<void> {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPassword = process.env.SMTP_APP_PASSWORD;
+  const emailFrom = process.env.EMAIL_FROM;
   const appUrl = process.env.NEXTAUTH_URL;
 
-  if (!appUrl) {
-    throw new Error("NEXTAUTH_URL is not configured.");
+  if (!smtpUser || !smtpPassword || !emailFrom || !appUrl) {
+    throw new Error("Email configuration is incomplete.");
   }
 
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not configured.");
-  }
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: smtpUser,
+      pass: smtpPassword,
+    },
+  });
 
-  const from = process.env.EMAIL_FROM;
-
-  if (!from) {
-    throw new Error("EMAIL_FROM is not configured.");
-  }
-
-  const verificationUrl = new URL(
-    "/verify-email",
-    appUrl,
-  );
-
+  const verificationUrl = new URL("/verify-email", appUrl);
   verificationUrl.searchParams.set("token", token);
-  verificationUrl.searchParams.set("email", email);
 
-  const { error } = await resend.emails.send({
-    from,
+  await transporter.sendMail({
+    from: emailFrom,
     to: email,
     subject: "Verify your MedOrch email address",
     text: [
       `Hello ${name},`,
       "",
-      "Verify your email address using the link below:",
+      "Thank you for registering with MedOrch.",
+      "",
+      "Verify your email address using the following link:",
       verificationUrl.toString(),
       "",
-      "This link expires in 30 minutes and can only be used once.",
-      "If you did not request this account, you can ignore this email.",
+      `This link expires in ${VERIFICATION_EXPIRY_MINUTES} minutes.`,
+      "",
+      "After verification, your account will remain pending",
+      "until an administrator approves it.",
+      "",
+      "If you did not register for MedOrch, ignore this email.",
+      "",
+      "MedOrch Team",
     ].join("\n"),
   });
-
-  if (error) {
-    console.error("Failed to send verification email:", error.message);
-    throw new Error("Unable to send verification email.");
-  }
 }
