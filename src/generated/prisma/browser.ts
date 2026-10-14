@@ -77,3 +77,8 @@ export type Alert = Prisma.AlertModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model EmailVerificationToken
+ * 
+ */
+export type EmailVerificationToken = Prisma.EmailVerificationTokenModel

@@ -222,6 +222,7 @@ export type UserWhereInput = {
   approvedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
   doctorProfile?: Prisma.XOR<Prisma.DoctorProfileNullableScalarRelationFilter, Prisma.DoctorProfileWhereInput> | null
   patient?: Prisma.XOR<Prisma.PatientNullableScalarRelationFilter, Prisma.PatientWhereInput> | null
   createdSchedules?: Prisma.ScheduleListRelationFilter
@@ -243,6 +244,7 @@ export type UserOrderByWithRelationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerificationTokens?: Prisma.EmailVerificationTokenOrderByRelationAggregateInput
   doctorProfile?: Prisma.DoctorProfileOrderByWithRelationInput
   patient?: Prisma.PatientOrderByWithRelationInput
   createdSchedules?: Prisma.ScheduleOrderByRelationAggregateInput
@@ -267,6 +269,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   approvedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenListRelationFilter
   doctorProfile?: Prisma.XOR<Prisma.DoctorProfileNullableScalarRelationFilter, Prisma.DoctorProfileWhereInput> | null
   patient?: Prisma.XOR<Prisma.PatientNullableScalarRelationFilter, Prisma.PatientWhereInput> | null
   createdSchedules?: Prisma.ScheduleListRelationFilter
@@ -320,6 +323,7 @@ export type UserCreateInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -341,6 +345,7 @@ export type UserUncheckedCreateInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -362,6 +367,7 @@ export type UserUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -383,6 +389,7 @@ export type UserUncheckedUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -621,6 +628,20 @@ export type UserUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutEmailVerificationTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailVerificationTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEmailVerificationTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailVerificationTokensInput
+  upsert?: Prisma.UserUpsertWithoutEmailVerificationTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailVerificationTokensInput, Prisma.UserUpdateWithoutEmailVerificationTokensInput>, Prisma.UserUncheckedUpdateWithoutEmailVerificationTokensInput>
+}
+
 export type UserCreateWithoutDoctorProfileInput = {
   id?: string
   email: string
@@ -632,6 +653,7 @@ export type UserCreateWithoutDoctorProfileInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
@@ -652,6 +674,7 @@ export type UserUncheckedCreateWithoutDoctorProfileInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
@@ -688,6 +711,7 @@ export type UserUpdateWithoutDoctorProfileInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
@@ -708,6 +732,7 @@ export type UserUncheckedUpdateWithoutDoctorProfileInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
@@ -728,6 +753,7 @@ export type UserCreateWithoutPatientInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
@@ -748,6 +774,7 @@ export type UserUncheckedCreateWithoutPatientInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
@@ -784,6 +811,7 @@ export type UserUpdateWithoutPatientInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
@@ -804,6 +832,7 @@ export type UserUncheckedUpdateWithoutPatientInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
@@ -824,6 +853,7 @@ export type UserCreateWithoutSurgeonSchedulesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -844,6 +874,7 @@ export type UserUncheckedCreateWithoutSurgeonSchedulesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -869,6 +900,7 @@ export type UserCreateWithoutCreatedSchedulesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
@@ -889,6 +921,7 @@ export type UserUncheckedCreateWithoutCreatedSchedulesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
@@ -925,6 +958,7 @@ export type UserUpdateWithoutSurgeonSchedulesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -945,6 +979,7 @@ export type UserUncheckedUpdateWithoutSurgeonSchedulesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -976,6 +1011,7 @@ export type UserUpdateWithoutCreatedSchedulesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
@@ -996,6 +1032,7 @@ export type UserUncheckedUpdateWithoutCreatedSchedulesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
@@ -1016,6 +1053,7 @@ export type UserCreateWithoutScheduleStaffInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -1036,6 +1074,7 @@ export type UserUncheckedCreateWithoutScheduleStaffInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1072,6 +1111,7 @@ export type UserUpdateWithoutScheduleStaffInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -1092,6 +1132,7 @@ export type UserUncheckedUpdateWithoutScheduleStaffInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1112,6 +1153,7 @@ export type UserCreateWithoutScheduleNotesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -1132,6 +1174,7 @@ export type UserUncheckedCreateWithoutScheduleNotesInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1168,6 +1211,7 @@ export type UserUpdateWithoutScheduleNotesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -1188,6 +1232,7 @@ export type UserUncheckedUpdateWithoutScheduleNotesInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1208,6 +1253,7 @@ export type UserCreateWithoutAlertsInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -1228,6 +1274,7 @@ export type UserUncheckedCreateWithoutAlertsInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1264,6 +1311,7 @@ export type UserUpdateWithoutAlertsInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -1284,6 +1332,7 @@ export type UserUncheckedUpdateWithoutAlertsInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1304,6 +1353,7 @@ export type UserCreateWithoutAuditLogsInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
@@ -1324,6 +1374,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
   doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1360,6 +1411,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
@@ -1380,6 +1432,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1389,12 +1442,113 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
 }
 
+export type UserCreateWithoutEmailVerificationTokensInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  doctorProfile?: Prisma.DoctorProfileCreateNestedOneWithoutUserInput
+  patient?: Prisma.PatientCreateNestedOneWithoutUserInput
+  createdSchedules?: Prisma.ScheduleCreateNestedManyWithoutCreatedByInput
+  surgeonSchedules?: Prisma.ScheduleCreateNestedManyWithoutSurgeonInput
+  scheduleStaff?: Prisma.ScheduleStaffCreateNestedManyWithoutUserInput
+  scheduleNotes?: Prisma.ScheduleNoteCreateNestedManyWithoutAuthorInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  doctorProfile?: Prisma.DoctorProfileUncheckedCreateNestedOneWithoutUserInput
+  patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
+  createdSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutCreatedByInput
+  surgeonSchedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutSurgeonInput
+  scheduleStaff?: Prisma.ScheduleStaffUncheckedCreateNestedManyWithoutUserInput
+  scheduleNotes?: Prisma.ScheduleNoteUncheckedCreateNestedManyWithoutAuthorInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationTokensInput>
+}
+
+export type UserUpsertWithoutEmailVerificationTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedUpdateWithoutEmailVerificationTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedCreateWithoutEmailVerificationTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmailVerificationTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmailVerificationTokensInput, Prisma.UserUncheckedUpdateWithoutEmailVerificationTokensInput>
+}
+
+export type UserUpdateWithoutEmailVerificationTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctorProfile?: Prisma.DoctorProfileUpdateOneWithoutUserNestedInput
+  patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
+  createdSchedules?: Prisma.ScheduleUpdateManyWithoutCreatedByNestedInput
+  surgeonSchedules?: Prisma.ScheduleUpdateManyWithoutSurgeonNestedInput
+  scheduleStaff?: Prisma.ScheduleStaffUpdateManyWithoutUserNestedInput
+  scheduleNotes?: Prisma.ScheduleNoteUpdateManyWithoutAuthorNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doctorProfile?: Prisma.DoctorProfileUncheckedUpdateOneWithoutUserNestedInput
+  patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
+  createdSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutCreatedByNestedInput
+  surgeonSchedules?: Prisma.ScheduleUncheckedUpdateManyWithoutSurgeonNestedInput
+  scheduleStaff?: Prisma.ScheduleStaffUncheckedUpdateManyWithoutUserNestedInput
+  scheduleNotes?: Prisma.ScheduleNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
 
 /**
  * Count Type UserCountOutputType
  */
 
 export type UserCountOutputType = {
+  emailVerificationTokens: number
   createdSchedules: number
   surgeonSchedules: number
   scheduleStaff: number
@@ -1404,6 +1558,7 @@ export type UserCountOutputType = {
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  emailVerificationTokens?: boolean | UserCountOutputTypeCountEmailVerificationTokensArgs
   createdSchedules?: boolean | UserCountOutputTypeCountCreatedSchedulesArgs
   surgeonSchedules?: boolean | UserCountOutputTypeCountSurgeonSchedulesArgs
   scheduleStaff?: boolean | UserCountOutputTypeCountScheduleStaffArgs
@@ -1420,6 +1575,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmailVerificationTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailVerificationTokenWhereInput
 }
 
 /**
@@ -1476,6 +1638,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
   doctorProfile?: boolean | Prisma.User$doctorProfileArgs<ExtArgs>
   patient?: boolean | Prisma.User$patientArgs<ExtArgs>
   createdSchedules?: boolean | Prisma.User$createdSchedulesArgs<ExtArgs>
@@ -1528,6 +1691,7 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "phone" | "role" | "status" | "approvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  emailVerificationTokens?: boolean | Prisma.User$emailVerificationTokensArgs<ExtArgs>
   doctorProfile?: boolean | Prisma.User$doctorProfileArgs<ExtArgs>
   patient?: boolean | Prisma.User$patientArgs<ExtArgs>
   createdSchedules?: boolean | Prisma.User$createdSchedulesArgs<ExtArgs>
@@ -1544,6 +1708,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
+    emailVerificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[]
     doctorProfile: Prisma.$DoctorProfilePayload<ExtArgs> | null
     patient: Prisma.$PatientPayload<ExtArgs> | null
     createdSchedules: Prisma.$SchedulePayload<ExtArgs>[]
@@ -1958,6 +2123,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  emailVerificationTokens<T extends Prisma.User$emailVerificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailVerificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   doctorProfile<T extends Prisma.User$doctorProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$doctorProfileArgs<ExtArgs>>): Prisma.Prisma__DoctorProfileClient<runtime.Types.Result.GetResult<Prisma.$DoctorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   patient<T extends Prisma.User$patientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$patientArgs<ExtArgs>>): Prisma.Prisma__PatientClient<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   createdSchedules<T extends Prisma.User$createdSchedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2395,6 +2561,30 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Users to delete.
    */
   limit?: number
+}
+
+/**
+ * User.emailVerificationTokens
+ */
+export type User$emailVerificationTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailVerificationToken
+   */
+  select?: Prisma.EmailVerificationTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailVerificationToken
+   */
+  omit?: Prisma.EmailVerificationTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailVerificationTokenInclude<ExtArgs> | null
+  where?: Prisma.EmailVerificationTokenWhereInput
+  orderBy?: Prisma.EmailVerificationTokenOrderByWithRelationInput | Prisma.EmailVerificationTokenOrderByWithRelationInput[]
+  cursor?: Prisma.EmailVerificationTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailVerificationTokenScalarFieldEnum | Prisma.EmailVerificationTokenScalarFieldEnum[]
 }
 
 /**
