@@ -87,6 +87,7 @@ model User {
   id           String     @id @default(uuid())
   email        String     @unique
   emailVerificationTokens EmailVerificationToken[]
+  emailVerifiedAt DateTime?
   passwordHash String
   name         String
   phone        String?

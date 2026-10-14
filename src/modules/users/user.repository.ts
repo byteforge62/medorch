@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { UserRole, UserStatus } from "@/generated/prisma/enums";
+import { randomUUID } from "node:crypto";
 
 export async function findUsers() {
     return prisma.user.findMany({
@@ -86,3 +87,52 @@ export async function createUserRecord(data: {
         },
     });
 }
+
+type CreatePatientRegistrationRecordInput = {
+  name: string;
+  email: string;
+  passwordHash: string;
+  phone?: string;
+  tokenHash: string;
+  expiresAt: Date;
+};
+
+export async function createPatientRegistrationRecord(
+  input: CreatePatientRegistrationRecordInput
+) {
+  const patientCode = `PAT-${randomUUID().replaceAll("-", "").toUpperCase()}`;
+
+  return prisma.user.create({
+    data: {
+      name: input.name,
+      email: input.email,
+      passwordHash: input.passwordHash,
+      phone: input.phone,
+      role: UserRole.PATIENT,
+      status: UserStatus.PENDING,
+      patient: {
+        create: {
+          patientCode,
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+        },
+      },
+      emailVerificationTokens: {
+        create: {
+          tokenHash: input.tokenHash,
+          expiresAt: input.expiresAt,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      emailVerifiedAt: true,
+      createdAt: true,
+    },
+  });
+} 
