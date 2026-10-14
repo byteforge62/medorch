@@ -136,3 +136,47 @@ export async function createPatientRegistrationRecord(
     },
   });
 } 
+
+
+export async function verifyPatientEmail(tokenHash: string): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const verificationToken = await tx.emailVerificationToken.findUnique({
+      where: { tokenHash },
+      select: {
+        userId: true,
+        expiresAt: true,
+        user: {
+          select: {
+            emailVerifiedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!verificationToken) {
+      return false;
+    }
+
+    if (verificationToken.expiresAt <= new Date()) {
+      await tx.emailVerificationToken.deleteMany({
+        where: { tokenHash },
+      });
+
+      return false;
+    }
+
+    if (!verificationToken.user.emailVerifiedAt) {
+      await tx.user.update({
+        where: { id: verificationToken.userId },
+        data: { emailVerifiedAt: new Date() },
+      });
+    }
+
+    // Invalidate all outstanding verification tokens for this user.
+    await tx.emailVerificationToken.deleteMany({
+      where: { userId: verificationToken.userId },
+    });
+
+    return true;
+  });
+}
