@@ -1,13 +1,10 @@
-import { findUserById,findUserByEmail,findUsers } from "./user.repository";
+import { createUserRecord,findUserById,findUserByEmail,findUsers,createPatientRegistrationRecord,verifyPatientEmail,approvePendingPatient } from "./user.repository";
 import type { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "../audit/audit.service";
-import { createUserRecord } from "./user.repository";
 import { generateEmailVerificationToken,hashEmailVerificationToken,getEmailVerificationExpiry } from "@/lib/auth/email-verification";
-import { createPatientRegistrationRecord } from "./user.repository";
 import type { PatientRegistrationInput } from "./user.validation";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
-import { verifyPatientEmail } from "./user.repository";
 
 export async function getUsers(){
     return findUsers();
@@ -84,7 +81,6 @@ export async function registerPatient(input: PatientRegistrationInput) {
   };
 }
 
-
 export async function verifyPatientEmailToken(token: string) {
   if (!/^[a-f0-9]{64}$/i.test(token)) {
     return { verified: false };
@@ -94,4 +90,27 @@ export async function verifyPatientEmailToken(token: string) {
   const verified = await verifyPatientEmail(tokenHash);
 
   return { verified };
+}
+
+
+export async function approvePatient(
+  patientUserId: string,
+  actorUserId: string,
+) {
+  const patient = await approvePendingPatient(patientUserId);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "User",
+    entityId: patient.id,
+    description: `Patient "${patient.email}" was approved.`,
+    metadata: {
+      role: patient.role,
+      status: patient.status,
+      approvedAt: patient.approvedAt?.toISOString() ?? null,
+    },
+  });
+
+  return patient;
 }

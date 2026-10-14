@@ -64,6 +64,10 @@ export function UserList() {
     const [status, setStatus] =
         useState<UserStatus | "ALL">("ALL");
 
+    const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
+    const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
     const fetchUsers = useCallback(async () => {
         try {
             setLoading(true);
@@ -149,6 +153,35 @@ export function UserList() {
         });
     }, [users, search, role, status]);
 
+
+    const handleApprove = async (user: User) => {
+        const confirmed = window.confirm(
+            `Approve patient ${user.name}? They will be able to sign in once their account becomes active.`,
+        );
+
+        if (!confirmed) return;
+
+        setApprovingUserId(user.id);
+        setActionError(null);
+        setActionSuccess(null);
+
+        try {
+            await apiClient.post(`/api/users/${user.id}/approve`, {});
+
+            setActionSuccess(`${user.name} was approved successfully.`);
+            await fetchUsers();
+        } catch (err) {
+            if (err instanceof ApiClientError) {
+                setActionError(err.message);
+            } else {
+                setActionError('Failed to approve patient.');
+            }
+        } finally {
+            setApprovingUserId(null);
+        }
+    };
+
+
     return (
         <Card>
             <CardHeader>
@@ -171,6 +204,18 @@ export function UserList() {
                     onStatusChange={setStatus}
                 />
             </div>
+
+            {actionError && (
+                <p role="alert" className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
+                    {actionError}
+                </p>
+            )}
+
+            {actionSuccess && (
+                <p role="status" className="mb-4 rounded-lg border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-300">
+                    {actionSuccess}
+                </p>
+            )}
 
             {loading ? (
                 <LoadingState message="Loading users..." />
@@ -216,6 +261,10 @@ export function UserList() {
                                 <th className="px-3 py-3 font-medium text-slate-500">
                                     Created
                                 </th>
+
+                                <th className="px-3 py-3 font-medium text-slate-500">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
 
@@ -256,6 +305,21 @@ export function UserList() {
                                     <td className="px-3 py-4 text-slate-600 dark:text-slate-300">
                                         {formatDate(user.createdAt)}
                                     </td>
+
+
+                                    <td className="px-3 py-4">
+                                        {user.role === "PATIENT" && user.status === "PENDING" && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleApprove(user)}
+                                                disabled={approvingUserId !== null}
+                                                className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                {approvingUserId === user.id ? "Approving..." : "Approve"}
+                                            </button>
+                                        )}
+                                    </td>
+
                                 </tr>
                             ))}
                         </tbody>

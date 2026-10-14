@@ -180,3 +180,51 @@ export async function verifyPatientEmail(tokenHash: string): Promise<boolean> {
     return true;
   });
 }
+
+
+export async function approvePendingPatient(userId: string) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    if (user.role !== UserRole.PATIENT) {
+      throw new Error("USER_NOT_PATIENT");
+    }
+
+    if (user.status !== UserStatus.PENDING) {
+      throw new Error("USER_NOT_PENDING");
+    }
+
+    if (!user.emailVerifiedAt) {
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
+
+    return tx.user.update({
+      where: { id: userId },
+      data: {
+        status: UserStatus.ACTIVE,
+        approvedAt: new Date(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+        approvedAt: true,
+      },
+    });
+  });
+}
