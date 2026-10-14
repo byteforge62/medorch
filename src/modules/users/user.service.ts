@@ -1,4 +1,4 @@
-import { createUserRecord,findUserById,findUserByEmail,findUsers,createPatientRegistrationRecord,verifyPatientEmail,approvePendingPatient } from "./user.repository";
+import { createUserRecord,findUserById,findUserByEmail,findUsers,createPatientRegistrationRecord,verifyPatientEmail,approvePendingPatient, createPatientResendVerificationToken } from "./user.repository";
 import type { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "../audit/audit.service";
@@ -113,4 +113,29 @@ export async function approvePatient(
   });
 
   return patient;
+}
+
+
+export async function resendPatientVerificationEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true };
+  }
+
+  const token = generateEmailVerificationToken();
+  const tokenHash = hashEmailVerificationToken(token);
+  const expiresAt = getEmailVerificationExpiry();
+
+  const user = await createPatientResendVerificationToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    await sendVerificationEmail(user.email, user.name, token);
+  }
+
+  return { accepted: true };
 }

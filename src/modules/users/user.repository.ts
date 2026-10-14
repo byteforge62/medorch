@@ -228,3 +228,51 @@ export async function approvePendingPatient(userId: string) {
     });
   });
 }
+
+
+export async function createPatientResendVerificationToken(
+  email: string,
+  tokenHash: string,
+  expiresAt: Date,
+) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
+    });
+
+    if (
+      !user ||
+      user.role !== UserRole.PATIENT ||
+      user.status !== UserStatus.PENDING ||
+      user.emailVerifiedAt
+    ) {
+      return null;
+    }
+
+    await tx.emailVerificationToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await tx.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+  });
+}

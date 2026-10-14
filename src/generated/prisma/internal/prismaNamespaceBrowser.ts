@@ -63,7 +63,8 @@ export const ModelName = {
   ScheduleNote: 'ScheduleNote',
   Alert: 'Alert',
   AuditLog: 'AuditLog',
-  EmailVerificationToken: 'EmailVerificationToken'
+  EmailVerificationToken: 'EmailVerificationToken',
+  VerificationEmailRequest: 'VerificationEmailRequest'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -266,6 +267,16 @@ export const EmailVerificationTokenScalarFieldEnum = {
 } as const
 
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
+
+
+export const VerificationEmailRequestScalarFieldEnum = {
+  id: 'id',
+  emailHash: 'emailHash',
+  ipHash: 'ipHash',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationEmailRequestScalarFieldEnum = (typeof VerificationEmailRequestScalarFieldEnum)[keyof typeof VerificationEmailRequestScalarFieldEnum]
 
 
 export const SortOrder = {

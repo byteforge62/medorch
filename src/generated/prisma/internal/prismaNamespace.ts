@@ -409,7 +409,8 @@ export const ModelName = {
   ScheduleNote: 'ScheduleNote',
   Alert: 'Alert',
   AuditLog: 'AuditLog',
-  EmailVerificationToken: 'EmailVerificationToken'
+  EmailVerificationToken: 'EmailVerificationToken',
+  VerificationEmailRequest: 'VerificationEmailRequest'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "doctorProfile" | "patient" | "department" | "oTRoom" | "equipment" | "schedule" | "scheduleStaff" | "scheduleEquipment" | "scheduleNote" | "alert" | "auditLog" | "emailVerificationToken"
+    modelProps: "user" | "doctorProfile" | "patient" | "department" | "oTRoom" | "equipment" | "schedule" | "scheduleStaff" | "scheduleEquipment" | "scheduleNote" | "alert" | "auditLog" | "emailVerificationToken" | "verificationEmailRequest"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1391,6 +1392,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VerificationEmailRequest: {
+      payload: Prisma.$VerificationEmailRequestPayload<ExtArgs>
+      fields: Prisma.VerificationEmailRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VerificationEmailRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VerificationEmailRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.VerificationEmailRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VerificationEmailRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        findMany: {
+          args: Prisma.VerificationEmailRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>[]
+        }
+        create: {
+          args: Prisma.VerificationEmailRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        createMany: {
+          args: Prisma.VerificationEmailRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VerificationEmailRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.VerificationEmailRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        update: {
+          args: Prisma.VerificationEmailRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.VerificationEmailRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VerificationEmailRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VerificationEmailRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.VerificationEmailRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationEmailRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.VerificationEmailRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVerificationEmailRequest>
+        }
+        groupBy: {
+          args: Prisma.VerificationEmailRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationEmailRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VerificationEmailRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationEmailRequestCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1614,6 +1689,16 @@ export const EmailVerificationTokenScalarFieldEnum = {
 } as const
 
 export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
+
+
+export const VerificationEmailRequestScalarFieldEnum = {
+  id: 'id',
+  emailHash: 'emailHash',
+  ipHash: 'ipHash',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationEmailRequestScalarFieldEnum = (typeof VerificationEmailRequestScalarFieldEnum)[keyof typeof VerificationEmailRequestScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2043,6 +2128,7 @@ export type GlobalOmitConfig = {
   alert?: Prisma.AlertOmit
   auditLog?: Prisma.AuditLogOmit
   emailVerificationToken?: Prisma.EmailVerificationTokenOmit
+  verificationEmailRequest?: Prisma.VerificationEmailRequestOmit
 }
 
 /* Types for Logging */
