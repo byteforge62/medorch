@@ -3,89 +3,89 @@ import { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { randomUUID } from "node:crypto";
 
 export async function findUsers() {
-    return prisma.user.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
+  return prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      doctorProfile: {
         select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            role: true,
-            status: true,
-            approvedAt: true,
-            createdAt: true,
-            updatedAt: true,
-            doctorProfile: {
-                select: {
-                    id: true,
-                },
-            },
+          id: true,
         },
+      },
+    },
 
-    })
+  })
 }
 
 export async function findUserById(id: string) {
-    return prisma.user.findUnique({
-        where: {
-            id,
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            role: true,
-            status: true,
-            approvedAt: true,
-            createdAt: true,
-            updatedAt: true,
-        }
-    })
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    }
+  })
 }
 
 export async function findUserByEmail(email: string) {
-    return prisma.user.findUnique({
-        where: {
-            email,
-        }
-    })
+  return prisma.user.findUnique({
+    where: {
+      email,
+    }
+  })
 }
 
 export async function createUserRecord(data: {
-    name: string;
-    email: string;
-    passwordHash: string;
-    phone?: string;
-    role: UserRole;
-    status?: UserStatus;
+  name: string;
+  email: string;
+  passwordHash: string;
+  phone?: string;
+  role: UserRole;
+  status?: UserStatus;
 }) {
-    const status: UserStatus = data.status ?? "PENDING";
+  const status: UserStatus = data.status ?? "PENDING";
 
-    return prisma.user.create({
-        data: {
-            name: data.name,
-            email: data.email,
-            passwordHash: data.passwordHash,
-            phone: data.phone,
-            role: data.role,
-            status,
-            approvedAt: status === "ACTIVE" ? new Date() : null,
-        },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            role: true,
-            status: true,
-            approvedAt: true,
-            createdAt: true,
-            updatedAt: true,
-        },
-    });
+  return prisma.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      phone: data.phone,
+      role: data.role,
+      status,
+      approvedAt: status === "ACTIVE" ? new Date() : null,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 }
 
 type CreatePatientRegistrationRecordInput = {
@@ -135,7 +135,7 @@ export async function createPatientRegistrationRecord(
       createdAt: true,
     },
   });
-} 
+}
 
 
 export async function verifyPatientEmail(tokenHash: string): Promise<boolean> {
@@ -291,8 +291,11 @@ export async function recordVerificationEmailRequest(
 
     for (const lockKey of lockKeys) {
       await tx.$queryRaw`
-        SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
-      `;
+    SELECT 1 AS locked
+    FROM (
+      SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
+    ) AS lock_query
+  `;
     }
 
     await tx.verificationEmailRequest.deleteMany({

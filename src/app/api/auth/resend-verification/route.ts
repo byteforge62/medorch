@@ -24,11 +24,26 @@ export async function POST(request: NextRequest) {
             realIp?.trim() ||
             "unknown";
 
-        await resendPatientVerificationEmail(email, ipAddress);
+        const result = await resendPatientVerificationEmail(email, ipAddress);
+
+        if (result.rateLimited) {
+            return apiSuccess(
+                {
+                    message:
+                        "You've reached the resend limit. Please wait 15 minutes before trying again.",
+                    rateLimited: true,
+                },
+                429,
+            );
+        }
 
         return apiSuccess(
-            "If an eligible account exists, a verification email will be sent.",
-            200
+            {
+                message:
+                    "If an eligible account exists, a verification email will be sent.",
+                rateLimited: false,
+            },
+            202,
         );
     } catch (error) {
         if (error instanceof ZodError) {

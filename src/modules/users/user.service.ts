@@ -147,7 +147,10 @@ export async function resendPatientVerificationEmail(
   );
 
   if (!allowed) {
-    return { accepted: true };
+    return {
+      accepted: true,
+      rateLimited: true,
+    };
   }
 
   const token = generateEmailVerificationToken();
