@@ -24,10 +24,27 @@ export function LoginForm() {
         redirect: false,
       });
 
-      if (!result || result.error) {
-        setError('Invalid email or password');
-        return;
-      }
+
+      
+if (!result || result.error) {
+  const authCode = result?.code ?? "";
+
+  if (authCode === "email_not_verified") {
+    setError(
+      "Please verify your email before signing in. Use the resend verification link below if needed.",
+    );
+  } else if (authCode === "account_pending_approval") {
+    setError(
+      "Your email is verified, but your account is awaiting admin approval.",
+    );
+  } else {
+    setError("Invalid email or password");
+  }
+
+  return;
+}
+
+
 
       router.push('/dashboard');
       router.refresh();

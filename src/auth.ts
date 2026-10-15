@@ -1,9 +1,18 @@
 import NextAuth from "next-auth";
+import { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { recordAudit } from "./modules/audit/audit.service";
+
+class EmailNotVerifiedError extends CredentialsSignin {
+    code = "email_not_verified";
+}
+
+class AccountPendingApprovalError extends CredentialsSignin {
+    code = "account_pending_approval";
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
@@ -19,41 +28,51 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             },
 
+
             async authorize(credentials) {
-                if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") {
+                if (
+                    typeof credentials?.email !== "string" ||
+                    typeof credentials?.password !== "string"
+                ) {
                     return null;
                 }
 
                 const email = credentials.email.trim().toLowerCase();
 
                 const user = await prisma.user.findUnique({
-                    where: {
-                        email,
-                    }
+                    where: { email },
                 });
 
                 if (!user) {
-                    return null
-                }
-
-                if (user.status !== "ACTIVE") {
                     return null;
                 }
 
-                const passwordValid = await verifyPassword(credentials.password, user.passwordHash);
+                const passwordValid = await verifyPassword(
+                    credentials.password,
+                    user.passwordHash,
+                );
 
                 if (!passwordValid) {
                     return null;
                 }
+
+                if (user.role === "PATIENT" && !user.emailVerifiedAt) {
+  throw new EmailNotVerifiedError();
+}
+
+if (user.status !== "ACTIVE") {
+  throw new AccountPendingApprovalError();
+}
 
                 return {
                     id: user.id,
                     email: user.email,
                     name: user.name,
                     role: user.role,
-                    status: user.status
-                }
+                    status: user.status,
+                };
             }
+
         })
     ],
 
