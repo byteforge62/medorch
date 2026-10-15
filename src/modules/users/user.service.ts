@@ -1,58 +1,60 @@
-import { createUserRecord,findUserById,findUserByEmail,findUsers,createPatientRegistrationRecord,verifyPatientEmail,approvePendingPatient, createPatientResendVerificationToken } from "./user.repository";
+import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest } from "./user.repository";
 import type { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "../audit/audit.service";
-import { generateEmailVerificationToken,hashEmailVerificationToken,getEmailVerificationExpiry } from "@/lib/auth/email-verification";
+import { generateEmailVerificationToken, hashEmailVerificationToken, getEmailVerificationExpiry } from "@/lib/auth/email-verification";
 import type { PatientRegistrationInput } from "./user.validation";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
+import { createHash } from "node:crypto";
 
-export async function getUsers(){
-    return findUsers();
+
+export async function getUsers() {
+  return findUsers();
 }
 
-export async function getUserById(id: string){
-    return findUserById(id);
+export async function getUserById(id: string) {
+  return findUserById(id);
 }
 
-export async function getUserByEmail(email: string){
-    return findUserByEmail(email);
+export async function getUserByEmail(email: string) {
+  return findUserByEmail(email);
 }
 
 export async function createUser(
-    data: {
-        name: string;
-        email: string;
-        password: string;
-        phone?: string;
-        role: UserRole;
-        status?: UserStatus;
-    },
-    actorUserId: string,
+  data: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    role: UserRole;
+    status?: UserStatus;
+  },
+  actorUserId: string,
 ) {
-    const passwordHash = await hashPassword(data.password);
+  const passwordHash = await hashPassword(data.password);
 
-    const user = await createUserRecord({
-        name: data.name,
-        email: data.email,
-        passwordHash,
-        phone: data.phone,
-        role: data.role,
-        status: data.status,
-    });
+  const user = await createUserRecord({
+    name: data.name,
+    email: data.email,
+    passwordHash,
+    phone: data.phone,
+    role: data.role,
+    status: data.status,
+  });
 
-    await recordAudit({
-        userId: actorUserId,
-        action: "CREATE",
-        entity: "User",
-        entityId: user.id,
-        description: `User "${user.email}" was created.`,
-        metadata: {
-            role: user.role,
-            status: user.status,
-        },
-    });
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "User",
+    entityId: user.id,
+    description: `User "${user.email}" was created.`,
+    metadata: {
+      role: user.role,
+      status: user.status,
+    },
+  });
 
-    return user;
+  return user;
 }
 
 export async function registerPatient(input: PatientRegistrationInput) {
@@ -71,7 +73,11 @@ export async function registerPatient(input: PatientRegistrationInput) {
     expiresAt,
   });
 
-  await sendVerificationEmail(user.email, user.name, token);
+  try {
+    await sendVerificationEmail(user.email, user.name, token);
+  } catch (error) {
+    console.error("Registration verification email failed:", error);
+  }
 
   return {
     id: user.id,
@@ -116,10 +122,31 @@ export async function approvePatient(
 }
 
 
-export async function resendPatientVerificationEmail(email: string) {
+
+export async function resendPatientVerificationEmail(
+  email: string,
+  ipAddress: string,
+) {
   const normalizedEmail = email.trim().toLowerCase();
 
   if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress)
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+  );
+
+  if (!allowed) {
     return { accepted: true };
   }
 
@@ -139,3 +166,4 @@ export async function resendPatientVerificationEmail(email: string) {
 
   return { accepted: true };
 }
+

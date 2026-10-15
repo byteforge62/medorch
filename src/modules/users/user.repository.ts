@@ -230,6 +230,7 @@ export async function approvePendingPatient(userId: string) {
 }
 
 
+
 export async function createPatientResendVerificationToken(
   email: string,
   tokenHash: string,
@@ -274,5 +275,53 @@ export async function createPatientResendVerificationToken(
       name: user.name,
       email: user.email,
     };
+  });
+}
+
+export async function recordVerificationEmailRequest(
+  emailHash: string,
+  ipHash: string,
+): Promise<boolean> {
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - 15 * 60 * 1000);
+  const cleanupBefore = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  return prisma.$transaction(async (tx) => {
+    const lockKeys = [`email:${emailHash}`, `ip:${ipHash}`].sort();
+
+    for (const lockKey of lockKeys) {
+      await tx.$queryRaw`
+        SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
+      `;
+    }
+
+    await tx.verificationEmailRequest.deleteMany({
+      where: { createdAt: { lt: cleanupBefore } },
+    });
+
+    const [emailRequests, ipRequests] = await Promise.all([
+      tx.verificationEmailRequest.count({
+        where: {
+          emailHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+      tx.verificationEmailRequest.count({
+        where: {
+          ipHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+    ]);
+
+    if (emailRequests >= 3 || ipRequests >= 10) {
+      return false;
+    }
+
+    await tx.verificationEmailRequest.create({
+      data: { emailHash, ipHash },
+    });
+
+    return true;
   });
 }

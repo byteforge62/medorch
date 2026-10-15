@@ -16,9 +16,16 @@ export async function POST(request: NextRequest) {
         const body: unknown = await request.json();
         const { email } = resendVerificationSchema.parse(body);
 
-        await resendPatientVerificationEmail(email);
+        const forwardedFor = request.headers.get("x-forwarded-for");
+        const realIp = request.headers.get("x-real-ip");
 
-        // Keep the response identical whether the account exists or not.
+        const ipAddress =
+            forwardedFor?.split(",")[0]?.trim() ||
+            realIp?.trim() ||
+            "unknown";
+
+        await resendPatientVerificationEmail(email, ipAddress);
+
         return apiSuccess(
             "If an eligible account exists, a verification email will be sent.",
             200
