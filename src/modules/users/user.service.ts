@@ -1,4 +1,4 @@
-import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest } from "./user.repository";
+import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest, createPasswordResetToken,resetPasswordWithToken } from "./user.repository";
 import type { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "../audit/audit.service";
@@ -6,7 +6,8 @@ import { generateEmailVerificationToken, hashEmailVerificationToken, getEmailVer
 import type { PatientRegistrationInput } from "./user.validation";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 import { createHash } from "node:crypto";
-
+import { generatePasswordResetToken, hashPasswordResetToken, getPasswordResetExpiry } from "@/lib/auth/password-reset";
+import { sendPasswordResetEmail } from "@/lib/email/send-password-reset-email";
 
 export async function getUsers() {
   return findUsers();
@@ -98,7 +99,6 @@ export async function verifyPatientEmailToken(token: string) {
   return { verified };
 }
 
-
 export async function approvePatient(
   patientUserId: string,
   actorUserId: string,
@@ -120,8 +120,6 @@ export async function approvePatient(
 
   return patient;
 }
-
-
 
 export async function resendPatientVerificationEmail(
   email: string,
@@ -170,3 +168,43 @@ export async function resendPatientVerificationEmail(
   return { accepted: true };
 }
 
+
+export async function requestPasswordReset(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true };
+  }
+
+  const token = generatePasswordResetToken();
+  const tokenHash = hashPasswordResetToken(token);
+  const expiresAt = getPasswordResetExpiry();
+
+  const user = await createPasswordResetToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    await sendPasswordResetEmail(user.email, user.name, token);
+  }
+
+  return { accepted: true };
+}
+
+export async function completePasswordReset(
+  token: string,
+  newPassword: string,
+) {
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return { reset: false };
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  const tokenHash = hashPasswordResetToken(token);
+
+  const reset = await resetPasswordWithToken(tokenHash, passwordHash);
+
+  return { reset };
+}

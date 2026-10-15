@@ -107,6 +107,11 @@ export type AuditLog = Prisma.AuditLogModel
  */
 export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
 /**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
  * Model VerificationEmailRequest
  * 
  */

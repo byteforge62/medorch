@@ -328,3 +328,78 @@ export async function recordVerificationEmailRequest(
     return true;
   });
 }
+
+
+export async function createPasswordResetToken(
+  email: string,
+  tokenHash: string,
+  expiresAt: Date,
+) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    await tx.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await tx.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    return user;
+  });
+}
+
+export async function resetPasswordWithToken(
+  tokenHash: string,
+  passwordHash: string,
+): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const resetToken = await tx.passwordResetToken.findUnique({
+      where: { tokenHash },
+      select: {
+        id: true,
+        userId: true,
+        expiresAt: true,
+      },
+    });
+
+    if (!resetToken) {
+      return false;
+    }
+
+    if (resetToken.expiresAt <= new Date()) {
+      await tx.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
+
+      return false;
+    }
+
+    await tx.user.update({
+      where: { id: resetToken.userId },
+      data: { passwordHash },
+    });
+
+    await tx.passwordResetToken.deleteMany({
+      where: { userId: resetToken.userId },
+    });
+
+    return true;
+  });
+}
