@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
@@ -98,6 +99,25 @@ export function LoginForm() {
       >
         {isLoading ? 'Signing in...' : 'Sign in'}
       </button>
+
+      <div className="flex flex-col gap-3 pt-2 text-center text-sm">
+        <Link
+          href="/resend-verification"
+          className="text-primary hover:underline"
+        >
+          Resend verification email
+        </Link>
+
+        <p className="text-foreground-muted">
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/register"
+            className="text-primary font-medium hover:underline"
+          >
+            Create an account
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }

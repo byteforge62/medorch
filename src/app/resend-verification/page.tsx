@@ -14,35 +14,45 @@ export default function ResendVerificationPage() {
     setMessage('');
     setError('');
 
+
     try {
-      const response = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
 
       const result = await response.json().catch(() => null);
+      const payload = result?.data;
 
-      if (!response.ok) {
+      if (response.status === 429 || payload?.rateLimited) {
+        setError(
+          payload?.message ||
+          "You've reached the resend limit. Please wait 15 minutes before trying again.",
+        );
+        return;
+      }
+
+      if (!response.ok || result?.success === false) {
         throw new Error(
-          result?.message ||
-            'Unable to process your request. Please try again.',
+          result?.message || "Unable to process your request. Please try again.",
         );
       }
 
       setMessage(
-        result?.message ||
-          'If an eligible account exists, a verification email will be sent.',
+        payload?.message ||
+        "If an eligible account exists, a verification email will be sent.",
       );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : 'Something went wrong. Please try again.',
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
     }
+
   }
 
   return (
