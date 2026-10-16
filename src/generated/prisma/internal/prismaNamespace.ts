@@ -1781,7 +1781,8 @@ export const VerificationEmailRequestScalarFieldEnum = {
   id: 'id',
   emailHash: 'emailHash',
   ipHash: 'ipHash',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  purpose: 'purpose'
 } as const
 
 export type VerificationEmailRequestScalarFieldEnum = (typeof VerificationEmailRequestScalarFieldEnum)[keyof typeof VerificationEmailRequestScalarFieldEnum]

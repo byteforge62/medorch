@@ -341,8 +341,6 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([expiresAt])
 }
-
-
 model PasswordResetToken {
   id        String   @id @default(uuid())
   userId    String
@@ -360,7 +358,8 @@ model VerificationEmailRequest {
   emailHash String
   ipHash    String
   createdAt DateTime @default(now())
+  purpose String @default("EMAIL_VERIFICATION")
 
-  @@index([emailHash, createdAt])
-  @@index([ipHash, createdAt])
+  @@index([purpose,emailHash, createdAt])
+  @@index([purpose,ipHash, createdAt])
 }

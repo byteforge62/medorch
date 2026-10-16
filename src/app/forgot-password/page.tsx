@@ -24,16 +24,24 @@ export default function ForgotPasswordPage() {
 
       const result = await response.json().catch(() => null);
 
+      if (response.status === 429 || result?.data?.rateLimited) {
+        setError(
+          result?.data?.message ||
+          "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
+        );
+        return;
+      }
+
       if (!response.ok || result?.success === false) {
         throw new Error(
           result?.message ||
-            'Unable to process your request. Please try again.',
+          'Unable to process your request. Please try again.',
         );
       }
 
       setMessage(
         result?.data?.message ||
-          'If an account exists for this email, password reset instructions will be sent.',
+        'If an account exists for this email, password reset instructions will be sent.',
       );
     } catch (err) {
       setError(

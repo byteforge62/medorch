@@ -278,16 +278,20 @@ export async function createPatientResendVerificationToken(
   });
 }
 
+type VerificationRequestPurpose = 
+| "EMAIL_VERIFICATION"
+| "PASSWORD_RESET";
 export async function recordVerificationEmailRequest(
   emailHash: string,
   ipHash: string,
+  purpose: VerificationRequestPurpose = "EMAIL_VERIFICATION"
 ): Promise<boolean> {
   const now = new Date();
   const windowStart = new Date(now.getTime() - 15 * 60 * 1000);
   const cleanupBefore = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   return prisma.$transaction(async (tx) => {
-    const lockKeys = [`email:${emailHash}`, `ip:${ipHash}`].sort();
+    const lockKeys = [`${purpose}:email:${emailHash}`,`${purpose}:ip:${ipHash}`].sort();
 
     for (const lockKey of lockKeys) {
       await tx.$queryRaw`
@@ -305,12 +309,14 @@ export async function recordVerificationEmailRequest(
     const [emailRequests, ipRequests] = await Promise.all([
       tx.verificationEmailRequest.count({
         where: {
+          purpose,
           emailHash,
           createdAt: { gte: windowStart },
         },
       }),
       tx.verificationEmailRequest.count({
         where: {
+          purpose,
           ipHash,
           createdAt: { gte: windowStart },
         },
@@ -322,7 +328,7 @@ export async function recordVerificationEmailRequest(
     }
 
     await tx.verificationEmailRequest.create({
-      data: { emailHash, ipHash },
+      data: { purpose, emailHash, ipHash },
     });
 
     return true;

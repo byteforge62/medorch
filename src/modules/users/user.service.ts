@@ -1,4 +1,4 @@
-import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest, createPasswordResetToken,resetPasswordWithToken } from "./user.repository";
+import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest, createPasswordResetToken, resetPasswordWithToken } from "./user.repository";
 import type { UserRole, UserStatus } from "@/generated/prisma/enums";
 import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "../audit/audit.service";
@@ -169,11 +169,29 @@ export async function resendPatientVerificationEmail(
 }
 
 
-export async function requestPasswordReset(email: string) {
+export async function requestPasswordReset(email: string, ipAddress: string) {
   const normalizedEmail = email.trim().toLowerCase();
 
   if (!normalizedEmail || normalizedEmail.length > 254) {
-    return { accepted: true };
+    return { accepted: true, rateLimited: false };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress || "unknown")
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "PASSWORD_RESET",
+  );
+
+  if (!allowed) {
+    return { accepted: true, rateLimited: true };
   }
 
   const token = generatePasswordResetToken();
@@ -190,7 +208,7 @@ export async function requestPasswordReset(email: string) {
     await sendPasswordResetEmail(user.email, user.name, token);
   }
 
-  return { accepted: true };
+  return { accepted: true, rateLimited:false };
 }
 
 export async function completePasswordReset(

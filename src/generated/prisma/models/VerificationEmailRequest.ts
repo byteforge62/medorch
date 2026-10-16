@@ -29,6 +29,7 @@ export type VerificationEmailRequestMinAggregateOutputType = {
   emailHash: string | null
   ipHash: string | null
   createdAt: Date | null
+  purpose: string | null
 }
 
 export type VerificationEmailRequestMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type VerificationEmailRequestMaxAggregateOutputType = {
   emailHash: string | null
   ipHash: string | null
   createdAt: Date | null
+  purpose: string | null
 }
 
 export type VerificationEmailRequestCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type VerificationEmailRequestCountAggregateOutputType = {
   emailHash: number
   ipHash: number
   createdAt: number
+  purpose: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type VerificationEmailRequestMinAggregateInputType = {
   emailHash?: true
   ipHash?: true
   createdAt?: true
+  purpose?: true
 }
 
 export type VerificationEmailRequestMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type VerificationEmailRequestMaxAggregateInputType = {
   emailHash?: true
   ipHash?: true
   createdAt?: true
+  purpose?: true
 }
 
 export type VerificationEmailRequestCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type VerificationEmailRequestCountAggregateInputType = {
   emailHash?: true
   ipHash?: true
   createdAt?: true
+  purpose?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type VerificationEmailRequestGroupByOutputType = {
   emailHash: string
   ipHash: string
   createdAt: Date
+  purpose: string
   _count: VerificationEmailRequestCountAggregateOutputType | null
   _min: VerificationEmailRequestMinAggregateOutputType | null
   _max: VerificationEmailRequestMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type VerificationEmailRequestWhereInput = {
   emailHash?: Prisma.StringFilter<"VerificationEmailRequest"> | string
   ipHash?: Prisma.StringFilter<"VerificationEmailRequest"> | string
   createdAt?: Prisma.DateTimeFilter<"VerificationEmailRequest"> | Date | string
+  purpose?: Prisma.StringFilter<"VerificationEmailRequest"> | string
 }
 
 export type VerificationEmailRequestOrderByWithRelationInput = {
@@ -181,6 +189,7 @@ export type VerificationEmailRequestOrderByWithRelationInput = {
   emailHash?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  purpose?: Prisma.SortOrder
 }
 
 export type VerificationEmailRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -191,6 +200,7 @@ export type VerificationEmailRequestWhereUniqueInput = Prisma.AtLeast<{
   emailHash?: Prisma.StringFilter<"VerificationEmailRequest"> | string
   ipHash?: Prisma.StringFilter<"VerificationEmailRequest"> | string
   createdAt?: Prisma.DateTimeFilter<"VerificationEmailRequest"> | Date | string
+  purpose?: Prisma.StringFilter<"VerificationEmailRequest"> | string
 }, "id">
 
 export type VerificationEmailRequestOrderByWithAggregationInput = {
@@ -198,6 +208,7 @@ export type VerificationEmailRequestOrderByWithAggregationInput = {
   emailHash?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  purpose?: Prisma.SortOrder
   _count?: Prisma.VerificationEmailRequestCountOrderByAggregateInput
   _max?: Prisma.VerificationEmailRequestMaxOrderByAggregateInput
   _min?: Prisma.VerificationEmailRequestMinOrderByAggregateInput
@@ -211,6 +222,7 @@ export type VerificationEmailRequestScalarWhereWithAggregatesInput = {
   emailHash?: Prisma.StringWithAggregatesFilter<"VerificationEmailRequest"> | string
   ipHash?: Prisma.StringWithAggregatesFilter<"VerificationEmailRequest"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VerificationEmailRequest"> | Date | string
+  purpose?: Prisma.StringWithAggregatesFilter<"VerificationEmailRequest"> | string
 }
 
 export type VerificationEmailRequestCreateInput = {
@@ -218,6 +230,7 @@ export type VerificationEmailRequestCreateInput = {
   emailHash: string
   ipHash: string
   createdAt?: Date | string
+  purpose?: string
 }
 
 export type VerificationEmailRequestUncheckedCreateInput = {
@@ -225,6 +238,7 @@ export type VerificationEmailRequestUncheckedCreateInput = {
   emailHash: string
   ipHash: string
   createdAt?: Date | string
+  purpose?: string
 }
 
 export type VerificationEmailRequestUpdateInput = {
@@ -232,6 +246,7 @@ export type VerificationEmailRequestUpdateInput = {
   emailHash?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type VerificationEmailRequestUncheckedUpdateInput = {
@@ -239,6 +254,7 @@ export type VerificationEmailRequestUncheckedUpdateInput = {
   emailHash?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type VerificationEmailRequestCreateManyInput = {
@@ -246,6 +262,7 @@ export type VerificationEmailRequestCreateManyInput = {
   emailHash: string
   ipHash: string
   createdAt?: Date | string
+  purpose?: string
 }
 
 export type VerificationEmailRequestUpdateManyMutationInput = {
@@ -253,6 +270,7 @@ export type VerificationEmailRequestUpdateManyMutationInput = {
   emailHash?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type VerificationEmailRequestUncheckedUpdateManyInput = {
@@ -260,6 +278,7 @@ export type VerificationEmailRequestUncheckedUpdateManyInput = {
   emailHash?: Prisma.StringFieldUpdateOperationsInput | string
   ipHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type VerificationEmailRequestCountOrderByAggregateInput = {
@@ -267,6 +286,7 @@ export type VerificationEmailRequestCountOrderByAggregateInput = {
   emailHash?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  purpose?: Prisma.SortOrder
 }
 
 export type VerificationEmailRequestMaxOrderByAggregateInput = {
@@ -274,6 +294,7 @@ export type VerificationEmailRequestMaxOrderByAggregateInput = {
   emailHash?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  purpose?: Prisma.SortOrder
 }
 
 export type VerificationEmailRequestMinOrderByAggregateInput = {
@@ -281,6 +302,7 @@ export type VerificationEmailRequestMinOrderByAggregateInput = {
   emailHash?: Prisma.SortOrder
   ipHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  purpose?: Prisma.SortOrder
 }
 
 
@@ -290,6 +312,7 @@ export type VerificationEmailRequestSelect<ExtArgs extends runtime.Types.Extensi
   emailHash?: boolean
   ipHash?: boolean
   createdAt?: boolean
+  purpose?: boolean
 }, ExtArgs["result"]["verificationEmailRequest"]>
 
 export type VerificationEmailRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -297,6 +320,7 @@ export type VerificationEmailRequestSelectCreateManyAndReturn<ExtArgs extends ru
   emailHash?: boolean
   ipHash?: boolean
   createdAt?: boolean
+  purpose?: boolean
 }, ExtArgs["result"]["verificationEmailRequest"]>
 
 export type VerificationEmailRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -304,6 +328,7 @@ export type VerificationEmailRequestSelectUpdateManyAndReturn<ExtArgs extends ru
   emailHash?: boolean
   ipHash?: boolean
   createdAt?: boolean
+  purpose?: boolean
 }, ExtArgs["result"]["verificationEmailRequest"]>
 
 export type VerificationEmailRequestSelectScalar = {
@@ -311,9 +336,10 @@ export type VerificationEmailRequestSelectScalar = {
   emailHash?: boolean
   ipHash?: boolean
   createdAt?: boolean
+  purpose?: boolean
 }
 
-export type VerificationEmailRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "emailHash" | "ipHash" | "createdAt", ExtArgs["result"]["verificationEmailRequest"]>
+export type VerificationEmailRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "emailHash" | "ipHash" | "createdAt" | "purpose", ExtArgs["result"]["verificationEmailRequest"]>
 
 export type $VerificationEmailRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VerificationEmailRequest"
@@ -323,6 +349,7 @@ export type $VerificationEmailRequestPayload<ExtArgs extends runtime.Types.Exten
     emailHash: string
     ipHash: string
     createdAt: Date
+    purpose: string
   }, ExtArgs["result"]["verificationEmailRequest"]>
   composites: {}
 }
@@ -750,6 +777,7 @@ export interface VerificationEmailRequestFieldRefs {
   readonly emailHash: Prisma.FieldRef<"VerificationEmailRequest", 'String'>
   readonly ipHash: Prisma.FieldRef<"VerificationEmailRequest", 'String'>
   readonly createdAt: Prisma.FieldRef<"VerificationEmailRequest", 'DateTime'>
+  readonly purpose: Prisma.FieldRef<"VerificationEmailRequest", 'String'>
 }
     
 

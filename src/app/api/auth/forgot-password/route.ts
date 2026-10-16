@@ -20,15 +20,27 @@ export async function POST(request: NextRequest) {
       return apiError("Please enter a valid email address.", 400, undefined, requestId);
     }
 
-    await requestPasswordReset(parsed.data.email);
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ipAddress =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
-    return apiSuccess(
-      {
-        message:
-          "If an account exists for this email, password reset instructions will be sent.",
-      },
-      200,
+    const result = await requestPasswordReset(
+      parsed.data.email,
+      ipAddress,
     );
+
+    if (result.rateLimited) {
+  return apiSuccess(
+    {
+      message:
+        "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
+      rateLimited: true,
+    },
+    429,
+  );
+}
   } catch (error) {
     console.error(`[${requestId}] Forgot-password request failed:`, error);
 
