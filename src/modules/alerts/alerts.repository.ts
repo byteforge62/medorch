@@ -148,39 +148,21 @@ export async function updateAlert(
     isRead?: boolean;
     readAt?: Date | null;
   },
+  userId?: string,
 ) {
-  return prisma.alert.update({
-    where: { id },
-    data,
-    select: {
-      id: true,
-      userId: true,
-      scheduleId: true,
-      type: true,
-      title: true,
-      message: true,
-      severity: true,
-      isRead: true,
-      readAt: true,
-      createdAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-        },
-      },
-      schedule: {
-        select: {
-          id: true,
-          procedure: true,
-          scheduledDate: true,
-          status: true,
-        },
-      },
+  const result = await prisma.alert.updateMany({
+    where: {
+      id,
+      ...(userId ? { userId } : {}),
     },
+    data,
   });
+
+  if (result.count === 0) {
+    return null;
+  }
+
+  return findAlertById(id);
 }
 
 export async function markAlertAsRead(id: string) {

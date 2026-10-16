@@ -134,7 +134,7 @@ export async function resendPatientVerificationEmail(
   const normalizedEmail = email.trim().toLowerCase();
 
   if (!normalizedEmail || normalizedEmail.length > 254) {
-    return { accepted: true };
+    return { accepted: true, rateLimited: false };
   }
 
   const emailHash = createHash("sha256")
@@ -142,12 +142,13 @@ export async function resendPatientVerificationEmail(
     .digest("hex");
 
   const ipHash = createHash("sha256")
-    .update(ipAddress)
+    .update(ipAddress || "unknown")
     .digest("hex");
 
   const allowed = await recordVerificationEmailRequest(
     emailHash,
     ipHash,
+    "EMAIL_VERIFICATION",
   );
 
   if (!allowed) {
@@ -168,10 +169,14 @@ export async function resendPatientVerificationEmail(
   );
 
   if (user) {
-    await sendVerificationEmail(user.email, user.name, token);
+    try {
+      await sendVerificationEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Resend verification email failed:", error);
+    }
   }
 
-  return { accepted: true };
+  return { accepted: true, rateLimited: false };
 }
 
 
