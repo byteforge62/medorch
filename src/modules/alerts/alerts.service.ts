@@ -17,7 +17,6 @@ export async function getAlerts(
   filter: FindAlertsFilter,
   requestingUser: { id: string; role: UserRole },
 ) {
-  // Non-ADMIN users can only see their own alerts
   const effectiveFilter = { ...filter };
   if (requestingUser.role !== "ADMIN") {
     effectiveFilter.userId = requestingUser.id;
@@ -108,33 +107,33 @@ export async function updateAlertById(
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
-  const updateData: {
-    title?: string;
-    message?: string;
-    severity?: AlertSeverity;
-    isRead?: boolean;
-    readAt?: Date | null;
-  } = { ...data };
+  const updateData = { ...data };
 
   if (data.isRead !== undefined) {
-    if (data.isRead && !alert.isRead) {
-      updateData.readAt = new Date();
-    } else if (!data.isRead) {
-      updateData.readAt = null;
-    }
+    Object.assign(updateData, {
+      readAt: data.isRead ? new Date() : null,
+    });
   }
 
-  const updatedAlert = await updateAlertRecord(id, updateData);
+  const updatedAlert = await updateAlertRecord(
+    id,
+    updateData,
+    requestingUser.role === "ADMIN" ? undefined : requestingUser.id,
+  );
+
+  if (!updatedAlert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
 
   await recordAudit({
     userId: requestingUser.id,
     action: "UPDATE",
     entity: "Alert",
-    entityId: updatedAlert.id,
+    entityId: id,
     description: `Alert "${updatedAlert.title}" was updated.`,
     metadata: {
-      alertId: updatedAlert.id,
-      changes: data,
+      alertId: id,
+      changes: updateData,
     },
   });
 
