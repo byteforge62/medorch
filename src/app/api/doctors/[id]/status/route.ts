@@ -2,7 +2,10 @@ import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { updateDoctorStatus } from "@/modules/doctors/doctor.service";
-import { updateDoctorStatusSchema } from "@/modules/doctors/doctor.validation";
+import {
+  doctorIdSchema,
+  updateDoctorStatusSchema,
+} from "@/modules/doctors/doctor.validation";
 
 type RouteContext = {
   params: Promise<{
@@ -28,6 +31,17 @@ export async function PATCH(
 
     const { id } = await params;
 
+    const idValidation = doctorIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid doctor ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
     const body = await request.json();
 
     const validation = updateDoctorStatusSchema.safeParse(body);
@@ -42,9 +56,9 @@ export async function PATCH(
     }
 
     const result = await updateDoctorStatus(
-      id,
+      idValidation.data.id,
       validation.data.status,
-      session.user.id
+      session.user.id,
     );
 
     return apiSuccess(result, 200);
