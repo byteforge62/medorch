@@ -74,9 +74,12 @@ export async function registerPatient(input: PatientRegistrationInput) {
     expiresAt,
   });
 
+  let emailSent = true;
+
   try {
     await sendVerificationEmail(user.email, user.name, token);
   } catch (error) {
+    emailSent = false;
     console.error("Registration verification email failed:", error);
   }
 
@@ -84,7 +87,10 @@ export async function registerPatient(input: PatientRegistrationInput) {
     id: user.id,
     email: user.email,
     status: user.status,
-    message: "Registration successful. Check your email to verify your account.",
+    emailSent,
+    message: emailSent
+      ? "Registration successful. Check your email to verify your account."
+      : "Registration successful, but the verification email could not be sent. Please request another verification email.",
   };
 }
 
@@ -169,7 +175,10 @@ export async function resendPatientVerificationEmail(
 }
 
 
-export async function requestPasswordReset(email: string, ipAddress: string) {
+export async function requestPasswordReset(
+  email: string,
+  ipAddress: string,
+) {
   const normalizedEmail = email.trim().toLowerCase();
 
   if (!normalizedEmail || normalizedEmail.length > 254) {
@@ -205,10 +214,14 @@ export async function requestPasswordReset(email: string, ipAddress: string) {
   );
 
   if (user) {
-    await sendPasswordResetEmail(user.email, user.name, token);
+    try {
+      await sendPasswordResetEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Failed to send password reset email:", error);
+    }
   }
 
-  return { accepted: true, rateLimited:false };
+  return { accepted: true, rateLimited: false };
 }
 
 export async function completePasswordReset(
