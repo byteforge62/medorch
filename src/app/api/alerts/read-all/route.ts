@@ -22,15 +22,36 @@ export async function PATCH(request: Request) {
     }
 
     let targetUserId = session.user.id;
+    const rawBody = await request.text();
 
-    try {
-      const body = await request.json();
+    if (rawBody.trim()) {
+      let body: unknown;
+
+      try {
+        body = JSON.parse(rawBody);
+      } catch {
+        return apiError(
+          "Invalid JSON request body.",
+          400,
+          undefined,
+          requestId,
+        );
+      }
+
       const validation = readAllSchema.safeParse(body);
-      if (validation.success && validation.data.userId) {
+
+      if (!validation.success) {
+        return apiError(
+          "Invalid request body.",
+          400,
+          validation.error.flatten(),
+          requestId,
+        );
+      }
+
+      if (validation.data.userId) {
         targetUserId = validation.data.userId;
       }
-    } catch {
-      // Body is optional; fallback to authenticated user ID
     }
 
     const result = await markAllAlertsAsRead(targetUserId, session.user);

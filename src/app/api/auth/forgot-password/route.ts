@@ -32,15 +32,23 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.rateLimited) {
-  return apiSuccess(
-    {
-      message:
-        "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
-      rateLimited: true,
-    },
-    429,
-  );
-}
+      return apiSuccess(
+        {
+          message:
+            "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
+          rateLimited: true,
+        },
+        429,
+      );
+    }
+
+    return apiSuccess(
+      {
+        message:
+          "If an eligible account exists, a password reset email will be sent.",
+      },
+      202,
+    );
   } catch (error) {
     console.error(`[${requestId}] Forgot-password request failed:`, error);
 

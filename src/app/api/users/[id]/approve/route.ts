@@ -3,6 +3,7 @@ import { apiError, apiSuccess } from "@/lib/api/response";
 import { getRequestId } from "@/lib/api/request-id";
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { approvePatient } from "@/modules/users/user.service";
+import { userIdSchema } from "@/modules/users/user.validation";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -26,16 +27,21 @@ export async function POST(
 
     const { id } = await context.params;
 
-    if (!id || id.length > 100) {
+    const idValidation = userIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
       return apiError(
         "Invalid user ID.",
         400,
-        undefined,
+        idValidation.error.flatten(),
         requestId,
       );
     }
 
-    const patient = await approvePatient(id, session.user.id);
+    const patient = await approvePatient(
+      idValidation.data.id,
+      session.user.id,
+    );
 
     return apiSuccess(patient, 200);
   } catch (error) {
