@@ -88,6 +88,7 @@ model User {
   email        String     @unique
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens PasswordResetToken[]
+  sessionVersion Int @default(0)
   emailVerifiedAt DateTime?
   passwordHash String
   name         String

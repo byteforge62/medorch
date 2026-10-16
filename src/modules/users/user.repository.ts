@@ -278,9 +278,10 @@ export async function createPatientResendVerificationToken(
   });
 }
 
-type VerificationRequestPurpose = 
-| "EMAIL_VERIFICATION"
-| "PASSWORD_RESET";
+type VerificationRequestPurpose =
+  | "EMAIL_VERIFICATION"
+  | "PASSWORD_RESET"
+  | "PASSWORD_RESET_ATTEMPT"
 export async function recordVerificationEmailRequest(
   emailHash: string,
   ipHash: string,
@@ -291,7 +292,7 @@ export async function recordVerificationEmailRequest(
   const cleanupBefore = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   return prisma.$transaction(async (tx) => {
-    const lockKeys = [`${purpose}:email:${emailHash}`,`${purpose}:ip:${ipHash}`].sort();
+    const lockKeys = [`${purpose}:email:${emailHash}`, `${purpose}:ip:${ipHash}`].sort();
 
     for (const lockKey of lockKeys) {
       await tx.$queryRaw`
@@ -371,19 +372,26 @@ export async function createPasswordResetToken(
   });
 }
 
+
 export async function resetPasswordWithToken(
   tokenHash: string,
   passwordHash: string,
 ): Promise<boolean> {
   return prisma.$transaction(async (tx) => {
-    const resetToken = await tx.passwordResetToken.findUnique({
-      where: { tokenHash },
-      select: {
-        id: true,
-        userId: true,
-        expiresAt: true,
-      },
-    });
+    const resetTokens = await tx.$queryRaw<
+      Array<{
+        id: string;
+        userId: string;
+        expiresAt: Date;
+      }>
+    >`
+      SELECT "id", "userId", "expiresAt"
+      FROM "PasswordResetToken"
+      WHERE "tokenHash" = ${tokenHash}
+      FOR UPDATE
+    `;
+
+    const resetToken = resetTokens[0];
 
     if (!resetToken) {
       return false;
@@ -399,7 +407,12 @@ export async function resetPasswordWithToken(
 
     await tx.user.update({
       where: { id: resetToken.userId },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        sessionVersion: {
+          increment: 1,
+        },
+      },
     });
 
     await tx.passwordResetToken.deleteMany({
@@ -409,3 +422,4 @@ export async function resetPasswordWithToken(
     return true;
   });
 }
+

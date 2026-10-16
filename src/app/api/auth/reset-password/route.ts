@@ -2,6 +2,8 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { completePasswordReset } from "@/modules/users/user.service";
 
@@ -25,6 +27,35 @@ export async function POST(request: NextRequest) {
         requestId,
       );
     }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+const ipAddress =
+  forwardedFor?.split(",")[0]?.trim() ||
+  request.headers.get("x-real-ip") ||
+  "unknown";
+
+const ipHash = createHash("sha256")
+  .update(ipAddress)
+  .digest("hex");
+
+const tokenHash = createHash("sha256")
+  .update(parsed.data.token)
+  .digest("hex");
+
+const allowed = await recordVerificationEmailRequest(
+  tokenHash,
+  ipHash,
+  "PASSWORD_RESET_ATTEMPT",
+);
+
+if (!allowed) {
+  return apiError(
+    "Too many password reset attempts. Please wait 15 minutes before trying again.",
+    429,
+    undefined,
+    requestId,
+  );
+}
 
     const result = await completePasswordReset(
       parsed.data.token,

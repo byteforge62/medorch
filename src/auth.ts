@@ -57,12 +57,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
 
                 if (user.role === "PATIENT" && !user.emailVerifiedAt) {
-  throw new EmailNotVerifiedError();
-}
+                    throw new EmailNotVerifiedError();
+                }
 
-if (user.status !== "ACTIVE") {
-  throw new AccountPendingApprovalError();
-}
+                if (user.status !== "ACTIVE") {
+                    throw new AccountPendingApprovalError();
+                }
 
                 return {
                     id: user.id,
@@ -70,6 +70,7 @@ if (user.status !== "ACTIVE") {
                     name: user.name,
                     role: user.role,
                     status: user.status,
+                    sessionVersion: user.sessionVersion
                 };
             }
 
@@ -86,12 +87,46 @@ if (user.status !== "ACTIVE") {
                 token.id = user.id;
                 token.role = user.role;
                 token.status = user.status;
+
+                if (
+                    "sessionVersion" in user &&
+                    typeof user.sessionVersion === "number"
+                ) {
+                    token.sessionVersion = user.sessionVersion;
+                }
+            }
+
+            if (typeof token.id === "string") {
+                const currentUser = await prisma.user.findUnique({
+                    where: { id: token.id },
+                    select: {
+                        sessionVersion: true,
+                        status: true,
+                    },
+                });
+
+                if (
+                    !currentUser ||
+                    currentUser.status !== "ACTIVE" ||
+                    (typeof token.sessionVersion === "number" &&
+                        currentUser.sessionVersion !== token.sessionVersion)
+                ) {
+                    token.invalidated = true;
+                } else {
+                    token.invalidated = false;
+                    token.sessionVersion = currentUser.sessionVersion;
+                }
             }
 
             return token;
         },
 
         async session({ session, token }) {
+            if (token.invalidated === true) {
+                session.user = undefined;
+                return session;
+            }
+
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role;
