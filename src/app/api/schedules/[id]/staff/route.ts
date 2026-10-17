@@ -176,6 +176,15 @@ export async function POST(
       );
     }
 
+    if (error.message === "STAFF_ROLE_MISMATCH") {
+      return apiError(
+        "User account role is incompatible with the requested staff role.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
     return apiError(
       "Failed to assign schedule staff.",
       500,

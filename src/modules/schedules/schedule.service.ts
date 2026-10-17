@@ -255,30 +255,30 @@ export async function createScheduleWithValidation(
   });
 
   if (conflicts.length > 0) {
-  const roomConflict = conflicts.some(
-    (conflict) => conflict.otRoomId === data.otRoomId,
-  );
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === data.otRoomId,
+    );
 
-  if (roomConflict) {
-    throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === data.surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
+
+    const patientConflict = conflicts.some(
+      (conflict) => conflict.patientId === data.patientId,
+    );
+
+    if (patientConflict) {
+      throw new Error("PATIENT_SCHEDULE_CONFLICT");
+    }
   }
-
-  const surgeonConflict = conflicts.some(
-    (conflict) => conflict.surgeonId === data.surgeonId,
-  );
-
-  if (surgeonConflict) {
-    throw new Error("SURGEON_SCHEDULE_CONFLICT");
-  }
-
-  const patientConflict = conflicts.some(
-    (conflict) => conflict.patientId === data.patientId,
-  );
-
-  if (patientConflict) {
-    throw new Error("PATIENT_SCHEDULE_CONFLICT");
-  }
-}
   const schedule = await createScheduleRecord(data);
 
   await recordAudit({
@@ -498,6 +498,16 @@ export async function assignScheduleStaffById(
     throw new Error("STAFF_USER_INACTIVE");
   }
 
+  const doctorRoles = ["SURGEON", "ANESTHETIST"] as const;
+
+  if (doctorRoles.includes(data.role as (typeof doctorRoles)[number])) {
+    if (user.role !== "DOCTOR" || !user.doctorProfile) {
+      throw new Error("STAFF_ROLE_MISMATCH");
+    }
+  } else if (user.role !== "OT_STAFF") {
+    throw new Error("STAFF_ROLE_MISMATCH");
+  }
+
   const staff = await createScheduleStaff({
     scheduleId,
     userId: data.userId,
@@ -599,10 +609,12 @@ export async function assignScheduleEquipmentById(
 
 export async function releaseScheduleEquipmentById(
   equipmentAssignmentId: string,
-  actorUserId?: string
+  scheduleId: string,
+  actorUserId?: string,
 ) {
   const assignment = await releaseScheduleEquipment(
     equipmentAssignmentId,
+    scheduleId,
   );
 
   await recordAudit({

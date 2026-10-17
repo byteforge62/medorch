@@ -531,6 +531,13 @@ export async function findUserForStaffAssignment(
       id: true,
       role: true,
       status: true,
+      doctorProfile:{
+        select:{
+          id:true,
+          specialization: true,
+          licenseNumber: true,
+        }
+      }
     },
   });
 }
@@ -681,15 +688,14 @@ export async function createScheduleEquipment(data: {
   });
 }
 
-export async function releaseScheduleEquipment(id: string) {
+
+export async function releaseScheduleEquipment(
+  id: string,
+  scheduleId: string,
+) {
   return prisma.$transaction(async (tx) => {
-    const assignment = await tx.scheduleEquipment.update({
-      where: {
-        id,
-      },
-      data: {
-        releasedAt: new Date(),
-      },
+    const assignment = await tx.scheduleEquipment.findUnique({
+      where: { id },
       select: {
         id: true,
         scheduleId: true,
@@ -699,8 +705,29 @@ export async function releaseScheduleEquipment(id: string) {
       },
     });
 
-    // Do not mark equipment available while another active
-    // assignment still references it.
+    if (!assignment || assignment.scheduleId !== scheduleId) {
+      throw new Error("EQUIPMENT_ASSIGNMENT_NOT_FOUND");
+    }
+
+    if (assignment.releasedAt !== null) {
+      throw new Error("EQUIPMENT_ALREADY_RELEASED");
+    }
+
+    const released = await tx.scheduleEquipment.updateMany({
+      where: {
+        id,
+        scheduleId,
+        releasedAt: null,
+      },
+      data: {
+        releasedAt: new Date(),
+      },
+    });
+
+    if (released.count !== 1) {
+      throw new Error("EQUIPMENT_ALREADY_RELEASED");
+    }
+
     const activeAssignments = await tx.scheduleEquipment.count({
       where: {
         equipmentId: assignment.equipmentId,
@@ -709,7 +736,6 @@ export async function releaseScheduleEquipment(id: string) {
     });
 
     if (activeAssignments === 0) {
-      // Preserve MAINTENANCE or RETIRED status.
       await tx.equipment.updateMany({
         where: {
           id: assignment.equipmentId,
@@ -721,9 +747,13 @@ export async function releaseScheduleEquipment(id: string) {
       });
     }
 
-    return assignment;
+    return {
+      ...assignment,
+      releasedAt: new Date(),
+    };
   });
 }
+
 
 export async function findScheduleNotes(
   scheduleId: string,

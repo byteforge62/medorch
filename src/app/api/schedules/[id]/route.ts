@@ -112,7 +112,18 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
 
     const validation = updateScheduleSchema.safeParse(body);
 
