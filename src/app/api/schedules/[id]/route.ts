@@ -2,9 +2,8 @@ import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedu
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getScheduleById, updateScheduleWithValidation } from "@/modules/schedules/schedule.service";
+import { getScheduleById, updateScheduleWithValidation, isScheduleAssignedToUser } from "@/modules/schedules/schedule.service";
 import { scheduleIdSchema, updateScheduleSchema } from "@/modules/schedules/schedule.validation";
-
 type RouteContext = {
   params: Promise<{
     id: string;
@@ -54,15 +53,20 @@ export async function GET(
     }
 
     if (session.user.role === "OT_STAFF") {
-      return apiSuccess(
-        {
-          ...schedule,
-          clinicalNotes: null,
-        },
-        200,
+      const isAssigned = await isScheduleAssignedToUser(
+        validation.data.id,
+        session.user.id,
       );
-    }
 
+      if (!isAssigned) {
+        return apiError(
+          "Schedule not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+    }
     return apiSuccess(schedule, 200);
   } catch (error) {
     console.error(

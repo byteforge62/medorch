@@ -24,6 +24,7 @@ import {
   findScheduleNoteById,
   findScheduleNotes,
   updateScheduleNote,
+  isUserAssignedToSchedule
 } from "./schedule.repository";
 import { recordAudit } from "@/modules/audit/audit.service";
 
@@ -722,4 +723,11 @@ export async function deleteScheduleNoteById(
   });
 
   return note;
+}
+
+export async function isScheduleAssignedToUser(
+  scheduleId: string,
+  userId: string,
+) {
+  return isUserAssignedToSchedule(scheduleId, userId);
 }

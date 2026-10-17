@@ -502,6 +502,24 @@ export async function findScheduleStaff(
   });
 }
 
+
+export async function isUserAssignedToSchedule(
+  scheduleId: string,
+  userId: string,
+) {
+  const assignment = await prisma.scheduleStaff.findFirst({
+    where: {
+      scheduleId,
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return assignment !== null;
+}
+
 export async function findUserForStaffAssignment(
   userId: string,
 ) {

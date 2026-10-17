@@ -33,42 +33,43 @@ export function RecentSchedulesList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSchedules = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await apiClient.get<Schedule[]>("/api/schedules");
-      setSchedules(data || []);
-    } catch (err) {
-      console.error("Failed to fetch schedules:", err);
-      setError("Failed to load schedules");
-    } finally {
-      setIsLoading(false);
-    }
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchSchedules = useCallback(() => {
+    setRefreshKey((current) => current + 1);
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    apiClient
-      .get<Schedule[]>("/api/schedules")
-      .then((data) => {
-        if (isMounted) {
+    let cancelled = false;
+
+    async function loadSchedules() {
+      try {
+        setError(null);
+        const data = await apiClient.get<Schedule[]>('/api/schedules');
+
+        if (!cancelled) {
           setSchedules(data || []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to fetch schedules:', err);
+          setError('Failed to load schedules');
+        }
+      } finally {
+        if (!cancelled) {
           setIsLoading(false);
         }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          console.error("Failed to fetch schedules:", err);
-          setError("Failed to load schedules");
-          setIsLoading(false);
-        }
-      });
+      }
+    }
+
+    void loadSchedules();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
+
 
   const getStatusBadge = (status: Schedule["status"]) => {
     switch (status) {
@@ -105,10 +106,16 @@ export function RecentSchedulesList() {
       <CardHeader>
         <div>
           <CardTitle>Surgical Procedures Schedule</CardTitle>
-          <p className="text-xs text-slate-500 mt-0.5">Upcoming & active operations</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Upcoming & active operations
+          </p>
         </div>
         <button
-          onClick={fetchSchedules}
+          onClick={() => {
+            setIsLoading(true);
+            setError(null);
+            fetchSchedules();
+          }}
           className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
         >
           Refresh
@@ -120,13 +127,16 @@ export function RecentSchedulesList() {
       ) : error ? (
         <ErrorState message={error} onRetry={fetchSchedules} />
       ) : schedules.length === 0 ? (
-        <EmptyState title="No Schedules Found" description="No procedures currently scheduled." />
+        <EmptyState
+          title="No Schedules Found"
+          description="No procedures currently scheduled."
+        />
       ) : (
-        <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+        <div className="max-h-[380px] space-y-2.5 overflow-y-auto pr-1">
           {schedules.map((schedule) => (
             <div
               key={schedule.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-slate-200 p-3 bg-white transition-colors hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
+              className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
             >
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
@@ -135,19 +145,22 @@ export function RecentSchedulesList() {
                   </span>
                   {getPriorityBadge(schedule.priority)}
                 </div>
-                <div className="text-xs text-slate-500 space-x-3">
-                  <span>Patient: {schedule.patient?.name || "N/A"}</span>
+                <div className="space-x-3 text-xs text-slate-500">
+                  <span>Patient: {schedule.patient?.name || 'N/A'}</span>
                   <span>•</span>
-                  <span>Surgeon: {schedule.surgeon?.name || "Unassigned"}</span>
+                  <span>Surgeon: {schedule.surgeon?.name || 'Unassigned'}</span>
                   <span>•</span>
-                  <span>Room: {schedule.otRoom?.name || "N/A"}</span>
+                  <span>Room: {schedule.otRoom?.name || 'N/A'}</span>
                 </div>
               </div>
 
-              <div className="mt-2 sm:mt-0 flex items-center justify-between sm:flex-col sm:items-end space-y-1">
+              <div className="mt-2 flex items-center justify-between space-y-1 sm:mt-0 sm:flex-col sm:items-end">
                 {getStatusBadge(schedule.status)}
-                <span className="text-[11px] font-mono text-slate-400">
-                  {new Date(schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <span className="font-mono text-[11px] text-slate-400">
+                  {new Date(schedule.startTime).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
             </div>

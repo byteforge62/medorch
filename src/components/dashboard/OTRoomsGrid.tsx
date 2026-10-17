@@ -25,42 +25,46 @@ export function OTRoomsGrid() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRooms = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await apiClient.get<OTRoom[]>("/api/ot-rooms");
-      setRooms(data || []);
-    } catch (err) {
-      console.error("Failed to fetch OT rooms:", err);
-      setError("Failed to load OT rooms");
-    } finally {
-      setIsLoading(false);
-    }
+
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchRooms = useCallback(() => {
+    setRefreshKey((current) => current + 1);
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    apiClient
-      .get<OTRoom[]>("/api/ot-rooms")
-      .then((data) => {
-        if (isMounted) {
+    let cancelled = false;
+
+    async function loadRooms() {
+      try {
+        setError(null);
+        const data = await apiClient.get<OTRoom[]>("/api/ot-rooms");
+
+        if (!cancelled) {
           setRooms(data || []);
-          setIsLoading(false);
         }
-      })
-      .catch((err) => {
-        if (isMounted) {
+      } catch (err) {
+        if (!cancelled) {
           console.error("Failed to fetch OT rooms:", err);
           setError("Failed to load OT rooms");
+        }
+      } finally {
+        if (!cancelled) {
           setIsLoading(false);
         }
-      });
+      }
+    }
+
+    void loadRooms();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
+
+
+
 
   const getStatusBadge = (status: OTRoom["status"]) => {
     switch (status) {
@@ -81,10 +85,15 @@ export function OTRoomsGrid() {
       <CardHeader>
         <div>
           <CardTitle>Operating Rooms Status</CardTitle>
-          <p className="text-xs text-slate-500 mt-0.5">Real-time availability of surgical suites</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Real-time availability of surgical suites
+          </p>
         </div>
         <button
-          onClick={fetchRooms}
+          onClick={() => {
+            setIsLoading(true);
+            fetchRooms();
+          }}
           className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
         >
           Refresh
@@ -96,7 +105,10 @@ export function OTRoomsGrid() {
       ) : error ? (
         <ErrorState message={error} onRetry={fetchRooms} />
       ) : rooms.length === 0 ? (
-        <EmptyState title="No OT Rooms found" description="No operating rooms configured in system." />
+        <EmptyState
+          title="No OT Rooms found"
+          description="No operating rooms configured in system."
+        />
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {rooms.map((room) => (
@@ -111,7 +123,7 @@ export function OTRoomsGrid() {
                 {getStatusBadge(room.status)}
               </div>
               <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                <span>Dept: {room.department?.name || "General"}</span>
+                <span>Dept: {room.department?.name || 'General'}</span>
                 {room.capacity ? <span>Capacity: {room.capacity}</span> : null}
               </div>
             </div>
