@@ -195,31 +195,36 @@ export function RecentSchedulesList() {
         </button>
 
 
-        <div className="flex flex-wrap items-center gap-2 pb-4">
-          {(
-            [
-              { value: "TODAY", label: "Today" },
-              { value: "UPCOMING", label: "Upcoming" },
-              { value: "ALL", label: "All schedules" },
-            ] as const
-          ).map((filter) => {
-            const isActive = activeFilter === filter.value;
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {(["TODAY", "UPCOMING", "ALL"] as ScheduleFilter[]).map((filter) => {
+              const isActive = activeFilter === filter;
 
-            return (
-              <button
-                key={filter.value}
-                type="button"
-                onClick={() => setActiveFilter(filter.value)}
-                aria-pressed={isActive}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${isActive
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                  }`}
-              >
-                {filter.label}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setActiveFilter(filter)}
+                  aria-pressed={isActive}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${isActive
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    }`}
+                >
+                  {filter === "TODAY"
+                    ? "Today"
+                    : filter === "UPCOMING"
+                      ? "Upcoming"
+                      : "All"}
+                </button>
+              );
+            })}
+          </div>
+
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {filteredSchedules.length}{" "}
+            {filteredSchedules.length === 1 ? "schedule" : "schedules"}
+          </span>
         </div>
 
       </CardHeader>
@@ -253,12 +258,18 @@ export function RecentSchedulesList() {
                   </span>
                   {getPriorityBadge(schedule.priority)}
                 </div>
-                <div className="space-x-3 text-xs text-slate-500">
-                  <span>Patient: {schedule.patient?.name || 'N/A'}</span>
-                  <span>•</span>
-                  <span>Surgeon: {schedule.surgeon?.name || 'Unassigned'}</span>
-                  <span>•</span>
-                  <span>Room: {schedule.otRoom?.name || 'N/A'}</span>
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                  {schedule.otRoom?.name && (
+                    <span>Room: {schedule.otRoom.name}</span>
+                  )}
+
+                  {schedule.surgeon?.name && (
+                    <span>Surgeon: {schedule.surgeon.name}</span>
+                  )}
+
+                  {schedule.patient?.patientCode && (
+                    <span>Patient ID: {schedule.patient.patientCode}</span>
+                  )}
                 </div>
               </div>
 

@@ -80,6 +80,17 @@ export function OTRoomsGrid() {
     }
   };
 
+  const availableCount = rooms.filter(
+    (room) => room.isActive && room.status === "AVAILABLE"
+  ).length;
+
+  const occupiedCount = rooms.filter(
+    (room) => room.status === "OCCUPIED"
+  ).length;
+
+  const maintenanceCount = rooms.filter(
+    (room) => room.status === "MAINTENANCE"
+  ).length;
   return (
     <Card className="h-full">
       <CardHeader>
@@ -99,6 +110,29 @@ export function OTRoomsGrid() {
           Refresh
         </button>
       </CardHeader>
+
+      <div className="grid grid-cols-3 gap-2 pb-4">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/30">
+          <p className="text-xs text-emerald-700 dark:text-emerald-400">Available</p>
+          <p className="mt-1 text-xl font-semibold text-emerald-800 dark:text-emerald-300">
+            {isLoading ? "—" : availableCount}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+          <p className="text-xs text-amber-700 dark:text-amber-400">Occupied</p>
+          <p className="mt-1 text-xl font-semibold text-amber-800 dark:text-amber-300">
+            {isLoading ? "—" : occupiedCount}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 dark:border-rose-900 dark:bg-rose-950/30">
+          <p className="text-xs text-rose-700 dark:text-rose-400">Maintenance</p>
+          <p className="mt-1 text-xl font-semibold text-rose-800 dark:text-rose-300">
+            {isLoading ? "—" : maintenanceCount}
+          </p>
+        </div>
+      </div>
 
       {isLoading ? (
         <LoadingState message="Loading OT rooms..." />
