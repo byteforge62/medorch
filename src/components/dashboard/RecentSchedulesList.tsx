@@ -101,6 +101,41 @@ export function RecentSchedulesList() {
     }
   };
 
+
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    const priorityOrder = {
+      EMERGENCY: 0,
+      URGENT: 1,
+      ELECTIVE: 2,
+    };
+
+    const activeOrder = (status: Schedule["status"]) =>
+      status === "IN_PROGRESS" ? 0 : 1;
+
+    const aTerminal =
+      a.status === "COMPLETED" || a.status === "CANCELLED";
+    const bTerminal =
+      b.status === "COMPLETED" || b.status === "CANCELLED";
+
+    if (aTerminal !== bTerminal) {
+      return aTerminal ? 1 : -1;
+    }
+
+    if (!aTerminal && activeOrder(a.status) !== activeOrder(b.status)) {
+      return activeOrder(a.status) - activeOrder(b.status);
+    }
+
+    if (!aTerminal && priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+
+    return (
+      new Date(a.startTime).getTime() -
+      new Date(b.startTime).getTime()
+    );
+  });
+
+
   return (
     <Card className="h-full">
       <CardHeader>
@@ -133,7 +168,7 @@ export function RecentSchedulesList() {
         />
       ) : (
         <div className="max-h-[380px] space-y-2.5 overflow-y-auto pr-1">
-          {schedules.map((schedule) => (
+          {sortedSchedules.map((schedule) => (
             <div
               key={schedule.id}
               className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
@@ -157,10 +192,7 @@ export function RecentSchedulesList() {
               <div className="mt-2 flex items-center justify-between space-y-1 sm:mt-0 sm:flex-col sm:items-end">
                 {getStatusBadge(schedule.status)}
                 <span className="font-mono text-[11px] text-slate-400">
-                  {new Date(schedule.startTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {new Date(schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
             </div>
