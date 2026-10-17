@@ -28,10 +28,15 @@ type Schedule = {
   };
 };
 
+type ScheduleFilter = "TODAY" | "UPCOMING" | "ALL";
+
+
 export function RecentSchedulesList() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] =
+    useState<ScheduleFilter>("TODAY");
 
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -136,6 +141,39 @@ export function RecentSchedulesList() {
   });
 
 
+  const toLocalDateKey = (value: string) => {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return "";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const now = new Date();
+  const todayKey = toLocalDateKey(now.toISOString());
+
+  const filteredSchedules = sortedSchedules.filter((schedule) => {
+    const scheduleDate = toLocalDateKey(schedule.scheduledDate);
+
+    if (activeFilter === "ALL") return true;
+
+    if (activeFilter === "TODAY") {
+      return scheduleDate === todayKey;
+    }
+
+    return (
+      scheduleDate > todayKey &&
+      schedule.status !== "COMPLETED" &&
+      schedule.status !== "CANCELLED"
+    );
+  });
+
+
+
   return (
     <Card className="h-full">
       <CardHeader>
@@ -155,20 +193,55 @@ export function RecentSchedulesList() {
         >
           Refresh
         </button>
+
+
+        <div className="flex flex-wrap items-center gap-2 pb-4">
+          {(
+            [
+              { value: "TODAY", label: "Today" },
+              { value: "UPCOMING", label: "Upcoming" },
+              { value: "ALL", label: "All schedules" },
+            ] as const
+          ).map((filter) => {
+            const isActive = activeFilter === filter.value;
+
+            return (
+              <button
+                key={filter.value}
+                type="button"
+                onClick={() => setActiveFilter(filter.value)}
+                aria-pressed={isActive}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${isActive
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                  }`}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
+        </div>
+
       </CardHeader>
 
       {isLoading ? (
         <LoadingState message="Loading surgical schedules..." />
       ) : error ? (
         <ErrorState message={error} onRetry={fetchSchedules} />
-      ) : schedules.length === 0 ? (
+      ) : filteredSchedules.length === 0 ? (
         <EmptyState
           title="No Schedules Found"
-          description="No procedures currently scheduled."
+          description={
+            activeFilter === "TODAY"
+              ? "No procedures are scheduled for today."
+              : activeFilter === "UPCOMING"
+                ? "No upcoming procedures found."
+                : "No procedures are currently available."
+          }
         />
       ) : (
         <div className="max-h-[380px] space-y-2.5 overflow-y-auto pr-1">
-          {sortedSchedules.map((schedule) => (
+          {filteredSchedules.map((schedule) => (
             <div
               key={schedule.id}
               className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
