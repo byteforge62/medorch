@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { deactivateDepartment, getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
 import { departmentIdSchema, updateDepartmentSchema } from "@/modules/departments/department.validation";
 
@@ -60,9 +61,12 @@ export async function PATCH(
       return apiError("Invalid department ID.",400,idValidation.error.flatten(),requestId);
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.",400,undefined,requestId);
+    }
 
-    const validation = updateDepartmentSchema.safeParse(body);
+    const validation = updateDepartmentSchema.safeParse(bodyResult.data);
     if (!validation.success) {
       return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
     }

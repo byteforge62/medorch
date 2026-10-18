@@ -27,6 +27,7 @@ import {
   isUserAssignedToSchedule
 } from "./schedule.repository";
 import { recordAudit } from "@/modules/audit/audit.service";
+import { isScheduleStatusTransitionAllowed } from "./schedule-access";
 
 export async function getSchedules() {
   return findSchedules();
@@ -109,42 +110,15 @@ export async function updateScheduleStatusById(
 
   const currentStatus = existingSchedule.status;
 
-  const allowedTransitions: Record<
-    typeof currentStatus,
-    string[]
-  > = {
-    SCHEDULED: [
-      "CONFIRMED",
-      "CANCELLED",
-    ],
-
-    CONFIRMED: [
-      "IN_PROGRESS",
-      "DELAYED",
-      "CANCELLED",
-    ],
-
-    IN_PROGRESS: [
-      "COMPLETED",
-      "DELAYED",
-    ],
-
-    DELAYED: [
-      "CONFIRMED",
-      "IN_PROGRESS",
-      "CANCELLED",
-    ],
-
-    COMPLETED: [],
-
-    CANCELLED: [],
-  };
-
-  if (!allowedTransitions[currentStatus].includes(status)) {
+  if (!isScheduleStatusTransitionAllowed(currentStatus, status)) {
     throw new Error("INVALID_STATUS_TRANSITION");
   }
 
-  const schedule = await updateScheduleStatusRecord(id, status);
+  const schedule = await updateScheduleStatusRecord(
+    id,
+    status,
+    currentStatus,
+  );
 
   const auditAction =
     status === "COMPLETED"
@@ -534,9 +508,10 @@ export async function assignScheduleStaffById(
 
 export async function removeScheduleStaffById(
   scheduleStaffId: string,
+  scheduleId: string,
   actorUserId?: string,
 ) {
-  const staff = await deleteScheduleStaff(scheduleStaffId);
+  const staff = await deleteScheduleStaff(scheduleStaffId, scheduleId);
 
   await recordAudit({
     userId: actorUserId,

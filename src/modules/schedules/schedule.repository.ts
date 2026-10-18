@@ -314,24 +314,49 @@ export async function updateScheduleStatus(
     | "COMPLETED"
     | "CANCELLED"
     | "DELAYED",
+  expectedStatus:
+    | "SCHEDULED"
+    | "CONFIRMED"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "DELAYED",
 ) {
-  return prisma.schedule.update({
-    where: {
-      id,
-    },
-    data: {
-      status,
-    },
-    select: {
-      id: true,
-      procedure: true,
-      scheduledDate: true,
-      startTime: true,
-      endTime: true,
-      status: true,
-      priority: true,
-      updatedAt: true,
-    },
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.schedule.updateMany({
+      where: {
+        id,
+        status: expectedStatus,
+      },
+      data: {
+        status,
+      },
+    });
+
+    if (update.count !== 1) {
+      const schedule = await tx.schedule.findUnique({
+        where: { id },
+        select: { id: true },
+      });
+
+      throw new Error(
+        schedule ? "SCHEDULE_STATUS_CONFLICT" : "SCHEDULE_NOT_FOUND",
+      );
+    }
+
+    return tx.schedule.findUniqueOrThrow({
+      where: { id },
+      select: {
+        id: true,
+        procedure: true,
+        scheduledDate: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        priority: true,
+        updatedAt: true,
+      },
+    });
   });
 }
 
@@ -576,12 +601,11 @@ export async function createScheduleStaff(
   });
 }
 
-export async function deleteScheduleStaff(
-  id: string,
-) {
+export async function deleteScheduleStaff(id: string, scheduleId: string) {
   return prisma.scheduleStaff.delete({
     where: {
       id,
+      scheduleId,
     },
   });
 }

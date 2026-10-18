@@ -4,6 +4,10 @@ import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getScheduleById, updateScheduleWithValidation, isScheduleAssignedToUser } from "@/modules/schedules/schedule.service";
 import { scheduleIdSchema, updateScheduleSchema } from "@/modules/schedules/schedule.validation";
+import {
+  canReadIndividualSchedule,
+  redactScheduleDetailsForOT,
+} from "@/modules/schedules/schedule-access";
 type RouteContext = {
   params: Promise<{
     id: string;
@@ -52,22 +56,27 @@ export async function GET(
       );
     }
 
-    if (session.user.role === "OT_STAFF") {
-      const isAssigned = await isScheduleAssignedToUser(
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
         validation.data.id,
         session.user.id,
-      );
+      ));
 
-      if (!isAssigned) {
-        return apiError(
-          "Schedule not found.",
-          404,
-          undefined,
-          requestId,
-        );
-      }
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
     }
-    return apiSuccess(schedule, 200);
+    const responseSchedule =
+      session.user.role === "OT_STAFF"
+        ? redactScheduleDetailsForOT(schedule)
+        : schedule;
+
+    return apiSuccess(responseSchedule, 200);
   } catch (error) {
     console.error(
       `[${requestId}] GET /api/schedules/[id] error:`,

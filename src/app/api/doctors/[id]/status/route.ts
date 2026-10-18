@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { updateDoctorStatus } from "@/modules/doctors/doctor.service";
 import {
   doctorIdSchema,
@@ -42,9 +43,13 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
 
-    const validation = updateDoctorStatusSchema.safeParse(body);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateDoctorStatusSchema.safeParse(bodyResult.data);
 
     if (!validation.success) {
       return apiError(

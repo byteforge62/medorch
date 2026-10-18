@@ -55,6 +55,7 @@ export async function DELETE(
 
     const staff = await removeScheduleStaffById(
       staffValidation.data.id,
+      scheduleValidation.data.id,
       session.user.id
     );
 

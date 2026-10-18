@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { getOTRooms, createOTRoom } from "@/modules/ot-rooms/ot-room.service";
 import { createOTRoomSchema } from "@/modules/ot-rooms/ot-room.validation";
 
@@ -47,9 +48,12 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
 
-    const validation = createOTRoomSchema.safeParse(body);
+    const validation = createOTRoomSchema.safeParse(bodyResult.data);
 
     if (!validation.success) {
       return apiError(

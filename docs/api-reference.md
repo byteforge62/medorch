@@ -89,7 +89,7 @@ Role names used by the API:
 | Doctors | `ADMIN`, `DOCTOR`, `OT_STAFF` | `ADMIN` |
 | Patients | `ADMIN`, `DOCTOR` | `ADMIN` |
 | Departments, rooms, equipment | `ADMIN`, `DOCTOR`, `OT_STAFF` | `ADMIN` |
-| Schedules | `ADMIN`, `DOCTOR`, `OT_STAFF`; patients can read only their own appointments through `/api/me/appointments` | Schedule create/update/status and staff/equipment assignment require `ADMIN`; schedule-note operations allow `ADMIN`, `DOCTOR`. |
+| Schedules | `ADMIN`, `DOCTOR`, `OT_STAFF`; OT staff can fetch an individual schedule and its staff/equipment only when assigned. Patients can read only their own appointments through `/api/me/appointments`. OT-staff schedule responses redact clinical notes and patient email, date of birth, and gender. | Schedule create/update/status and staff/equipment assignment require `ADMIN`; schedule-note operations allow `ADMIN`, `DOCTOR`. |
 | Alerts | All four roles can read; non-admins are restricted to their own alerts by the service. | Alert creation allows `ADMIN`, `DOCTOR`, `OT_STAFF`; alert changes are available to all four roles, with non-admin ownership checks in the service. |
 | Audit | `ADMIN` | No audit mutation endpoint is exposed. |
 
@@ -97,7 +97,7 @@ This table describes the current Route Handler guards and service-level ownershi
 
 ## Query and body validation
 
-Handlers validate route IDs and request data with Zod schemas located in each domain module's `*.validation.ts` file. For example, schedule input requires UUID references, a trimmed procedure name from 1–200 characters, an end time later than the start time, and a supported optional priority. Schedule notes are trimmed and limited to 5,000 characters.
+Handlers validate route IDs and request data with Zod schemas located in each domain module's `*.validation.ts` file. Malformed JSON request bodies return HTTP `400`. For example, schedule input requires UUID references, a trimmed procedure name from 1–200 characters, an end time later than the start time, and a supported optional priority. Schedule notes are trimmed and limited to 5,000 characters.
 
 `GET /api/alerts` accepts these query parameters:
 
