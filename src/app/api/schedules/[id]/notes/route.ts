@@ -106,11 +106,20 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
 
-    const validation = createScheduleNoteSchema.safeParse(
-      body,
-    );
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = createScheduleNoteSchema.safeParse(body);
 
     if (!validation.success) {
       return apiError(

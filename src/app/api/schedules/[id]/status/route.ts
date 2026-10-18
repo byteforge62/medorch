@@ -45,10 +45,20 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
 
-    const validation =
-      updateScheduleStatusSchema.safeParse(body);
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleStatusSchema.safeParse(body);
 
     if (!validation.success) {
       return apiError(

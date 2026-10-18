@@ -244,7 +244,9 @@ export async function createScheduleWithValidation(
     throw new Error("SURGEON_INACTIVE");
   }
 
-
+  if (data.endTime <= data.startTime) {
+    throw new Error("INVALID_TIME_RANGE");
+  }
 
   const conflicts = await findScheduleConflicts({
     patientId: data.patientId,
@@ -676,14 +678,16 @@ export async function createScheduleNoteById(
   return note;
 }
 
+
 export async function updateScheduleNoteById(
   noteId: string,
+  scheduleId: string,
   authorId: string,
   content: string,
 ) {
   const note = await findScheduleNoteById(noteId);
 
-  if (!note) {
+  if (!note || note.scheduleId !== scheduleId) {
     throw new Error("SCHEDULE_NOTE_NOT_FOUND");
   }
 
@@ -699,9 +703,7 @@ export async function updateScheduleNoteById(
     entity: "ScheduleNote",
     entityId: note.id,
     description: "Schedule note was updated.",
-    metadata: {
-      scheduleId: note.scheduleId,
-    },
+    metadata: { scheduleId: note.scheduleId },
   });
 
   return updatedNote;
@@ -709,11 +711,12 @@ export async function updateScheduleNoteById(
 
 export async function deleteScheduleNoteById(
   noteId: string,
+  scheduleId: string,
   authorId: string,
 ) {
   const note = await findScheduleNoteById(noteId);
 
-  if (!note) {
+  if (!note || note.scheduleId !== scheduleId) {
     throw new Error("SCHEDULE_NOTE_NOT_FOUND");
   }
 
@@ -729,9 +732,7 @@ export async function deleteScheduleNoteById(
     entity: "ScheduleNote",
     entityId: note.id,
     description: "Schedule note was deleted.",
-    metadata: {
-      scheduleId: note.scheduleId,
-    },
+    metadata: { scheduleId: note.scheduleId },
   });
 
   return note;

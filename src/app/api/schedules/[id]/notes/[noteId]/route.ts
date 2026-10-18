@@ -7,6 +7,7 @@ import {
 } from "@/modules/schedules/schedule.service";
 import {
   scheduleNoteIdSchema,
+  scheduleIdSchema,
   updateScheduleNoteSchema,
 } from "@/modules/schedules/schedule.validation";
 
@@ -33,7 +34,13 @@ export async function PATCH(
       return response;
     }
 
-    const { noteId } = await params;
+    const { id, noteId } = await params;
+
+    const scheduleValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError("Invalid schedule ID.", 400, scheduleValidation.error.flatten(), requestId)
+    }
 
     const idValidation = scheduleNoteIdSchema.safeParse({
       id: noteId,
@@ -48,11 +55,20 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
 
-    const validation = updateScheduleNoteSchema.safeParse(
-      body,
-    );
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleNoteSchema.safeParse(body);
 
     if (!validation.success) {
       return apiError(
@@ -65,6 +81,7 @@ export async function PATCH(
 
     const note = await updateScheduleNoteById(
       idValidation.data.id,
+      scheduleValidation.data.id,
       session.user.id,
       validation.data.content,
     );
@@ -121,7 +138,18 @@ export async function DELETE(
       return response;
     }
 
-    const { noteId } = await params;
+    const { id, noteId } = await params;
+
+    const scheduleValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        scheduleValidation.error.flatten(),
+        requestId,
+      );
+    }
 
     const idValidation = scheduleNoteIdSchema.safeParse({
       id: noteId,
@@ -138,6 +166,7 @@ export async function DELETE(
 
     const note = await deleteScheduleNoteById(
       idValidation.data.id,
+      scheduleValidation.data.id,
       session.user.id,
     );
 
