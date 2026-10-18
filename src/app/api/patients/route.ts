@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { getPatients } from "@/modules/patients/patient.service";
 import { createPatient } from "@/modules/patients/patient.service";
 import { createPatientSchema } from "@/modules/patients/patient.validation";
@@ -49,9 +50,13 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
 
-    const validation = createPatientSchema.safeParse(body);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createPatientSchema.safeParse(bodyResult.data);
 
     if (!validation.success) {
       return apiError(

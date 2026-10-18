@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { ZodError, z } from "zod";
 
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { resendPatientVerificationEmail } from "@/modules/users/user.service";
 
 const resendVerificationSchema = z.object({
@@ -13,8 +14,12 @@ export async function POST(request: NextRequest) {
     const requestId = crypto.randomUUID();
 
     try {
-        const body: unknown = await request.json();
-        const { email } = resendVerificationSchema.parse(body);
+        const bodyResult = await readJsonBody(request);
+        if (!bodyResult.success) {
+            return apiError("Invalid JSON request body.", 400, undefined, requestId);
+        }
+
+        const { email } = resendVerificationSchema.parse(bodyResult.data);
 
         const forwardedFor = request.headers.get("x-forwarded-for");
         const realIp = request.headers.get("x-real-ip");
@@ -47,7 +52,7 @@ export async function POST(request: NextRequest) {
         );
     } catch (error) {
         if (error instanceof ZodError) {
-            return apiError("Invalid email address.", 400);
+            return apiError("Invalid email address.", 400, undefined, requestId);
         }
 
         console.error(`[${requestId}] Resend verification failed:`, error);

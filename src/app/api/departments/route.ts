@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { createNewDepartment, getDepartments } from "@/modules/departments/department.service";
 import { createDepartmentSchema } from "@/modules/departments/department.validation";
 
@@ -28,8 +29,11 @@ export async function POST(request: Request){
    if(!session){
     return response;
    }
-   const body = await request.json();
-   const validation = createDepartmentSchema.safeParse(body);
+   const bodyResult = await readJsonBody(request);
+   if (!bodyResult.success) {
+     return apiError("Invalid JSON request body.",400,undefined,requestId);
+   }
+   const validation = createDepartmentSchema.safeParse(bodyResult.data);
    if(!validation.success){
      return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
    }

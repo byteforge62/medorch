@@ -4,6 +4,7 @@ import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getSchedules, createScheduleWithValidation } from "@/modules/schedules/schedule.service";
 import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
+import { redactScheduleClinicalNotes } from "@/modules/schedules/schedule-access";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -22,10 +23,7 @@ export async function GET(request: Request) {
 
     const responseSchedules =
       session.user.role === "OT_STAFF"
-        ? schedules.map((schedule) => ({
-          ...schedule,
-          clinicalNotes: null,
-        }))
+        ? schedules.map(redactScheduleClinicalNotes)
         : schedules;
 
     return apiSuccess(responseSchedules, 200);

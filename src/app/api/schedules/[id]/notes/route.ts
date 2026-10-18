@@ -24,7 +24,7 @@ export async function GET(
 
   try {
     const { session, response } = await authorizeApiPermission(
-      "schedules:read",
+      "schedules:notes:manage",
       requestId,
     );
 

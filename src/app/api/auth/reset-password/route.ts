@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createHash } from "node:crypto";
 import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import { completePasswordReset } from "@/modules/users/user.service";
 
 const resetPasswordSchema = z.object({
@@ -16,8 +17,12 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    const body: unknown = await request.json();
-    const parsed = resetPasswordSchema.safeParse(body);
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const parsed = resetPasswordSchema.safeParse(bodyResult.data);
 
     if (!parsed.success) {
       return apiError(

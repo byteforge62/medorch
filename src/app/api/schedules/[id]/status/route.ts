@@ -113,6 +113,15 @@ export async function PATCH(
           requestId,
         );
       }
+
+      if (error.message === "SCHEDULE_STATUS_CONFLICT") {
+        return apiError(
+          "Schedule status changed concurrently. Refresh and retry.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
     }
 
     return apiError(
