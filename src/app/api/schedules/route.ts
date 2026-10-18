@@ -4,6 +4,7 @@ import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { getSchedules, createScheduleWithValidation } from "@/modules/schedules/schedule.service";
 import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
+import { redactScheduleClinicalNotes } from "@/modules/schedules/schedule-access";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -22,10 +23,7 @@ export async function GET(request: Request) {
 
     const responseSchedules =
       session.user.role === "OT_STAFF"
-        ? schedules.map((schedule) => ({
-          ...schedule,
-          clinicalNotes: null,
-        }))
+        ? schedules.map(redactScheduleClinicalNotes)
         : schedules;
 
     return apiSuccess(responseSchedules, 200);
@@ -57,8 +55,18 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const body = await request.json();
+    let body: unknown;
 
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
     const validation = createScheduleSchema.safeParse(body);
 
     if (!validation.success) {
@@ -117,6 +125,8 @@ export async function POST(request: Request) {
           "The selected OT room is already scheduled during this time.",
         SURGEON_SCHEDULE_CONFLICT:
           "The selected surgeon is already scheduled during this time.",
+        INVALID_TIME_RANGE:
+          "End time must be later than start time.",
       };
 
       const message = messages[error.message];

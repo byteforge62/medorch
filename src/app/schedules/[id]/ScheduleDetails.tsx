@@ -159,6 +159,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
 
+
   const loadSchedule = useCallback(async () => {
     const response = await apiClient.get<Schedule>(
       `/api/schedules/${scheduleId}`,
@@ -166,6 +167,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
 
     setSchedule(response);
   }, [scheduleId]);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -361,7 +363,18 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   }
 
   if (error && !schedule) {
-    return <ErrorState message={error} />;
+    return (
+      <div className="space-y-3">
+        <ErrorState message={error} />
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="text-sm font-medium text-[var(--color-primary)] underline"
+        >
+          Reload schedule
+        </button>
+      </div>
+    );
   }
 
   if (!schedule) {

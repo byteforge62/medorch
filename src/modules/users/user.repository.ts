@@ -165,6 +165,17 @@ export async function verifyPatientEmail(tokenHash: string): Promise<boolean> {
       return false;
     }
 
+    const consumedToken = await tx.emailVerificationToken.deleteMany({
+      where: {
+        tokenHash,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (consumedToken.count === 0) {
+      return false;
+    }
+
     if (!verificationToken.user.emailVerifiedAt) {
       await tx.user.update({
         where: { id: verificationToken.userId },
@@ -422,4 +433,3 @@ export async function resetPasswordWithToken(
     return true;
   });
 }
-

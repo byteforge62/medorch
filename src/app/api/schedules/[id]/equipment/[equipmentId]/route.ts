@@ -58,6 +58,7 @@ export async function PATCH(
     const assignment =
       await releaseScheduleEquipmentById(
         equipmentValidation.data.id,
+        scheduleValidation.data.id,
         session.user.id
       );
 
@@ -80,6 +81,26 @@ export async function PATCH(
         undefined,
         requestId,
       );
+    }
+
+    if (error instanceof Error) {
+      if (error.message === "EQUIPMENT_ASSIGNMENT_NOT_FOUND") {
+        return apiError(
+          "Equipment assignment not found for this schedule.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "EQUIPMENT_ALREADY_RELEASED") {
+        return apiError(
+          "Equipment has already been released.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
     }
 
     return apiError(

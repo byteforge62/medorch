@@ -1,9 +1,14 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  canReadIndividualSchedule,
+} from "@/modules/schedules/schedule-access";
 import {
   assignScheduleEquipmentById,
   getScheduleEquipment,
+  isScheduleAssignedToUser,
 } from "@/modules/schedules/schedule.service";
 import {
   assignScheduleEquipmentSchema,
@@ -43,6 +48,17 @@ export async function GET(
         validation.error.flatten(),
         requestId,
       );
+    }
+
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
+        validation.data.id,
+        session.user.id,
+      ));
+
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError("Schedule not found.", 404, undefined, requestId);
     }
 
     const equipment = await getScheduleEquipment(
@@ -106,10 +122,13 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
 
     const validation =
-      assignScheduleEquipmentSchema.safeParse(body);
+      assignScheduleEquipmentSchema.safeParse(bodyResult.data);
 
     if (!validation.success) {
       return apiError(

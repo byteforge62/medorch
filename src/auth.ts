@@ -108,8 +108,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 if (
                     !currentUser ||
                     currentUser.status !== "ACTIVE" ||
-                    (typeof token.sessionVersion === "number" &&
-                        currentUser.sessionVersion !== token.sessionVersion)
+                    typeof token.sessionVersion !== "number" ||
+                    currentUser.sessionVersion !== token.sessionVersion
                 ) {
                     token.invalidated = true;
                 } else {

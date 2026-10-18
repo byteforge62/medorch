@@ -7,7 +7,7 @@ export const alertIdSchema = z.object({
 export const getAlertsQuerySchema = z.object({
   userId: z.string().uuid().optional(),
   isRead: z
-    .string()
+    .enum(["true", "false"])
     .transform((val) => val === "true")
     .optional(),
   severity: z

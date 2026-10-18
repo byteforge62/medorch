@@ -45,10 +45,20 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
 
-    const validation =
-      updateScheduleStatusSchema.safeParse(body);
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleStatusSchema.safeParse(body);
 
     if (!validation.success) {
       return apiError(
@@ -98,6 +108,15 @@ export async function PATCH(
       ) {
         return apiError(
           "Invalid schedule status transition.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "SCHEDULE_STATUS_CONFLICT") {
+        return apiError(
+          "Schedule status changed concurrently. Refresh and retry.",
           409,
           undefined,
           requestId,

@@ -2,9 +2,12 @@ import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedu
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getScheduleById, updateScheduleWithValidation } from "@/modules/schedules/schedule.service";
+import { getScheduleById, updateScheduleWithValidation, isScheduleAssignedToUser } from "@/modules/schedules/schedule.service";
 import { scheduleIdSchema, updateScheduleSchema } from "@/modules/schedules/schedule.validation";
-
+import {
+  canReadIndividualSchedule,
+  redactScheduleDetailsForOT,
+} from "@/modules/schedules/schedule-access";
 type RouteContext = {
   params: Promise<{
     id: string;
@@ -53,17 +56,27 @@ export async function GET(
       );
     }
 
-    if (session.user.role === "OT_STAFF") {
-      return apiSuccess(
-        {
-          ...schedule,
-          clinicalNotes: null,
-        },
-        200,
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
+        validation.data.id,
+        session.user.id,
+      ));
+
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
       );
     }
+    const responseSchedule =
+      session.user.role === "OT_STAFF"
+        ? redactScheduleDetailsForOT(schedule)
+        : schedule;
 
-    return apiSuccess(schedule, 200);
+    return apiSuccess(responseSchedule, 200);
   } catch (error) {
     console.error(
       `[${requestId}] GET /api/schedules/[id] error:`,
@@ -108,7 +121,18 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
 
     const validation = updateScheduleSchema.safeParse(body);
 
@@ -199,6 +223,20 @@ export async function PATCH(
       return apiError(
         "This patient already has a procedure scheduled during the selected time.",
         409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
         undefined,
         requestId,
       );

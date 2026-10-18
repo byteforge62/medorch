@@ -1,6 +1,7 @@
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
 import {
   getAlertById,
   updateAlertById,
@@ -98,9 +99,12 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
 
-    const validation = updateAlertSchema.safeParse(body);
+    const validation = updateAlertSchema.safeParse(bodyResult.data);
 
     if (!validation.success) {
       return apiError(

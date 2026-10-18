@@ -104,4 +104,18 @@ test("schedule mutation permissions are role-restricted", () => {
     hasPermission(UserRole.DOCTOR, "schedules:equipment:manage"),
     false
   );
+
+    // Schedule management
+  assert.equal(
+    hasPermission(UserRole.ADMIN, "schedules:manage"),
+    true,
+  );
+  assert.equal(
+    hasPermission(UserRole.DOCTOR, "schedules:manage"),
+    true,
+  );
+  assert.equal(
+    hasPermission(UserRole.OT_STAFF, "schedules:manage"),
+    false,
+  );
 });

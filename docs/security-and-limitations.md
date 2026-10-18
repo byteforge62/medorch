@@ -10,7 +10,8 @@ No production deployment or compliance assessment is documented in this reposito
 
 - **Credential sign-in:** Auth.js credentials authenticate against a stored password hash. Email input is trimmed and normalized to lowercase. Only users in `ACTIVE` status can sign in.
 - **Password hashing:** Password hashes use bcryptjs with 12 salt rounds.
-- **Session shape:** Auth.js uses JWT sessions and places user ID, role, and status on the session user object.
+- **Session lifecycle:** Auth.js uses JWT sessions and exposes user ID, role, and status. The JWT callback checks that the account remains active and that its session version still matches; invalid or outdated sessions do not populate `session.user`.
+- **Password reset:** Reset tokens are hashed at rest, consumed transactionally, and increment the user session version so existing sessions are invalidated.
 - **Page and API guards:** Server-side helpers gate authenticated pages and role-restricted API operations. Endpoint permissions vary by method; consult the [authorization matrix](./api-reference.md#authorization-matrix).
 - **Input validation:** Domain Zod schemas validate request bodies, identifiers, enums, and selected cross-field constraints. Services perform persisted-record and operational checks.
 - **Alert ownership:** Non-admin alert reads and mutations are checked against the requesting user's ID in alert service logic.
@@ -30,11 +31,11 @@ The seed upserts the account and resets its password when run. These values are 
 ## Known implementation boundaries
 
 1. **Prototype data only.** There is no documented production operations plan for backups, monitoring, incident response, encryption configuration, retention, or recovery.
-2. **Declared permission versus effective access.** `src/lib/auth/permissions.ts` expresses broader role permissions than every Route Handler currently grants. For example, the schedule read API permits administrators, doctors, and OT staff, but not patients—even though the permission map declares a patient-owned schedule-read permission. Treat handler guards as the effective API behavior.
-3. **Schedule conflict concurrency.** Room and surgeon overlaps are checked in application service logic before the write. The database schema does not define an exclusion constraint or equivalent concurrency-safe interval reservation. Concurrent requests could therefore require stronger transactional/database enforcement in a production design.
+2. **Declared permission versus effective access.** `src/lib/auth/permission.ts` defines role permissions, while Route Handlers also apply route-specific checks and ownership filters. For example, patients can read only their own appointments through `/api/me/appointments`; they do not receive general schedule-list access. Treat handler and service checks as the effective API behavior.
+3. **Schedule conflict concurrency.** Application services check for overlapping room, surgeon, and patient schedules, and the PostgreSQL migration adds exclusion constraints for all three resources. The database constraints provide concurrency-safe enforcement when migrations are applied; deployment state was not verified as part of this repository audit.
 4. **Audit scope.** Audit events are written for selected mutations, not every read or every conceivable state change. The table is not demonstrated as immutable, tamper-evident, retention-controlled, or compliance-grade.
 5. **Operational freshness.** Dashboard values are fetched on page load and summarized in the client. There is no push-based real-time feed.
-6. **Automated verification.** The package currently has lint and build scripts but no dedicated test script. Authentication, authorization, schedule conflict, and ownership behavior need an automated test strategy before production adaptation.
+6. **Automated verification.** The repository has focused permission and PostgreSQL schedule-constraint tests, but no tests for authentication/session invalidation, endpoint ownership, or password/email token flows. Expand automated coverage for those boundaries before production adaptation.
 
 ## Before any production adaptation
 

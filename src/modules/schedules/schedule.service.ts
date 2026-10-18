@@ -24,8 +24,10 @@ import {
   findScheduleNoteById,
   findScheduleNotes,
   updateScheduleNote,
+  isUserAssignedToSchedule
 } from "./schedule.repository";
 import { recordAudit } from "@/modules/audit/audit.service";
+import { isScheduleStatusTransitionAllowed } from "./schedule-access";
 
 export async function getSchedules() {
   return findSchedules();
@@ -108,42 +110,15 @@ export async function updateScheduleStatusById(
 
   const currentStatus = existingSchedule.status;
 
-  const allowedTransitions: Record<
-    typeof currentStatus,
-    string[]
-  > = {
-    SCHEDULED: [
-      "CONFIRMED",
-      "CANCELLED",
-    ],
-
-    CONFIRMED: [
-      "IN_PROGRESS",
-      "DELAYED",
-      "CANCELLED",
-    ],
-
-    IN_PROGRESS: [
-      "COMPLETED",
-      "DELAYED",
-    ],
-
-    DELAYED: [
-      "CONFIRMED",
-      "IN_PROGRESS",
-      "CANCELLED",
-    ],
-
-    COMPLETED: [],
-
-    CANCELLED: [],
-  };
-
-  if (!allowedTransitions[currentStatus].includes(status)) {
+  if (!isScheduleStatusTransitionAllowed(currentStatus, status)) {
     throw new Error("INVALID_STATUS_TRANSITION");
   }
 
-  const schedule = await updateScheduleStatusRecord(id, status);
+  const schedule = await updateScheduleStatusRecord(
+    id,
+    status,
+    currentStatus,
+  );
 
   const auditAction =
     status === "COMPLETED"
@@ -243,7 +218,9 @@ export async function createScheduleWithValidation(
     throw new Error("SURGEON_INACTIVE");
   }
 
-
+  if (data.endTime <= data.startTime) {
+    throw new Error("INVALID_TIME_RANGE");
+  }
 
   const conflicts = await findScheduleConflicts({
     patientId: data.patientId,
@@ -254,30 +231,30 @@ export async function createScheduleWithValidation(
   });
 
   if (conflicts.length > 0) {
-  const roomConflict = conflicts.some(
-    (conflict) => conflict.otRoomId === data.otRoomId,
-  );
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === data.otRoomId,
+    );
 
-  if (roomConflict) {
-    throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === data.surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
+
+    const patientConflict = conflicts.some(
+      (conflict) => conflict.patientId === data.patientId,
+    );
+
+    if (patientConflict) {
+      throw new Error("PATIENT_SCHEDULE_CONFLICT");
+    }
   }
-
-  const surgeonConflict = conflicts.some(
-    (conflict) => conflict.surgeonId === data.surgeonId,
-  );
-
-  if (surgeonConflict) {
-    throw new Error("SURGEON_SCHEDULE_CONFLICT");
-  }
-
-  const patientConflict = conflicts.some(
-    (conflict) => conflict.patientId === data.patientId,
-  );
-
-  if (patientConflict) {
-    throw new Error("PATIENT_SCHEDULE_CONFLICT");
-  }
-}
   const schedule = await createScheduleRecord(data);
 
   await recordAudit({
@@ -497,6 +474,16 @@ export async function assignScheduleStaffById(
     throw new Error("STAFF_USER_INACTIVE");
   }
 
+  const doctorRoles = ["SURGEON", "ANESTHETIST"] as const;
+
+  if (doctorRoles.includes(data.role as (typeof doctorRoles)[number])) {
+    if (user.role !== "DOCTOR" || !user.doctorProfile) {
+      throw new Error("STAFF_ROLE_MISMATCH");
+    }
+  } else if (user.role !== "OT_STAFF") {
+    throw new Error("STAFF_ROLE_MISMATCH");
+  }
+
   const staff = await createScheduleStaff({
     scheduleId,
     userId: data.userId,
@@ -521,9 +508,10 @@ export async function assignScheduleStaffById(
 
 export async function removeScheduleStaffById(
   scheduleStaffId: string,
+  scheduleId: string,
   actorUserId?: string,
 ) {
-  const staff = await deleteScheduleStaff(scheduleStaffId);
+  const staff = await deleteScheduleStaff(scheduleStaffId, scheduleId);
 
   await recordAudit({
     userId: actorUserId,
@@ -598,10 +586,12 @@ export async function assignScheduleEquipmentById(
 
 export async function releaseScheduleEquipmentById(
   equipmentAssignmentId: string,
-  actorUserId?: string
+  scheduleId: string,
+  actorUserId?: string,
 ) {
   const assignment = await releaseScheduleEquipment(
     equipmentAssignmentId,
+    scheduleId,
   );
 
   await recordAudit({
@@ -663,14 +653,16 @@ export async function createScheduleNoteById(
   return note;
 }
 
+
 export async function updateScheduleNoteById(
   noteId: string,
+  scheduleId: string,
   authorId: string,
   content: string,
 ) {
   const note = await findScheduleNoteById(noteId);
 
-  if (!note) {
+  if (!note || note.scheduleId !== scheduleId) {
     throw new Error("SCHEDULE_NOTE_NOT_FOUND");
   }
 
@@ -686,9 +678,7 @@ export async function updateScheduleNoteById(
     entity: "ScheduleNote",
     entityId: note.id,
     description: "Schedule note was updated.",
-    metadata: {
-      scheduleId: note.scheduleId,
-    },
+    metadata: { scheduleId: note.scheduleId },
   });
 
   return updatedNote;
@@ -696,11 +686,12 @@ export async function updateScheduleNoteById(
 
 export async function deleteScheduleNoteById(
   noteId: string,
+  scheduleId: string,
   authorId: string,
 ) {
   const note = await findScheduleNoteById(noteId);
 
-  if (!note) {
+  if (!note || note.scheduleId !== scheduleId) {
     throw new Error("SCHEDULE_NOTE_NOT_FOUND");
   }
 
@@ -716,10 +707,15 @@ export async function deleteScheduleNoteById(
     entity: "ScheduleNote",
     entityId: note.id,
     description: "Schedule note was deleted.",
-    metadata: {
-      scheduleId: note.scheduleId,
-    },
+    metadata: { scheduleId: note.scheduleId },
   });
 
   return note;
+}
+
+export async function isScheduleAssignedToUser(
+  scheduleId: string,
+  userId: string,
+) {
+  return isUserAssignedToSchedule(scheduleId, userId);
 }

@@ -51,7 +51,6 @@ export const ROLE_PERMISSIONS = {
     "otRooms:read",
     "equipment:read",
     "schedules:read",
-    "schedules:manage",
     "doctors:read",
     "alerts:read",
     "alerts:create",
