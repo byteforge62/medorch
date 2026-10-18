@@ -219,6 +219,20 @@ export async function PATCH(
       );
     }
 
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
     return apiError(
       "Failed to update schedule.",
       500,

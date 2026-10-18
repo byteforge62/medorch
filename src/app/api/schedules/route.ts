@@ -57,8 +57,18 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const body = await request.json();
+    let body: unknown;
 
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
     const validation = createScheduleSchema.safeParse(body);
 
     if (!validation.success) {
@@ -117,6 +127,8 @@ export async function POST(request: Request) {
           "The selected OT room is already scheduled during this time.",
         SURGEON_SCHEDULE_CONFLICT:
           "The selected surgeon is already scheduled during this time.",
+        INVALID_TIME_RANGE:
+          "End time must be later than start time.",
       };
 
       const message = messages[error.message];
