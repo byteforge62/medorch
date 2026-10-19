@@ -113,3 +113,8 @@ For exact request shapes and domain error mapping, consult the matching route an
 ## Schedule lifecycle values
 
 `PATCH /api/schedules/{id}/status` accepts `SCHEDULED`, `CONFIRMED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`, or `DELAYED`. Valid transitions are checked by the schedule service. See [Product and workflow overview](./product-overview.md#status-and-priority-are-separate-concepts).
+
+
+## Source-of-truth note (2026-10-19)
+
+This inventory was cross-checked against the uploaded source snapshot. The current route files include `POST /api/users`, `/api/users/{id}/approve`, patient/doctor/OT-room/equipment management pages, `/schedules/{id}` detail UI, and the audit page/API. Older project notes that say these are absent are stale. For the exact permission required by any operation, inspect that method's `authorizeApiPermission(...)` call in its current route handler and `src/lib/auth/permission.ts`; do not infer permission solely from this table. This document lists routes but does not replace source-level review or integration tests.
