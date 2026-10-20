@@ -63,50 +63,76 @@ export function SchedulePage() {
   useEffect(() => {
     let isMounted = true;
 
-    apiClient
-      .get<ScheduleItem[]>("/api/schedules")
-      .then((data) => {
+    async function loadSchedules() {
+      try {
+        const data = await apiClient.get<ScheduleItem[]>("/api/schedules");
+
         if (isMounted) {
           setSchedules(data || []);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (isMounted) {
           console.error("Failed to fetch schedules:", err);
           setError("Failed to load surgery schedules from server.");
         }
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) {
           setIsLoading(false);
         }
-      });
+      }
+    }
 
-    Promise.allSettled([
-      apiClient.get<DepartmentOption[]>("/api/departments"),
-      apiClient.get<OTRoomOption[]>("/api/ot-rooms"),
-      apiClient.get<PatientOption[]>("/api/patients"),
-      apiClient.get<DoctorOption[]>("/api/doctors"),
-    ]).then(([deptRes, roomRes, patientRes, doctorRes]) => {
+    async function loadReferenceData() {
+      const departmentRequest = apiClient.get<DepartmentOption[]>("/api/departments");
+      const roomRequest = apiClient.get<OTRoomOption[]>("/api/ot-rooms");
+
+      const patientRequest = isAdmin
+        ? apiClient.get<PatientOption[]>("/api/patients")
+        : Promise.resolve(null);
+
+      const doctorRequest = isAdmin
+        ? apiClient.get<DoctorOption[]>("/api/doctors")
+        : Promise.resolve(null);
+
+      const [deptRes, roomRes, patientRes, doctorRes] = await Promise.allSettled([
+        departmentRequest,
+        roomRequest,
+        patientRequest,
+        doctorRequest,
+      ]);
+
       if (!isMounted) return;
+
       if (deptRes.status === "fulfilled" && deptRes.value) {
         setDepartments(deptRes.value);
       }
+
       if (roomRes.status === "fulfilled" && roomRes.value) {
         setOtRooms(roomRes.value);
       }
-      if (patientRes.status === "fulfilled" && patientRes.value) {
+
+      if (
+        patientRes.status === "fulfilled" &&
+        patientRes.value
+      ) {
         setPatients(patientRes.value);
       }
-      if (doctorRes.status === "fulfilled" && doctorRes.value) {
+
+      if (
+        doctorRes.status === "fulfilled" &&
+        doctorRes.value
+      ) {
         setDoctors(doctorRes.value);
       }
-    });
+    }
+
+    void loadSchedules();
+    void loadReferenceData();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAdmin]);
 
   // Client-side filtering logic
   const filteredSchedules = useMemo(() => {

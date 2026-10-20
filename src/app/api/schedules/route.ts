@@ -2,9 +2,8 @@ import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedu
 import { authorizeApiPermission } from "@/lib/api/auth";
 import { getRequestId } from "@/lib/api/request-id";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { getSchedules, createScheduleWithValidation } from "@/modules/schedules/schedule.service";
+import { getSchedules, createScheduleWithValidation, getSchedulesForStaff } from "@/modules/schedules/schedule.service";
 import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
-import { redactScheduleClinicalNotes } from "@/modules/schedules/schedule-access";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -19,14 +18,20 @@ export async function GET(request: Request) {
       return response;
     }
 
+    if (session.user.role === "OT_STAFF") {
+      const assignments = await getSchedulesForStaff(session.user.id);
+
+      const schedules = assignments.map(({ schedule }) => ({
+        ...schedule,
+        clinicalNotes: null,
+      }));
+
+      return apiSuccess(schedules, 200);
+    }
+
     const schedules = await getSchedules();
 
-    const responseSchedules =
-      session.user.role === "OT_STAFF"
-        ? schedules.map(redactScheduleClinicalNotes)
-        : schedules;
-
-    return apiSuccess(responseSchedules, 200);
+    return apiSuccess(schedules, 200);
   } catch (error) {
     console.error(
       `[${requestId}] GET /api/schedules error:`,

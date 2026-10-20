@@ -1,0 +1,4720 @@
+==================================================
+FILE: src\app\api\alerts\[id]\read\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { markAlertAsReadById } from "@/modules/alerts/alerts.service";
+import { alertIdSchema } from "@/modules/alerts/alerts.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      ["alerts:update","alerts:update:own"],
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = alertIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid alert ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const alert = await markAlertAsReadById(validation.data.id, session.user);
+
+    return apiSuccess(alert, 200);
+  } catch (error) {
+    console.error(`[${requestId}] PATCH /api/alerts/[id]/read error:`, error);
+
+    if (error instanceof Error && error.message === "ALERT_NOT_FOUND") {
+      return apiError("Alert not found.", 404, undefined, requestId);
+    }
+
+    if (error instanceof Error && error.message === "FORBIDDEN_ALERT_ACCESS") {
+      return apiError(
+        "You do not have permission to modify this alert.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to mark alert as read.", 500, undefined, requestId);
+  }
+}
+
+
+==================================================
+FILE: src\app\api\alerts\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  getAlertById,
+  updateAlertById,
+  deleteAlertById,
+} from "@/modules/alerts/alerts.service";
+import {
+  alertIdSchema,
+  updateAlertSchema,
+} from "@/modules/alerts/alerts.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "alerts:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = alertIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid alert ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const alert = await getAlertById(validation.data.id, session.user);
+
+    return apiSuccess(alert, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/alerts/[id] error:`, error);
+
+    if (error instanceof Error && error.message === "ALERT_NOT_FOUND") {
+      return apiError("Alert not found.", 404, undefined, requestId);
+    }
+
+    if (error instanceof Error && error.message === "FORBIDDEN_ALERT_ACCESS") {
+      return apiError(
+        "You do not have permission to view this alert.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to fetch alert.", 500, undefined, requestId);
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      ["alerts:update","alerts:update:own"],
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = alertIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid alert ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateAlertSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid alert data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const alert = await updateAlertById(
+      idValidation.data.id,
+      validation.data,
+      session.user,
+    );
+
+    return apiSuccess(alert, 200);
+  } catch (error) {
+    console.error(`[${requestId}] PATCH /api/alerts/[id] error:`, error);
+
+    if (error instanceof Error && error.message === "ALERT_NOT_FOUND") {
+      return apiError("Alert not found.", 404, undefined, requestId);
+    }
+
+    if (error instanceof Error && error.message === "FORBIDDEN_ALERT_ACCESS") {
+      return apiError(
+        "You do not have permission to update this alert.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to update alert.", 500, undefined, requestId);
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      ["alerts:delete","alerts:delete:own"],
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = alertIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid alert ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const result = await deleteAlertById(validation.data.id, session.user);
+
+    return apiSuccess(result, 200);
+  } catch (error) {
+    console.error(`[${requestId}] DELETE /api/alerts/[id] error:`, error);
+
+    if (error instanceof Error && error.message === "ALERT_NOT_FOUND") {
+      return apiError("Alert not found.", 404, undefined, requestId);
+    }
+
+    if (error instanceof Error && error.message === "FORBIDDEN_ALERT_ACCESS") {
+      return apiError(
+        "You do not have permission to delete this alert.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to delete alert.", 500, undefined, requestId);
+  }
+}
+
+
+==================================================
+FILE: src\app\api\alerts\read-all\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { markAllAlertsAsRead } from "@/modules/alerts/alerts.service";
+import { z } from "zod";
+
+const readAllSchema = z.object({
+  userId: z.string().uuid().optional(),
+});
+
+export async function PATCH(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      ["alerts:update","alerts:update:own"],
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    let targetUserId = session.user.id;
+    const rawBody = await request.text();
+
+    if (rawBody.trim()) {
+      let body: unknown;
+
+      try {
+        body = JSON.parse(rawBody);
+      } catch {
+        return apiError(
+          "Invalid JSON request body.",
+          400,
+          undefined,
+          requestId,
+        );
+      }
+
+      const validation = readAllSchema.safeParse(body);
+
+      if (!validation.success) {
+        return apiError(
+          "Invalid request body.",
+          400,
+          validation.error.flatten(),
+          requestId,
+        );
+      }
+
+      if (validation.data.userId) {
+        targetUserId = validation.data.userId;
+      }
+    }
+
+    const result = await markAllAlertsAsRead(targetUserId, session.user);
+
+    return apiSuccess(result, 200);
+  } catch (error) {
+    console.error(`[${requestId}] PATCH /api/alerts/read-all error:`, error);
+
+    if (error instanceof Error && error.message === "FORBIDDEN_ALERT_ACCESS") {
+      return apiError(
+        "You do not have permission to mark alerts as read for this user.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to mark alerts as read.", 500, undefined, requestId);
+  }
+}
+
+
+==================================================
+FILE: src\app\api\alerts\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getAlerts, createAlert } from "@/modules/alerts/alerts.service";
+import {
+  createAlertSchema,
+  getAlertsQuerySchema,
+} from "@/modules/alerts/alerts.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "alerts:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { searchParams } = new URL(request.url);
+    const rawQuery = {
+      userId: searchParams.get("userId") || undefined,
+      isRead: searchParams.get("isRead") || undefined,
+      severity: searchParams.get("severity") || undefined,
+      type: searchParams.get("type") || undefined,
+    };
+
+    const validation = getAlertsQuerySchema.safeParse(rawQuery);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid query parameters.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const alerts = await getAlerts(validation.data, session.user);
+
+    return apiSuccess(alerts, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/alerts error:`, error);
+
+    return apiError("Failed to fetch alerts.", 500, undefined, requestId);
+  }
+}
+
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "alerts:create",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createAlertSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid alert data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const alert = await createAlert(validation.data, session.user.id);
+
+    return apiSuccess(alert, 200);
+  } catch (error) {
+    console.error(`[${requestId}] POST /api/alerts error:`, error);
+
+    if (error instanceof Error && error.message === "USER_NOT_FOUND") {
+      return apiError("Recipient user not found.", 404, undefined, requestId);
+    }
+
+    if (error instanceof Error && error.message === "SCHEDULE_NOT_FOUND") {
+      return apiError("Referenced schedule not found.", 404, undefined, requestId);
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return apiError(
+        "Invalid foreign key reference.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError("Failed to create alert.", 500, undefined, requestId);
+  }
+}
+
+
+==================================================
+FILE: src\app\api\audit\route.ts
+==================================================
+import { z } from "zod";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getAuditLogs, getAuditLogCount } from "@/modules/audit/audit.service";
+import type { AuditAction } from "@/generated/prisma/client";
+
+const auditQuerySchema = z.object({
+  userId: z.string().uuid().optional(),
+  action: z
+    .enum([
+      "CREATE",
+      "UPDATE",
+      "DELETE",
+      "LOGIN",
+      "LOGOUT",
+      "APPROVE",
+      "REJECT",
+      "CANCEL",
+      "COMPLETE",
+    ])
+    .optional(),
+  entity: z.string().trim().min(1).max(100).optional(),
+  entityId: z.string().trim().min(1).max(100).optional(),
+  fromDate: z.iso.date().optional(),
+  toDate: z.iso.date().optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+}).refine(
+  (data) => 
+    !data.fromDate ||
+  !data.toDate || 
+  data.fromDate <= data.toDate,
+  {
+    message: "fromDate must be on or before toDate",
+    path:["toDate"]
+  }
+);
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  const { response } = await authorizeApiPermission(
+    "audit:read",
+    requestId,
+  );
+
+  if (response) {
+    return response;
+  }
+
+  const url = new URL(request.url);
+
+  const parsed = auditQuerySchema.safeParse({
+    userId: url.searchParams.get("userId") ?? undefined,
+    action: url.searchParams.get("action") ?? undefined,
+    entity: url.searchParams.get("entity") ?? undefined,
+    entityId: url.searchParams.get("entityId") ?? undefined,
+    fromDate: url.searchParams.get("fromDate") ?? undefined,
+    toDate: url.searchParams.get("toDate") ?? undefined,
+    limit: url.searchParams.get("limit") ?? undefined,
+    offset: url.searchParams.get("offset") ?? undefined,
+  });
+
+  if (!parsed.success) {
+    return apiError(
+      "Invalid audit query parameters.",
+      400,
+      parsed.error.flatten(),
+      requestId,
+    );
+  }
+
+  try {
+    const options = {
+  ...parsed.data,
+  fromDate: parsed.data.fromDate
+    ? new Date(`${parsed.data.fromDate}T00:00:00.000Z`)
+    : undefined,
+  toDate: parsed.data.toDate
+    ? new Date(`${parsed.data.toDate}T23:59:59.999Z`)
+    : undefined,
+  action: parsed.data.action as AuditAction | undefined,
+};
+
+const [auditLogs, total] = await Promise.all([
+  getAuditLogs(options),
+  getAuditLogCount(options),
+]);
+
+return apiSuccess(
+  {
+    items: auditLogs,
+    pagination: {
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+      total,
+      hasMore: parsed.data.offset + auditLogs.length < total,
+    },
+  },
+  200,
+);
+  } catch (error) {
+    console.error(
+      `[${requestId}] Failed to fetch audit logs:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch audit logs.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\auth\[...nextauth]\route.ts
+==================================================
+import { handlers } from "@/auth";
+
+export const {GET, POST} = handlers;
+
+==================================================
+FILE: src\app\api\auth\forgot-password\route.ts
+==================================================
+
+import { NextRequest } from "next/server";
+import { z } from "zod";
+
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { requestPasswordReset } from "@/modules/users/user.service";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
+});
+
+export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+
+  try {
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const parsed = forgotPasswordSchema.safeParse(bodyResult.data);
+
+    if (!parsed.success) {
+      return apiError("Please enter a valid email address.", 400, undefined, requestId);
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ipAddress =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    const result = await requestPasswordReset(
+      parsed.data.email,
+      ipAddress,
+    );
+
+    if (result.rateLimited) {
+      return apiSuccess(
+        {
+          message:
+            "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
+          rateLimited: true,
+        },
+        429,
+      );
+    }
+
+    return apiSuccess(
+      {
+        message:
+          "If an eligible account exists, a password reset email will be sent.",
+      },
+      202,
+    );
+  } catch (error) {
+    console.error(`[${requestId}] Forgot-password request failed:`, error);
+
+    return apiError(
+      "Unable to process your request. Please try again later.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\auth\register\route.ts
+==================================================
+import { NextResponse } from "next/server";
+import { patientRegistrationSchema } from "@/modules/users/user.validation";
+import { registerPatient } from "@/modules/users/user.service";
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
+
+const REGISTRATION_MESSAGE =
+  "If registration can be completed, a verification email will be sent to the provided address.";
+
+function isDuplicateEmailError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null || !("code" in error)) {
+    return false;
+  }
+
+  return error.code === "P2002";
+}
+
+export async function POST(request: Request) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Invalid JSON request body." },
+      { status: 400 }
+    );
+  }
+
+  const validation = patientRegistrationSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        message: "Validation failed.",
+        errors: validation.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      },
+      { status: 400 }
+    );
+  }
+
+  const email = validation.data.email.trim().toLowerCase();
+
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip")?.trim();
+
+  const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp;
+
+  const emailHash = createHash("sha256")
+    .update(email)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(clientIp || `unavailable:${email}`)
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "REGISTRATION",
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { message: "Too many registration attempts. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": "900" },
+      },
+    );
+  }
+
+  try {
+    await registerPatient(validation.data);
+
+    return NextResponse.json(
+      { message: REGISTRATION_MESSAGE },
+      { status: 202 }
+    );
+  } catch (error) {
+    if (isDuplicateEmailError(error)) {
+      // Avoid disclosing whether an email is already registered.
+      return NextResponse.json(
+        { message: REGISTRATION_MESSAGE },
+        { status: 202 }
+      );
+    }
+
+    console.error("Patient registration failed:", error);
+
+    return NextResponse.json(
+      { message: "Registration could not be completed. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\auth\resend-verification\route.ts
+==================================================
+
+import { NextRequest } from "next/server";
+import { ZodError, z } from "zod";
+
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { resendPatientVerificationEmail } from "@/modules/users/user.service";
+
+const resendVerificationSchema = z.object({
+    email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
+});
+
+export async function POST(request: NextRequest) {
+    const requestId = crypto.randomUUID();
+
+    try {
+        const bodyResult = await readJsonBody(request);
+        if (!bodyResult.success) {
+            return apiError("Invalid JSON request body.", 400, undefined, requestId);
+        }
+
+        const { email } = resendVerificationSchema.parse(bodyResult.data);
+
+        const forwardedFor = request.headers.get("x-forwarded-for");
+        const realIp = request.headers.get("x-real-ip");
+
+        const ipAddress =
+            forwardedFor?.split(",")[0]?.trim() ||
+            realIp?.trim() ||
+            "unknown";
+
+        const result = await resendPatientVerificationEmail(email, ipAddress);
+
+        if (result.rateLimited) {
+            return apiSuccess(
+                {
+                    message:
+                        "You've reached the resend limit. Please wait 15 minutes before trying again.",
+                    rateLimited: true,
+                },
+                429,
+            );
+        }
+
+        return apiSuccess(
+            {
+                message:
+                    "If an eligible account exists, a verification email will be sent.",
+                rateLimited: false,
+            },
+            202,
+        );
+    } catch (error) {
+        if (error instanceof ZodError) {
+            return apiError("Invalid email address.", 400, undefined, requestId);
+        }
+
+        console.error(`[${requestId}] Resend verification failed:`, error);
+        return apiError("Unable to process the request. Please try again later.", 500);
+    }
+}
+
+
+==================================================
+FILE: src\app\api\auth\reset-password\route.ts
+==================================================
+
+import { NextRequest } from "next/server";
+import { z } from "zod";
+
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { completePasswordReset } from "@/modules/users/user.service";
+
+const resetPasswordSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/i),
+  password: z.string().min(12).max(128),
+});
+
+export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+
+  try {
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const parsed = resetPasswordSchema.safeParse(bodyResult.data);
+
+    if (!parsed.success) {
+      return apiError(
+        "Invalid reset link or password. Use a password between 12 and 128 characters.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ipAddress =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    const ipHash = createHash("sha256")
+      .update(ipAddress)
+      .digest("hex");
+
+    const tokenHash = createHash("sha256")
+      .update(parsed.data.token)
+      .digest("hex");
+
+    const allowed = await recordVerificationEmailRequest(
+      tokenHash,
+      ipHash,
+      "PASSWORD_RESET_ATTEMPT",
+    );
+
+    if (!allowed) {
+      return apiError(
+        "Too many password reset attempts. Please wait 15 minutes before trying again.",
+        429,
+        undefined,
+        requestId,
+      );
+    }
+
+    const result = await completePasswordReset(
+      parsed.data.token,
+      parsed.data.password,
+    );
+
+    if (!result.reset) {
+      return apiError(
+        "This password reset link is invalid, expired, or already used.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(
+      { message: "Your password has been reset successfully." },
+      200,
+    );
+  } catch (error) {
+    console.error(`[${requestId}] Password reset failed:`, error);
+
+    return apiError(
+      "Unable to reset your password. Please try again later.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\auth\verify-email\route.ts
+==================================================
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
+import { NextResponse } from "next/server";
+import { verifyPatientEmailToken } from "@/modules/users/user.service";
+
+export async function POST(request: Request) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: "Invalid JSON request body." },
+      { status: 400 }
+    );
+  }
+
+  if (
+    typeof body !== "object" ||
+    body === null ||
+    !("token" in body) ||
+    typeof body.token !== "string"
+  ) {
+    return NextResponse.json(
+      { message: "A verification token is required." },
+      { status: 400 }
+    );
+  }
+
+  const token = body.token.trim();
+
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return NextResponse.json(
+      { message: "This verification link is invalid or expired." },
+      { status: 400 },
+    );
+  }
+
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
+
+  const tokenHash = createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(clientIp)
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    tokenHash,
+    ipHash,
+    "EMAIL_VERIFICATION_TOKEN",
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { message: "Too many verification attempts. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": "900" },
+      },
+    );
+  }
+
+  try {
+    const result = await verifyPatientEmailToken(token);
+    if (!result.verified) {
+      return NextResponse.json(
+        { message: "This verification link is invalid or expired." },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      message:
+        "Email verified successfully. Your account is awaiting administrator approval.",
+    });
+  } catch (error) {
+    console.error("Email verification failed:", error);
+
+    return NextResponse.json(
+      { message: "Email verification could not be completed. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\departments\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { deactivateDepartment, getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
+import { departmentIdSchema, updateDepartmentSchema } from "@/modules/departments/department.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission("departments:read",requestId);
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = departmentIdSchema.safeParse({ id });
+    if (!validation.success) {
+      return apiError("Invalid department ID.",400,validation.error.flatten(),requestId);
+    }
+
+    const department = await getDepartmentById(validation.data.id);
+    if (!department) {
+      return apiError("Department not found.",404,undefined,requestId);
+    }
+
+    return apiSuccess(department, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/departments/[id] error:`,error);
+    return apiError("Failed to fetch department.",500,undefined,requestId);
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission("departments:manage",requestId);
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = departmentIdSchema.safeParse({ id });
+    if (!idValidation.success) {
+      return apiError("Invalid department ID.",400,idValidation.error.flatten(),requestId);
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.",400,undefined,requestId);
+    }
+
+    const validation = updateDepartmentSchema.safeParse(bodyResult.data);
+    if (!validation.success) {
+      return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
+    }
+
+    const existingDepartment = await getDepartmentById(idValidation.data.id);
+    if (!existingDepartment) {
+      return apiError("Department not found.",404,undefined,requestId);
+    }
+
+    const department = await updateExistingDepartment(idValidation.data.id,validation.data,session.user.id);
+
+    return apiSuccess(department, 200);
+  } catch (error) {
+    console.error(`[${requestId}] PATCH /api/departments/[id] error:`,error);
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
+      return apiError("A department with this name already exists.",409,undefined,requestId);
+    }
+
+    return apiError("Failed to update department.",500,undefined,requestId);
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  {params}: RouteContext,
+){
+  const requestId = getRequestId(request);
+  try{
+   const {session,response} = await authorizeApiPermission("departments:manage",requestId);
+   if(!session){
+    return response;
+   }
+
+   const {id} = await params;
+
+   const validation = departmentIdSchema.safeParse({id});
+   if(!validation.success){
+    return apiError("Invalid department ID",400,validation.error.flatten(),requestId)
+   }
+
+   const existingDepartment = await getDepartmentById(validation.data.id);
+   if(!existingDepartment){
+    return apiError("Department not found",404,undefined,requestId)
+   }
+
+   if(!existingDepartment.isActive){
+    return apiError("Department is already inactive",409,undefined,requestId)
+   }
+
+   const department = await deactivateDepartment(validation.data.id,session.user.id);
+   return apiSuccess(department,200)
+  }catch(error){
+  console.error(`[${requestId}] DELETE /api/departments/[id] error:`,error);
+    return apiError("Failed to deactivate department.",500,undefined,requestId);
+  }
+}
+
+==================================================
+FILE: src\app\api\departments\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { createNewDepartment, getDepartments } from "@/modules/departments/department.service";
+import { createDepartmentSchema } from "@/modules/departments/department.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission("departments:read",requestId);
+    if (!session) {
+      return response;
+    }
+
+    const departments = await getDepartments();
+    return apiSuccess(departments, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/departments error:`,error,);
+    return apiError("Failed to fetch departments.",500,undefined,requestId)}
+}
+
+export async function POST(request: Request){
+  const requestId = getRequestId(request);
+
+  try{
+   const {session,response} = await authorizeApiPermission("departments:manage",requestId);
+   if(!session){
+    return response;
+   }
+   const bodyResult = await readJsonBody(request);
+   if (!bodyResult.success) {
+     return apiError("Invalid JSON request body.",400,undefined,requestId);
+   }
+   const validation = createDepartmentSchema.safeParse(bodyResult.data);
+   if(!validation.success){
+     return apiError("Invalid department data.",400,validation.error.flatten(),requestId);
+   }
+
+   const department = await createNewDepartment(validation.data,session.user.id);
+   return apiSuccess(department,200);
+  }catch(error){
+   console.error(`[${requestId}] POST /api/departments error:`,error);
+   if(error && typeof error === "object" && "code" in error && error.code === "P2002"){
+    return apiError("A department with this name already exists.",409,undefined,requestId);
+   }
+   return apiError("Failed to create department.",500,undefined,requestId);
+  }
+}
+
+==================================================
+FILE: src\app\api\doctors\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  getDoctorById,
+  updateDoctor,
+} from "@/modules/doctors/doctor.service";
+import {
+  doctorIdSchema,
+  updateDoctorSchema,
+} from "@/modules/doctors/doctor.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "doctors:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = doctorIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid doctor ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const doctor = await getDoctorById(validation.data.id);
+
+    if (!doctor) {
+      return apiError(
+        "Doctor not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(doctor, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/doctors/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch doctor.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "doctors:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = doctorIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid doctor ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateDoctorSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid doctor data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const doctor = await updateDoctor(
+      idValidation.data.id,
+      validation.data,
+      session.user.id,
+    );
+
+    return apiSuccess(doctor, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/doctors/[id] error:`,
+      error,
+    );
+
+    if (error instanceof Error) {
+      if (error.message === "DOCTOR_NOT_FOUND") {
+        return apiError(
+          "Doctor not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "The license number is already in use.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update doctor.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\doctors\[id]\status\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { updateDoctorStatus } from "@/modules/doctors/doctor.service";
+import {
+  doctorIdSchema,
+  updateDoctorStatusSchema,
+} from "@/modules/doctors/doctor.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "doctors:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = doctorIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid doctor ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateDoctorStatusSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid doctor status.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const result = await updateDoctorStatus(
+      idValidation.data.id,
+      validation.data.status,
+      session.user.id,
+    );
+
+    return apiSuccess(result, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/doctors/[id]/status error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "DOCTOR_NOT_FOUND"
+    ) {
+      return apiError(
+        "Doctor not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update doctor status.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\doctors\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getDoctors } from "@/modules/doctors/doctor.service";
+import { createDoctor } from "@/modules/doctors/doctor.service";
+import { createDoctorSchema } from "@/modules/doctors/doctor.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+  try {
+    const { session, response } = await authorizeApiPermission("doctors:read", requestId);
+    if (!session) {
+      return response;
+    }
+
+    const doctors = await getDoctors();
+    return apiSuccess(doctors, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/doctors error`, error);
+    return apiError("Failed to fetch doctors.", 500, undefined, requestId)
+  }
+}
+
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "doctors:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const bodyResult = await readJsonBody(request);
+
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createDoctorSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid doctor data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const doctor = await createDoctor(validation.data, session.user.id);
+
+    return apiSuccess(doctor, 200);
+  }  catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === "USER_NOT_FOUND") {
+        return apiError("User not found.", 404, undefined, requestId);
+      }
+
+      if (error.message === "USER_NOT_DOCTOR") {
+        return apiError(
+          "The specified user does not have the DOCTOR role.",
+          400,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "DOCTOR_PROFILE_EXISTS") {
+        return apiError(
+          "Doctor profile already exists for this user.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "A doctor profile with this unique value already exists.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    console.error(`[${requestId}] POST /api/doctors error`, error);
+
+    return apiError(
+      "Failed to create doctor.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+
+}
+
+==================================================
+FILE: src\app\api\equipment\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { equipmentIdSchema, updateEquipmentSchema } from "@/modules/equipment/equipment.validation";
+import { getEquipmentById,updateEquipmentById } from "@/modules/equipment/equipment.service";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "equipment:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = equipmentIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid equipment ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipment = await getEquipmentById(validation.data.id);
+
+    if (!equipment) {
+      return apiError(
+        "Equipment not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/equipment/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "equipment:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = equipmentIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid equipment ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateEquipmentSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid equipment data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipment = await updateEquipmentById(
+      idValidation.data.id,
+      validation.data,
+      session.user.id
+    );
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/equipment/[id] error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "EQUIPMENT_NOT_FOUND"
+    ) {
+      return apiError(
+        "Equipment not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "Equipment with this serial number already exists.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return apiError(
+        "The specified department does not exist.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\equipment\[id]\status\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { updateEquipmentStatusById } from "@/modules/equipment/equipment.service";
+import {
+  equipmentIdSchema,
+  updateEquipmentStatusSchema,
+} from "@/modules/equipment/equipment.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "equipment:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = equipmentIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid equipment ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateEquipmentStatusSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid equipment status.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipment = await updateEquipmentStatusById(
+      idValidation.data.id,
+      validation.data.status,
+      session.user.id
+    );
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/equipment/[id]/status error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "EQUIPMENT_NOT_FOUND"
+    ) {
+      return apiError(
+        "Equipment not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error) {
+      const messages: Record<string, string> = {
+        EQUIPMENT_HAS_ACTIVE_ASSIGNMENTS:
+          "Equipment with an active schedule assignment cannot be moved out of IN_USE.",
+        EQUIPMENT_STATUS_REQUIRES_ASSIGNMENT:
+          "Equipment can only be marked IN_USE through a schedule assignment.",
+        EQUIPMENT_STATUS_CONFLICT:
+          "Equipment status changed concurrently. Refresh and retry.",
+      };
+
+      const message = messages[error.message];
+
+      if (message) {
+        return apiError(message, 409, undefined, requestId);
+      }
+    }
+
+    return apiError(
+      "Failed to update equipment status.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\equipment\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getEquipment, createEquipment } from "@/modules/equipment/equipment.service";
+import { createEquipmentSchema } from "@/modules/equipment/equipment.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "equipment:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const equipment = await getEquipment();
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/equipment error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "equipment:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createEquipmentSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid equipment data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipment = await createEquipment(validation.data,session.user.id);
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/equipment error:`,
+      error,
+    );
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "Equipment with this serial number already exists.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return apiError(
+        "The specified department does not exist.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to create equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\me\appointments\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getPatientPortalData } from "@/modules/patients/patient.service";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read:own",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const patient = await getPatientPortalData(session.user.id);
+
+    if (!patient) {
+      return apiError(
+        "No patient record is linked to this account.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+if (!patient) {
+  return apiError(
+    "No patient record is linked to this account.",
+    404,
+    undefined,
+    requestId,
+  );
+}
+
+return apiSuccess({
+  ...patient,
+  currentTime: Date.now(),
+},200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/me/appointments error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch patient appointments.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\me\schedules\route.ts
+==================================================
+
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getSchedulesForSurgeon } from "@/modules/schedules/schedule.service";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    if (session.user.role !== "DOCTOR") {
+      return apiError(
+        "Only doctor accounts can access this schedule.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    const schedules = await getSchedulesForSurgeon(session.user.id);
+
+    return apiSuccess(schedules, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/me/schedules error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch your surgical schedules.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\me\staff-schedules\route.ts
+==================================================
+
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getSchedulesForStaff } from "@/modules/schedules/schedule.service";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    if (session.user.role !== "OT_STAFF") {
+      return apiError(
+        "Only OT staff accounts can access staff assignments.",
+        403,
+        undefined,
+        requestId,
+      );
+    }
+
+    const schedules = await getSchedulesForStaff(session.user.id);
+
+    return apiSuccess(schedules, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/me/staff-schedules error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch your staff assignments.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\ot-rooms\[id]\active\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  updateOTRoomActiveById,
+} from "@/modules/ot-rooms/ot-room.service";
+import {
+  otRoomIdSchema,
+  updateOTRoomActiveSchema,
+} from "@/modules/ot-rooms/ot-room.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = otRoomIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid OT room ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateOTRoomActiveSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid OT room active state.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const otRoom = await updateOTRoomActiveById(
+      idValidation.data.id,
+      validation.data.isActive,
+      session.user.id
+    );
+
+    return apiSuccess(otRoom, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/ot-rooms/[id]/active error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "OT_ROOM_NOT_FOUND"
+    ) {
+      return apiError(
+        "OT room not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update OT room active state.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\ot-rooms\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getOTRoomById, updateOTRoomById } from "@/modules/ot-rooms/ot-room.service";
+import { otRoomIdSchema, updateOTRoomSchema } from "@/modules/ot-rooms/ot-room.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = otRoomIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid OT room ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const otRoom = await getOTRoomById(validation.data.id);
+
+    if (!otRoom) {
+      return apiError(
+        "OT room not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(otRoom, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/ot-rooms/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch OT room.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = otRoomIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid OT room ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateOTRoomSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid OT room data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const otRoom = await updateOTRoomById(
+      idValidation.data.id,
+      validation.data,
+      session.user.id
+    );
+
+    return apiSuccess(otRoom, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/ot-rooms/[id] error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "OT_ROOM_NOT_FOUND"
+    ) {
+      return apiError(
+        "OT room not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return apiError(
+        "The specified department does not exist.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update OT room.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\ot-rooms\[id]\status\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  updateOTRoomStatusById,
+} from "@/modules/ot-rooms/ot-room.service";
+import {
+  otRoomIdSchema,
+  updateOTRoomStatusSchema,
+} from "@/modules/ot-rooms/ot-room.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = otRoomIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid OT room ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updateOTRoomStatusSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid OT room status.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const otRoom = await updateOTRoomStatusById(
+      idValidation.data.id,
+      validation.data.status,
+      session.user.id
+    );
+
+    return apiSuccess(otRoom, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/ot-rooms/[id]/status error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "OT_ROOM_NOT_FOUND"
+    ) {
+      return apiError(
+        "OT room not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update OT room status.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\ot-rooms\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getOTRooms, createOTRoom } from "@/modules/ot-rooms/ot-room.service";
+import { createOTRoomSchema } from "@/modules/ot-rooms/ot-room.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const otRooms = await getOTRooms();
+
+    return apiSuccess(otRooms, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/ot-rooms error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch OT rooms.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "otRooms:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createOTRoomSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid OT room data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const otRoom = await createOTRoom(validation.data,session.user.id);
+
+    return apiSuccess(otRoom, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/ot-rooms error:`,
+      error,
+    );
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "An OT room with this code already exists.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return apiError(
+        "The specified department does not exist.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to create OT room.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\patients\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getPatientById, updatePatientById } from "@/modules/patients/patient.service";
+import { patientIdSchema, updatePatientSchema } from "@/modules/patients/patient.validation";
+
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "patients:clinical:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = patientIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid patient ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const patient = await getPatientById(validation.data.id);
+
+    if (!patient) {
+      return apiError(
+        "Patient not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(patient, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/patients/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch patient.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "patients:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = patientIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid patient ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = updatePatientSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid patient data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const patient = await updatePatientById(
+      idValidation.data.id,
+      validation.data,
+      session.user.id
+    );
+
+    return apiSuccess(patient, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/patients/[id] error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "PATIENT_NOT_FOUND"
+    ) {
+      return apiError(
+        "Patient not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update patient.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\patients\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import { getPatients } from "@/modules/patients/patient.service";
+import { createPatient } from "@/modules/patients/patient.service";
+import { createPatientSchema } from "@/modules/patients/patient.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "patients:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const patients = await getPatients();
+
+    return apiSuccess(patients, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/patients error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch patients.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "patients:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const bodyResult = await readJsonBody(request);
+
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation = createPatientSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid patient data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const patient = await createPatient(validation.data,session.user.id);
+
+    return apiSuccess(patient, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/patients error:`,
+      error,
+    );
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "Patient code or user association already exists.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to create patient.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\equipment\[equipmentId]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { releaseScheduleEquipmentById } from "@/modules/schedules/schedule.service";
+import { scheduleIdSchema } from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+    equipmentId: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:equipment:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id, equipmentId } = await params;
+
+    const scheduleValidation =
+      scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        scheduleValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipmentValidation =
+      scheduleIdSchema.safeParse({
+        id: equipmentId,
+      });
+
+    if (!equipmentValidation.success) {
+      return apiError(
+        "Invalid equipment assignment ID.",
+        400,
+        equipmentValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const assignment =
+      await releaseScheduleEquipmentById(
+        equipmentValidation.data.id,
+        scheduleValidation.data.id,
+        session.user.id
+      );
+
+    return apiSuccess(assignment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/schedules/[id]/equipment/[equipmentId] error:`,
+      error,
+    );
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return apiError(
+        "Equipment assignment not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error) {
+      if (error.message === "EQUIPMENT_ASSIGNMENT_NOT_FOUND") {
+        return apiError(
+          "Equipment assignment not found for this schedule.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "EQUIPMENT_ALREADY_RELEASED") {
+        return apiError(
+          "Equipment has already been released.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    return apiError(
+      "Failed to release schedule equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\equipment\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  canReadIndividualSchedule,
+} from "@/modules/schedules/schedule-access";
+import {
+  assignScheduleEquipmentById,
+  getScheduleEquipment,
+  isScheduleAssignedToUser,
+} from "@/modules/schedules/schedule.service";
+import {
+  assignScheduleEquipmentSchema,
+  scheduleIdSchema,
+} from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = scheduleIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
+        validation.data.id,
+        session.user.id,
+      ));
+
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError("Schedule not found.", 404, undefined, requestId);
+    }
+
+    const equipment = await getScheduleEquipment(
+      validation.data.id,
+    );
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/schedules/[id]/equipment error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "SCHEDULE_NOT_FOUND"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to fetch schedule equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:equipment:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation =
+      assignScheduleEquipmentSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid equipment assignment.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const equipment =
+      await assignScheduleEquipmentById(
+        idValidation.data.id,
+        validation.data.equipmentId,
+        session.user.id
+      );
+
+    return apiSuccess(equipment, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/schedules/[id]/equipment error:`,
+      error,
+    );
+
+    if (error instanceof Error) {
+      if (error.message === "SCHEDULE_NOT_FOUND") {
+        return apiError(
+          "Schedule not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "EQUIPMENT_NOT_FOUND") {
+        return apiError(
+          "Equipment not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "EQUIPMENT_UNAVAILABLE") {
+        return apiError(
+          "Equipment is not available.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "This equipment is already assigned to the schedule.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to assign schedule equipment.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\notes\[noteId]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import {
+  deleteScheduleNoteById,
+  updateScheduleNoteById,
+} from "@/modules/schedules/schedule.service";
+import {
+  scheduleNoteIdSchema,
+  scheduleIdSchema,
+  updateScheduleNoteSchema,
+} from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+    noteId: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:notes:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id, noteId } = await params;
+
+    const scheduleValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError("Invalid schedule ID.", 400, scheduleValidation.error.flatten(), requestId)
+    }
+
+    const idValidation = scheduleNoteIdSchema.safeParse({
+      id: noteId,
+    });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid note ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleNoteSchema.safeParse(body);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule note.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const note = await updateScheduleNoteById(
+      idValidation.data.id,
+      scheduleValidation.data.id,
+      session.user.id,
+      validation.data.content,
+    );
+
+    return apiSuccess(note, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/schedules/[id]/notes/[noteId] error:`,
+      error,
+    );
+
+    if (error instanceof Error) {
+      if (error.message === "SCHEDULE_NOTE_NOT_FOUND") {
+        return apiError(
+          "Schedule note not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "SCHEDULE_NOTE_FORBIDDEN") {
+        return apiError(
+          "You are not allowed to modify this note.",
+          403,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    return apiError(
+      "Failed to update schedule note.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:notes:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id, noteId } = await params;
+
+    const scheduleValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        scheduleValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const idValidation = scheduleNoteIdSchema.safeParse({
+      id: noteId,
+    });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid note ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const note = await deleteScheduleNoteById(
+      idValidation.data.id,
+      scheduleValidation.data.id,
+      session.user.id,
+    );
+
+    return apiSuccess(note, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] DELETE /api/schedules/[id]/notes/[noteId] error:`,
+      error,
+    );
+
+    if (error instanceof Error) {
+      if (error.message === "SCHEDULE_NOTE_NOT_FOUND") {
+        return apiError(
+          "Schedule note not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "SCHEDULE_NOTE_FORBIDDEN") {
+        return apiError(
+          "You are not allowed to delete this note.",
+          403,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    return apiError(
+      "Failed to delete schedule note.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\notes\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import {
+  createScheduleNoteById,
+  getScheduleNotes,
+} from "@/modules/schedules/schedule.service";
+import {
+  createScheduleNoteSchema,
+  scheduleIdSchema,
+} from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:notes:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = scheduleIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const notes = await getScheduleNotes(
+      validation.data.id,
+    );
+
+    return apiSuccess(notes, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/schedules/[id]/notes error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "SCHEDULE_NOT_FOUND"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to fetch schedule notes.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:notes:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = createScheduleNoteSchema.safeParse(body);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule note.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const note = await createScheduleNoteById(
+      idValidation.data.id,
+      session.user.id,
+      validation.data.content,
+    );
+
+    return apiSuccess(note, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/schedules/[id]/notes error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "SCHEDULE_NOT_FOUND"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to create schedule note.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\route.ts
+==================================================
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getScheduleById, updateScheduleWithValidation, isScheduleAssignedToUser } from "@/modules/schedules/schedule.service";
+import { scheduleIdSchema, updateScheduleSchema } from "@/modules/schedules/schedule.validation";
+import {
+  canReadIndividualSchedule,
+  redactScheduleDetailsForOT,
+} from "@/modules/schedules/schedule-access";
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = scheduleIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const schedule = await getScheduleById(
+      validation.data.id,
+    );
+
+    if (!schedule) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
+        validation.data.id,
+        session.user.id,
+      ));
+
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+    const responseSchedule =
+      session.user.role === "OT_STAFF"
+        ? redactScheduleDetailsForOT(schedule)
+        : schedule;
+
+    return apiSuccess(responseSchedule, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/schedules/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch schedule.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleSchema.safeParse(body);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const schedule = await updateScheduleWithValidation(
+      idValidation.data.id,
+      validation.data,
+      session.user.id
+    );
+
+    return apiSuccess(schedule, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/schedules/[id] error:`,
+      error,
+    );
+
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error) {
+      const messages: Record<string, string> = {
+        SCHEDULE_NOT_FOUND: "Schedule not found.",
+        SCHEDULE_IMMUTABLE:
+          "Completed or cancelled schedules cannot be updated.",
+        PATIENT_NOT_FOUND: "Patient not found.",
+        DEPARTMENT_NOT_FOUND: "Department not found.",
+        DEPARTMENT_INACTIVE: "Department is inactive.",
+        OT_ROOM_NOT_FOUND: "OT room not found.",
+        OT_ROOM_INACTIVE: "OT room is inactive.",
+        OT_ROOM_DEPARTMENT_MISMATCH:
+          "OT room does not belong to the selected department.",
+        OT_ROOM_UNAVAILABLE:
+          "OT room is currently unavailable.",
+        SURGEON_NOT_FOUND: "Surgeon not found.",
+        INVALID_SURGEON:
+          "Selected user is not a doctor.",
+        SURGEON_INACTIVE:
+          "Selected surgeon is not active.",
+        INVALID_TIME_RANGE:
+          "End time must be after start time.",
+        OT_ROOM_SCHEDULE_CONFLICT:
+          "The OT room is already scheduled during this time.",
+        SURGEON_SCHEDULE_CONFLICT:
+          "The surgeon is already scheduled during this time.",
+      };
+
+      const message = messages[error.message];
+
+      if (message) {
+        return apiError(
+          message,
+          error.message === "SCHEDULE_NOT_FOUND"
+            ? 404
+            : error.message === "SCHEDULE_IMMUTABLE" ||
+              [
+                "OT_ROOM_SCHEDULE_CONFLICT",
+                "SURGEON_SCHEDULE_CONFLICT",
+              ].includes(error.message)
+              ? 409
+              : 400,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "PATIENT_SCHEDULE_CONFLICT"
+    ) {
+      return apiError(
+        "This patient already has a procedure scheduled during the selected time.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to update schedule.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\staff\[staffId]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { removeScheduleStaffById } from "@/modules/schedules/schedule.service";
+import { scheduleIdSchema } from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+    staffId: string;
+  }>;
+};
+
+export async function DELETE(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:staff:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id, staffId } = await params;
+
+    const scheduleValidation =
+      scheduleIdSchema.safeParse({ id });
+
+    if (!scheduleValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        scheduleValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const staffValidation =
+      scheduleIdSchema.safeParse({ id: staffId });
+
+    if (!staffValidation.success) {
+      return apiError(
+        "Invalid staff assignment ID.",
+        400,
+        staffValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const staff = await removeScheduleStaffById(
+      staffValidation.data.id,
+      scheduleValidation.data.id,
+      session.user.id
+    );
+
+    return apiSuccess(staff, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] DELETE /api/schedules/[id]/staff/[staffId] error:`,
+      error,
+    );
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return apiError(
+        "Staff assignment not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to remove schedule staff.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\staff\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { readJsonBody } from "@/lib/api/validation";
+import {
+  canReadIndividualSchedule,
+} from "@/modules/schedules/schedule-access";
+import {
+  assignScheduleStaffById,
+  getScheduleStaff,
+  isScheduleAssignedToUser,
+} from "@/modules/schedules/schedule.service";
+import {
+  assignScheduleStaffSchema,
+  scheduleIdSchema,
+} from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const isAssigned =
+      session.user.role === "OT_STAFF" &&
+      (await isScheduleAssignedToUser(
+        idValidation.data.id,
+        session.user.id,
+      ));
+
+    if (!canReadIndividualSchedule(session.user.role, isAssigned)) {
+      return apiError("Schedule not found.", 404, undefined, requestId);
+    }
+
+    const staff = await getScheduleStaff(
+      idValidation.data.id,
+    );
+
+    return apiSuccess(staff, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/schedules/[id]/staff error:`,
+      error,
+    );
+
+    if (
+      error instanceof Error &&
+      error.message === "SCHEDULE_NOT_FOUND"
+    ) {
+      return apiError(
+        "Schedule not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to fetch schedule staff.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:staff:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const bodyResult = await readJsonBody(request);
+    if (!bodyResult.success) {
+      return apiError("Invalid JSON request body.", 400, undefined, requestId);
+    }
+
+    const validation =
+      assignScheduleStaffSchema.safeParse(bodyResult.data);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid staff assignment.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const staff = await assignScheduleStaffById(
+      idValidation.data.id,
+      validation.data,
+      session.user.id
+    );
+
+    return apiSuccess(staff, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/schedules/[id]/staff error:`,
+      error,
+    );
+
+    if (error instanceof Error) {
+      if (error.message === "SCHEDULE_NOT_FOUND") {
+        return apiError(
+          "Schedule not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "STAFF_USER_NOT_FOUND") {
+        return apiError(
+          "Staff user not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "STAFF_USER_INACTIVE") {
+        return apiError(
+          "Staff user is inactive.",
+          400,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return apiError(
+        "This user is already assigned to the schedule with this role.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error && error.message === "STAFF_ROLE_MISMATCH") {
+      return apiError(
+        "User account role is incompatible with the requested staff role.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to assign schedule staff.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\[id]\status\route.ts
+==================================================
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import {
+  updateScheduleStatusById,
+} from "@/modules/schedules/schedule.service";
+import {
+  scheduleIdSchema,
+  updateScheduleStatusSchema,
+} from "@/modules/schedules/schedule.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PATCH(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const idValidation = scheduleIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid schedule ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+
+    const validation = updateScheduleStatusSchema.safeParse(body);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule status.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const schedule = await updateScheduleStatusById(
+      idValidation.data.id,
+      validation.data.status,
+      session.user.id
+    );
+
+    return apiSuccess(schedule, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] PATCH /api/schedules/[id]/status error:`,
+      error,
+    );
+
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error) {
+      if (error.message === "SCHEDULE_NOT_FOUND") {
+        return apiError(
+          "Schedule not found.",
+          404,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (
+        error.message === "INVALID_STATUS_TRANSITION"
+      ) {
+        return apiError(
+          "Invalid schedule status transition.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+
+      if (error.message === "SCHEDULE_STATUS_CONFLICT") {
+        return apiError(
+          "Schedule status changed concurrently. Refresh and retry.",
+          409,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    return apiError(
+      "Failed to update schedule status.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\schedules\route.ts
+==================================================
+import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getSchedules, createScheduleWithValidation } from "@/modules/schedules/schedule.service";
+import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
+import { redactScheduleClinicalNotes } from "@/modules/schedules/schedule-access";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const schedules = await getSchedules();
+
+    const responseSchedules =
+      session.user.role === "OT_STAFF"
+        ? schedules.map(redactScheduleClinicalNotes)
+        : schedules;
+
+    return apiSuccess(responseSchedules, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/schedules error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch schedules.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "schedules:create",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "Invalid JSON request body.",
+        400,
+        undefined,
+        requestId,
+      );
+    }
+    const validation = createScheduleSchema.safeParse(body);
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid schedule data.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const schedule = await createScheduleWithValidation({
+      ...validation.data,
+      createdById: session.user.id,
+    },
+      session.user.id
+    );
+
+    return apiSuccess(schedule, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] POST /api/schedules error:`,
+      error,
+    );
+
+    const conflictMessage = getScheduleConstraintConflictMessage(error);
+
+    if (conflictMessage) {
+      return apiError(
+        conflictMessage,
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    if (error instanceof Error) {
+      const messages: Record<string, string> = {
+        PATIENT_NOT_FOUND: "Patient not found.",
+        DEPARTMENT_NOT_FOUND: "Department not found.",
+        DEPARTMENT_INACTIVE: "Department is inactive.",
+        OT_ROOM_NOT_FOUND: "OT room not found.",
+        OT_ROOM_INACTIVE: "OT room is inactive.",
+        OT_ROOM_DEPARTMENT_MISMATCH:
+          "OT room does not belong to the selected department.",
+        OT_ROOM_MAINTENANCE:
+          "OT room is currently under maintenance.",
+        OT_ROOM_DISABLED:
+          "OT room is disabled.",
+        SURGEON_NOT_FOUND: "Surgeon not found.",
+        INVALID_SURGEON:
+          "Selected user is not a doctor.",
+        SURGEON_INACTIVE:
+          "Selected surgeon is not active.",
+        OT_ROOM_SCHEDULE_CONFLICT:
+          "The selected OT room is already scheduled during this time.",
+        SURGEON_SCHEDULE_CONFLICT:
+          "The selected surgeon is already scheduled during this time.",
+        INVALID_TIME_RANGE:
+          "End time must be later than start time.",
+      };
+
+      const message = messages[error.message];
+
+      if (message) {
+        return apiError(
+          message,
+          [
+            "OT_ROOM_SCHEDULE_CONFLICT",
+            "SURGEON_SCHEDULE_CONFLICT",
+          ].includes(error.message)
+            ? 409
+            : 400,
+          undefined,
+          requestId,
+        );
+      }
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "PATIENT_SCHEDULE_CONFLICT"
+    ) {
+      return apiError(
+        "This patient already has a procedure scheduled during the selected time.",
+        409,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiError(
+      "Failed to create schedule.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\users\[id]\approve\route.ts
+==================================================
+
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getRequestId } from "@/lib/api/request-id";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { approvePatient } from "@/modules/users/user.service";
+import { userIdSchema } from "@/modules/users/user.validation";
+
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
+export async function POST(
+  request: Request,
+  context: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "users:manage",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await context.params;
+
+    const idValidation = userIdSchema.safeParse({ id });
+
+    if (!idValidation.success) {
+      return apiError(
+        "Invalid user ID.",
+        400,
+        idValidation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const patient = await approvePatient(
+      idValidation.data.id,
+      session.user.id,
+    );
+
+    return apiSuccess(patient, 200);
+  } catch (error) {
+    if (error instanceof Error) {
+      switch (error.message) {
+        case "USER_NOT_FOUND":
+          return apiError("User not found.", 404, undefined, requestId);
+        case "USER_NOT_PATIENT":
+          return apiError("Only patient accounts can be approved.", 409, undefined, requestId);
+        case "USER_NOT_PENDING":
+          return apiError("This account is not pending approval.", 409, undefined, requestId);
+        case "EMAIL_NOT_VERIFIED":
+          return apiError("The patient must verify their email before approval.", 409, undefined, requestId);
+      }
+    }
+
+    console.error(`[${requestId}] POST /api/users/${"approve"} error:`, error);
+
+    return apiError(
+      "Failed to approve patient.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+
+==================================================
+FILE: src\app\api\users\[id]\route.ts
+==================================================
+import { authorizeApiPermission } from "@/lib/api/auth";
+import { getRequestId } from "@/lib/api/request-id";
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getUserById } from "@/modules/users/user.service";
+import { userIdSchema } from "@/modules/users/user.validation";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: Request,
+  { params }: RouteContext,
+) {
+  const requestId = getRequestId(request);
+
+  try {
+    const { session, response } = await authorizeApiPermission(
+      "users:read",
+      requestId,
+    );
+
+    if (!session) {
+      return response;
+    }
+
+    const { id } = await params;
+
+    const validation = userIdSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return apiError(
+        "Invalid user ID.",
+        400,
+        validation.error.flatten(),
+        requestId,
+      );
+    }
+
+    const user = await getUserById(validation.data.id);
+
+    if (!user) {
+      return apiError(
+        "User not found.",
+        404,
+        undefined,
+        requestId,
+      );
+    }
+
+    return apiSuccess(user, 200);
+  } catch (error) {
+    console.error(
+      `[${requestId}] GET /api/users/[id] error:`,
+      error,
+    );
+
+    return apiError(
+      "Failed to fetch user.",
+      500,
+      undefined,
+      requestId,
+    );
+  }
+}
+
+==================================================
+FILE: src\app\api\users\route.ts
+==================================================
+import { apiError, apiSuccess } from "@/lib/api/response";
+import { getRequestId } from "@/lib/api/request-id";
+import { authorizeApiPermission } from "@/lib/api/auth";
+import {createUser ,getUsers } from "@/modules/users/user.service";
+import { createUserSchema } from "@/modules/users/user.validation";
+
+export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+  try {
+    const { session, response } = await authorizeApiPermission("users:read",requestId);
+    if (!session) {
+      return response;
+    }
+
+    const users = await getUsers();
+    return apiSuccess(users, 200);
+  } catch (error) {
+    console.error(`[${requestId}] GET /api/users error:`, error);
+    return apiError("Failed to fetch users.", 500, undefined, requestId)
+  }
+}
+
+export async function POST(request: Request) {
+    const requestId = getRequestId(request);
+
+    try {
+        const { session, response } = await authorizeApiPermission(
+            "users:manage",
+            requestId,
+        );
+
+        if (!session) {
+            return response;
+        }
+
+        let body: unknown;
+
+        try {
+            body = await request.json();
+        } catch {
+            return apiError(
+                "Invalid JSON request body.",
+                400,
+                undefined,
+                requestId,
+            );
+        }
+
+        const validation = createUserSchema.safeParse(body);
+
+        if (!validation.success) {
+            return apiError(
+                "Invalid user data.",
+                400,
+                validation.error.flatten(),
+                requestId,
+            );
+        }
+
+        const user = await createUser(
+            validation.data,
+            session.user.id,
+        );
+
+        return apiSuccess(user, 200);
+    } catch (error) {
+        if (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === "P2002"
+        ) {
+            return apiError(
+                "A user with this email already exists.",
+                409,
+                undefined,
+                requestId,
+            );
+        }
+
+        console.error(`[${requestId}] POST /api/users error:`, error);
+
+        return apiError(
+            "Failed to create user.",
+            500,
+            undefined,
+            requestId,
+        );
+    }
+}
+

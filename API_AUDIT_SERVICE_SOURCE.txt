@@ -1,0 +1,3318 @@
+==================================================
+FILE: src\modules\schedules\schedule-access.ts
+==================================================
+import type { ScheduleStatus, UserRole } from "@/generated/prisma/client";
+
+const ALLOWED_STATUS_TRANSITIONS = {
+  SCHEDULED: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["IN_PROGRESS", "DELAYED", "CANCELLED"],
+  IN_PROGRESS: ["COMPLETED", "DELAYED"],
+  DELAYED: ["CONFIRMED", "IN_PROGRESS", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+} satisfies Record<ScheduleStatus, readonly ScheduleStatus[]>;
+
+export function isScheduleStatusTransitionAllowed(
+  currentStatus: ScheduleStatus,
+  nextStatus: ScheduleStatus,
+) {
+  return ALLOWED_STATUS_TRANSITIONS[currentStatus].some(
+    (status) => status === nextStatus,
+  );
+}
+
+export function canReadIndividualSchedule(
+  role: UserRole,
+  isAssignedToUser: boolean,
+) {
+  return role !== "OT_STAFF" || isAssignedToUser;
+}
+
+export function redactScheduleClinicalNotes<
+  T extends { clinicalNotes: unknown },
+>(schedule: T) {
+  return {
+    ...schedule,
+    clinicalNotes: null,
+  };
+}
+
+export function redactScheduleDetailsForOT<
+  T extends {
+    clinicalNotes: unknown;
+    notes: unknown;
+    patient: {
+      email: unknown;
+      dateOfBirth: unknown;
+      gender: unknown;
+    };
+  },
+>(schedule: T) {
+  return {
+    ...schedule,
+    clinicalNotes: null,
+    notes: [],
+    patient: {
+      ...schedule.patient,
+      email: null,
+      dateOfBirth: null,
+      gender: null,
+    },
+  };
+}
+
+
+==================================================
+FILE: src\modules\schedules\schedule.service.ts
+==================================================
+import {
+  createSchedule as createScheduleRecord,
+  findScheduleById,
+  findSchedules,
+  findSchedulesForSurgeon,
+  updateSchedule as updateScheduleRecord,
+  updateScheduleStatus as updateScheduleStatusRecord,
+  findOTRoomForSchedule,
+  findPatientById,
+  findDepartmentById,
+  findSurgeonById,
+  findScheduleConflicts,
+  createScheduleStaff,
+  deleteScheduleStaff,
+  findScheduleStaff,
+  findSchedulesForStaff,
+  findUserForStaffAssignment,
+  createScheduleEquipment,
+  findEquipmentForAssignment,
+  findScheduleEquipment,
+  releaseScheduleEquipment,
+  createScheduleNote,
+  deleteScheduleNote,
+  findScheduleNoteById,
+  findScheduleNotes,
+  updateScheduleNote,
+  isUserAssignedToSchedule
+} from "./schedule.repository";
+import { recordAudit } from "@/modules/audit/audit.service";
+import { isScheduleStatusTransitionAllowed } from "./schedule-access";
+
+export async function getSchedules() {
+  return findSchedules();
+}
+
+export async function getSchedulesForSurgeon(userId: string) {
+  return findSchedulesForSurgeon(userId);
+}
+
+export async function getSchedulesForStaff(userId: string) {
+  return findSchedulesForStaff(userId);
+}
+
+export async function getScheduleById(id: string) {
+  return findScheduleById(id);
+}
+
+export async function createSchedule(data: {
+  patientId: string;
+  departmentId: string;
+  otRoomId: string;
+  surgeonId: string;
+  createdById: string;
+  procedure: string;
+  scheduledDate: Date;
+  startTime: Date;
+  endTime: Date;
+  priority?:
+  | "ELECTIVE"
+  | "URGENT"
+  | "EMERGENCY";
+  clinicalNotes?: string;
+}) {
+  return createScheduleRecord(data);
+}
+
+export async function updateScheduleById(
+  id: string,
+  data: {
+    patientId?: string;
+    departmentId?: string;
+    otRoomId?: string;
+    surgeonId?: string;
+    procedure?: string;
+    scheduledDate?: Date;
+    startTime?: Date;
+    endTime?: Date;
+    priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+    clinicalNotes?: string | null;
+  },
+) {
+  const existingSchedule = await findScheduleById(id);
+
+  if (!existingSchedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return updateScheduleRecord(id, data);
+}
+
+export async function updateScheduleStatusById(
+  id: string,
+  status:
+    | "SCHEDULED"
+    | "CONFIRMED"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "DELAYED",
+  actorUserId?: string
+) {
+  const existingSchedule = await findScheduleById(id);
+
+  if (!existingSchedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const currentStatus = existingSchedule.status;
+
+  if (!isScheduleStatusTransitionAllowed(currentStatus, status)) {
+    throw new Error("INVALID_STATUS_TRANSITION");
+  }
+
+  const schedule = await updateScheduleStatusRecord(
+    id,
+    status,
+    currentStatus,
+    actorUserId,
+  );
+
+  // The repository updates the status and writes its audit record
+  // within the same transaction.
+  return schedule;
+}
+
+export async function createScheduleWithValidation(
+  data: {
+    patientId: string;
+    departmentId: string;
+    otRoomId: string;
+    surgeonId: string;
+    createdById: string;
+    procedure: string;
+    scheduledDate: Date;
+    startTime: Date;
+    endTime: Date;
+    priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+    clinicalNotes?: string;
+  },
+  actorUserId?: string
+) {
+  const patient = await findPatientById(data.patientId);
+
+  if (!patient) {
+    throw new Error("PATIENT_NOT_FOUND");
+  }
+
+  const department = await findDepartmentById(
+    data.departmentId,
+  );
+
+  if (!department) {
+    throw new Error("DEPARTMENT_NOT_FOUND");
+  }
+
+  if (!department.isActive) {
+    throw new Error("DEPARTMENT_INACTIVE");
+  }
+
+  const otRoom = await findOTRoomForSchedule(
+    data.otRoomId,
+  );
+
+  if (!otRoom) {
+    throw new Error("OT_ROOM_NOT_FOUND");
+  }
+
+  if (!otRoom.isActive) {
+    throw new Error("OT_ROOM_INACTIVE");
+  }
+
+  if (otRoom.departmentId !== data.departmentId) {
+    throw new Error("OT_ROOM_DEPARTMENT_MISMATCH");
+  }
+
+  if (otRoom.status === "MAINTENANCE") {
+    throw new Error("OT_ROOM_MAINTENANCE");
+  }
+
+  if (otRoom.status === "DISABLED") {
+    throw new Error("OT_ROOM_DISABLED");
+  }
+
+  const surgeon = await findSurgeonById(
+    data.surgeonId,
+  );
+
+  if (!surgeon) {
+    throw new Error("SURGEON_NOT_FOUND");
+  }
+
+  if (surgeon.role !== "DOCTOR") {
+    throw new Error("INVALID_SURGEON");
+  }
+
+  if (surgeon.status !== "ACTIVE") {
+    throw new Error("SURGEON_INACTIVE");
+  }
+
+  if (data.endTime <= data.startTime) {
+    throw new Error("INVALID_TIME_RANGE");
+  }
+
+  const conflicts = await findScheduleConflicts({
+    patientId: data.patientId,
+    otRoomId: data.otRoomId,
+    surgeonId: data.surgeonId,
+    startTime: data.startTime,
+    endTime: data.endTime,
+  });
+
+  if (conflicts.length > 0) {
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === data.otRoomId,
+    );
+
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === data.surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
+
+    const patientConflict = conflicts.some(
+      (conflict) => conflict.patientId === data.patientId,
+    );
+
+    if (patientConflict) {
+      throw new Error("PATIENT_SCHEDULE_CONFLICT");
+    }
+  }
+  const schedule = await createScheduleRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Schedule",
+    entityId: schedule.id,
+    description: `Schedule for procedure "${schedule.procedure}" was created.`,
+    metadata: {
+      patientId: schedule.patientId,
+      departmentId: schedule.departmentId,
+      otRoomId: schedule.otRoomId,
+      surgeonId: schedule.surgeonId,
+      priority: schedule.priority,
+    },
+  });
+
+  return schedule;
+}
+
+export async function updateScheduleWithValidation(
+  id: string,
+  data: {
+    patientId?: string;
+    departmentId?: string;
+    otRoomId?: string;
+    surgeonId?: string;
+    procedure?: string;
+    scheduledDate?: Date;
+    startTime?: Date;
+    endTime?: Date;
+    priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+    clinicalNotes?: string | null;
+  },
+  actorUserId?: string
+) {
+  const existingSchedule = await findScheduleById(id);
+
+  if (!existingSchedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  if (
+    existingSchedule.status === "COMPLETED" ||
+    existingSchedule.status === "CANCELLED"
+  ) {
+    throw new Error("SCHEDULE_IMMUTABLE");
+  }
+
+  const patientId =
+    data.patientId ?? existingSchedule.patientId;
+
+  const departmentId =
+    data.departmentId ?? existingSchedule.departmentId;
+
+  const otRoomId =
+    data.otRoomId ?? existingSchedule.otRoomId;
+
+  const surgeonId =
+    data.surgeonId ?? existingSchedule.surgeonId;
+
+  const startTime =
+    data.startTime ?? existingSchedule.startTime;
+
+  const endTime =
+    data.endTime ?? existingSchedule.endTime;
+
+  const patient = await findPatientById(patientId);
+
+  if (!patient) {
+    throw new Error("PATIENT_NOT_FOUND");
+  }
+
+  const department = await findDepartmentById(departmentId);
+
+  if (!department) {
+    throw new Error("DEPARTMENT_NOT_FOUND");
+  }
+
+  if (!department.isActive) {
+    throw new Error("DEPARTMENT_INACTIVE");
+  }
+
+  const otRoom = await findOTRoomForSchedule(otRoomId);
+
+  if (!otRoom) {
+    throw new Error("OT_ROOM_NOT_FOUND");
+  }
+
+  if (!otRoom.isActive) {
+    throw new Error("OT_ROOM_INACTIVE");
+  }
+
+  if (otRoom.departmentId !== departmentId) {
+    throw new Error("OT_ROOM_DEPARTMENT_MISMATCH");
+  }
+
+  if (
+    otRoom.status === "MAINTENANCE" ||
+    otRoom.status === "DISABLED"
+  ) {
+    throw new Error("OT_ROOM_UNAVAILABLE");
+  }
+
+  const surgeon = await findSurgeonById(surgeonId);
+
+  if (!surgeon) {
+    throw new Error("SURGEON_NOT_FOUND");
+  }
+
+  if (surgeon.role !== "DOCTOR") {
+    throw new Error("INVALID_SURGEON");
+  }
+
+  if (surgeon.status !== "ACTIVE") {
+    throw new Error("SURGEON_INACTIVE");
+  }
+
+  if (endTime <= startTime) {
+    throw new Error("INVALID_TIME_RANGE");
+  }
+
+  const conflicts = await findScheduleConflicts({
+    patientId,
+    otRoomId,
+    surgeonId,
+    startTime,
+    endTime,
+    excludeScheduleId: id,
+  });
+
+  if (conflicts.length > 0) {
+    const roomConflict = conflicts.some(
+      (conflict) => conflict.otRoomId === otRoomId,
+    );
+
+    if (roomConflict) {
+      throw new Error("OT_ROOM_SCHEDULE_CONFLICT");
+    }
+
+    const surgeonConflict = conflicts.some(
+      (conflict) => conflict.surgeonId === surgeonId,
+    );
+
+    if (surgeonConflict) {
+      throw new Error("SURGEON_SCHEDULE_CONFLICT");
+    }
+  }
+
+  const patientConflict = conflicts.some(
+    (conflict) => conflict.patientId === patientId,
+  );
+
+  if (patientConflict) {
+    throw new Error("PATIENT_SCHEDULE_CONFLICT");
+  }
+
+  return updateScheduleRecord(id, data, actorUserId);
+}
+
+export async function getScheduleStaff(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleStaff(scheduleId);
+}
+
+export async function assignScheduleStaffById(
+  scheduleId: string,
+  data: {
+    userId: string;
+    role:
+    | "SURGEON"
+    | "NURSE"
+    | "ANESTHETIST"
+    | "TECHNICIAN"
+    | "OTHER";
+  },
+  actorUserId?: string
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const user = await findUserForStaffAssignment(
+    data.userId,
+  );
+
+  if (!user) {
+    throw new Error("STAFF_USER_NOT_FOUND");
+  }
+
+  if (user.status !== "ACTIVE") {
+    throw new Error("STAFF_USER_INACTIVE");
+  }
+
+  const doctorRoles = ["SURGEON", "ANESTHETIST"] as const;
+
+  if (doctorRoles.includes(data.role as (typeof doctorRoles)[number])) {
+    if (user.role !== "DOCTOR" || !user.doctorProfile) {
+      throw new Error("STAFF_ROLE_MISMATCH");
+    }
+  } else if (user.role !== "OT_STAFF") {
+    throw new Error("STAFF_ROLE_MISMATCH");
+  }
+
+  // The repository creates the assignment and its audit record
+  // within the same transaction.
+  return createScheduleStaff(
+    {
+      scheduleId,
+      userId: data.userId,
+      role: data.role,
+    },
+    actorUserId,
+  );
+}
+
+export async function removeScheduleStaffById(
+  scheduleStaffId: string,
+  scheduleId: string,
+  actorUserId?: string,
+) {
+  return deleteScheduleStaff(
+    scheduleStaffId,
+    scheduleId,
+    actorUserId,
+  );
+}
+
+export async function getScheduleEquipment(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleEquipment(scheduleId);
+}
+
+export async function assignScheduleEquipmentById(
+  scheduleId: string,
+  equipmentId: string,
+  actorUserId?: string
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  const equipment = await findEquipmentForAssignment(
+    equipmentId,
+  );
+
+  if (!equipment) {
+    throw new Error("EQUIPMENT_NOT_FOUND");
+  }
+
+  if (equipment.status !== "AVAILABLE") {
+    throw new Error("EQUIPMENT_UNAVAILABLE");
+  }
+
+  // The repository creates the assignment and audit record atomically.
+  return createScheduleEquipment(
+    { scheduleId, equipmentId },
+    actorUserId,
+  );
+}
+
+export async function releaseScheduleEquipmentById(
+  equipmentAssignmentId: string,
+  scheduleId: string,
+  actorUserId?: string,
+) {
+  // The repository releases the assignment and writes its audit record atomically.
+  return releaseScheduleEquipment(
+    equipmentAssignmentId,
+    scheduleId,
+    actorUserId,
+  );
+}
+
+export async function getScheduleNotes(
+  scheduleId: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  return findScheduleNotes(scheduleId);
+}
+
+export async function createScheduleNoteById(
+  scheduleId: string,
+  authorId: string,
+  content: string,
+) {
+  const schedule = await findScheduleById(scheduleId);
+
+  if (!schedule) {
+    throw new Error("SCHEDULE_NOT_FOUND");
+  }
+
+  // The repository creates the note and its audit record atomically.
+  return createScheduleNote({ scheduleId, authorId, content });
+}
+
+
+export async function updateScheduleNoteById(
+  noteId: string,
+  scheduleId: string,
+  authorId: string,
+  content: string,
+) {
+  const note = await findScheduleNoteById(noteId);
+
+  if (!note || note.scheduleId !== scheduleId) {
+    throw new Error("SCHEDULE_NOTE_NOT_FOUND");
+  }
+
+  if (note.authorId !== authorId) {
+    throw new Error("SCHEDULE_NOTE_FORBIDDEN");
+  }
+
+  // The repository updates the note and writes its audit record atomically.
+  return updateScheduleNote(noteId, content, authorId);
+}
+
+export async function deleteScheduleNoteById(
+  noteId: string,
+  scheduleId: string,
+  authorId: string,
+) {
+  const note = await findScheduleNoteById(noteId);
+
+  if (!note || note.scheduleId !== scheduleId) {
+    throw new Error("SCHEDULE_NOTE_NOT_FOUND");
+  }
+
+  if (note.authorId !== authorId) {
+    throw new Error("SCHEDULE_NOTE_FORBIDDEN");
+  }
+
+  // The repository deletes the note and writes its audit record atomically.
+  return deleteScheduleNote(noteId, authorId);
+}
+
+export async function isScheduleAssignedToUser(
+  scheduleId: string,
+  userId: string,
+) {
+  return isUserAssignedToSchedule(scheduleId, userId);
+}
+
+==================================================
+FILE: src\modules\schedules\schedule.repository.ts
+==================================================
+import { prisma } from "@/lib/db/prisma";
+import { createAuditLog } from "../audit/audit.repository";
+
+export async function findSchedules() {
+  return prisma.schedule.findMany({
+    orderBy: {
+      scheduledDate: "desc",
+    },
+    select: {
+      id: true,
+      patientId: true,
+      departmentId: true,
+      otRoomId: true,
+      surgeonId: true,
+      createdById: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      clinicalNotes: true,
+      createdAt: true,
+      updatedAt: true,
+
+      patient: {
+        select: {
+          id: true,
+          patientCode: true,
+          name: true,
+          phone: true,
+        },
+      },
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      otRoom: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          status: true,
+        },
+      },
+
+      surgeon: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findSchedulesForSurgeon(userId: string) {
+  return prisma.schedule.findMany({
+    where: {
+      surgeonId: userId,
+    },
+    orderBy: [
+      { scheduledDate: "asc" },
+      { startTime: "asc" },
+    ],
+    select: {
+      id: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      patient: {
+        select: {
+          name: true,
+          patientCode: true,
+        },
+      },
+      department: {
+        select: {
+          name: true,
+        },
+      },
+      otRoom: {
+        select: {
+          name: true,
+          code: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findScheduleById(id: string) {
+  return prisma.schedule.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      patientId: true,
+      departmentId: true,
+      otRoomId: true,
+      surgeonId: true,
+      createdById: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      clinicalNotes: true,
+      createdAt: true,
+      updatedAt: true,
+
+      patient: {
+        select: {
+          id: true,
+          patientCode: true,
+          name: true,
+          email: true,
+          phone: true,
+          dateOfBirth: true,
+          gender: true,
+        },
+      },
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      otRoom: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          capacity: true,
+          status: true,
+          isActive: true,
+        },
+      },
+
+      surgeon: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      staff: {
+        select: {
+          id: true,
+          userId: true,
+          role: true,
+          assignedAt: true,
+
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+
+      equipment: {
+        select: {
+          id: true,
+          equipmentId: true,
+          assignedAt: true,
+          releasedAt: true,
+
+          equipment: {
+            select: {
+              id: true,
+              name: true,
+              category: true,
+              serialNumber: true,
+              status: true,
+            },
+          },
+        },
+      },
+
+      notes: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          authorId: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function createSchedule(data: {
+  patientId: string;
+  departmentId: string;
+  otRoomId: string;
+  surgeonId: string;
+  createdById: string;
+  procedure: string;
+  scheduledDate: Date;
+  startTime: Date;
+  endTime: Date;
+  priority?:
+  | "ELECTIVE"
+  | "URGENT"
+  | "EMERGENCY";
+  clinicalNotes?: string;
+}) {
+  return prisma.schedule.create({
+    data,
+    select: {
+      id: true,
+      patientId: true,
+      departmentId: true,
+      otRoomId: true,
+      surgeonId: true,
+      createdById: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      clinicalNotes: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function updateSchedule(
+  id: string,
+  data: {
+    patientId?: string;
+    departmentId?: string;
+    otRoomId?: string;
+    surgeonId?: string;
+    procedure?: string;
+    scheduledDate?: Date;
+    startTime?: Date;
+    endTime?: Date;
+    priority?:
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
+    clinicalNotes?: string | null;
+  },
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const schedule = await tx.schedule.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        patientId: true,
+        departmentId: true,
+        otRoomId: true,
+        surgeonId: true,
+        createdById: true,
+        procedure: true,
+        scheduledDate: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        priority: true,
+        clinicalNotes: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "UPDATE",
+        entity: "Schedule",
+        entityId: schedule.id,
+        description: `Schedule for procedure "${schedule.procedure}" was updated.`,
+        metadata: {
+          scheduleId: schedule.id,
+        },
+      },
+      tx,
+    );
+
+    return schedule;
+  });
+}
+
+export async function updateScheduleStatus(
+  id: string,
+  status:
+    | "SCHEDULED"
+    | "CONFIRMED"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "DELAYED",
+  expectedStatus:
+    | "SCHEDULED"
+    | "CONFIRMED"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "DELAYED",
+  actorUserId?: string
+) {
+  return prisma.$transaction(async (tx) => {
+    const update = await tx.schedule.updateMany({
+      where: {
+        id,
+        status: expectedStatus,
+      },
+      data: {
+        status,
+      },
+    });
+
+    if (update.count !== 1) {
+      const schedule = await tx.schedule.findUnique({
+        where: { id },
+        select: { id: true },
+      });
+
+      throw new Error(
+        schedule ? "SCHEDULE_STATUS_CONFLICT" : "SCHEDULE_NOT_FOUND",
+      );
+    }
+
+    const schedule = await tx.schedule.findUniqueOrThrow({
+      where: { id },
+      select: {
+        id: true,
+        procedure: true,
+        scheduledDate: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        priority: true,
+        updatedAt: true,
+      },
+    });
+
+    const auditAction =
+      status === "COMPLETED"
+        ? "COMPLETE"
+        : status === "CANCELLED"
+          ? "CANCEL"
+          : "UPDATE";
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: auditAction,
+        entity: "Schedule",
+        entityId: schedule.id,
+        description: `Schedule status changed to ${status}.`,
+        metadata: { status },
+      },
+      tx,
+    );
+
+    return schedule;
+  });
+}
+
+export async function findPatientById(id: string) {
+  return prisma.patient.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+}
+
+export async function findDepartmentById(id: string) {
+  return prisma.department.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      isActive: true,
+    },
+  });
+}
+
+export async function findOTRoomForSchedule(id: string) {
+  return prisma.oTRoom.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      departmentId: true,
+      status: true,
+      isActive: true,
+    },
+  });
+}
+
+export async function findSurgeonById(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+    },
+  });
+}
+
+export async function findScheduleConflicts(data: {
+  patientId: string;
+  otRoomId: string;
+  surgeonId: string;
+  startTime: Date;
+  endTime: Date;
+  excludeScheduleId?: string;
+}) {
+  return prisma.schedule.findMany({
+    where: {
+      id: data.excludeScheduleId
+        ? { not: data.excludeScheduleId }
+        : undefined,
+
+      status: {
+        notIn: ["CANCELLED", "COMPLETED"],
+      },
+
+      startTime: {
+        lt: data.endTime,
+      },
+
+      endTime: {
+        gt: data.startTime,
+      },
+
+      OR: [
+        {
+          otRoomId: data.otRoomId,
+        },
+        {
+          surgeonId: data.surgeonId,
+        },
+        {
+          patientId: data.patientId,
+        }
+      ],
+    },
+
+    select: {
+      id: true,
+      otRoomId: true,
+      surgeonId: true,
+      patientId: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+    },
+  });
+}
+
+
+export async function findSchedulesForStaff(userId: string) {
+  return prisma.scheduleStaff.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      role: true,
+      assignedAt: true,
+      schedule: {
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          startTime: true,
+          endTime: true,
+          status: true,
+          priority: true,
+          patient: {
+            select: {
+              name: true,
+              patientCode: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          otRoom: {
+            select: {
+              name: true,
+              code: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+
+export async function findScheduleStaff(
+  scheduleId: string,
+) {
+  return prisma.scheduleStaff.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      userId: true,
+      role: true,
+      assignedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+
+export async function isUserAssignedToSchedule(
+  scheduleId: string,
+  userId: string,
+) {
+  const assignment = await prisma.scheduleStaff.findFirst({
+    where: {
+      scheduleId,
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return assignment !== null;
+}
+
+export async function findUserForStaffAssignment(
+  userId: string,
+) {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      doctorProfile: {
+        select: {
+          id: true,
+          specialization: true,
+          licenseNumber: true,
+        }
+      }
+    },
+  });
+}
+
+export async function createScheduleStaff(
+  data: {
+    scheduleId: string;
+    userId: string;
+    role:
+      | "SURGEON"
+      | "NURSE"
+      | "ANESTHETIST"
+      | "TECHNICIAN"
+      | "OTHER";
+  },
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const staff = await tx.scheduleStaff.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        userId: true,
+        role: true,
+        assignedAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "CREATE",
+        entity: "ScheduleStaff",
+        entityId: staff.id,
+        description: `Staff member was assigned to schedule ${data.scheduleId}.`,
+        metadata: {
+          scheduleId: data.scheduleId,
+          staffUserId: data.userId,
+          role: data.role,
+        },
+      },
+      tx,
+    );
+
+    return staff;
+  });
+}
+
+export async function deleteScheduleStaff(
+  id: string,
+  scheduleId: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const staff = await tx.scheduleStaff.delete({
+      where: {
+        id,
+        scheduleId,
+      },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "DELETE",
+        entity: "ScheduleStaff",
+        entityId: staff.id,
+        description: "Staff member was removed from a schedule.",
+        metadata: {
+          scheduleId: staff.scheduleId,
+          staffUserId: staff.userId,
+          role: staff.role,
+        },
+      },
+      tx,
+    );
+
+    return staff;
+  });
+}
+
+export async function findScheduleEquipment(
+  scheduleId: string,
+) {
+  return prisma.scheduleEquipment.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      assignedAt: "asc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      equipmentId: true,
+      assignedAt: true,
+      releasedAt: true,
+
+      equipment: {
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          serialNumber: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findEquipmentForAssignment(
+  equipmentId: string,
+) {
+  return prisma.equipment.findUnique({
+    where: {
+      id: equipmentId,
+    },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      departmentId: true,
+    },
+  });
+}
+
+export async function createScheduleEquipment(
+  data: { scheduleId: string; equipmentId: string },
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    // Claim the equipment only if it is still available.
+    const claim = await tx.equipment.updateMany({
+      where: { id: data.equipmentId, status: "AVAILABLE" },
+      data: { status: "IN_USE" },
+    });
+
+    if (claim.count !== 1) {
+      const equipment = await tx.equipment.findUnique({
+        where: { id: data.equipmentId },
+        select: { id: true },
+      });
+      if (!equipment) throw new Error("EQUIPMENT_NOT_FOUND");
+      throw new Error("EQUIPMENT_UNAVAILABLE");
+    }
+
+    const assignment = await tx.scheduleEquipment.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        equipmentId: true,
+        assignedAt: true,
+        releasedAt: true,
+        equipment: {
+          select: {
+            id: true,
+            name: true,
+            category: true,
+            serialNumber: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "CREATE",
+      entity: "ScheduleEquipment",
+      entityId: assignment.id,
+      description: "Equipment assigned to schedule.",
+      metadata: { scheduleId: assignment.scheduleId, equipmentId: assignment.equipmentId },
+    }, tx);
+
+    return assignment;
+  });
+}
+
+
+export async function releaseScheduleEquipment(
+  id: string,
+  scheduleId: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const assignment = await tx.scheduleEquipment.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        scheduleId: true,
+        equipmentId: true,
+        assignedAt: true,
+        releasedAt: true,
+      },
+    });
+
+    if (!assignment || assignment.scheduleId !== scheduleId) {
+      throw new Error("EQUIPMENT_ASSIGNMENT_NOT_FOUND");
+    }
+
+    if (assignment.releasedAt !== null) {
+      throw new Error("EQUIPMENT_ALREADY_RELEASED");
+    }
+
+    const released = await tx.scheduleEquipment.updateMany({
+      where: {
+        id,
+        scheduleId,
+        releasedAt: null,
+      },
+      data: {
+        releasedAt: new Date(),
+      },
+    });
+
+    if (released.count !== 1) {
+      throw new Error("EQUIPMENT_ALREADY_RELEASED");
+    }
+
+    const activeAssignments = await tx.scheduleEquipment.count({
+      where: {
+        equipmentId: assignment.equipmentId,
+        releasedAt: null,
+      },
+    });
+
+    if (activeAssignments === 0) {
+      await tx.equipment.updateMany({
+        where: {
+          id: assignment.equipmentId,
+          status: "IN_USE",
+        },
+        data: {
+          status: "AVAILABLE",
+        },
+      });
+    }
+
+    const result = {
+      ...assignment,
+      releasedAt: new Date(),
+    };
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "UPDATE",
+      entity: "ScheduleEquipment",
+      entityId: assignment.id,
+      description: "Equipment released from schedule.",
+      metadata: { scheduleId: assignment.scheduleId, equipmentId: assignment.equipmentId },
+    }, tx);
+
+    return result;
+  });
+}
+
+
+export async function findScheduleNotes(
+  scheduleId: string,
+) {
+  return prisma.scheduleNote.findMany({
+    where: {
+      scheduleId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function createScheduleNote(data: {
+  scheduleId: string;
+  authorId: string;
+  content: string;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        authorId: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    await createAuditLog({
+      userId: data.authorId,
+      action: "CREATE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: `Note was added to schedule ${note.scheduleId}.`,
+      metadata: { scheduleId: note.scheduleId, authorId: note.authorId },
+    }, tx);
+
+    return note;
+  });
+}
+
+export async function updateScheduleNote(
+  id: string,
+  content: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.update({
+      where: { id },
+      data: { content },
+      select: {
+        id: true,
+        scheduleId: true,
+        authorId: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "UPDATE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: "Schedule note was updated.",
+      metadata: { scheduleId: note.scheduleId },
+    }, tx);
+
+    return note;
+  });
+}
+
+export async function findScheduleNoteById(id: string) {
+  return prisma.scheduleNote.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      scheduleId: true,
+      authorId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function deleteScheduleNote(
+  id: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.delete({ where: { id } });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "DELETE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: "Schedule note was deleted.",
+      metadata: { scheduleId: note.scheduleId },
+    }, tx);
+
+    return note;
+  });
+}
+
+==================================================
+FILE: src\modules\patients\patient.service.ts
+==================================================
+import { findPatientById, findPatients, createPatientRecord, updatePatient, findPatientPortalDataByUserId } from "./patient.repository";
+import { recordAudit } from "@/modules/audit/audit.service";
+
+export async function getPatients() {
+  return findPatients();
+}
+
+export async function getPatientById(id: string) {
+  return findPatientById(id);
+}
+
+export async function createPatient(data: {
+  patientCode: string;
+  userId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  medicalHistory?: string;
+},
+  actorUserId: string
+) {
+  const patient = await createPatientRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Patient",
+    entityId: patient.id,
+    description: "Patient record created.",
+    metadata: {
+      patientCode: patient.patientCode
+    }
+  });
+
+  return patient;
+}
+
+export async function updatePatientById(
+  id: string,
+  data: {
+    name?: string;
+    email?: string | null;
+    phone?: string | null;
+    dateOfBirth?: Date | null;
+    gender?: string | null;
+    medicalHistory?: string | null;
+  },
+  actorUserId: string
+) {
+  const existingPatient = await findPatientById(id);
+
+  if (!existingPatient) {
+    throw new Error("PATIENT_NOT_FOUND");
+  }
+
+  const patient = await updatePatient(id, data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "Patient",
+    entityId: patient.id,
+    description: `Patient "${patient.name}" was updated.`,
+    metadata: {
+      patientId: patient.id,
+    },
+  });
+
+  return patient;
+}
+
+export async function getPatientPortalData(userId: string) {
+  return findPatientPortalDataByUserId(userId);
+}
+
+==================================================
+FILE: src\modules\patients\patient.repository.ts
+==================================================
+import { prisma } from "@/lib/db/prisma";
+
+export async function findPatients() {
+  return prisma.patient.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      patientCode: true,
+      name:true,
+      email:true,
+      phone:true,
+      dateOfBirth:true,
+      gender:true,
+      createdAt: true,
+      updatedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findPatientById(id: string) {
+  return prisma.patient.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      patientCode: true,
+      name:true,
+      email:true,
+      phone:true,
+      dateOfBirth:true,
+      gender:true,
+      medicalHistory:true,
+      createdAt: true,
+      updatedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          status: true,
+        },
+      },
+
+      schedules: {
+  orderBy: {
+    scheduledDate: "desc",
+  },
+  select: {
+    id: true,
+    procedure: true,
+    scheduledDate: true,
+    startTime: true,
+    endTime: true,
+    status: true,
+    priority: true,
+    department: {
+      select: {
+        name: true,
+      },
+    },
+    otRoom: {
+      select: {
+        name: true,
+        code: true,
+      },
+    },
+  },
+},
+    },
+  });
+}
+
+export async function createPatientRecord(data: {
+  patientCode: string;
+  userId?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  medicalHistory?: string;
+}) {
+  return prisma.patient.create({
+    data,
+    select: {
+      id: true,
+      patientCode: true,
+      userId: true,
+      name: true,
+      email: true,
+      phone: true,
+      dateOfBirth: true,
+      gender: true,
+      medicalHistory: true,
+      createdAt: true,
+      updatedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updatePatient(
+  id: string,
+  data: {
+    name?: string;
+    email?: string | null;
+    phone?: string | null;
+    dateOfBirth?: Date | null;
+    gender?: string | null;
+    medicalHistory?: string | null;
+  },
+) {
+  return prisma.patient.update({
+    where: {
+      id,
+    },
+    data,
+    select: {
+      id: true,
+      patientCode: true,
+      userId: true,
+      name: true,
+      email: true,
+      phone: true,
+      dateOfBirth: true,
+      gender: true,
+      medicalHistory: true,
+      createdAt: true,
+      updatedAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findPatientPortalDataByUserId(userId: string) {
+  return prisma.patient.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+      patientCode: true,
+      name: true,
+      schedules: {
+        orderBy: [
+          { scheduledDate: "asc" },
+          { startTime: "asc" },
+        ],
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          startTime: true,
+          endTime: true,
+          status: true,
+          priority: true,
+          department: {
+            select: {
+              name: true,
+            },
+          },
+          otRoom: {
+            select: {
+              name: true,
+              code: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+==================================================
+FILE: src\modules\users\user.service.ts
+==================================================
+import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest, createPasswordResetToken, resetPasswordWithToken } from "./user.repository";
+import type { UserRole, UserStatus } from "@/generated/prisma/enums";
+import { hashPassword } from "@/lib/auth/password";
+import { recordAudit } from "../audit/audit.service";
+import { generateEmailVerificationToken, hashEmailVerificationToken, getEmailVerificationExpiry } from "@/lib/auth/email-verification";
+import type { PatientRegistrationInput } from "./user.validation";
+import { sendVerificationEmail } from "@/lib/email/send-verification-email";
+import { createHash } from "node:crypto";
+import { generatePasswordResetToken, hashPasswordResetToken, getPasswordResetExpiry } from "@/lib/auth/password-reset";
+import { sendPasswordResetEmail } from "@/lib/email/send-password-reset-email";
+
+export async function getUsers() {
+  return findUsers();
+}
+
+export async function getUserById(id: string) {
+  return findUserById(id);
+}
+
+export async function getUserByEmail(email: string) {
+  return findUserByEmail(email);
+}
+
+export async function createUser(
+  data: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    role: UserRole;
+    status?: UserStatus;
+  },
+  actorUserId: string,
+) {
+  const passwordHash = await hashPassword(data.password);
+
+  const user = await createUserRecord({
+    name: data.name,
+    email: data.email,
+    passwordHash,
+    phone: data.phone,
+    role: data.role,
+    status: data.status,
+  });
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "User",
+    entityId: user.id,
+    description: `User "${user.email}" was created.`,
+    metadata: {
+      role: user.role,
+      status: user.status,
+    },
+  });
+
+  return user;
+}
+
+export async function registerPatient(input: PatientRegistrationInput) {
+  const passwordHash = await hashPassword(input.password);
+
+  const token = generateEmailVerificationToken();
+  const tokenHash = hashEmailVerificationToken(token);
+  const expiresAt = getEmailVerificationExpiry();
+
+  const user = await createPatientRegistrationRecord({
+    name: input.name,
+    email: input.email,
+    passwordHash,
+    phone: input.phone,
+    tokenHash,
+    expiresAt,
+  });
+
+  let emailSent = true;
+
+  try {
+    await sendVerificationEmail(user.email, user.name, token);
+  } catch (error) {
+    emailSent = false;
+    console.error("Registration verification email failed:", error);
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    status: user.status,
+    emailSent,
+    message: emailSent
+      ? "Registration successful. Check your email to verify your account."
+      : "Registration successful, but the verification email could not be sent. Please request another verification email.",
+  };
+}
+
+export async function verifyPatientEmailToken(token: string) {
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return { verified: false };
+  }
+
+  const tokenHash = hashEmailVerificationToken(token);
+  const verified = await verifyPatientEmail(tokenHash);
+
+  return { verified };
+}
+
+export async function approvePatient(
+  patientUserId: string,
+  actorUserId: string,
+) {
+  const patient = await approvePendingPatient(patientUserId);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "UPDATE",
+    entity: "User",
+    entityId: patient.id,
+    description: `Patient "${patient.email}" was approved.`,
+    metadata: {
+      role: patient.role,
+      status: patient.status,
+      approvedAt: patient.approvedAt?.toISOString() ?? null,
+    },
+  });
+
+  return patient;
+}
+
+export async function resendPatientVerificationEmail(
+  email: string,
+  ipAddress: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true, rateLimited: false };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress || "unknown")
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "EMAIL_VERIFICATION",
+  );
+
+  if (!allowed) {
+    return {
+      accepted: true,
+      rateLimited: true,
+    };
+  }
+
+  const token = generateEmailVerificationToken();
+  const tokenHash = hashEmailVerificationToken(token);
+  const expiresAt = getEmailVerificationExpiry();
+
+  const user = await createPatientResendVerificationToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    try {
+      await sendVerificationEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Resend verification email failed:", error);
+    }
+  }
+
+  return { accepted: true, rateLimited: false };
+}
+
+
+export async function requestPasswordReset(
+  email: string,
+  ipAddress: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true, rateLimited: false };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress || "unknown")
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "PASSWORD_RESET",
+  );
+
+  if (!allowed) {
+    return { accepted: true, rateLimited: true };
+  }
+
+  const token = generatePasswordResetToken();
+  const tokenHash = hashPasswordResetToken(token);
+  const expiresAt = getPasswordResetExpiry();
+
+  const user = await createPasswordResetToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    try {
+      await sendPasswordResetEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Failed to send password reset email:", error);
+    }
+  }
+
+  return { accepted: true, rateLimited: false };
+}
+
+export async function completePasswordReset(
+  token: string,
+  newPassword: string,
+) {
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return { reset: false };
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  const tokenHash = hashPasswordResetToken(token);
+
+  const reset = await resetPasswordWithToken(tokenHash, passwordHash);
+
+  return { reset };
+}
+
+
+==================================================
+FILE: src\modules\users\user.repository.ts
+==================================================
+import { prisma } from "@/lib/db/prisma";
+import { UserRole, UserStatus } from "@/generated/prisma/enums";
+import { randomUUID } from "node:crypto";
+
+export async function findUsers() {
+  return prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      doctorProfile: {
+        select: {
+          id: true,
+        },
+      },
+    },
+
+  })
+}
+
+export async function findUserById(id: string) {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    }
+  })
+}
+
+export async function findUserByEmail(email: string) {
+  return prisma.user.findUnique({
+    where: {
+      email,
+    }
+  })
+}
+
+export async function createUserRecord(data: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  phone?: string;
+  role: UserRole;
+  status?: UserStatus;
+}) {
+  const status: UserStatus = data.status ?? "PENDING";
+
+  return prisma.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      phone: data.phone,
+      role: data.role,
+      status,
+      approvedAt: status === "ACTIVE" ? new Date() : null,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      approvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+type CreatePatientRegistrationRecordInput = {
+  name: string;
+  email: string;
+  passwordHash: string;
+  phone?: string;
+  tokenHash: string;
+  expiresAt: Date;
+};
+
+export async function createPatientRegistrationRecord(
+  input: CreatePatientRegistrationRecordInput
+) {
+  const patientCode = `PAT-${randomUUID().replaceAll("-", "").toUpperCase()}`;
+
+  return prisma.user.create({
+    data: {
+      name: input.name,
+      email: input.email,
+      passwordHash: input.passwordHash,
+      phone: input.phone,
+      role: UserRole.PATIENT,
+      status: UserStatus.PENDING,
+      patient: {
+        create: {
+          patientCode,
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+        },
+      },
+      emailVerificationTokens: {
+        create: {
+          tokenHash: input.tokenHash,
+          expiresAt: input.expiresAt,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      emailVerifiedAt: true,
+      createdAt: true,
+    },
+  });
+}
+
+
+export async function verifyPatientEmail(tokenHash: string): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const verificationToken = await tx.emailVerificationToken.findUnique({
+      where: { tokenHash },
+      select: {
+        userId: true,
+        expiresAt: true,
+        user: {
+          select: {
+            emailVerifiedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!verificationToken) {
+      return false;
+    }
+
+    if (verificationToken.expiresAt <= new Date()) {
+      await tx.emailVerificationToken.deleteMany({
+        where: { tokenHash },
+      });
+
+      return false;
+    }
+
+    const consumedToken = await tx.emailVerificationToken.deleteMany({
+      where: {
+        tokenHash,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (consumedToken.count === 0) {
+      return false;
+    }
+
+    if (!verificationToken.user.emailVerifiedAt) {
+      await tx.user.update({
+        where: { id: verificationToken.userId },
+        data: { emailVerifiedAt: new Date() },
+      });
+    }
+
+    // Invalidate all outstanding verification tokens for this user.
+    await tx.emailVerificationToken.deleteMany({
+      where: { userId: verificationToken.userId },
+    });
+
+    return true;
+  });
+}
+
+
+export async function approvePendingPatient(userId: string) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    if (user.role !== UserRole.PATIENT) {
+      throw new Error("USER_NOT_PATIENT");
+    }
+
+    if (user.status !== UserStatus.PENDING) {
+      throw new Error("USER_NOT_PENDING");
+    }
+
+    if (!user.emailVerifiedAt) {
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
+
+    return tx.user.update({
+      where: { id: userId },
+      data: {
+        status: UserStatus.ACTIVE,
+        approvedAt: new Date(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+        approvedAt: true,
+      },
+    });
+  });
+}
+
+
+
+export async function createPatientResendVerificationToken(
+  email: string,
+  tokenHash: string,
+  expiresAt: Date,
+) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+      },
+    });
+
+    if (
+      !user ||
+      user.role !== UserRole.PATIENT ||
+      user.status !== UserStatus.PENDING ||
+      user.emailVerifiedAt
+    ) {
+      return null;
+    }
+
+    await tx.emailVerificationToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await tx.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+  });
+}
+
+type VerificationRequestPurpose =
+  | "EMAIL_VERIFICATION"
+  | "PASSWORD_RESET"
+  | "PASSWORD_RESET_ATTEMPT"
+  | "LOGIN_ATTEMPT"
+  | "REGISTRATION"
+  | "EMAIL_VERIFICATION_TOKEN"
+
+
+export async function isLoginAttemptAllowed(
+  emailHash: string,
+  ipHash: string,
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - 15 * 60 * 1000);
+
+  return prisma.$transaction(async (tx) => {
+    const lockKeys = [
+      `LOGIN_ATTEMPT:email:${emailHash}`,
+      `LOGIN_ATTEMPT:ip:${ipHash}`,
+    ].sort();
+
+    for (const lockKey of lockKeys) {
+      await tx.$queryRaw`
+        SELECT 1 AS locked
+        FROM (
+          SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
+        ) AS lock_query
+      `;
+    }
+
+    const [emailAttempts, ipAttempts] = await Promise.all([
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose: "LOGIN_ATTEMPT",
+          emailHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose: "LOGIN_ATTEMPT",
+          ipHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+    ]);
+
+    return emailAttempts < 5 && ipAttempts < 20;
+  });
+}
+
+export async function recordVerificationEmailRequest(
+  emailHash: string,
+  ipHash: string,
+  purpose: VerificationRequestPurpose = "EMAIL_VERIFICATION"
+): Promise<boolean> {
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - 15 * 60 * 1000);
+  const cleanupBefore = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  return prisma.$transaction(async (tx) => {
+    const lockKeys = [`${purpose}:email:${emailHash}`, `${purpose}:ip:${ipHash}`].sort();
+
+    for (const lockKey of lockKeys) {
+      await tx.$queryRaw`
+    SELECT 1 AS locked
+    FROM (
+      SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
+    ) AS lock_query
+  `;
+    }
+
+    await tx.verificationEmailRequest.deleteMany({
+      where: { createdAt: { lt: cleanupBefore } },
+    });
+
+    const [emailRequests, ipRequests] = await Promise.all([
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose,
+          emailHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose,
+          ipHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+    ]);
+
+    const emailLimit = purpose === "LOGIN_ATTEMPT" ? 5 : 3;
+    const ipLimit = purpose === "LOGIN_ATTEMPT" ? 20 : 10;
+
+    if (emailRequests >= emailLimit || ipRequests >= ipLimit) {
+      return false;
+    }
+
+    await tx.verificationEmailRequest.create({
+      data: { purpose, emailHash, ipHash },
+    });
+
+    return true;
+  });
+}
+
+
+export async function createPasswordResetToken(
+  email: string,
+  tokenHash: string,
+  expiresAt: Date,
+) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    await tx.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await tx.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    return user;
+  });
+}
+
+
+export async function resetPasswordWithToken(
+  tokenHash: string,
+  passwordHash: string,
+): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const resetTokens = await tx.$queryRaw<
+      Array<{
+        id: string;
+        userId: string;
+        expiresAt: Date;
+      }>
+    >`
+      SELECT "id", "userId", "expiresAt"
+      FROM "PasswordResetToken"
+      WHERE "tokenHash" = ${tokenHash}
+      FOR UPDATE
+    `;
+
+    const resetToken = resetTokens[0];
+
+    if (!resetToken) {
+      return false;
+    }
+
+    if (resetToken.expiresAt <= new Date()) {
+      await tx.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
+
+      return false;
+    }
+
+    await tx.user.update({
+      where: { id: resetToken.userId },
+      data: {
+        passwordHash,
+        sessionVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    await tx.passwordResetToken.deleteMany({
+      where: { userId: resetToken.userId },
+    });
+
+    return true;
+  });
+}
+
+
+==================================================
+FILE: src\modules\alerts\alerts.service.ts
+==================================================
+import {
+  findAlerts,
+  findAlertById,
+  createAlert as createAlertRecord,
+  updateAlert as updateAlertRecord,
+  markAlertAsRead as markAlertAsReadRecord,
+  markAllAlertsAsReadForUser,
+  deleteAlert as deleteAlertRecord,
+  type FindAlertsFilter,
+} from "./alerts.repository";
+import type { AlertType, AlertSeverity, UserRole } from "@/generated/prisma/client";
+import { recordAudit } from "@/modules/audit/audit.service";
+import { findUserById } from "@/modules/users/user.repository";
+import { findScheduleById } from "@/modules/schedules/schedule.repository";
+
+export async function getAlerts(
+  filter: FindAlertsFilter,
+  requestingUser: { id: string; role: UserRole },
+) {
+  const effectiveFilter = { ...filter };
+  if (requestingUser.role !== "ADMIN") {
+    effectiveFilter.userId = requestingUser.id;
+  }
+
+  return findAlerts(effectiveFilter);
+}
+
+export async function getAlertById(
+  id: string,
+  requestingUser: { id: string; role: UserRole },
+) {
+  const alert = await findAlertById(id);
+
+  if (!alert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
+
+  if (requestingUser.role !== "ADMIN" && alert.userId !== requestingUser.id) {
+    throw new Error("FORBIDDEN_ALERT_ACCESS");
+  }
+
+  return alert;
+}
+
+export async function createAlert(
+  data: {
+    userId: string;
+    scheduleId?: string | null;
+    type: AlertType;
+    title: string;
+    message: string;
+    severity?: AlertSeverity;
+  },
+  actorUserId: string,
+) {
+  const targetUser = await findUserById(data.userId);
+  if (!targetUser) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  if (data.scheduleId) {
+    const schedule = await findScheduleById(data.scheduleId);
+    if (!schedule) {
+      throw new Error("SCHEDULE_NOT_FOUND");
+    }
+  }
+
+  const alert = await createAlertRecord(data);
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "Alert",
+    entityId: alert.id,
+    description: `Alert "${alert.title}" was created for user ${targetUser.name || targetUser.email}.`,
+    metadata: {
+      alertId: alert.id,
+      recipientUserId: data.userId,
+      severity: alert.severity,
+      type: alert.type,
+    },
+  });
+
+  return alert;
+}
+
+export async function updateAlertById(
+  id: string,
+  data: {
+    title?: string;
+    message?: string;
+    severity?: AlertSeverity;
+    isRead?: boolean;
+  },
+  requestingUser: { id: string; role: UserRole },
+) {
+  const alert = await findAlertById(id);
+
+  if (!alert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
+
+  if (
+    requestingUser.role !== "ADMIN" &&
+    alert.userId !== requestingUser.id
+  ) {
+    throw new Error("FORBIDDEN_ALERT_ACCESS");
+  }
+
+  const updateData = { ...data };
+
+  if (data.isRead !== undefined) {
+    Object.assign(updateData, {
+      readAt: data.isRead ? new Date() : null,
+    });
+  }
+
+  const updatedAlert = await updateAlertRecord(
+    id,
+    updateData,
+    requestingUser.role === "ADMIN" ? undefined : requestingUser.id,
+  );
+
+  if (!updatedAlert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
+
+  await recordAudit({
+    userId: requestingUser.id,
+    action: "UPDATE",
+    entity: "Alert",
+    entityId: id,
+    description: `Alert "${updatedAlert.title}" was updated.`,
+    metadata: {
+      alertId: id,
+      changes: updateData,
+    },
+  });
+
+  return updatedAlert;
+}
+
+export async function markAlertAsReadById(
+  id: string,
+  requestingUser: { id: string; role: UserRole },
+) {
+  const alert = await findAlertById(id);
+
+  if (!alert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
+
+  if (
+    requestingUser.role !== "ADMIN" &&
+    alert.userId !== requestingUser.id
+  ) {
+    throw new Error("FORBIDDEN_ALERT_ACCESS");
+  }
+
+  if (alert.isRead) {
+    return alert;
+  }
+
+  const updatedAlert = await markAlertAsReadRecord(id);
+
+  await recordAudit({
+    userId: requestingUser.id,
+    action: "UPDATE",
+    entity: "Alert",
+    entityId: updatedAlert.id,
+    description: `Alert "${updatedAlert.title}" was marked as read.`,
+    metadata: {
+      alertId: updatedAlert.id,
+      read: true,
+    },
+  });
+
+  return updatedAlert;
+}
+
+export async function markAllAlertsAsRead(
+  targetUserId: string,
+  requestingUser: { id: string; role: UserRole },
+) {
+  if (
+    requestingUser.role !== "ADMIN" &&
+    targetUserId !== requestingUser.id
+  ) {
+    throw new Error("FORBIDDEN_ALERT_ACCESS");
+  }
+
+  const result = await markAllAlertsAsReadForUser(targetUserId);
+
+  if (result.count > 0) {
+    await recordAudit({
+      userId: requestingUser.id,
+      action: "UPDATE",
+      entity: "Alert",
+      entityId: targetUserId,
+      description: `${result.count} alert(s) were marked as read.`,
+      metadata: {
+        targetUserId,
+        affectedCount: result.count,
+        operation: "MARK_ALL_READ",
+      },
+    });
+  }
+
+  return result;
+}
+
+export async function deleteAlertById(
+  id: string,
+  requestingUser: { id: string; role: UserRole },
+) {
+  const alert = await findAlertById(id);
+
+  if (!alert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
+
+  if (requestingUser.role !== "ADMIN" && alert.userId !== requestingUser.id) {
+    throw new Error("FORBIDDEN_ALERT_ACCESS");
+  }
+
+  await deleteAlertRecord(id);
+
+  await recordAudit({
+    userId: requestingUser.id,
+    action: "DELETE",
+    entity: "Alert",
+    entityId: id,
+    description: `Alert "${alert.title}" was deleted.`,
+  });
+
+  return { success: true };
+}
+
+
+==================================================
+FILE: src\modules\alerts\alerts.repository.ts
+==================================================
+import { prisma } from "@/lib/db/prisma";
+import type { AlertType, AlertSeverity } from "@/generated/prisma/client";
+
+export type FindAlertsFilter = {
+  userId?: string;
+  isRead?: boolean;
+  severity?: AlertSeverity;
+  type?: AlertType;
+};
+
+export async function findAlerts(filter: FindAlertsFilter) {
+  const where: {
+    userId?: string;
+    isRead?: boolean;
+    severity?: AlertSeverity;
+    type?: AlertType;
+  } = {};
+
+  if (filter.userId) where.userId = filter.userId;
+  if (filter.isRead !== undefined) where.isRead = filter.isRead;
+  if (filter.severity) where.severity = filter.severity;
+  if (filter.type) where.type = filter.type;
+
+  return prisma.alert.findMany({
+    where,
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+      scheduleId: true,
+      type: true,
+      title: true,
+      message: true,
+      severity: true,
+      isRead: true,
+      readAt: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      schedule: {
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findAlertById(id: string) {
+  return prisma.alert.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      userId: true,
+      scheduleId: true,
+      type: true,
+      title: true,
+      message: true,
+      severity: true,
+      isRead: true,
+      readAt: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      schedule: {
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function createAlert(data: {
+  userId: string;
+  scheduleId?: string | null;
+  type: AlertType;
+  title: string;
+  message: string;
+  severity?: AlertSeverity;
+}) {
+  return prisma.alert.create({
+    data: {
+      userId: data.userId,
+      scheduleId: data.scheduleId,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      severity: data.severity,
+    },
+    select: {
+      id: true,
+      userId: true,
+      scheduleId: true,
+      type: true,
+      title: true,
+      message: true,
+      severity: true,
+      isRead: true,
+      readAt: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      schedule: {
+        select: {
+          id: true,
+          procedure: true,
+          scheduledDate: true,
+          status: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updateAlert(
+  id: string,
+  data: {
+    title?: string;
+    message?: string;
+    severity?: AlertSeverity;
+    isRead?: boolean;
+    readAt?: Date | null;
+  },
+  userId?: string,
+) {
+  const result = await prisma.alert.updateMany({
+    where: {
+      id,
+      ...(userId ? { userId } : {}),
+    },
+    data,
+  });
+
+  if (result.count === 0) {
+    return null;
+  }
+
+  return findAlertById(id);
+}
+
+export async function markAlertAsRead(id: string) {
+  return prisma.alert.update({
+    where: { id },
+    data: {
+      isRead: true,
+      readAt: new Date(),
+    },
+    select: {
+      id: true,
+      userId: true,
+      scheduleId: true,
+      type: true,
+      title: true,
+      message: true,
+      severity: true,
+      isRead: true,
+      readAt: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function markAllAlertsAsReadForUser(userId: string) {
+  return prisma.alert.updateMany({
+    where: {
+      userId,
+      isRead: false,
+    },
+    data: {
+      isRead: true,
+      readAt: new Date(),
+    },
+  });
+}
+
+export async function deleteAlert(id: string) {
+  return prisma.alert.delete({
+    where: { id },
+  });
+}
+
+
+==================================================
+FILE: src\modules\audit\audit.service.ts
+==================================================
+import type { AuditAction, Prisma } from "@/generated/prisma/client";
+import { createAuditLog, findAuditLogs, countAuditLogs } from "./audit.repository";
+import type { FindAuditLogsOptions } from "./audit.repository";
+
+type RecordAuditData = {
+  userId?: string;
+  action: AuditAction;
+  entity: string;
+  entityId: string;
+  description?: string;
+  metadata?: Prisma.InputJsonValue;
+};
+
+export async function recordAudit(
+  data: RecordAuditData,
+) {
+  return createAuditLog(data);
+}
+
+export async function getAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  return findAuditLogs(options);
+}
+
+export async function getAuditLogCount(
+  options: FindAuditLogsOptions = {},
+) {
+  return countAuditLogs(options);
+}
+
+==================================================
+FILE: src\modules\audit\audit.repository.ts
+==================================================
+import { prisma } from "@/lib/db/prisma";
+import type { AuditAction, Prisma } from "@/generated/prisma/client";
+
+type CreateAuditLogData = {
+  userId?: string;
+  action: AuditAction;
+  entity: string;
+  entityId: string;
+  description?: string;
+  metadata?: Prisma.InputJsonValue;
+};
+
+export async function createAuditLog(
+  data: CreateAuditLogData,
+  tx?: Prisma.TransactionClient,
+) {
+  const client = tx ?? prisma;
+
+  return client.auditLog.create({
+    data: {
+      userId: data.userId,
+      action: data.action,
+      entity: data.entity,
+      entityId: data.entityId,
+      description: data.description,
+      metadata: data.metadata,
+    },
+  });
+}
+
+export interface FindAuditLogsOptions {
+  userId?: string;
+  action?: AuditAction;
+  entity?: string;
+  entityId?: string;
+  fromDate?: Date;
+  toDate?:Date;
+  limit?: number;
+  offset?: number;
+}
+
+
+function buildAuditLogWhere(
+  options: FindAuditLogsOptions = {},
+): Prisma.AuditLogWhereInput {
+  const {
+    userId,
+    action,
+    entity,
+    entityId,
+    fromDate,
+    toDate,
+  } = options;
+
+  return {
+    ...(userId ? { userId } : {}),
+    ...(action ? { action } : {}),
+    ...(entity ? { entity } : {}),
+    ...(entityId ? { entityId } : {}),
+    ...(fromDate || toDate
+      ? {
+          createdAt: {
+            ...(fromDate ? { gte: fromDate } : {}),
+            ...(toDate ? { lte: toDate } : {}),
+          },
+        }
+      : {}),
+  };
+}
+
+export async function findAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  const { limit = 50, offset = 0 } = options;
+
+  return prisma.auditLog.findMany({
+    where: buildAuditLogWhere(options),
+    orderBy: {
+      createdAt: "desc",
+    },
+    skip: offset,
+    take: Math.min(limit, 100),
+    select: {
+      id: true,
+      userId: true,
+      action: true,
+      entity: true,
+      entityId: true,
+      description: true,
+      metadata: true,
+      createdAt: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function countAuditLogs(
+  options: FindAuditLogsOptions = {},
+) {
+  return prisma.auditLog.count({
+    where: buildAuditLogWhere(options),
+  });
+}
+
