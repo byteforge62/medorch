@@ -12,8 +12,11 @@ type CreateAuditLogData = {
 
 export async function createAuditLog(
   data: CreateAuditLogData,
+  tx?: Prisma.TransactionClient,
 ) {
-  return prisma.auditLog.create({
+  const client = tx ?? prisma;
+
+  return client.auditLog.create({
     data: {
       userId: data.userId,
       action: data.action,

@@ -34,33 +34,33 @@ export async function POST(request: NextRequest) {
     }
 
     const forwardedFor = request.headers.get("x-forwarded-for");
-const ipAddress =
-  forwardedFor?.split(",")[0]?.trim() ||
-  request.headers.get("x-real-ip") ||
-  "unknown";
+    const ipAddress =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
-const ipHash = createHash("sha256")
-  .update(ipAddress)
-  .digest("hex");
+    const ipHash = createHash("sha256")
+      .update(ipAddress)
+      .digest("hex");
 
-const tokenHash = createHash("sha256")
-  .update(parsed.data.token)
-  .digest("hex");
+    const tokenHash = createHash("sha256")
+      .update(parsed.data.token)
+      .digest("hex");
 
-const allowed = await recordVerificationEmailRequest(
-  tokenHash,
-  ipHash,
-  "PASSWORD_RESET_ATTEMPT",
-);
+    const allowed = await recordVerificationEmailRequest(
+      tokenHash,
+      ipHash,
+      "PASSWORD_RESET_ATTEMPT",
+    );
 
-if (!allowed) {
-  return apiError(
-    "Too many password reset attempts. Please wait 15 minutes before trying again.",
-    429,
-    undefined,
-    requestId,
-  );
-}
+    if (!allowed) {
+      return apiError(
+        "Too many password reset attempts. Please wait 15 minutes before trying again.",
+        429,
+        undefined,
+        requestId,
+      );
+    }
 
     const result = await completePasswordReset(
       parsed.data.token,

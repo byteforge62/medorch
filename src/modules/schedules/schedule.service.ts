@@ -118,6 +118,7 @@ export async function updateScheduleStatusById(
     id,
     status,
     currentStatus,
+    actorUserId,
   );
 
   const auditAction =
@@ -415,20 +416,7 @@ export async function updateScheduleWithValidation(
     throw new Error("PATIENT_SCHEDULE_CONFLICT");
   }
 
-  const schedule = await updateScheduleRecord(id, data);
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "UPDATE",
-    entity: "Schedule",
-    entityId: schedule.id,
-    description: `Schedule for procedure "${schedule.procedure}" was updated.`,
-    metadata: {
-      scheduleId: schedule.id,
-    },
-  });
-
-  return schedule;
+  return updateScheduleRecord(id, data, actorUserId);
 }
 
 export async function getScheduleStaff(

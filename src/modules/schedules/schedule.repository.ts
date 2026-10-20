@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import { createAuditLog } from "../audit/audit.repository";
 
 export async function findSchedules() {
   return prisma.schedule.findMany({
@@ -235,9 +236,9 @@ export async function createSchedule(data: {
   startTime: Date;
   endTime: Date;
   priority?:
-    | "ELECTIVE"
-    | "URGENT"
-    | "EMERGENCY";
+  | "ELECTIVE"
+  | "URGENT"
+  | "EMERGENCY";
   clinicalNotes?: string;
 }) {
   return prisma.schedule.create({
@@ -274,34 +275,51 @@ export async function updateSchedule(
     startTime?: Date;
     endTime?: Date;
     priority?:
-      | "ELECTIVE"
-      | "URGENT"
-      | "EMERGENCY";
+    | "ELECTIVE"
+    | "URGENT"
+    | "EMERGENCY";
     clinicalNotes?: string | null;
   },
+  actorUserId?: string,
 ) {
-  return prisma.schedule.update({
-    where: {
-      id,
-    },
-    data,
-    select: {
-      id: true,
-      patientId: true,
-      departmentId: true,
-      otRoomId: true,
-      surgeonId: true,
-      createdById: true,
-      procedure: true,
-      scheduledDate: true,
-      startTime: true,
-      endTime: true,
-      status: true,
-      priority: true,
-      clinicalNotes: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  return prisma.$transaction(async (tx) => {
+    const schedule = await tx.schedule.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        patientId: true,
+        departmentId: true,
+        otRoomId: true,
+        surgeonId: true,
+        createdById: true,
+        procedure: true,
+        scheduledDate: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        priority: true,
+        clinicalNotes: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "UPDATE",
+        entity: "Schedule",
+        entityId: schedule.id,
+        description: `Schedule for procedure "${schedule.procedure}" was updated.`,
+        metadata: {
+          scheduleId: schedule.id,
+        },
+      },
+      tx,
+    );
+
+    return schedule;
   });
 }
 
@@ -321,6 +339,7 @@ export async function updateScheduleStatus(
     | "COMPLETED"
     | "CANCELLED"
     | "DELAYED",
+  actorUserId?: string
 ) {
   return prisma.$transaction(async (tx) => {
     const update = await tx.schedule.updateMany({
@@ -344,7 +363,7 @@ export async function updateScheduleStatus(
       );
     }
 
-    return tx.schedule.findUniqueOrThrow({
+    const schedule = await tx.schedule.findUniqueOrThrow({
       where: { id },
       select: {
         id: true,
@@ -357,6 +376,27 @@ export async function updateScheduleStatus(
         updatedAt: true,
       },
     });
+
+    const auditAction =
+      status === "COMPLETED"
+        ? "COMPLETE"
+        : status === "CANCELLED"
+          ? "CANCEL"
+          : "UPDATE";
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: auditAction,
+        entity: "Schedule",
+        entityId: schedule.id,
+        description: `Schedule status changed to ${status}.`,
+        metadata: { status },
+      },
+      tx,
+    );
+
+    return schedule;
   });
 }
 
@@ -556,9 +596,9 @@ export async function findUserForStaffAssignment(
       id: true,
       role: true,
       status: true,
-      doctorProfile:{
-        select:{
-          id:true,
+      doctorProfile: {
+        select: {
+          id: true,
           specialization: true,
           licenseNumber: true,
         }
@@ -572,11 +612,11 @@ export async function createScheduleStaff(
     scheduleId: string;
     userId: string;
     role:
-      | "SURGEON"
-      | "NURSE"
-      | "ANESTHETIST"
-      | "TECHNICIAN"
-      | "OTHER";
+    | "SURGEON"
+    | "NURSE"
+    | "ANESTHETIST"
+    | "TECHNICIAN"
+    | "OTHER";
   },
 ) {
   return prisma.scheduleStaff.create({
