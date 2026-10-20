@@ -42,7 +42,7 @@ export function ScheduleFilters({
     Boolean(filters.search);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       <div className="flex items-center justify-between">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Filter Schedules
@@ -60,15 +60,20 @@ export function ScheduleFilters({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
         {/* Search Input */}
         <div>
-          <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
-            Search
+          <label
+            htmlFor="schedule-search"
+            className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400"
+          >
+            Search procedures
           </label>
+
           <input
-            type="text"
-            placeholder="Procedure, Patient, Surgeon..."
+            id="schedule-search"
+            type="search"
+            placeholder="Procedure, patient, surgeon..."
             value={filters.search}
             onChange={(e) => handleChange("search", e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-400"
+            className="min-h-10 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
           />
         </div>
 

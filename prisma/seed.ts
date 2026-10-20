@@ -448,7 +448,23 @@ async function main() {
     }
   >();
 
-  for (const schedule of DEMO_SEED_CONFIG.schedules) {
+  // Reschedule demo-owned rows as one atomic operation. Moving dates with
+  // the current-day anchor can temporarily overlap another demo row that is
+  // scheduled to move later in this loop. Mark the existing deterministic
+  // demo rows as CANCELLED inside the same transaction first; the final
+  // statuses and times are restored below. If any write fails, the entire
+  // transaction rolls back and the original schedules remain unchanged.
+  await prisma.$transaction(async (tx) => {
+    const demoScheduleIds = DEMO_SEED_CONFIG.schedules.map((schedule) =>
+      stableId(`schedule:${schedule.key}`),
+    );
+
+    await tx.schedule.updateMany({
+      where: { id: { in: demoScheduleIds } },
+      data: { status: "CANCELLED" },
+    });
+
+    for (const schedule of DEMO_SEED_CONFIG.schedules) {
     const id = stableId(`schedule:${schedule.key}`);
 
     const patientId = requiredId(
@@ -505,38 +521,56 @@ async function main() {
       );
     }
 
-    const saved = await prisma.schedule.upsert({
+    const scheduleData = {
+      patientId,
+      departmentId,
+      otRoomId,
+      surgeonId,
+      createdById,
+      procedure: schedule.procedure,
+      scheduledDate,
+      startTime,
+      endTime,
+      status: schedule.status,
+      priority: schedule.priority,
+      clinicalNotes: schedule.clinicalNotes,
+    };
+
+    // Prefer the deterministic ID. Older versions of the seed may have
+    // created these same demo schedules with different IDs, so also look
+    // for an exact demo-schedule match before inserting a new row. This
+    // avoids creating a duplicate that violates the overlap constraints.
+    const existingById = await tx.schedule.findUnique({
       where: { id },
-      create: {
-        id,
-        patientId,
-        departmentId,
-        otRoomId,
-        surgeonId,
-        createdById,
-        procedure: schedule.procedure,
-        scheduledDate,
-        startTime,
-        endTime,
-        status: schedule.status,
-        priority: schedule.priority,
-        clinicalNotes: schedule.clinicalNotes,
-      },
-      update: {
-        patientId,
-        departmentId,
-        otRoomId,
-        surgeonId,
-        createdById,
-        procedure: schedule.procedure,
-        scheduledDate,
-        startTime,
-        endTime,
-        status: schedule.status,
-        priority: schedule.priority,
-        clinicalNotes: schedule.clinicalNotes,
-      },
+      select: { id: true },
     });
+
+    const existingLegacySchedule = existingById
+      ? null
+      : await tx.schedule.findFirst({
+          where: {
+            patientId,
+            departmentId,
+            otRoomId,
+            surgeonId,
+            procedure: schedule.procedure,
+            startTime,
+            endTime,
+          },
+          select: { id: true },
+        });
+
+    const existingScheduleId =
+      existingById?.id ?? existingLegacySchedule?.id;
+
+    const saved = existingScheduleId
+      ? await tx.schedule.update({
+          where: { id: existingScheduleId },
+          data: scheduleData,
+        })
+      : await tx.schedule.create({
+          data: { id, ...scheduleData },
+        });
 
     scheduleIds.set(schedule.key, saved.id);
     recordIds.set(schedule.key, saved.id);
@@ -547,7 +581,8 @@ async function main() {
       endTime,
       status: schedule.status,
     });
-  }
+    }
+  });
 
   // 9. Staff and equipment assignments
   const equipmentInUse = new Set<string>();

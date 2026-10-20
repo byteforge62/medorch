@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -54,9 +55,45 @@ interface ScheduleCardProps {
   schedule: ScheduleItem;
   isAdmin?: boolean;
   onEdit?: (schedule: ScheduleItem) => void;
-  /** Called after a successful status change so the parent list can update */
-  onStatusUpdated?: (scheduleId: string, newStatus: ScheduleStatus) => void;
+  /** Called after a successful status change so the parent list can update. */
+  onStatusUpdated?: (
+    scheduleId: string,
+    newStatus: ScheduleStatus
+  ) => void;
 }
+
+const formatDate = (dateStr: string): string => {
+  if (!dateStr) return "Date unavailable";
+
+  const date = new Date(dateStr);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateStr;
+  }
+
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const formatTime = (timeStr: string): string => {
+  if (!timeStr) return "Time unavailable";
+
+  const date = new Date(timeStr);
+
+  if (Number.isNaN(date.getTime())) {
+    // Preserve values already formatted as HH:mm or similar.
+    return timeStr;
+  }
+
+  return date.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
 
 export function ScheduleCard({
   schedule,
@@ -64,167 +101,130 @@ export function ScheduleCard({
   onEdit,
   onStatusUpdated,
 }: ScheduleCardProps) {
-  const formatDate = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString(undefined, {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const formatTime = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
   return (
     <Card className="transition-all hover:border-slate-300 dark:hover:border-slate-700">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex-1 space-y-3">
-          {/* Header row: Procedure + Badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+      <div className="space-y-4">
+        {/* Procedure header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <h3 className="break-words text-base font-semibold text-slate-900 dark:text-slate-100">
               {schedule.procedure}
             </h3>
+
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Scheduled for {formatDate(schedule.scheduledDate)}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
             <ScheduleStatusBadge status={schedule.status} />
             <SchedulePriorityBadge priority={schedule.priority} />
           </div>
+        </div>
 
-          {/* Details grid */}
-          <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-xs text-slate-600 sm:grid-cols-2 lg:grid-cols-3 dark:text-slate-300">
-            {/* Patient */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                Patient:
+        {/* Schedule details */}
+        <div className="grid grid-cols-1 gap-4 border-t border-slate-100 pt-4 dark:border-slate-800 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Patient
+            </span>
+            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
+              {schedule.patient?.name || "Not assigned"}
+            </span>
+            {schedule.patient?.patientCode && (
+              <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                ID: {schedule.patient.patientCode}
               </span>
-              <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.patient?.name || 'N/A'}
-              </span>
-              {schedule.patient?.patientCode && (
-                <span className="text-[11px] text-slate-400">
-                  ({schedule.patient.patientCode})
-                </span>
-              )}
-            </div>
-
-            {/* Surgeon */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                Surgeon:
-              </span>
-              <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.surgeon?.name || 'Unassigned'}
-              </span>
-            </div>
-
-            {/* Department */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                Department:
-              </span>
-              <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.department?.name || 'N/A'}
-              </span>
-            </div>
-
-            {/* OT Room */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                OT Room:
-              </span>
-              <span className="font-medium text-slate-800 dark:text-slate-200">
-                {schedule.otRoom?.name || 'N/A'}
-              </span>
-              {schedule.otRoom?.code && (
-                <span className="text-[11px] text-slate-400">
-                  [{schedule.otRoom.code}]
-                </span>
-              )}
-            </div>
-
-            {/* Date */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                Date:
-              </span>
-              <span className="font-mono text-slate-700 dark:text-slate-300">
-                {formatDate(schedule.scheduledDate)}
-              </span>
-            </div>
-
-            {/* Timing */}
-            <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">
-                Time:
-              </span>
-              <span className="font-mono text-slate-700 dark:text-slate-300">
-                {formatTime(schedule.startTime)} -{' '}
-                {formatTime(schedule.endTime)}
-              </span>
-            </div>
+            )}
           </div>
 
-          {/* Clinical notes if present */}
-          {schedule.clinicalNotes && (
-            <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5 text-xs dark:border-slate-800 dark:bg-slate-800/60">
-              <span className="mr-1.5 font-semibold text-slate-500 dark:text-slate-400">
-                Notes:
-              </span>
-              <span className="text-slate-700 dark:text-slate-300">
-                {schedule.clinicalNotes}
-              </span>
-            </div>
-          )}
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Surgeon
+            </span>
+            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
+              {schedule.surgeon?.name || "Not assigned"}
+            </span>
+          </div>
 
-          {/* Status lifecycle actions — only for ADMIN users */}
-          {isAdmin && onStatusUpdated && (
-            <div className="border-t border-slate-100 pt-1 dark:border-slate-800">
-              <p className="mb-1.5 text-[11px] font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500">
-                Status Actions
-              </p>
-              <ScheduleStatusActions
-                scheduleId={schedule.id}
-                currentStatus={schedule.status}
-                onStatusUpdated={onStatusUpdated}
-              />
-            </div>
-          )}
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Department
+            </span>
+            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
+              {schedule.department?.name || "Not assigned"}
+            </span>
+          </div>
+
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Operating room
+            </span>
+            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
+              {schedule.otRoom?.name || "Not assigned"}
+              {schedule.otRoom?.code ? ` (${schedule.otRoom.code})` : ""}
+            </span>
+          </div>
+
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Start time
+            </span>
+            <span className="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">
+              {formatTime(schedule.startTime)}
+            </span>
+          </div>
+
+          <div className="min-w-0">
+            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              End time
+            </span>
+            <span className="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">
+              {formatTime(schedule.endTime)}
+            </span>
+          </div>
         </div>
 
-        {/* Edit action — only for ADMIN users */}
-        <div className="flex flex-wrap justify-end gap-2 pt-2 sm:pt-0 sm:pl-4">
-          <Link
-            href={`/schedules/${schedule.id}`}
-            className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            View details
-          </Link>
+        {/* Clinical notes, when available to this user */}
+        {schedule.clinicalNotes && (
+          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-900/50">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Clinical notes
+            </p>
+            <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-700 dark:text-slate-300">
+              {schedule.clinicalNotes}
+            </p>
+          </div>
+        )}
 
-          {/* Edit action — only for ADMIN users */}
-          {isAdmin && onEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(schedule)}
-              aria-label={`Edit schedule for ${schedule.procedure}`}
-            >
-              Edit
-            </Button>
-          )}
-        </div>
+        {/* Status lifecycle actions — ADMIN only */}
+        {isAdmin && onStatusUpdated && (
+          <div className="border-t border-slate-100 pt-3 dark:border-slate-800">
+            <ScheduleStatusActions
+              scheduleId={schedule.id}
+              currentStatus={schedule.status}
+              onStatusUpdated={(scheduleId, newStatus) =>
+                onStatusUpdated?.(scheduleId, newStatus)
+              }
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Card actions */}
+      <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
+        <Link
+          href={`/schedules/${schedule.id}`}
+          className="inline-flex min-h-9 items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+        >
+          View details
+        </Link>
+
+        {isAdmin && onEdit && (
+          <Button onClick={() => onEdit(schedule)}>
+            Edit
+          </Button>
+        )}
       </div>
     </Card>
   );

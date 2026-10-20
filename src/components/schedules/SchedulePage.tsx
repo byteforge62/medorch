@@ -181,6 +181,40 @@ export function SchedulePage() {
     });
   }, [schedules, filters]);
 
+  const scheduleMetrics = useMemo(
+    () => [
+      {
+        label: "Total procedures",
+        value: schedules.length,
+        detail: "All accessible schedules",
+        accent: "border-l-slate-400",
+      },
+      {
+        label: "Scheduled",
+        value: schedules.filter((item) => item.status === "SCHEDULED").length,
+        detail: "Awaiting confirmation",
+        accent: "border-l-sky-500",
+      },
+      {
+        label: "In progress",
+        value: schedules.filter((item) => item.status === "IN_PROGRESS").length,
+        detail: "Currently underway",
+        accent: "border-l-amber-500",
+      },
+      {
+        label: "Completed",
+        value: schedules.filter((item) => item.status === "COMPLETED").length,
+        detail: "Finished procedures",
+        accent: "border-l-emerald-500",
+      },
+    ],
+    [schedules],
+  );
+
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value.trim().length > 0,
+  );
+
   const handleOpenCreate = () => {
     setEditingSchedule(null);
     setIsFormOpen(true);
@@ -232,7 +266,7 @@ export function SchedulePage() {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <div
             role="group"
             aria-label="Schedule view"
@@ -279,6 +313,27 @@ export function SchedulePage() {
         </div>
       </div>
 
+      <section
+        aria-label="Schedule overview"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"
+      >
+        {scheduleMetrics.map((metric) => (
+          <div
+            key={metric.label}
+            className={`rounded-xl border border-slate-200 border-l-4 ${metric.accent} bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900`}
+          >
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {metric.label}
+            </p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
+              {metric.value}
+            </p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {metric.detail}
+            </p>
+          </div>
+        ))}
+      </section>
       {/* Filter Section */}
       <ScheduleFilters
         filters={filters}
@@ -287,6 +342,29 @@ export function SchedulePage() {
         otRooms={otRooms}
         onReset={handleResetFilters}
       />
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p
+          className="text-sm text-slate-600 dark:text-slate-400"
+          aria-live="polite"
+        >
+          Showing{" "}
+          <span className="font-semibold text-slate-900 dark:text-white">
+            {filteredSchedules.length}
+          </span>{" "}
+          of {schedules.length} procedures
+        </p>
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-400 dark:hover:bg-slate-800"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
 
       {/* Schedules List */}
       {viewMode === "calendar" ? (
