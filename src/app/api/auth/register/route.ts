@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { patientRegistrationSchema } from "@/modules/users/user.validation";
 import { registerPatient } from "@/modules/users/user.service";
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
 
 const REGISTRATION_MESSAGE =
   "If registration can be completed, a verification email will be sent to the provided address.";
@@ -37,6 +39,37 @@ export async function POST(request: Request) {
         })),
       },
       { status: 400 }
+    );
+  }
+
+  const email = validation.data.email.trim().toLowerCase();
+
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip")?.trim();
+
+  const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp;
+
+  const emailHash = createHash("sha256")
+    .update(email)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(clientIp || `unavailable:${email}`)
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "REGISTRATION",
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { message: "Too many registration attempts. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": "900" },
+      },
     );
   }
 

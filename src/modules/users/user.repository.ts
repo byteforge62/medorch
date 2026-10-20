@@ -294,6 +294,7 @@ type VerificationRequestPurpose =
   | "PASSWORD_RESET"
   | "PASSWORD_RESET_ATTEMPT"
   | "LOGIN_ATTEMPT"
+  | "REGISTRATION"
 
 
 export async function isLoginAttemptAllowed(
