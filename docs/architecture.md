@@ -68,7 +68,7 @@ Prisma 7 uses the PostgreSQL adapter (`@prisma/adapter-pg`). The application cli
 
 - Dashboard counts are assembled from API list requests on the client; there is no dedicated aggregate endpoint or push-based update channel.
 - Schedule lists and their filters are loaded and filtered in the browser in the current interface.
-- Schedule conflict detection is performed in service logic before persistence. The schema does not declare a database exclusion constraint for overlapping time ranges.
+- Schedule conflict detection is performed in service logic for readable errors and is also enforced by PostgreSQL GiST exclusion constraints in migration `20261010224215_schedule_overlap_constraints` for room, surgeon and patient intervals. The constraints exclude `CANCELLED` and `COMPLETED` schedules and use half-open `[startTime, endTime)` ranges.
 - Role permissions are enforced at route level and differ by operation. The permission definition is not a universal policy engine; consult the [API reference](./api-reference.md).
 - Audit records are written by selected domain operations. Their presence does not by itself provide a compliance-grade immutable audit system.
 

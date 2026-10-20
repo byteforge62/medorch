@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
 import { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-
+import { createHash } from "node:crypto";
+import { isLoginAttemptAllowed, recordVerificationEmailRequest } from "./modules/users/user.repository";
 import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { recordAudit } from "./modules/audit/audit.service";
@@ -29,7 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
 
 
-            async authorize(credentials) {
+            async authorize(credentials, request) {
                 if (
                     typeof credentials?.email !== "string" ||
                     typeof credentials?.password !== "string"
@@ -39,20 +40,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 const email = credentials.email.trim().toLowerCase();
 
+                const forwardedFor = request.headers.get("x-forwarded-for");
+                const clientIp = forwardedFor?.split(",")[0]?.trim() || "unknown";
+
+                const emailHash = createHash("sha256")
+                    .update(email)
+                    .digest("hex");
+
+                const ipHash = createHash("sha256")
+                    .update(clientIp)
+                    .digest("hex");
+
+                if (!(await isLoginAttemptAllowed(emailHash, ipHash))) {
+                    return null;
+                }
+
                 const user = await prisma.user.findUnique({
                     where: { email },
                 });
 
-                if (!user) {
-                    return null;
-                }
+                const passwordValid = user
+                    ? await verifyPassword(credentials.password, user.passwordHash)
+                    : false;
 
-                const passwordValid = await verifyPassword(
-                    credentials.password,
-                    user.passwordHash,
-                );
+                if (!user || !passwordValid) {
+                    await recordVerificationEmailRequest(
+                        emailHash,
+                        ipHash,
+                        "LOGIN_ATTEMPT",
+                    );
 
-                if (!passwordValid) {
                     return null;
                 }
 

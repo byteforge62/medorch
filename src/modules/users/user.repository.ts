@@ -293,6 +293,51 @@ type VerificationRequestPurpose =
   | "EMAIL_VERIFICATION"
   | "PASSWORD_RESET"
   | "PASSWORD_RESET_ATTEMPT"
+  | "LOGIN_ATTEMPT"
+
+
+export async function isLoginAttemptAllowed(
+  emailHash: string,
+  ipHash: string,
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - 15 * 60 * 1000);
+
+  return prisma.$transaction(async (tx) => {
+    const lockKeys = [
+      `LOGIN_ATTEMPT:email:${emailHash}`,
+      `LOGIN_ATTEMPT:ip:${ipHash}`,
+    ].sort();
+
+    for (const lockKey of lockKeys) {
+      await tx.$queryRaw`
+        SELECT 1 AS locked
+        FROM (
+          SELECT pg_advisory_xact_lock(hashtext(${lockKey})::bigint)
+        ) AS lock_query
+      `;
+    }
+
+    const [emailAttempts, ipAttempts] = await Promise.all([
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose: "LOGIN_ATTEMPT",
+          emailHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+      tx.verificationEmailRequest.count({
+        where: {
+          purpose: "LOGIN_ATTEMPT",
+          ipHash,
+          createdAt: { gte: windowStart },
+        },
+      }),
+    ]);
+
+    return emailAttempts < 5 && ipAttempts < 20;
+  });
+}
+
 export async function recordVerificationEmailRequest(
   emailHash: string,
   ipHash: string,
@@ -335,7 +380,10 @@ export async function recordVerificationEmailRequest(
       }),
     ]);
 
-    if (emailRequests >= 3 || ipRequests >= 10) {
+    const emailLimit = purpose === "LOGIN_ATTEMPT" ? 5 : 3;
+    const ipLimit = purpose === "LOGIN_ATTEMPT" ? 20 : 10;
+
+    if (emailRequests >= emailLimit || ipRequests >= ipLimit) {
       return false;
     }
 
