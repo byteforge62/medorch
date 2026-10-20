@@ -121,24 +121,8 @@ export async function updateScheduleStatusById(
     actorUserId,
   );
 
-  const auditAction =
-    status === "COMPLETED"
-      ? "COMPLETE"
-      : status === "CANCELLED"
-        ? "CANCEL"
-        : "UPDATE";
-
-  await recordAudit({
-    userId: actorUserId,
-    action: auditAction,
-    entity: "Schedule",
-    entityId: schedule.id,
-    description: `Schedule status changed to ${status}.`,
-    metadata: {
-      status,
-    },
-  });
-
+  // The repository updates the status and writes its audit record
+  // within the same transaction.
   return schedule;
 }
 
@@ -472,28 +456,16 @@ export async function assignScheduleStaffById(
     throw new Error("STAFF_ROLE_MISMATCH");
   }
 
-  const staff = await createScheduleStaff({
-    scheduleId,
-    userId: data.userId,
-    role: data.role,
-  },
-    actorUserId
-  );
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "CREATE",
-    entity: "ScheduleStaff",
-    entityId: staff.id,
-    description: `Staff member was assigned to schedule ${scheduleId}.`,
-    metadata: {
+  // The repository creates the assignment and its audit record
+  // within the same transaction.
+  return createScheduleStaff(
+    {
       scheduleId,
-      staffUserId: data.userId,
+      userId: data.userId,
       role: data.role,
     },
-  });
-
-  return staff;
+    actorUserId,
+  );
 }
 
 export async function removeScheduleStaffById(
@@ -501,13 +473,11 @@ export async function removeScheduleStaffById(
   scheduleId: string,
   actorUserId?: string,
 ) {
-  const staff = await deleteScheduleStaff(
-  scheduleStaffId,
-  scheduleId,
-  actorUserId,
-);
-
-  return staff;
+  return deleteScheduleStaff(
+    scheduleStaffId,
+    scheduleId,
+    actorUserId,
+  );
 }
 
 export async function getScheduleEquipment(
@@ -545,24 +515,11 @@ export async function assignScheduleEquipmentById(
     throw new Error("EQUIPMENT_UNAVAILABLE");
   }
 
-  const assignment = await createScheduleEquipment({
-    scheduleId,
-    equipmentId,
-  });
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "CREATE",
-    entity: "ScheduleEquipment",
-    entityId: assignment.id,
-    description: "Equipment assigned to schedule.",
-    metadata: {
-      scheduleId,
-      equipmentId
-    }
-  })
-
-  return assignment;
+  // The repository creates the assignment and audit record atomically.
+  return createScheduleEquipment(
+    { scheduleId, equipmentId },
+    actorUserId,
+  );
 }
 
 export async function releaseScheduleEquipmentById(
@@ -570,24 +527,12 @@ export async function releaseScheduleEquipmentById(
   scheduleId: string,
   actorUserId?: string,
 ) {
-  const assignment = await releaseScheduleEquipment(
+  // The repository releases the assignment and writes its audit record atomically.
+  return releaseScheduleEquipment(
     equipmentAssignmentId,
     scheduleId,
+    actorUserId,
   );
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "UPDATE",
-    entity: "ScheduleEquipment",
-    entityId: assignment.id,
-    description: "Equipment released from schedule.",
-    metadata: {
-      scheduleId: assignment.scheduleId,
-      equipmentId: assignment.equipmentId
-    }
-  })
-
-  return assignment;
 }
 
 export async function getScheduleNotes(
@@ -613,25 +558,8 @@ export async function createScheduleNoteById(
     throw new Error("SCHEDULE_NOT_FOUND");
   }
 
-  const note = await createScheduleNote({
-    scheduleId,
-    authorId,
-    content,
-  });
-
-  await recordAudit({
-    userId: authorId,
-    action: "CREATE",
-    entity: "ScheduleNote",
-    entityId: note.id,
-    description: `Note was added to schedule ${scheduleId}.`,
-    metadata: {
-      scheduleId,
-      authorId,
-    },
-  });
-
-  return note;
+  // The repository creates the note and its audit record atomically.
+  return createScheduleNote({ scheduleId, authorId, content });
 }
 
 
@@ -651,18 +579,8 @@ export async function updateScheduleNoteById(
     throw new Error("SCHEDULE_NOTE_FORBIDDEN");
   }
 
-  const updatedNote = await updateScheduleNote(noteId, content);
-
-  await recordAudit({
-    userId: authorId,
-    action: "UPDATE",
-    entity: "ScheduleNote",
-    entityId: note.id,
-    description: "Schedule note was updated.",
-    metadata: { scheduleId: note.scheduleId },
-  });
-
-  return updatedNote;
+  // The repository updates the note and writes its audit record atomically.
+  return updateScheduleNote(noteId, content, authorId);
 }
 
 export async function deleteScheduleNoteById(
@@ -680,18 +598,8 @@ export async function deleteScheduleNoteById(
     throw new Error("SCHEDULE_NOTE_FORBIDDEN");
   }
 
-  await deleteScheduleNote(noteId);
-
-  await recordAudit({
-    userId: authorId,
-    action: "DELETE",
-    entity: "ScheduleNote",
-    entityId: note.id,
-    description: "Schedule note was deleted.",
-    metadata: { scheduleId: note.scheduleId },
-  });
-
-  return note;
+  // The repository deletes the note and writes its audit record atomically.
+  return deleteScheduleNote(noteId, authorId);
 }
 
 export async function isScheduleAssignedToUser(

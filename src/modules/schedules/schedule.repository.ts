@@ -740,41 +740,27 @@ export async function findEquipmentForAssignment(
   });
 }
 
-export async function createScheduleEquipment(data: {
-  scheduleId: string;
-  equipmentId: string;
-}) {
+export async function createScheduleEquipment(
+  data: { scheduleId: string; equipmentId: string },
+  actorUserId?: string,
+) {
   return prisma.$transaction(async (tx) => {
     // Claim the equipment only if it is still available.
     const claim = await tx.equipment.updateMany({
-      where: {
-        id: data.equipmentId,
-        status: "AVAILABLE",
-      },
-      data: {
-        status: "IN_USE",
-      },
+      where: { id: data.equipmentId, status: "AVAILABLE" },
+      data: { status: "IN_USE" },
     });
 
     if (claim.count !== 1) {
       const equipment = await tx.equipment.findUnique({
-        where: {
-          id: data.equipmentId,
-        },
-        select: {
-          id: true,
-        },
+        where: { id: data.equipmentId },
+        select: { id: true },
       });
-
-      if (!equipment) {
-        throw new Error("EQUIPMENT_NOT_FOUND");
-      }
-
+      if (!equipment) throw new Error("EQUIPMENT_NOT_FOUND");
       throw new Error("EQUIPMENT_UNAVAILABLE");
     }
 
-    // Create the assignment in the same transaction.
-    return tx.scheduleEquipment.create({
+    const assignment = await tx.scheduleEquipment.create({
       data,
       select: {
         id: true,
@@ -793,6 +779,17 @@ export async function createScheduleEquipment(data: {
         },
       },
     });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "CREATE",
+      entity: "ScheduleEquipment",
+      entityId: assignment.id,
+      description: "Equipment assigned to schedule.",
+      metadata: { scheduleId: assignment.scheduleId, equipmentId: assignment.equipmentId },
+    }, tx);
+
+    return assignment;
   });
 }
 
@@ -800,6 +797,7 @@ export async function createScheduleEquipment(data: {
 export async function releaseScheduleEquipment(
   id: string,
   scheduleId: string,
+  actorUserId?: string,
 ) {
   return prisma.$transaction(async (tx) => {
     const assignment = await tx.scheduleEquipment.findUnique({
@@ -855,10 +853,21 @@ export async function releaseScheduleEquipment(
       });
     }
 
-    return {
+    const result = {
       ...assignment,
       releasedAt: new Date(),
     };
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "UPDATE",
+      entity: "ScheduleEquipment",
+      entityId: assignment.id,
+      description: "Equipment released from schedule.",
+      metadata: { scheduleId: assignment.scheduleId, equipmentId: assignment.equipmentId },
+    }, tx);
+
+    return result;
   });
 }
 
@@ -892,53 +901,67 @@ export async function findScheduleNotes(
   });
 }
 
-export async function createScheduleNote(
-  data: {
-    scheduleId: string;
-    authorId: string;
-    content: string;
-  },
-) {
-  return prisma.scheduleNote.create({
-    data,
-    select: {
-      id: true,
-      scheduleId: true,
-      authorId: true,
-      content: true,
-      createdAt: true,
-      updatedAt: true,
-
-      author: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
+export async function createScheduleNote(data: {
+  scheduleId: string;
+  authorId: string;
+  content: string;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        authorId: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        author: { select: { id: true, name: true, email: true } },
       },
-    },
+    });
+
+    await createAuditLog({
+      userId: data.authorId,
+      action: "CREATE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: `Note was added to schedule ${note.scheduleId}.`,
+      metadata: { scheduleId: note.scheduleId, authorId: note.authorId },
+    }, tx);
+
+    return note;
   });
 }
 
 export async function updateScheduleNote(
   id: string,
   content: string,
+  actorUserId?: string,
 ) {
-  return prisma.scheduleNote.update({
-    where: {
-      id,
-    },
-    data: {
-      content,
-    },
-    select: {
-      id: true,
-      scheduleId: true,
-      authorId: true,
-      content: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.update({
+      where: { id },
+      data: { content },
+      select: {
+        id: true,
+        scheduleId: true,
+        authorId: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "UPDATE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: "Schedule note was updated.",
+      metadata: { scheduleId: note.scheduleId },
+    }, tx);
+
+    return note;
   });
 }
 
@@ -958,10 +981,22 @@ export async function findScheduleNoteById(id: string) {
   });
 }
 
-export async function deleteScheduleNote(id: string) {
-  return prisma.scheduleNote.delete({
-    where: {
-      id,
-    },
+export async function deleteScheduleNote(
+  id: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const note = await tx.scheduleNote.delete({ where: { id } });
+
+    await createAuditLog({
+      userId: actorUserId,
+      action: "DELETE",
+      entity: "ScheduleNote",
+      entityId: note.id,
+      description: "Schedule note was deleted.",
+      metadata: { scheduleId: note.scheduleId },
+    }, tx);
+
+    return note;
   });
 }
