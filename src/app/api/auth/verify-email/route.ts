@@ -1,4 +1,5 @@
-
+import { createHash } from "node:crypto";
+import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
 import { NextResponse } from "next/server";
 import { verifyPatientEmailToken } from "@/modules/users/user.service";
 
@@ -26,9 +27,45 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const result = await verifyPatientEmailToken(body.token);
+  const token = body.token.trim();
 
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return NextResponse.json(
+      { message: "This verification link is invalid or expired." },
+      { status: 400 },
+    );
+  }
+
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
+
+  const tokenHash = createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(clientIp)
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    tokenHash,
+    ipHash,
+    "EMAIL_VERIFICATION_TOKEN",
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { message: "Too many verification attempts. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": "900" },
+      },
+    );
+  }
+
+  try {
+    const result = await verifyPatientEmailToken(token);
     if (!result.verified) {
       return NextResponse.json(
         { message: "This verification link is invalid or expired." },
