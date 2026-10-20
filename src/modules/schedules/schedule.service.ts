@@ -476,7 +476,9 @@ export async function assignScheduleStaffById(
     scheduleId,
     userId: data.userId,
     role: data.role,
-  });
+  },
+    actorUserId
+  );
 
   await recordAudit({
     userId: actorUserId,
@@ -499,20 +501,11 @@ export async function removeScheduleStaffById(
   scheduleId: string,
   actorUserId?: string,
 ) {
-  const staff = await deleteScheduleStaff(scheduleStaffId, scheduleId);
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "DELETE",
-    entity: "ScheduleStaff",
-    entityId: staff.id,
-    description: "Staff member was removed from a schedule.",
-    metadata: {
-      scheduleId: staff.scheduleId,
-      staffUserId: staff.userId,
-      role: staff.role,
-    },
-  });
+  const staff = await deleteScheduleStaff(
+  scheduleStaffId,
+  scheduleId,
+  actorUserId,
+);
 
   return staff;
 }

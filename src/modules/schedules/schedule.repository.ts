@@ -612,41 +612,85 @@ export async function createScheduleStaff(
     scheduleId: string;
     userId: string;
     role:
-    | "SURGEON"
-    | "NURSE"
-    | "ANESTHETIST"
-    | "TECHNICIAN"
-    | "OTHER";
+      | "SURGEON"
+      | "NURSE"
+      | "ANESTHETIST"
+      | "TECHNICIAN"
+      | "OTHER";
   },
+  actorUserId?: string,
 ) {
-  return prisma.scheduleStaff.create({
-    data,
-    select: {
-      id: true,
-      scheduleId: true,
-      userId: true,
-      role: true,
-      assignedAt: true,
-
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          status: true,
+  return prisma.$transaction(async (tx) => {
+    const staff = await tx.scheduleStaff.create({
+      data,
+      select: {
+        id: true,
+        scheduleId: true,
+        userId: true,
+        role: true,
+        assignedAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            status: true,
+          },
         },
       },
-    },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "CREATE",
+        entity: "ScheduleStaff",
+        entityId: staff.id,
+        description: `Staff member was assigned to schedule ${data.scheduleId}.`,
+        metadata: {
+          scheduleId: data.scheduleId,
+          staffUserId: data.userId,
+          role: data.role,
+        },
+      },
+      tx,
+    );
+
+    return staff;
   });
 }
 
-export async function deleteScheduleStaff(id: string, scheduleId: string) {
-  return prisma.scheduleStaff.delete({
-    where: {
-      id,
-      scheduleId,
-    },
+export async function deleteScheduleStaff(
+  id: string,
+  scheduleId: string,
+  actorUserId?: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const staff = await tx.scheduleStaff.delete({
+      where: {
+        id,
+        scheduleId,
+      },
+    });
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "DELETE",
+        entity: "ScheduleStaff",
+        entityId: staff.id,
+        description: "Staff member was removed from a schedule.",
+        metadata: {
+          scheduleId: staff.scheduleId,
+          staffUserId: staff.userId,
+          role: staff.role,
+        },
+      },
+      tx,
+    );
+
+    return staff;
   });
 }
 
