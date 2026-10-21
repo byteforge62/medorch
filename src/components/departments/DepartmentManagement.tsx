@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -68,6 +69,9 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export function DepartmentManagement() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'ADMIN';
+
   const [departments, setDepartments] = useState<Department[]>([]);
   const [doctors, setDoctors] = useState<DoctorOption[]>([]);
   const [search, setSearch] = useState('');
@@ -325,14 +329,22 @@ return (
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={openCreateForm}
-          className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-        >
-          + New department
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={openCreateForm}
+            className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            + New department
+          </button>
+        )}
       </header>
+
+      {!isAdmin && (
+        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3 text-sm text-[var(--color-foreground-secondary)]">
+          Read-only department access. Only administrators can create, edit, or deactivate departments.
+        </div>
+      )}
 
       {notice && (
         <div
@@ -507,28 +519,30 @@ return (
                 ))}
               </dl>
 
-              <div className="mt-5 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-4">
-                <button
-                  type="button"
-                  onClick={() => openEditForm(department)}
-                  className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
-                >
-                  Edit department
-                </button>
+              {isAdmin && (
+                <div className="mt-5 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-4">
+                  <button
+                    type="button"
+                    onClick={() => openEditForm(department)}
+                    className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+                  >
+                    Edit department
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => void toggleDepartmentStatus(department)}
-                  disabled={pendingActionId === department.id}
-                  className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
-                >
-                  {pendingActionId === department.id
-                    ? 'Updating...'
-                    : department.isActive
-                      ? 'Deactivate'
-                      : 'Reactivate'}
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => void toggleDepartmentStatus(department)}
+                    disabled={pendingActionId === department.id}
+                    className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
+                  >
+                    {pendingActionId === department.id
+                      ? 'Updating...'
+                      : department.isActive
+                        ? 'Deactivate'
+                        : 'Reactivate'}
+                  </button>
+                </div>
+              )}
             </Card>
           ))}
         </section>

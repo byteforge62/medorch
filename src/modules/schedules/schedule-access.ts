@@ -36,21 +36,23 @@ export function redactScheduleClinicalNotes<
 
 export function redactScheduleDetailsForOT<
   T extends {
-    clinicalNotes: unknown;
-    notes: unknown;
-    patient: {
-      email: unknown;
-      dateOfBirth: unknown;
-      gender: unknown;
-    };
+    clinicalNotes?: unknown;
+    notes?: unknown;
+    patient?: {
+      email?: unknown;
+      dateOfBirth?: unknown;
+      gender?: unknown;
+    } | null;
   },
 >(schedule: T) {
+  const patient = schedule.patient ?? {};
+
   return {
     ...schedule,
     clinicalNotes: null,
-    notes: [],
+    notes: Array.isArray(schedule.notes) ? [] : [],
     patient: {
-      ...schedule.patient,
+      ...patient,
       email: null,
       dateOfBirth: null,
       gender: null,
