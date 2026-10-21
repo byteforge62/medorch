@@ -68,7 +68,20 @@ docker compose down
 | `npm run format` | Format the repository with Prettier. |
 | `npm run format:check` | Check formatting with Prettier. |
 
-The repository currently has no `test` or `typecheck` npm script. `npm run build` is the available production compilation check; it does not replace automated behavior tests.
+There is no aggregate `test` or `typecheck` npm script. TypeScript is checked by `npm run build` or `npx tsc --noEmit`; neither replaces automated behavior tests.
+
+## Automated tests
+
+The project uses Node's test runner with `tsx`:
+
+```powershell
+node --import tsx --test tests/api-request-validation.test.ts tests/schedule-access.test.ts tests/permissions.test.ts tests/foundation-validation.test.ts
+npm run test:permissions
+```
+
+PostgreSQL integration tests require `DATABASE_URL` to point to a confirmed disposable database. `npm run test:database` runs the constraint, schedule-status concurrency, repository/audit, and synthetic privacy-boundary integration tests. It uses Node's `react-server` export condition so tests can import server-only Prisma modules. Never run it against a valuable development or production database.
+
+The more focused `npm run test:schedule-constraints` command runs only the overlap-constraint suite and also requires a disposable database.
 
 ## Validation before sharing changes
 
@@ -79,7 +92,7 @@ npm run lint
 npm run build
 ```
 
-For schema changes, generate the Prisma client and verify migrations against a disposable local database. For API or domain behavior changes, add or run targeted tests once a test harness is established; no dedicated test suite is currently configured.
+For schema changes, generate the Prisma client and verify migrations against a disposable local database. For API or domain behavior changes, add or run the focused tests above, then run `npm run test:database` when the changed behavior relies on PostgreSQL.
 
 ## Troubleshooting
 
