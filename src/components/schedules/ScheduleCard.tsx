@@ -53,7 +53,7 @@ export type ScheduleItem = {
 
 interface ScheduleCardProps {
   schedule: ScheduleItem;
-  isAdmin?: boolean;
+  canManageSchedules?: boolean;
   onEdit?: (schedule: ScheduleItem) => void;
   /** Called after a successful status change so the parent list can update. */
   onStatusUpdated?: (
@@ -97,7 +97,7 @@ const formatTime = (timeStr: string): string => {
 
 export function ScheduleCard({
   schedule,
-  isAdmin = false,
+  canManageSchedules = false,
   onEdit,
   onStatusUpdated,
 }: ScheduleCardProps) {
@@ -197,8 +197,8 @@ export function ScheduleCard({
           </div>
         )}
 
-        {/* Status lifecycle actions — ADMIN only */}
-        {isAdmin && onStatusUpdated && (
+        {/* Status transitions and schedule edits require schedules:manage. */}
+        {canManageSchedules && onStatusUpdated && (
           <div className="border-t border-slate-100 pt-3 dark:border-slate-800">
             <ScheduleStatusActions
               scheduleId={schedule.id}
@@ -220,7 +220,7 @@ export function ScheduleCard({
           View details
         </Link>
 
-        {isAdmin && onEdit && (
+        {canManageSchedules && onEdit && (
           <Button onClick={() => onEdit(schedule)}>
             Edit
           </Button>

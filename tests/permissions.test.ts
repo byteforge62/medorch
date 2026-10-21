@@ -24,6 +24,7 @@ test("ADMIN permissions", () => {
 
 test("DOCTOR permissions", () => {
   assert.equal(hasPermission(UserRole.DOCTOR, "schedules:read"), true);
+  assert.equal(hasPermission(UserRole.DOCTOR, "schedules:manage"), true);
   assert.equal(
     hasPermission(UserRole.DOCTOR, "schedules:notes:manage"),
     true,
@@ -40,6 +41,8 @@ test("DOCTOR permissions", () => {
     hasPermission(UserRole.DOCTOR, "schedules:create"),
     false,
   );
+  assert.equal(hasPermission(UserRole.DOCTOR, "otRooms:manage"), false);
+  assert.equal(hasPermission(UserRole.DOCTOR, "equipment:manage"), false);
 });
 
 test("OT_STAFF cannot manage clinical notes or equipment assignments", () => {
@@ -56,6 +59,8 @@ test("OT_STAFF cannot manage clinical notes or equipment assignments", () => {
     hasPermission(UserRole.OT_STAFF, "patients:clinical:read"),
     false,
   );
+  assert.equal(hasPermission(UserRole.OT_STAFF, "otRooms:manage"), false);
+  assert.equal(hasPermission(UserRole.OT_STAFF, "equipment:manage"), false);
 });
 
 test("PATIENT is restricted to own schedule access", () => {

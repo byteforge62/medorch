@@ -12,7 +12,7 @@ interface ScheduleListProps {
   isLoading: boolean;
   error: string | null;
   onRetry: () => void;
-  isAdmin?: boolean;
+  canManageSchedules?: boolean;
   onEdit?: (schedule: ScheduleItem) => void;
   onStatusUpdated?: (scheduleId: string, newStatus: ScheduleStatus) => void;
 }
@@ -22,7 +22,7 @@ export function ScheduleList({
   isLoading,
   error,
   onRetry,
-  isAdmin = false,
+  canManageSchedules = false,
   onEdit,
   onStatusUpdated,
 }: ScheduleListProps) {
@@ -49,7 +49,7 @@ export function ScheduleList({
         <ScheduleCard
           key={schedule.id}
           schedule={schedule}
-          isAdmin={isAdmin}
+          canManageSchedules={canManageSchedules}
           onEdit={onEdit}
           onStatusUpdated={onStatusUpdated}
         />

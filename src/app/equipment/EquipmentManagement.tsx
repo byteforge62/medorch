@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
@@ -14,6 +16,7 @@ interface Equipment {
   id: string;
   name: string;
   category: string;
+  departmentId?: string | null;
   serialNumber?: string | null;
   status: EquipmentStatus;
   maintenanceDueAt?: string | null;
@@ -22,6 +25,27 @@ interface Equipment {
     name: string;
   } | null;
 }
+
+interface DepartmentOption {
+  id: string;
+  name: string;
+}
+
+interface EquipmentForm {
+  name: string;
+  category: string;
+  serialNumber: string;
+  departmentId: string;
+  maintenanceDueAt: string;
+}
+
+const EMPTY_FORM: EquipmentForm = {
+  name: '',
+  category: '',
+  serialNumber: '',
+  departmentId: '',
+  maintenanceDueAt: '',
+};
 
 const STATUS_OPTIONS: EquipmentStatus[] = [
   'AVAILABLE',
@@ -45,11 +69,144 @@ function formatDate(value?: string | null) {
 }
 
 export function EquipmentManagement() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'ADMIN';
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<EquipmentStatus | 'ALL'>('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [updatingEquipmentId, setUpdatingEquipmentId] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+  const [form, setForm] = useState<EquipmentForm>(EMPTY_FORM);
+  const [formError, setFormError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+
+    apiClient
+      .get<DepartmentOption[]>('/api/departments')
+      .then((response) => {
+        if (!cancelled) setDepartments(response);
+      })
+      .catch((fetchError: unknown) => {
+        if (!cancelled) {
+          setFormError(
+            fetchError instanceof ApiClientError
+              ? fetchError.message
+              : 'Failed to load departments.',
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin]);
+
+  function openCreateForm() {
+    setEditingEquipment(null);
+    setForm({ ...EMPTY_FORM });
+    setFormError('');
+    setShowForm(true);
+  }
+
+  function openEditForm(item: Equipment) {
+    setEditingEquipment(item);
+    setForm({
+      name: item.name,
+      category: item.category,
+      serialNumber: item.serialNumber ?? '',
+      departmentId: item.department?.id ?? item.departmentId ?? '',
+      maintenanceDueAt: item.maintenanceDueAt
+        ? new Date(item.maintenanceDueAt).toISOString().slice(0, 10)
+        : '',
+    });
+    setFormError('');
+    setShowForm(true);
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setFormError('');
+
+    const common = {
+      name: form.name.trim(),
+      category: form.category.trim(),
+    };
+    const payload = editingEquipment
+      ? {
+          ...common,
+          serialNumber: form.serialNumber.trim() || null,
+          departmentId: form.departmentId || null,
+          maintenanceDueAt: form.maintenanceDueAt || null,
+        }
+      : {
+          ...common,
+          ...(form.serialNumber.trim()
+            ? { serialNumber: form.serialNumber.trim() }
+            : {}),
+          ...(form.departmentId ? { departmentId: form.departmentId } : {}),
+          ...(form.maintenanceDueAt
+            ? { maintenanceDueAt: form.maintenanceDueAt }
+            : {}),
+        };
+
+    try {
+      const saved = editingEquipment
+        ? await apiClient.patch<Equipment>(
+            `/api/equipment/${editingEquipment.id}`,
+            payload,
+          )
+        : await apiClient.post<Equipment>('/api/equipment', payload);
+      setEquipment((current) =>
+        editingEquipment
+          ? current.map((item) =>
+              item.id === saved.id ? { ...item, ...saved } : item,
+            )
+          : [saved, ...current],
+      );
+      setShowForm(false);
+      setEditingEquipment(null);
+      setForm({ ...EMPTY_FORM });
+    } catch (submitError) {
+      setFormError(
+        submitError instanceof ApiClientError
+          ? submitError.message
+          : `Failed to ${editingEquipment ? 'update' : 'create'} equipment.`,
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleStatusChange(id: string, nextStatus: EquipmentStatus) {
+    setUpdatingEquipmentId(id);
+    setError('');
+
+    try {
+      const updated = await apiClient.patch<Equipment>(
+        `/api/equipment/${id}/status`,
+        { status: nextStatus },
+      );
+      setEquipment((current) =>
+        current.map((item) => (item.id === id ? { ...item, ...updated } : item)),
+      );
+    } catch (updateError) {
+      setError(
+        updateError instanceof ApiClientError
+          ? updateError.message
+          : 'Failed to update equipment status.',
+      );
+    } finally {
+      setUpdatingEquipmentId(null);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -115,7 +272,7 @@ export function EquipmentManagement() {
     return <LoadingState />;
   }
 
-  if (error) {
+  if (error && equipment.length === 0) {
     return <ErrorState message={error} />;
   }
 
@@ -131,6 +288,133 @@ export function EquipmentManagement() {
           maintenance information.
         </p>
       </section>
+
+      {isAdmin && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={openCreateForm}
+            className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white"
+          >
+            Add equipment
+          </button>
+        </div>
+      )}
+
+      {showForm && isAdmin && (
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="text-lg font-semibold">
+              {editingEquipment ? 'Edit equipment' : 'Add equipment'}
+            </h2>
+            {formError && (
+              <p role="alert" className="text-sm text-[var(--color-danger)]">
+                {formError}
+              </p>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-1 text-sm">
+                <span>Name</span>
+                <input
+                  required
+                  maxLength={150}
+                  value={form.name}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, name: event.target.value }))
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>Category</span>
+                <input
+                  required
+                  maxLength={100}
+                  value={form.category}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, category: event.target.value }))
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>Serial number</span>
+                <input
+                  maxLength={100}
+                  value={form.serialNumber}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      serialNumber: event.target.value,
+                    }))
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>Department</span>
+                <select
+                  value={form.departmentId}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      departmentId: event.target.value,
+                    }))
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                >
+                  <option value="">Unassigned</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>Maintenance due</span>
+                <input
+                  type="date"
+                  value={form.maintenanceDueAt}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      maintenanceDueAt: event.target.value,
+                    }))
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                />
+              </label>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => setShowForm(false)}
+                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {saving ? 'Saving…' : editingEquipment ? 'Save changes' : 'Create'}
+              </button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg border border-[var(--color-danger-border)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]"
+        >
+          {error}
+        </div>
+      )}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
@@ -216,7 +500,32 @@ export function EquipmentManagement() {
                   </p>
                 </div>
 
-                <Badge>{formatStatus(item.status)}</Badge>
+                {isAdmin ? (
+                  <select
+                    aria-label={`Status for ${item.name}`}
+                    value={item.status}
+                    disabled={updatingEquipmentId === item.id}
+                    onChange={(event) =>
+                      void handleStatusChange(
+                        item.id,
+                        event.target.value as EquipmentStatus,
+                      )
+                    }
+                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-xs"
+                  >
+                    {STATUS_OPTIONS.map((option) => (
+                      <option
+                        key={option}
+                        value={option}
+                        disabled={option === 'IN_USE'}
+                      >
+                        {formatStatus(option)}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <Badge>{formatStatus(item.status)}</Badge>
+                )}
               </div>
 
               <dl className="mt-5 space-y-3 text-sm">
@@ -243,6 +552,15 @@ export function EquipmentManagement() {
                   </dd>
                 </div>
               </dl>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => openEditForm(item)}
+                  className="mt-4 text-sm font-medium text-[var(--color-primary)]"
+                >
+                  Edit details
+                </button>
+              )}
             </Card>
           ))}
         </section>

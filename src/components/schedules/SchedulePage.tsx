@@ -21,6 +21,8 @@ import { ScheduleCalendar } from './ScheduleCalendar';
 export function SchedulePage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "ADMIN";
+  const canManageSchedules =
+    isAdmin || session?.user?.role === "DOCTOR";
 
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
@@ -86,11 +88,11 @@ export function SchedulePage() {
       const departmentRequest = apiClient.get<DepartmentOption[]>("/api/departments");
       const roomRequest = apiClient.get<OTRoomOption[]>("/api/ot-rooms");
 
-      const patientRequest = isAdmin
+      const patientRequest = canManageSchedules
         ? apiClient.get<PatientOption[]>("/api/patients")
         : Promise.resolve(null);
 
-      const doctorRequest = isAdmin
+      const doctorRequest = canManageSchedules
         ? apiClient.get<DoctorOption[]>("/api/doctors")
         : Promise.resolve(null);
 
@@ -132,7 +134,7 @@ export function SchedulePage() {
     return () => {
       isMounted = false;
     };
-  }, [isAdmin]);
+  }, [canManageSchedules]);
 
   // Client-side filtering logic
   const filteredSchedules = useMemo(() => {
@@ -380,7 +382,7 @@ export function SchedulePage() {
           isLoading={isLoading}
           error={error}
           onRetry={fetchSchedules}
-          isAdmin={isAdmin}
+          canManageSchedules={canManageSchedules}
           onEdit={handleOpenEdit}
           onStatusUpdated={handleStatusUpdated}
         />

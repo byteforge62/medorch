@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { ScheduleStatusActions } from '@/components/schedules/ScheduleStatusActions';
 
 type ScheduleStatus =
   | 'SCHEDULED'
@@ -48,6 +49,7 @@ interface ScheduleEquipment {
 
 interface ScheduleNote {
   id: string;
+  authorId?: string;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -140,6 +142,8 @@ function formatDateTime(value: string) {
 export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'ADMIN';
+  const canManageSchedules =
+    isAdmin || session?.user?.role === 'DOCTOR';
   const canManageNotes = isAdmin || session?.user?.role === "DOCTOR";
 
   const [schedule, setSchedule] = useState<Schedule | null>(null);
@@ -154,6 +158,8 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   const [selectedEquipmentId, setSelectedEquipmentId] = useState('');
 
   const [noteContent, setNoteContent] = useState('');
+  const [editingNote, setEditingNote] = useState<ScheduleNote | null>(null);
+  const [editingNoteContent, setEditingNoteContent] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -167,6 +173,20 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
 
     setSchedule(response);
   }, [scheduleId]);
+
+  const refreshAfterMutation = async () => {
+    try {
+      await loadSchedule();
+    } catch (refreshError) {
+      setError(
+        `The change was saved, but the schedule could not be refreshed: ${
+          refreshError instanceof ApiClientError
+            ? refreshError.message
+            : 'Please reload this page.'
+        }`,
+      );
+    }
+  };
 
 
   useEffect(() => {
@@ -250,8 +270,8 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         role: selectedStaffRole,
       });
 
-      await loadSchedule();
       setSelectedUserId('');
+      await refreshAfterMutation();
     } catch (actionError) {
       setError(
         actionError instanceof ApiClientError
@@ -270,7 +290,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
     try {
       await apiClient.delete(`/api/schedules/${scheduleId}/staff/${staffId}`);
 
-      await loadSchedule();
+      await refreshAfterMutation();
     } catch (actionError) {
       setError(
         actionError instanceof ApiClientError
@@ -295,8 +315,8 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         equipmentId: selectedEquipmentId,
       });
 
-      await loadSchedule();
       setSelectedEquipmentId('');
+      await refreshAfterMutation();
     } catch (actionError) {
       setError(
         actionError instanceof ApiClientError
@@ -318,7 +338,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         {},
       );
 
-      await loadSchedule();
+      await refreshAfterMutation();
     } catch (actionError) {
       setError(
         actionError instanceof ApiClientError
@@ -345,13 +365,81 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         content,
       });
 
-      await loadSchedule();
       setNoteContent('');
+      await refreshAfterMutation();
     } catch (actionError) {
       setError(
         actionError instanceof ApiClientError
           ? actionError.message
           : 'Failed to add note.',
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateNote = async () => {
+    const content = editingNoteContent.trim();
+    if (!editingNote || !content) return;
+
+    setActionLoading(true);
+    setError('');
+    try {
+      const updatedNote = await apiClient.patch<Pick<ScheduleNote, 'id' | 'content' | 'updatedAt'>>(
+        `/api/schedules/${scheduleId}/notes/${editingNote.id}`,
+        { content },
+      );
+
+      setSchedule((current) =>
+        current
+          ? {
+              ...current,
+              notes: current.notes.map((note) =>
+                note.id === updatedNote.id
+                  ? { ...note, content: updatedNote.content, updatedAt: updatedNote.updatedAt }
+                  : note,
+              ),
+            }
+          : current,
+      );
+      setEditingNote(null);
+      setEditingNoteContent('');
+    } catch (actionError) {
+      setError(
+        actionError instanceof ApiClientError
+          ? actionError.message
+          : 'Failed to update note.',
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteNote = async (note: ScheduleNote) => {
+    if (!window.confirm('Delete this schedule note? This action cannot be undone.')) {
+      return;
+    }
+
+    setActionLoading(true);
+    setError('');
+    try {
+      await apiClient.delete(
+        `/api/schedules/${scheduleId}/notes/${note.id}`,
+      );
+      setSchedule((current) =>
+        current
+          ? { ...current, notes: current.notes.filter((item) => item.id !== note.id) }
+          : current,
+      );
+      if (editingNote?.id === note.id) {
+        setEditingNote(null);
+        setEditingNoteContent('');
+      }
+    } catch (actionError) {
+      setError(
+        actionError instanceof ApiClientError
+          ? actionError.message
+          : 'Failed to delete note.',
       );
     } finally {
       setActionLoading(false);
@@ -410,6 +498,17 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
             <Badge>{formatLabel(schedule.priority)}</Badge>
           </div>
         </div>
+        {canManageSchedules && (
+          <ScheduleStatusActions
+            scheduleId={schedule.id}
+            currentStatus={schedule.status}
+            onStatusUpdated={(_scheduleId, status) =>
+              setSchedule((current) =>
+                current ? { ...current, status } : current,
+              )
+            }
+          />
+        )}
 
         {error ? (
           <p className="text-sm text-[var(--color-danger)]">{error}</p>
@@ -673,9 +772,67 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                   </p>
                 </div>
 
-                <p className="mt-3 text-sm whitespace-pre-wrap">
-                  {note.content}
-                </p>
+                {editingNote?.id === note.id ? (
+                  <div className="mt-3 space-y-2">
+                    <textarea
+                      value={editingNoteContent}
+                      onChange={(event) => setEditingNoteContent(event.target.value)}
+                      rows={3}
+                      maxLength={5000}
+                      disabled={actionLoading}
+                      aria-label="Edit schedule note"
+                      className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        disabled={actionLoading}
+                        onClick={() => {
+                          setEditingNote(null);
+                          setEditingNoteContent('');
+                        }}
+                        className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-medium disabled:opacity-50"
+                      >
+                        Keep note
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!editingNoteContent.trim() || actionLoading}
+                        onClick={() => void handleUpdateNote()}
+                        className="rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
+                      >
+                        Save note
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm whitespace-pre-wrap">
+                    {note.content}
+                  </p>
+                )}
+                {canManageNotes && note.author.id === session?.user?.id && (
+                  <div className="mt-3 flex justify-end gap-3">
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => {
+                        setEditingNote(note);
+                        setEditingNoteContent(note.content);
+                      }}
+                      className="text-xs font-medium text-[var(--color-primary)] disabled:opacity-50"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => void handleDeleteNote(note)}
+                      className="text-xs font-medium text-[var(--color-danger)] disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </article>
             ))
           )}
@@ -687,6 +844,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               value={noteContent}
               onChange={(event) => setNoteContent(event.target.value)}
               rows={4}
+              maxLength={5000}
               placeholder="Add a clinical or operational note..."
               className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
             />
