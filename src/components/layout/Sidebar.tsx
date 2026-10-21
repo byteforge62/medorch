@@ -54,7 +54,106 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
-
+  {
+    name: 'Departments',
+    href: '/departments',
+    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 19V7.5A1.5 1.5 0 015.5 6H8l2-2h6.5A1.5 1.5 0 0118 5.5V19M4 19h16M8 10h8M8 14h8"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: 'Patients',
+    href: '/patients',
+    roles: ['ADMIN', 'DOCTOR'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17 20v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M9.5 7a3.5 3.5 0 107 0 3.5 3.5 0 00-7 0zM19 8h2m-1-1v2"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: 'Doctors',
+    href: '/doctors',
+    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M10 19v-1a4 4 0 014-4h2a4 4 0 014 4v1M16 11a4 4 0 100-8 4 4 0 000 8zM6 11a4 4 0 100-8 4 4 0 000 8z"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: 'Equipment',
+    href: '/equipment',
+    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 6h10l1 10H6L7 6zm2 10h6M9 6V4h6v2M9 14v2m6-2v2"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: 'OT Rooms',
+    href: '/ot-rooms',
+    roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
+    icon: (
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 19V5h18v14M6 8h12M6 12h12M9 19v-2m6 2v-2"
+        />
+      </svg>
+    ),
+  },
   {
     name: 'My Appointments',
     href: '/patients/appointments',
@@ -75,7 +174,6 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
-
   {
     name: 'Users',
     href: '/users',

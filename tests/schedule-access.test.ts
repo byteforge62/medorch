@@ -70,3 +70,21 @@ test("schedule detail redaction removes clinical and patient-specific fields", (
     },
   });
 });
+
+test("schedule detail redaction is null-safe for missing patient or notes data", () => {
+  const result = redactScheduleDetailsForOT({
+    clinicalNotes: undefined,
+    notes: undefined,
+    patient: undefined,
+  });
+
+  assert.deepEqual(result, {
+    clinicalNotes: null,
+    notes: [],
+    patient: {
+      email: null,
+      dateOfBirth: null,
+      gender: null,
+    },
+  });
+});
