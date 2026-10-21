@@ -89,7 +89,7 @@ Role names used by the API:
 | Doctors | `ADMIN`, `DOCTOR`, `OT_STAFF` | `ADMIN` |
 | Patients | `ADMIN`, `DOCTOR` | `ADMIN` |
 | Departments, rooms, equipment | `ADMIN`, `DOCTOR`, `OT_STAFF` | `ADMIN` |
-| Schedules | `ADMIN`, `DOCTOR`, `OT_STAFF`; OT staff can fetch an individual schedule and its staff/equipment only when assigned. Patients can read only their own appointments through `/api/me/appointments`. OT-staff schedule responses redact clinical notes and patient email, date of birth, and gender. | Schedule create/update/status and staff/equipment assignment require `ADMIN`; schedule-note operations allow `ADMIN`, `DOCTOR`. |
+| Schedules | `ADMIN`, `DOCTOR`, `OT_STAFF`; OT staff can fetch an individual schedule and its staff/equipment only when assigned. Patients can read only their own appointments through `/api/me/appointments`. OT-staff schedule responses redact clinical notes and patient email, date of birth, and gender. | Schedule create and staff/equipment assignment require `ADMIN`. Schedule update and status changes allow `ADMIN` and `DOCTOR`; Doctors may manage any schedule. Schedule-note operations allow `ADMIN`, `DOCTOR`. |
 | Alerts | All four roles can read; non-admins are restricted to their own alerts by the service. | Alert creation allows `ADMIN`, `DOCTOR`, `OT_STAFF`; alert changes are available to all four roles, with non-admin ownership checks in the service. |
 | Audit | `ADMIN` | No audit mutation endpoint is exposed. |
 

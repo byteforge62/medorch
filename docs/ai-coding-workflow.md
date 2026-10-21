@@ -32,11 +32,11 @@ Run only relevant checks first, then the full available suite for meaningful cha
 npx tsc --noEmit
 npm run lint
 node --import tsx --test tests/api-request-validation.test.ts tests/schedule-access.test.ts tests/permissions.test.ts tests/foundation-validation.test.ts
-npm run test:schedule-constraints
+npm run test:database
 npm run build
 ```
 
-Also use `npx prisma validate` and `npx prisma migrate status` for schema/migration work. DB tests must point to a disposable test database. Never run a seed or destructive test against valuable data.
+Also use `npx prisma validate` and `npx prisma migrate status` for schema/migration work. `npm run test:database` includes the schedule-constraint, repository/audit, and synthetic privacy-boundary integration suites; it requires `DATABASE_URL` to point to a confirmed disposable test database. Never run a seed or destructive test against valuable data.
 
 Report command results honestly: PASS only if run and passed; BLOCKED if prerequisites are missing; NOT RUN if not attempted. Do not infer success from old logs.
 

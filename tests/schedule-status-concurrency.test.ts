@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { Pool } from "pg";
+import { updateScheduleStatus } from "@/modules/schedules/schedule.repository";
 
 test("concurrent status updates from the same initial state allow only one winner", async () => {
   const connectionString = process.env.DATABASE_URL;
@@ -103,32 +104,36 @@ test("concurrent status updates from the same initial state allow only one winne
       setup.release();
     }
 
-    // Both requests expect the same initial status. PostgreSQL serializes
-    // conflicting updates and rechecks the WHERE condition after waiting.
-    const attempts = await Promise.all([
-      pool.query<{ status: string }>(
-        `UPDATE "Schedule"
-         SET "status" = 'CONFIRMED', "updatedAt" = NOW()
-         WHERE "id" = $1 AND "status" = 'SCHEDULED'
-         RETURNING "status"`,
-        [scheduleId],
+    const attempts = await Promise.allSettled([
+      updateScheduleStatus(
+        scheduleId,
+        "CONFIRMED",
+        "SCHEDULED",
+        surgeonId,
       ),
-      pool.query<{ status: string }>(
-        `UPDATE "Schedule"
-         SET "status" = 'CANCELLED', "updatedAt" = NOW()
-         WHERE "id" = $1 AND "status" = 'SCHEDULED'
-         RETURNING "status"`,
-        [scheduleId],
+      updateScheduleStatus(
+        scheduleId,
+        "CANCELLED",
+        "SCHEDULED",
+        surgeonId,
       ),
     ]);
 
-    const affectedRows = attempts.map((result) => result.rowCount ?? 0);
-
-    assert.deepEqual(
-      [...affectedRows].sort(),
-      [0, 1],
-      "Exactly one competing update should succeed.",
+    const winners = attempts.filter(
+      (attempt) => attempt.status === "fulfilled",
     );
+    const conflicts = attempts.filter(
+      (attempt) => attempt.status === "rejected",
+    );
+
+    assert.equal(winners.length, 1, "Exactly one competing update should succeed.");
+    assert.equal(conflicts.length, 1, "The stale update should be rejected.");
+    assert.equal(conflicts[0].status, "rejected");
+
+    if (conflicts[0].status === "rejected") {
+      assert.ok(conflicts[0].reason instanceof Error);
+      assert.equal(conflicts[0].reason.message, "SCHEDULE_STATUS_CONFLICT");
+    }
 
     const finalState = await pool.query<{ status: string }>(
       `SELECT "status" FROM "Schedule" WHERE "id" = $1`,
@@ -140,9 +145,26 @@ test("concurrent status updates from the same initial state allow only one winne
       ["CONFIRMED", "CANCELLED"].includes(finalState.rows[0].status),
       "The final status must be the winning update.",
     );
+
+    const auditRecords = await pool.query<{ action: string }>(
+      `SELECT "action"
+       FROM "AuditLog"
+       WHERE "entity" = 'Schedule' AND "entityId" = $1`,
+      [scheduleId],
+    );
+
+    assert.equal(auditRecords.rowCount, 1);
+    assert.equal(
+      auditRecords.rows[0].action,
+      finalState.rows[0].status === "CANCELLED" ? "CANCEL" : "UPDATE",
+    );
   } finally {
     try {
       if (fixturesCommitted) {
+        await pool.query(
+          `DELETE FROM "AuditLog" WHERE "entity" = 'Schedule' AND "entityId" = $1`,
+          [scheduleId],
+        );
         await pool.query(
           `DELETE FROM "Schedule" WHERE "id" = $1`,
           [scheduleId],
