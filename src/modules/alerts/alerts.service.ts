@@ -9,7 +9,6 @@ import {
   type FindAlertsFilter,
 } from "./alerts.repository";
 import type { AlertType, AlertSeverity, UserRole } from "@/generated/prisma/client";
-import { recordAudit } from "@/modules/audit/audit.service";
 import { findUserById } from "@/modules/users/user.repository";
 import { findScheduleById } from "@/modules/schedules/schedule.repository";
 
@@ -35,7 +34,10 @@ export async function getAlertById(
     throw new Error("ALERT_NOT_FOUND");
   }
 
-  if (requestingUser.role !== "ADMIN" && alert.userId !== requestingUser.id) {
+  if (
+    requestingUser.role !== "ADMIN" &&
+    alert.userId !== requestingUser.id
+  ) {
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
@@ -65,23 +67,11 @@ export async function createAlert(
     }
   }
 
-  const alert = await createAlertRecord(data);
-
-  await recordAudit({
-    userId: actorUserId,
-    action: "CREATE",
-    entity: "Alert",
-    entityId: alert.id,
-    description: `Alert "${alert.title}" was created for user ${targetUser.name || targetUser.email}.`,
-    metadata: {
-      alertId: alert.id,
-      recipientUserId: data.userId,
-      severity: alert.severity,
-      type: alert.type,
-    },
-  });
-
-  return alert;
+  return createAlertRecord(
+    data,
+    actorUserId,
+    targetUser.name || targetUser.email,
+  );
 }
 
 export async function updateAlertById(
@@ -119,23 +109,12 @@ export async function updateAlertById(
     id,
     updateData,
     requestingUser.role === "ADMIN" ? undefined : requestingUser.id,
+    requestingUser.id,
   );
 
   if (!updatedAlert) {
     throw new Error("ALERT_NOT_FOUND");
   }
-
-  await recordAudit({
-    userId: requestingUser.id,
-    action: "UPDATE",
-    entity: "Alert",
-    entityId: id,
-    description: `Alert "${updatedAlert.title}" was updated.`,
-    metadata: {
-      alertId: id,
-      changes: updateData,
-    },
-  });
 
   return updatedAlert;
 }
@@ -161,20 +140,15 @@ export async function markAlertAsReadById(
     return alert;
   }
 
-  const updatedAlert = await markAlertAsReadRecord(id);
+  const updatedAlert = await markAlertAsReadRecord(
+    id,
+    requestingUser.id,
+    requestingUser.role === "ADMIN" ? undefined : requestingUser.id,
+  );
 
-  await recordAudit({
-    userId: requestingUser.id,
-    action: "UPDATE",
-    entity: "Alert",
-    entityId: updatedAlert.id,
-    description: `Alert "${updatedAlert.title}" was marked as read.`,
-    metadata: {
-      alertId: updatedAlert.id,
-      read: true,
-    },
-  });
-
+  if (!updatedAlert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
   return updatedAlert;
 }
 
@@ -189,24 +163,7 @@ export async function markAllAlertsAsRead(
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
-  const result = await markAllAlertsAsReadForUser(targetUserId);
-
-  if (result.count > 0) {
-    await recordAudit({
-      userId: requestingUser.id,
-      action: "UPDATE",
-      entity: "Alert",
-      entityId: targetUserId,
-      description: `${result.count} alert(s) were marked as read.`,
-      metadata: {
-        targetUserId,
-        affectedCount: result.count,
-        operation: "MARK_ALL_READ",
-      },
-    });
-  }
-
-  return result;
+  return markAllAlertsAsReadForUser(targetUserId, requestingUser.id);
 }
 
 export async function deleteAlertById(
@@ -223,15 +180,15 @@ export async function deleteAlertById(
     throw new Error("FORBIDDEN_ALERT_ACCESS");
   }
 
-  await deleteAlertRecord(id);
+  const deletedAlert = await deleteAlertRecord(
+    id,
+    requestingUser.id,
+    requestingUser.role === "ADMIN" ? undefined : requestingUser.id,
+  );
 
-  await recordAudit({
-    userId: requestingUser.id,
-    action: "DELETE",
-    entity: "Alert",
-    entityId: id,
-    description: `Alert "${alert.title}" was deleted.`,
-  });
+  if (!deletedAlert) {
+    throw new Error("ALERT_NOT_FOUND");
+  }
 
   return { success: true };
 }

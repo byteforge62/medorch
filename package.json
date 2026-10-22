@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:schedule-constraints": "node --import tsx --test tests/schedule-constraints.test.ts",
-    "test:database": "node --conditions=react-server --import tsx --test tests/schedule-constraints.test.ts tests/schedule-status-concurrency.test.ts tests/schedule-audit-atomicity.test.ts tests/schedule-repository-audit.test.ts tests/schedule-related-repository-audit.test.ts tests/privacy-boundary.test.ts",
+    "test:database": "node --conditions=react-server --import tsx --test tests/schedule-constraints.test.ts tests/schedule-status-concurrency.test.ts tests/schedule-audit-atomicity.test.ts tests/schedule-repository-audit.test.ts tests/schedule-related-repository-audit.test.ts tests/alerts-repository-audit.test.ts tests/privacy-boundary.test.ts",
     "test:permissions": "node --import tsx --test tests/permissions.test.ts",
     "test:me-read-handlers": "node --import tsx --test tests/me-read-handlers.test.ts"
   },
