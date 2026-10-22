@@ -8,6 +8,8 @@ import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 import { createHash } from "node:crypto";
 import { generatePasswordResetToken, hashPasswordResetToken, getPasswordResetExpiry } from "@/lib/auth/password-reset";
 import { sendPasswordResetEmail } from "@/lib/email/send-password-reset-email";
+import { prisma } from "@/lib/db/prisma";
+import { createAuditLog } from "../audit/audit.repository";
 
 export async function getUsers() {
   return findUsers();
@@ -109,22 +111,27 @@ export async function approvePatient(
   patientUserId: string,
   actorUserId: string,
 ) {
-  const patient = await approvePendingPatient(patientUserId);
+  return prisma.$transaction(async (tx) => {
+    const patient = await approvePendingPatient(tx, patientUserId);
 
-  await recordAudit({
-    userId: actorUserId,
-    action: "UPDATE",
-    entity: "User",
-    entityId: patient.id,
-    description: `Patient "${patient.email}" was approved.`,
-    metadata: {
-      role: patient.role,
-      status: patient.status,
-      approvedAt: patient.approvedAt?.toISOString() ?? null,
-    },
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "UPDATE",
+        entity: "User",
+        entityId: patient.id,
+        description: `Patient "${patient.email}" was approved.`,
+        metadata: {
+          role: patient.role,
+          status: patient.status,
+          approvedAt: patient.approvedAt?.toISOString() ?? null,
+        },
+      },
+      tx,
+    );
+
+    return patient;
   });
-
-  return patient;
 }
 
 export async function resendPatientVerificationEmail(
