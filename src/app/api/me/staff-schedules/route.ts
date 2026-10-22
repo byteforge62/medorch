@@ -1,42 +1,28 @@
-
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getSchedulesForStaff } from "@/modules/schedules/schedule.service";
+import { apiError } from '@/lib/api/response';
+import { getRequestId } from '@/lib/api/request-id';
+import { getApiSession } from '@/lib/auth/authorization';
+import { handleStaffSchedules } from '@/lib/api/me-read-handlers';
+import { getSchedulesForStaff } from '@/modules/schedules/schedule.service';
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
 
   try {
-    const { session, response } = await authorizeApiPermission(
-      "schedules:read",
+    const session = await getApiSession();
+
+    return handleStaffSchedules({
+      session,
       requestId,
-    );
-
-    if (!session) {
-      return response;
-    }
-
-    if (session.user.role !== "OT_STAFF") {
-      return apiError(
-        "Only OT staff accounts can access staff assignments.",
-        403,
-        undefined,
-        requestId,
-      );
-    }
-
-    const schedules = await getSchedulesForStaff(session.user.id);
-
-    return apiSuccess(schedules, 200);
+      getData: getSchedulesForStaff,
+    });
   } catch (error) {
     console.error(
-      `[${requestId}] GET /api/me/staff-schedules error:`,
+      `[${requestId}] GET /api/me/staff-schedules session error:`,
       error,
     );
 
     return apiError(
-      "Failed to fetch your staff assignments.",
+      'Failed to fetch your staff assignments.',
       500,
       undefined,
       requestId,
