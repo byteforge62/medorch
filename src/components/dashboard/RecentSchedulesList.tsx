@@ -154,7 +154,12 @@ export function RecentSchedulesList() {
   };
 
   const now = new Date();
-  const todayKey = toLocalDateKey(now.toISOString());
+
+  const todayKey = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
 
   const filteredSchedules = sortedSchedules.filter((schedule) => {
     const scheduleDate = toLocalDateKey(schedule.scheduledDate);

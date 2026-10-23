@@ -97,7 +97,7 @@ export function OTRoomsGrid() {
         <div>
           <CardTitle>Operating Rooms Status</CardTitle>
           <p className="mt-0.5 text-xs text-slate-500">
-            Real-time availability of surgical suites
+            Latest room availability
           </p>
         </div>
         <button
