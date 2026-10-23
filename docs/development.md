@@ -34,6 +34,23 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000). The current seed script creates or updates `admin@medorch.local` with the password `MedOrch@Dev123!`. It resets the password each time it runs; keep this behavior confined to local development. See [Security and project boundaries](./security-and-limitations.md#local-development-credentials).
 
+`NEXTAUTH_URL` must match the origin the dev server actually listens on. Sign-out resolves its callback through it, and `src/lib/email/send-verification-email.ts` builds verification and reset links from it, so running the server on any other port (for example `npm run dev -- -p 3210` while `NEXTAUTH_URL` is `http://localhost:3000`) makes sign-out request a dead origin and would send links pointing at the wrong one. If you change the port, change `NEXTAUTH_URL` to match.
+
+Seeded `PATIENT` accounts cannot sign in by default: `src/auth.ts` requires a populated `emailVerifiedAt` for the `PATIENT` role, and `prisma/seed.ts` does not set it. For development-only patient-role testing you have two options:
+
+- **Seed flag (no SMTP):** run the seed with `SEED_VERIFIED_PATIENTS=1`, for example `SEED_VERIFIED_PATIENTS=1 npx prisma db seed`. This marks seeded PATIENT accounts as email-verified **at seed time only**. The flag is unset by default, so normal seeding behaves exactly as before, and the authentication policy itself is never weakened. Never enable it for production seeding.
+- **Real verification:** configure `SMTP_USER`, `SMTP_APP_PASSWORD`, `EMAIL_FROM`, and a correct `NEXTAUTH_URL`, then use the normal verification-email flow.
+
+## Database tests
+
+`npm run test:database` includes `tests/alerts-repository-audit.test.ts`, which **requires** a disposable database whose name matches `medorch_alerts_test_<lowercase-or-digits>` on a localhost host. This safety assertion is intentional — it prevents the suite from running against a development database — so the suite exits non-zero until `DATABASE_URL` points at such a database:
+
+1. Start an isolated PostgreSQL (for example a throwaway container with a tmpfs data directory and a loopback-only port).
+2. Create a database named `medorch_alerts_test_<suffix>` and apply migrations with `npx prisma migrate deploy`.
+3. Run `DATABASE_URL=postgresql://<user>@localhost:<port>/medorch_alerts_test_<suffix>?schema=public npm run test:database`.
+
+Remove the container/database afterwards. Never point the suite at your development database.
+
 ## Database workflow
 
 Prisma configuration is in `prisma.config.ts`; the schema is in `prisma/schema.prisma`; committed SQL migrations are under `prisma/migrations/`; and the seed is `prisma/seed.ts`.

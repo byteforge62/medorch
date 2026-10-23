@@ -165,6 +165,16 @@ async function main() {
     const approvedAt =
       user.status === "ACTIVE" ? new Date(anchor) : null;
 
+    // Development-only opt-in (SEED_VERIFIED_PATIENTS=1): mark seeded PATIENT
+    // accounts as email-verified so local patient-role acceptance testing can
+    // run without SMTP. This changes only this seed script's output — the
+    // authentication policy in src/auth.ts is untouched, and without the flag
+    // seeded patients keep the default unverified state.
+    const emailVerifiedAt =
+      process.env.SEED_VERIFIED_PATIENTS === "1" && user.role === "PATIENT"
+        ? new Date(anchor)
+        : undefined;
+
     const saved = await prisma.user.upsert({
       where: { email: user.email },
       create: {
@@ -176,6 +186,7 @@ async function main() {
         status: user.status,
         approvedAt,
         passwordHash,
+        ...(emailVerifiedAt ? { emailVerifiedAt } : {}),
       },
       update: {
         name: user.name,
@@ -184,6 +195,7 @@ async function main() {
         status: user.status,
         approvedAt,
         passwordHash,
+        ...(emailVerifiedAt ? { emailVerifiedAt } : {}),
       },
     });
 

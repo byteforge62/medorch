@@ -501,6 +501,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         {canManageSchedules && (
           <ScheduleStatusActions
             scheduleId={schedule.id}
+            scheduleLabel={schedule.procedure}
             currentStatus={schedule.status}
             onStatusUpdated={(_scheduleId, status) =>
               setSchedule((current) =>

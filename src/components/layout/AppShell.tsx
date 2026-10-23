@@ -9,7 +9,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-subtle)] text-[var(--color-foreground)]">
-      <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <Header
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        sidebarOpen={sidebarOpen}
+      />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Page components render their own <main> landmark; this is only the
           layout container so we never nest two <main> elements. */}

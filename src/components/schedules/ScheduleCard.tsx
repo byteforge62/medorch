@@ -202,6 +202,7 @@ export function ScheduleCard({
           <div className="border-t border-slate-100 pt-3 dark:border-slate-800">
             <ScheduleStatusActions
               scheduleId={schedule.id}
+              scheduleLabel={schedule.procedure}
               currentStatus={schedule.status}
               onStatusUpdated={(scheduleId, newStatus) =>
                 onStatusUpdated?.(scheduleId, newStatus)
@@ -215,13 +216,17 @@ export function ScheduleCard({
       <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
         <Link
           href={`/schedules/${schedule.id}`}
+          aria-label={`View details for ${schedule.procedure}`}
           className="inline-flex min-h-9 items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           View details
         </Link>
 
         {canManageSchedules && onEdit && (
-          <Button onClick={() => onEdit(schedule)}>
+          <Button
+            onClick={() => onEdit(schedule)}
+            aria-label={`Edit ${schedule.procedure}`}
+          >
             Edit
           </Button>
         )}

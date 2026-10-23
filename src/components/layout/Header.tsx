@@ -4,12 +4,15 @@ import React from "react";
 import { signOut, useSession } from "next-auth/react";
 import { AlertCenter } from "@/components/alerts/AlertCenter";
 import { Badge } from "@/components/ui/Badge";
+import { PRIMARY_NAVIGATION_ID } from "./Sidebar";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
+  /** Current visibility of the sidebar drawer, reflected on the toggle. */
+  sidebarOpen?: boolean;
 }
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+export function Header({ onToggleSidebar, sidebarOpen = false }: HeaderProps) {
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -33,9 +36,14 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         <button
           onClick={onToggleSidebar}
           className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] lg:hidden"
-          aria-label="Open navigation menu"
+          aria-label={
+            sidebarOpen ? "Close navigation menu" : "Open navigation menu"
+          }
+          aria-expanded={sidebarOpen}
+          aria-controls={PRIMARY_NAVIGATION_ID}
         >
           <svg
+            aria-hidden="true"
             className="h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"

@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import type { UserRole } from "@/generated/prisma/client";
 
+/** Stable id shared with the Header toggle so `aria-controls` resolves. */
+export const PRIMARY_NAVIGATION_ID = "primary-navigation";
+
 interface NavItem {
   name: string;
   href: string;
@@ -248,6 +251,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ) : null}
 
       <aside
+        id={PRIMARY_NAVIGATION_ID}
         aria-label="Primary navigation"
         className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-[var(--color-border)] bg-[var(--color-surface)] transition-transform duration-200 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}

@@ -38,6 +38,11 @@ interface ScheduleStatusActionsProps {
   currentStatus: ScheduleStatus;
   /** Called after a successful status update with the new status */
   onStatusUpdated: (scheduleId: string, newStatus: ScheduleStatus) => void;
+  /**
+   * Procedure name used to make the accessible names of repeated action
+   * buttons unique when several cards render on one page.
+   */
+  scheduleLabel?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -263,6 +268,7 @@ export function ScheduleStatusActions({
   scheduleId,
   currentStatus,
   onStatusUpdated,
+  scheduleLabel,
 }: ScheduleStatusActionsProps) {
   const [pendingAction, setPendingAction] = useState<StatusAction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -344,7 +350,11 @@ export function ScheduleStatusActions({
               size="sm"
               disabled={isSubmitting}
               isLoading={isSubmitting}
-              aria-label={`${action.label} schedule`}
+              aria-label={
+                scheduleLabel
+                  ? `${action.label} schedule for ${scheduleLabel}`
+                  : `${action.label} schedule`
+              }
               onClick={() => handleActionClick(action)}
             >
               {action.label}
