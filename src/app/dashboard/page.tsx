@@ -50,7 +50,7 @@ if (user.role === "OT_STAFF") {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <main className="space-y-6">
         {/* Top Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
           <div>
@@ -90,7 +90,7 @@ if (user.role === "OT_STAFF") {
             <AlertsSummaryWidget />
           </div>
         </div>
-      </div>
+      </main>
     </AppShell>
   );
 }

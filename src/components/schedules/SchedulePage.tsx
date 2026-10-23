@@ -252,7 +252,7 @@ export function SchedulePage() {
   );
 
   return (
-    <div className="space-y-6">
+    <main className="space-y-6">
       {/* Header Banner */}
       <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
         <div>
@@ -403,6 +403,6 @@ export function SchedulePage() {
         }}
         onSuccess={fetchSchedules}
       />
-    </div>
+    </main>
   );
 }

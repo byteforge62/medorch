@@ -199,7 +199,7 @@ const nextAppointment = upcoming[0];
   ];
 
   return (
-    <div className="space-y-6">
+    <main className="space-y-6">
       <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
@@ -364,6 +364,6 @@ const nextAppointment = upcoming[0];
           </div>
         )}
       </section>
-    </div>
+    </main>
   );
 }

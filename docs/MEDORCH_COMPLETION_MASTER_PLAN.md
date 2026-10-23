@@ -247,6 +247,22 @@ The custom handler inventory contains no health or diagnostics endpoint. The aut
 | Alerts | `AlertCenter` reads, marks read/read-all, and deletes alerts | No alert-create consumer found; backend-only status/purpose needs product review. |
 | Audit | `AuditLogViewer` queries `/api/audit` | Source wiring present; filters, pagination/order, and sensitive-field handling untested. |
 
+### Frontend completion audit (Phase G frontend pass)
+
+Source-level audit of every rendered page and shared client component against the API contracts. Statuses describe what was verified by source inspection plus the checks recorded in the [Baseline command log](#baseline-command-log); no browser E2E run was performed.
+
+| Area | Surfaces reviewed | Result |
+|---|---|---|
+| Public / auth | Landing page, login, register, verify-email, resend-verification, forgot-password, reset-password, unauthorized | `VERIFIED` — all flows wired to their endpoints with validation, loading, success and error states. Fixed: forgot-password was unreachable; a login link now exposes it. Register/resend/reset handle rate limiting and generic responses per the API contract. |
+| App shell | `AppShell`, `Header`, `Sidebar`, `LandingMobileNav` | `VERIFIED` — role-filtered navigation for all four roles, mobile drawer with backdrop and Escape handling, session-aware header with alert centre and sign-out. Fixed: nested `<main>` landmarks. |
+| Admin | `/dashboard` widgets, `/users`, `/departments`, `/patients` + detail, `/doctors` + detail, `/ot-rooms`, `/equipment`, `/schedules` + detail, `/audit` | `VERIFIED` — list/search/filter, create/edit/deactivate/status/approve operations wired to the supported endpoints with duplicate-submit guards, post-mutation refresh, and loading/empty/error/retry states. Added: user-provisioning form. |
+| Doctor | `/dashboard`, `/schedules`, `/schedules/[id]`, directories, alerts | `VERIFIED` — `/api/me/schedules` dashboard, schedule list/detail, status transitions per the approved any-schedule update policy, notes author-scoped edit/delete. |
+| OT staff | `/dashboard`, `/schedules`, `/schedules/[id]`, `/ot-rooms`, `/equipment`, `/departments`, `/doctors`, alerts | `VERIFIED` — `/api/me/staff-schedules` dashboard, read-only resource directories, assignment-scoped schedule detail with no unsupported mutation controls exposed. |
+| Patient | `/dashboard`, `/patients/appointments`, `/patients/appointments/[id]`, alerts | `VERIFIED` — `/api/me/appointments` scoped views with own-record empty state; detail resolves only from the patient's own appointment set, so foreign IDs render "not found" rather than another patient's data. No booking/cancellation controls exist because no such API contract is established. |
+| Cross-cutting | `apiClient`, `AlertCenter`, dashboard widgets, schedule form/list/filters/calendar/status actions | `VERIFIED` — every consumer uses the shared `apiClient` and the `{ success, data }` envelope; errors surface `ApiClientError.message`; mutations disable while pending and refresh afterwards. Fixed: schedule `scheduledDate` payload contract. |
+
+Not verified by this pass: actual browser rendering, responsive breakpoints at real device sizes, keyboard-only traversal, and live server responses (the dev server was not run). These remain Phase J items.
+
 ### Repository structure
 
 - [x] `VERIFIED` — Next.js App Router application; layouts, loading/error/not-found routes, public/auth pages, and dashboard route group exist. Evidence: current `src/app` tree and successful build.
@@ -330,13 +346,17 @@ This matrix reflects the current permission constants and the inspected routes. 
 ### Confirmed defects / documentation mismatches
 
 - [x] `VERIFIED` — **P1, authorization policy/documentation mismatch resolved:** User approved Doctor access to update/status any schedule. `docs/api-reference.md` now documents that policy and `docs/decisions.md` records the decision. Route-level runtime behavior remains untested. Relevant sources: `src/lib/auth/permission.ts`, the schedule PATCH/status handlers, `tests/permissions.test.ts`, `docs/api-reference.md`, and `docs/decisions.md`.
+- [x] `VERIFIED` — **P1, schedule create/edit payload contract defect (frontend) FIXED:** `ScheduleForm` sent `scheduledDate` as a full ISO datetime, but `createScheduleSchema`/`updateScheduleSchema` validate it with `z.iso.date()` (`YYYY-MM-DD` only), so every schedule create and edit from the UI failed validation with HTTP 400. Confirmed by running the real schema against both payload shapes before the fix. `src/components/schedules/ScheduleForm.tsx` now sends the raw `YYYY-MM-DD` string, which also removes a timezone conversion that could shift the stored date. Backend unchanged.
+- [x] `VERIFIED` — **P2, patient registry table columns misaligned (frontend) FIXED:** the `PatientRegistry` table header rendered the `Actions` column before `Gender`, while the body cells rendered `Gender` before `Actions`, so row data was displayed under the wrong headings. `src/app/patients/PatientRegistry.tsx` header order now matches the body.
+- [x] `VERIFIED` — **P2, forgot-password flow unreachable (frontend) FIXED:** `/forgot-password` existed but no page linked to it, leaving the flow a dead end. `LoginForm` now includes a "Forgot your password?" link between sign-in and the resend-verification link.
+- [x] `VERIFIED` — **P2, nested `<main>` landmarks (frontend) FIXED:** `AppShell` rendered `<main>` and nearly every page component rendered another `<main>`, producing invalid nested landmarks on every authenticated page. `AppShell` now renders a plain container `div`; the admin dashboard branch and `SchedulePage`/`PatientDashboard` gained their own `<main>` so each page still exposes exactly one main landmark.
 - [ ] `NOT_STARTED` — **P2, stale route inventory:** `/departments` exists, is sidebar-linked, and has a guarded page, but is missing from the older `docs/file-index.md` page inventory. Update the index when the source-of-truth docs are reconciled.
 - [ ] `NOT_STARTED` — **P2, stale test inventory:** current source has ten test files; `PROJECT_CONTEXT.md` and `PROJECT_STATUS.md` still describe five. `docs/development.md` and `docs/ai-coding-workflow.md` now document the database suite and its React server condition. Reconcile the remaining status/context docs.
 - [ ] `NOT_STARTED` — **P3, redundant branch:** `GET /api/me/appointments` contains a duplicate `if (!patient)` check after the same null check already returned. This appears behaviorally redundant, not a demonstrated exposure or availability defect; clean up with a focused regression check if accepted in the implementation backlog.
 
 ### Potential missing integrations (not yet approved feature work)
 
-- [ ] `NOT_STARTED` — `POST /api/users` is implemented for ADMIN, but no user-provisioning UI call exists. Decide if the Admin UI should provision accounts and define supported roles, credentials setup, verification, and approval lifecycle before implementing.
+- [x] `VERIFIED` — **RESOLVED (frontend):** `POST /api/users` had no UI caller. The admin `/users` page now has a create-user form (name, email, temporary password, optional phone, role, optional initial status) that posts to the existing endpoint with the documented validation constraints (name 2–100, password 12–128, phone 7–20). Server-side rules are unchanged; duplicate-email conflicts surface the API's own 409 message.
 - [ ] `NOT_STARTED` — `POST /api/alerts` has no create-alert UI caller found. Determine whether it is intentionally backend-only or whether a supported user workflow requires a UI.
 - [ ] `NOT_STARTED` — `GET /api/users/{id}` and resource detail endpoints for departments/rooms/equipment have no direct UI request found. Determine whether they are intentionally API-only; do not add duplicate UI detail routes just to consume them.
 - [ ] `NOT_STARTED` — Nested schedule staff/equipment read routes have no separate UI request found; the schedule detail endpoint may already supply nested relations. Verify response shape and intent before classifying this as a gap.
@@ -396,6 +416,12 @@ Commands were executed on the audited source revision. “Not run” means no re
 | Initial default-condition run of database repository tests | FAILED because Node selected the default `server-only` export. Rerunning with `--conditions=react-server` passed; `package.json` records this condition in `test:database`. |
 | `npm audit` | NOT RUN — npm install reported a summary count only; no advisory details were reviewed. |
 | Browser/manual E2E workflows | NOT RUN. |
+| `npx tsc --noEmit` (frontend completion pass) | PASS; exit code 0 after the frontend completion edits. |
+| `npm run lint` (frontend completion pass) | PASS; exit code 0 after the frontend completion edits. |
+| `node --import tsx --test tests/api-request-validation.test.ts tests/schedule-access.test.ts tests/permissions.test.ts tests/foundation-validation.test.ts` | PASS; 15 tests, 0 failures after the frontend completion edits. |
+| `npm run test:me-read-handlers` | PASS after the frontend completion edits. |
+| `npm run build` (frontend completion pass) | PASS; Next.js production build completed and enumerated the current route set. |
+| `node --import tsx` script against `createScheduleSchema` | VERIFIED the contract defect: the schema accepts only `YYYY-MM-DD` for `scheduledDate`; the previous UI payload sent a full ISO datetime and failed validation. Confirmed both inputs before applying the frontend fix. |
 
 ## Files changed by phase
 
@@ -404,6 +430,7 @@ Commands were executed on the audited source revision. “Not run” means no re
 | A — baseline/inventory | `docs/MEDORCH_COMPLETION_MASTER_PLAN.md` (this tracker). Application code and configuration are unchanged. |
 | D — policy/documentation reconciliation | `docs/api-reference.md`, `docs/decisions.md`, and this tracker. No application code or schema changed; existing behavior was retained. |
 | I — database and privacy-boundary test coverage | `tests/schedule-status-concurrency.test.ts`, `tests/privacy-boundary.test.ts`, `package.json`, `docs/development.md`, `docs/ai-coding-workflow.md`, and this tracker. |
+| G — frontend completion pass | `src/components/schedules/ScheduleForm.tsx` (scheduledDate payload contract fix), `src/app/patients/PatientRegistry.tsx` (table column order fix), `src/components/users/UserList.tsx` (admin user-provisioning form), `src/components/auth/LoginForm.tsx` (forgot-password link), `src/components/layout/AppShell.tsx`, `src/app/dashboard/page.tsx`, `src/components/schedules/SchedulePage.tsx`, `src/components/dashboard/PatientDashboard.tsx` (single `<main>` landmark), and this tracker. Frontend-only; no API handler, service, repository, schema, or auth logic was modified. |
 | B–C, E–H, J–K | None yet. Record exact files after each phase; do not commit unless explicitly requested. |
 
 ## Current phase, next task, and exact resume instructions

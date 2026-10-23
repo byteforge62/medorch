@@ -635,11 +635,11 @@ export function PatientRegistry() {
                   <th className="px-3 py-3 font-medium">Patient</th>
                   <th className="px-3 py-3 font-medium">Contact</th>
                   <th className="px-3 py-3 font-medium">Date of birth</th>
+                  <th className="px-3 py-3 font-medium">Gender</th>
                   {(session?.user?.role === 'ADMIN' ||
                     session?.user?.role === 'DOCTOR') && (
                       <th className="px-3 py-3 font-medium">Actions</th>
                     )}
-                  <th className="px-3 py-3 font-medium">Gender</th>
                 </tr>
               </thead>
 

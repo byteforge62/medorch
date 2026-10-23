@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { apiClient, ApiClientError } from "@/lib/api/client";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
 import { LoadingState } from "@/components/ui/LoadingState";
@@ -32,6 +33,35 @@ interface User {
     createdAt: string;
     updatedAt: string;
 }
+
+interface CreateUserForm {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    role: UserRole | "";
+    status: UserStatus | "";
+}
+
+const EMPTY_CREATE_FORM: CreateUserForm = {
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "",
+    status: "",
+};
+
+const ROLE_OPTIONS: UserRole[] = ["ADMIN", "DOCTOR", "OT_STAFF", "PATIENT"];
+const STATUS_OPTIONS: UserStatus[] = [
+    "PENDING",
+    "ACTIVE",
+    "SUSPENDED",
+    "REJECTED",
+];
+
+const inputClass =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white";
 
 function formatDate(value: string | null) {
     if (!value) {
@@ -67,6 +97,12 @@ export function UserList() {
     const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
     const [actionError, setActionError] = useState<string | null>(null);
     const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+    const [createOpen, setCreateOpen] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [createError, setCreateError] = useState<string | null>(null);
+    const [createForm, setCreateForm] =
+        useState<CreateUserForm>(EMPTY_CREATE_FORM);
 
     const fetchUsers = useCallback(async () => {
         try {
@@ -154,6 +190,65 @@ export function UserList() {
     }, [users, search, role, status]);
 
 
+    function updateCreateForm(field: keyof CreateUserForm, value: string) {
+        setCreateForm((current) => ({ ...current, [field]: value }));
+    }
+
+    async function handleCreateUser(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const name = createForm.name.trim();
+        const email = createForm.email.trim().toLowerCase();
+        const phone = createForm.phone.trim();
+
+        if (name.length < 2 || name.length > 100) {
+            setCreateError("Name must contain between 2 and 100 characters.");
+            return;
+        }
+
+        if (createForm.password.length < 12 || createForm.password.length > 128) {
+            setCreateError("Password must contain between 12 and 128 characters.");
+            return;
+        }
+
+        if (!createForm.role) {
+            setCreateError("Select a role for this account.");
+            return;
+        }
+
+        if (phone && (phone.length < 7 || phone.length > 20)) {
+            setCreateError("Phone must contain between 7 and 20 characters.");
+            return;
+        }
+
+        setCreating(true);
+        setCreateError(null);
+
+        try {
+            await apiClient.post<User>("/api/users", {
+                name,
+                email,
+                password: createForm.password,
+                ...(phone ? { phone } : {}),
+                role: createForm.role,
+                ...(createForm.status ? { status: createForm.status } : {}),
+            });
+
+            setActionSuccess(`${name} was created successfully.`);
+            setCreateForm(EMPTY_CREATE_FORM);
+            setCreateOpen(false);
+            await fetchUsers();
+        } catch (err) {
+            if (err instanceof ApiClientError) {
+                setCreateError(err.message);
+            } else {
+                setCreateError("Failed to create user.");
+            }
+        } finally {
+            setCreating(false);
+        }
+    }
+
     const handleApprove = async (user: User) => {
         const confirmed = window.confirm(
             `Approve patient ${user.name}? They will be able to sign in once their account becomes active.`,
@@ -192,7 +287,204 @@ export function UserList() {
                         {filteredUsers.length} of {users.length} users
                     </p>
                 </div>
+
+                <button
+                    type="button"
+                    onClick={() => {
+                        setCreateOpen((current) => !current);
+                        setCreateError(null);
+                    }}
+                    className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                >
+                    {createOpen ? "Close form" : "+ Create user"}
+                </button>
             </CardHeader>
+
+            {createOpen && (
+                <form
+                    onSubmit={handleCreateUser}
+                    className="mb-6 space-y-4 rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+                >
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                            Create user account
+                        </h3>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Provision an account directly. Patient accounts created here
+                            should still be verified and approved through the normal
+                            lifecycle where required.
+                        </p>
+                    </div>
+
+                    {createError && (
+                        <p
+                            role="alert"
+                            className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300"
+                        >
+                            {createError}
+                        </p>
+                    )}
+
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div>
+                            <label
+                                htmlFor="create-user-name"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Full name *
+                            </label>
+                            <input
+                                id="create-user-name"
+                                required
+                                minLength={2}
+                                maxLength={100}
+                                value={createForm.name}
+                                onChange={(event) =>
+                                    updateCreateForm("name", event.target.value)
+                                }
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="create-user-email"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Email *
+                            </label>
+                            <input
+                                id="create-user-email"
+                                type="email"
+                                required
+                                maxLength={254}
+                                value={createForm.email}
+                                onChange={(event) =>
+                                    updateCreateForm("email", event.target.value)
+                                }
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="create-user-password"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Temporary password *
+                            </label>
+                            <input
+                                id="create-user-password"
+                                type="password"
+                                autoComplete="new-password"
+                                required
+                                minLength={12}
+                                maxLength={128}
+                                value={createForm.password}
+                                onChange={(event) =>
+                                    updateCreateForm("password", event.target.value)
+                                }
+                                className={inputClass}
+                            />
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                12–128 characters.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="create-user-phone"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Phone
+                            </label>
+                            <input
+                                id="create-user-phone"
+                                type="tel"
+                                minLength={7}
+                                maxLength={20}
+                                value={createForm.phone}
+                                onChange={(event) =>
+                                    updateCreateForm("phone", event.target.value)
+                                }
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="create-user-role"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Role *
+                            </label>
+                            <select
+                                id="create-user-role"
+                                required
+                                value={createForm.role}
+                                onChange={(event) =>
+                                    updateCreateForm("role", event.target.value)
+                                }
+                                className={inputClass}
+                            >
+                                <option value="">Select a role</option>
+                                {ROLE_OPTIONS.map((option) => (
+                                    <option key={option} value={option}>
+                                        {formatRole(option)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="create-user-status"
+                                className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
+                            >
+                                Initial status
+                            </label>
+                            <select
+                                id="create-user-status"
+                                value={createForm.status}
+                                onChange={(event) =>
+                                    updateCreateForm("status", event.target.value)
+                                }
+                                className={inputClass}
+                            >
+                                <option value="">Default (server decides)</option>
+                                {STATUS_OPTIONS.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                        <button
+                            type="button"
+                            disabled={creating}
+                            onClick={() => {
+                                setCreateOpen(false);
+                                setCreateForm(EMPTY_CREATE_FORM);
+                                setCreateError(null);
+                            }}
+                            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            disabled={creating}
+                            className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                        >
+                            {creating ? "Creating..." : "Create user"}
+                        </button>
+                    </div>
+                </form>
+            )}
 
             <div className="mb-5">
                 <UserFilters

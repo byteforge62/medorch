@@ -119,6 +119,13 @@ if (!result || result.error) {
 
       <div className="flex flex-col gap-3 pt-2 text-center text-sm">
         <Link
+          href="/forgot-password"
+          className="text-primary hover:underline"
+        >
+          Forgot your password?
+        </Link>
+
+        <Link
           href="/resend-verification"
           className="text-primary hover:underline"
         >

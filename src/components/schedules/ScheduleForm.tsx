@@ -166,7 +166,10 @@ export function ScheduleForm({
         otRoomId,
         surgeonId,
         procedure: procedure.trim(),
-        scheduledDate: new Date(`${scheduledDate}T00:00:00`).toISOString(),
+        // The API validates scheduledDate as a plain ISO calendar date
+        // (YYYY-MM-DD), so send the raw date string rather than a full
+        // datetime. This also avoids a timezone shift moving the date.
+        scheduledDate,
         startTime: startDateTime.toISOString(),
         endTime: endDateTime.toISOString(),
         priority,
