@@ -53,51 +53,70 @@ export function OperationalOverview() {
           apiClient.get<AlertSummary[]>("/api/alerts"),
         ]);
 
-        const failedRequest = results.some(
-          (result) => result.status === "rejected"
-        );
-
-        if (failedRequest) {
-          setError("Some metrics could not be loaded. Refresh the page to retry.");
-          return;
-        }
 
         const [rooms, schedules, equipment, alerts] = results;
 
-        if (
-          rooms.status !== "fulfilled" ||
-          schedules.status !== "fulfilled" ||
-          equipment.status !== "fulfilled" ||
-          alerts.status !== "fulfilled"
-        ) {
-          return;
+        const nextStats = {
+          totalRooms: 0,
+          availableRooms: 0,
+          occupiedRooms: 0,
+          totalSchedules: 0,
+          inProgressSchedules: 0,
+          availableEquipment: 0,
+          totalEquipment: 0,
+          unreadAlerts: 0,
+        };
+
+        const failedMetrics: string[] = [];
+
+        if (rooms.status === "fulfilled") {
+          const roomData = rooms.value;
+          nextStats.totalRooms = roomData.length;
+          nextStats.availableRooms = roomData.filter(
+            (room) => room.status === "AVAILABLE" && room.isActive
+          ).length;
+          nextStats.occupiedRooms = roomData.filter(
+            (room) => room.status === "OCCUPIED"
+          ).length;
+        } else {
+          failedMetrics.push("room");
         }
 
-        setError(null);
-
-        const roomData = rooms.value;
-        const schedData = schedules.value;
-        const equipData = equipment.value;
-        const alertData = alerts.value;
-
-        setStats({
-          totalRooms: roomData.length,
-          availableRooms: roomData.filter(
-            (room) => room.status === "AVAILABLE" && room.isActive
-          ).length,
-          occupiedRooms: roomData.filter(
-            (room) => room.status === "OCCUPIED"
-          ).length,
-          totalSchedules: schedData.length,
-          inProgressSchedules: schedData.filter(
+        if (schedules.status === "fulfilled") {
+          const scheduleData = schedules.value;
+          nextStats.totalSchedules = scheduleData.length;
+          nextStats.inProgressSchedules = scheduleData.filter(
             (schedule) => schedule.status === "IN_PROGRESS"
-          ).length,
-          availableEquipment: equipData.filter(
+          ).length;
+        } else {
+          failedMetrics.push("schedule");
+        }
+
+        if (equipment.status === "fulfilled") {
+          const equipmentData = equipment.value;
+          nextStats.totalEquipment = equipmentData.length;
+          nextStats.availableEquipment = equipmentData.filter(
             (item) => item.status === "AVAILABLE"
-          ).length,
-          totalEquipment: equipData.length,
-          unreadAlerts: alertData.filter((alert) => !alert.isRead).length,
-        });
+          ).length;
+        } else {
+          failedMetrics.push("equipment");
+        }
+
+        if (alerts.status === "fulfilled") {
+          nextStats.unreadAlerts = alerts.value.filter(
+            (alert) => !alert.isRead
+          ).length;
+        } else {
+          failedMetrics.push("alert");
+        }
+
+        setStats(nextStats);
+        setError(
+          failedMetrics.length > 0
+            ? `Unable to load ${failedMetrics.join(", ")} metrics.`
+            : null
+        );
+
       } catch (err) {
         console.error("Error loading operational overview:", err);
         setError("Unable to load operational metrics.");
