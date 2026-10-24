@@ -53,6 +53,7 @@ test("schedule detail redaction removes clinical and patient-specific fields", (
     patient: {
       name: "Example Patient",
       email: "patient@example.test",
+      phone: "555-0100",
       dateOfBirth: new Date("1980-01-01"),
       gender: "Example",
     },
@@ -65,6 +66,7 @@ test("schedule detail redaction removes clinical and patient-specific fields", (
     patient: {
       name: "Example Patient",
       email: null,
+      phone: null,
       dateOfBirth: null,
       gender: null,
     },
@@ -83,6 +85,38 @@ test("schedule detail redaction is null-safe for missing patient or notes data",
     notes: [],
     patient: {
       email: null,
+      phone: null,
+      dateOfBirth: null,
+      gender: null,
+    },
+  });
+});
+
+test("OT detail redaction nulls every patient demographic the detail query selects", () => {
+  const result = redactScheduleDetailsForOT({
+    id: "schedule-id",
+    clinicalNotes: "Sensitive clinical data",
+    patient: {
+      name: "Example Patient",
+      patientCode: "PT-0001",
+      email: "patient@example.test",
+      phone: "555-0100",
+      dateOfBirth: new Date("1980-01-01"),
+      gender: "Example",
+    },
+  });
+
+  // Regression: patient.phone previously passed through to OT_STAFF because
+  // findScheduleById selects it while redactScheduleDetailsForOT omitted it.
+  assert.deepEqual(result, {
+    id: "schedule-id",
+    clinicalNotes: null,
+    notes: [],
+    patient: {
+      name: "Example Patient",
+      patientCode: "PT-0001",
+      email: null,
+      phone: null,
       dateOfBirth: null,
       gender: null,
     },

@@ -39,9 +39,10 @@ export function redactScheduleDetailsForOT<
     clinicalNotes?: unknown;
     notes?: unknown;
     patient?: {
-      email?: unknown;
-      dateOfBirth?: unknown;
-      gender?: unknown;
+    email?: unknown;
+    phone?: unknown;
+    dateOfBirth?: unknown;
+    gender?: unknown;
     } | null;
   },
 >(schedule: T) {
@@ -54,6 +55,7 @@ export function redactScheduleDetailsForOT<
     patient: {
       ...patient,
       email: null,
+      phone: null,
       dateOfBirth: null,
       gender: null,
     },

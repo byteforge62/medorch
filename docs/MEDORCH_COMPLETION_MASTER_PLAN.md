@@ -1,12 +1,12 @@
 # MedOrch Completion Master Plan
 
-**Status:** `IN_PROGRESS` — Phase A repository baseline and database-backed schedule checks are verified. Service-level OT_STAFF/PATIENT read scoping is now tested; route-level security and browser verification remain outstanding.
-**Last audited:** 2026-10-21
+**Status:** `IN_PROGRESS` — Phase 5 live API authorization and isolation tests complete: 13 route-level runtime tests covering all four roles plus unauthenticated requests passed over live HTTP against a production build and a disposable seeded database; no new runtime defects found. Account-lifecycle (Phase B) verification remains outstanding.
+**Last audited:** 2026-10-24 (Phase 5 — live API authorization and isolation tests)
 **Repository:** `byteforge62/medorch`
-**Branch:** `agents/pasted-text-processing-476ac5f7`
-**Working tree at audit start:** clean
-**Current phase:** Phase I — schedule integrity and targeted service-level privacy tests passed on isolated PostgreSQL.
-**Next task:** Add route-level authorization and ownership tests for the staff and patient endpoints; then continue remaining read-path and browser checks.
+**Branch:** `master`
+**Working tree at audit start:** clean (Phase 3 work committed in `00ae18e`)
+**Current phase:** Phase 5 — live HTTP verification of authorization, role boundaries, ownership, isolation, redaction, and status transitions across all four roles; Phase 4's source-level findings confirmed at runtime with no new defect.
+**Next task:** Phase B account-lifecycle token tests (verification/reset token expiry, replay, session invalidation, throttling); then the remaining Phase H abuse-case probes (malformed/oversized bodies, invalid enum values).
 
 This document is the working source of truth for project completion. A `VERIFIED` status describes only the evidence written beside that item; source inspection does not prove runtime behavior. Use synthetic data only. Never point a database test or migration at a valuable development or production database.
 
@@ -21,7 +21,7 @@ This document is the working source of truth for project completion. A `VERIFIED
 ## Overall status
 
 - [ ] `IN_PROGRESS` — Phase A source inventory and available non-database checks are recorded below. Evidence: current source tree inspection and the command results in [Baseline command log](#baseline-command-log).
-- [ ] `NOT_STARTED` — Complete runtime authorization, ownership, account lifecycle, and data-redaction verification. Targeted service-level staff/patient scope is covered; route-level and alternate-read-path checks remain.
+- [ ] `IN_PROGRESS` — Complete runtime authorization, ownership, account lifecycle, and data-redaction verification. Phase 5 (2026-10-24) verified route-level authorization, ownership, isolation, and redaction for all four roles over live HTTP on a disposable database; account-lifecycle (tokens, expiry, replay, session invalidation, throttling) remains. Evidence: [Phase 5](#phase-5--live-api-authorization-and-isolation-tests-2026-10-24).
 - [x] `VERIFIED` — Complete role-specific browser workflows. All four roles (Admin, Doctor, OT_STAFF, PATIENT) now have executed browser acceptance evidence in Phase J; cross-role direct-access, console/network, and responsive checks are done. Release-readiness review (deployment/CI/production) remains open.
 - [ ] `NOT_STARTED` — Resolve the policy decisions and either implement or explicitly accept each confirmed gap.
 
@@ -91,10 +91,10 @@ This document is the working source of truth for project completion. A `VERIFIED
 
 ### Phase H — Security and backend contract verification
 
-- [ ] `NOT_STARTED` — Compare page guards, role map, every handler guard, and service-level ownership checks.
-- [ ] `NOT_STARTED` — Test direct unauthorized API access, manipulated IDs, and ownership boundaries for all roles.
-- [ ] `NOT_STARTED` — Verify OT_STAFF assignment checks/redaction and PATIENT record/appointment ownership on every related read path.
-- [ ] `NOT_STARTED` — Verify ADMIN-only mutations, Doctor-specific permissions, malformed JSON, invalid identifiers, missing/wrong/oversized fields, and invalid enum values.
+- [x] `VERIFIED` — Compare page guards, role map, every handler guard, and service-level ownership checks. Phase 4 source audit (2026-10-24): all 40 route handlers / 61 methods enumerated with their guard calls; every non-public handler calls `authorizeApiPermission` (or `authorizeApiSession` via the injected `/me` handlers) before any service work; permission strings compared against `ROLE_PERMISSIONS` (exact match, no prefix semantics); service ownership checks re-read for alerts, schedule notes, patient portal, and schedule assignment. Evidence: [Phase 4 audit](#phase-4--api-authorization-and-security-audit-2026-10-24).
+- [x] `VERIFIED` — Test direct unauthorized API access, manipulated IDs, and ownership boundaries for all roles. Phase 5 (2026-10-24): `tests/runtime-authorization.test.ts` (13 tests, `npm run test:runtime`) authenticated ADMIN, DOCTOR, OT_STAFF, and two PATIENT accounts through the real NextAuth credentials flow and probed a live `next start` server backed by a disposable seeded database. Covered: 401 across 12 protected endpoints when unauthenticated; per-role 403 matrices; PATIENT cross-account isolation for appointments and alerts (foreign alert read/update/delete 403); OT_STAFF assignment scoping (list/detail/staff/equipment) with non-disclosing 404s; patient-field redaction including `phone`; admin-only mutations and audit access; schedule transitions (200 valid / 409 invalid); unknown and malformed resource IDs (404/400). Evidence: [Phase 5](#phase-5--live-api-authorization-and-isolation-tests-2026-10-24).
+- [x] `VERIFIED` — Verify OT_STAFF assignment checks/redaction and PATIENT record/appointment ownership on every related read path. Phase 4 source audit: OT_STAFF list, detail, `staff` GET, `equipment` GET are assignment-scoped (detail/sub-resources return a non-disclosing 404 when unassigned); `notes` endpoints deny OT_STAFF (403, no `schedules:notes:manage`); `me/staff-schedules` is role-restricted and assignment-derived; PATIENT reaches schedules only via `me/appointments` (`schedules:read` gate returns 403; `schedules:read:own` is satisfied only by that handler and the appointment pages). One redaction gap found and fixed: `patient.phone` on schedule detail. Evidence: [Phase 4 audit](#phase-4--api-authorization-and-security-audit-2026-10-24) and `tests/schedule-access.test.ts`.
+- [ ] `IN_PROGRESS` — Verify ADMIN-only mutations, Doctor-specific permissions, malformed JSON, invalid identifiers, missing/wrong/oversized fields, and invalid enum values. Phase 5 runtime probes confirmed ADMIN-only mutations (department create/soft-delete, user approval gating), DOCTOR permission boundaries, identifier abuse (unknown ids → 404, malformed UUIDs → 400), and invalid status transitions (409) over live HTTP. Malformed-JSON bodies, missing/oversized fields, and invalid enum values were not exercised at runtime and remain open.
 - [ ] `NOT_STARTED` — Verify domain/Prisma errors map to correct HTTP codes, rate limits/token expiry/replay protection work, and secrets are not committed.
 - [ ] `NOT_STARTED` — Review audit coverage and transactionality against an explicit policy.
 - [x] `VERIFIED` — Database-backed schedule/assignment/audit and targeted privacy-scope tests ran on separate ephemeral PostgreSQL containers; the running `medorch-postgres` container was not used. Evidence: latest `npm run test:database` passed 30 tests.
@@ -124,6 +124,60 @@ This document is the working source of truth for project completion. A `VERIFIED
 - [ ] `NOT_STARTED` — Run final typecheck, lint, all safe tests, DB tests on disposable DB, Prisma validation, production build, and `git diff --check`.
 - [ ] `NOT_STARTED` — Review CI, deployment environment, HTTPS/cookies, DB connectivity, logging/monitoring, backups/recovery, privacy boundaries, and limitations.
 - [ ] `NOT_STARTED` — Prepare a short role-by-role demo walkthrough; do not describe a successful build as production certification.
+
+### Phase 4 — API authorization and security audit (2026-10-24)
+
+Source-level audit of every API route handler against the role map, service ownership checks, and redaction helpers. No route handler, service, repository, schema, migration, permission rule, or auth policy was changed; the only production-code change is the redaction fix below. Worktree was clean at start (Phase 3 committed in `00ae18e`); nothing was committed or pushed.
+
+**Inventory method:** all 40 `route.ts` files / 61 HTTP methods under `src/app/api` were enumerated mechanically with their exported methods and `authorizeApiPermission`/`authorizeApiSession` guard arguments, then every guard string was resolved through `ROLE_PERMISSIONS`. Public by design: the five `auth/*` endpoints and the Auth.js catch-all. Every other handler guards before any service work. Permission matching is exact-string (`permissions.includes`), so PATIENT's `schedules:read:own` never satisfies `schedules:read`, and a missing `session.user.role` fails closed (403).
+
+**Boundaries verified (evidence: the named handler/service/test files, not route existence):**
+
+| Boundary | Result |
+|---|---|
+| Unauthenticated access | Every non-public handler returns 401 before touching a service; no handler skips the guard (mechanical enumeration + per-handler reads). |
+| PATIENT cross-record access | PATIENT holds only `schedules:read:own`, `alerts:read`, `alerts:update:own`, `alerts:delete:own`. All schedule endpoints require `schedules:read` → 403. `me/appointments` resolves data via session user id only (`handlePatientAppointments` + `getPatientPortalData`; covered by `tests/me-read-handlers.test.ts` and `tests/privacy-boundary.test.ts`). Alerts service forces `userId = requester` for non-admins on the list and checks ownership on get/update/mark-read/read-all/delete. |
+| OT_STAFF scoping | List is assignment-derived with `clinicalNotes` nulled; detail, `staff` GET, and `equipment` GET apply `canReadIndividualSchedule` + non-disclosing 404; `notes` GET/POST/PATCH/DELETE deny OT_STAFF (no `schedules:notes:manage`); `me/staff-schedules` is role-restricted (`['OT_STAFF']`) and assignment-derived; `me/schedules` has an explicit DOCTOR role check so OT_STAFF cannot reach the surgeon view. |
+| DOCTOR boundaries | Per approved policy, may read and transition any schedule; cannot create schedules, assign staff/equipment, or manage users/rooms/equipment/departments/doctor profiles (no matching permission in the map; `tests/permissions.test.ts` asserts the map). |
+| ADMIN-only mutations | `users:manage`, `departments/doctors/ot-rooms/equipment:manage`, `patients:manage`, `schedules:create/staff:manage/equipment:manage`, `audit:read` verified handler-by-handler against the role map. |
+| IDOR via client-supplied IDs | Alert recipient/owner ids overridden or checked in the service; note mutations validate parent schedule + author (`SCHEDULE_NOTE_FORBIDDEN` → 403); `createdById` is server-set from the session; approve/user-detail ids are admin-gated; patient portal keyed strictly by session user id. |
+| Status/state transitions | `updateScheduleSchema` contains no `status` field; `updateScheduleStatusSchema` is status-only and the service enforces `ALLOWED_STATUS_TRANSITIONS` with compare-and-set (concurrency-tested). |
+| Sensitive fields | `passwordHash` appears in no repository `select` (searched); registration schema has no role/status field and the service forces PATIENT/PENDING/unverified (verification not weakened); `medicalHistory` is not selected by any schedule read; audit endpoint is ADMIN-only. |
+| Validation gaps | No gap found that permits an invalid or unauthorized state transition. |
+
+**Confirmed defect (fixed):** `GET /api/schedules/{id}` leaked `patient.phone` to OT_STAFF — see [Confirmed defects](#confirmed-defects--documentation-mismatches). Regression test added in `tests/schedule-access.test.ts`.
+
+**Design questions (documented, not changed):** the minimum OT_STAFF patient-field set remains an open product decision — this phase aligned the detail endpoint with the already-tested list minimum (`name` + `patientCode`, asserted by `tests/privacy-boundary.test.ts`) and left `name`/`patientCode` visible; `GET /api/doctors` exposes doctor office-contact details to OT_STAFF (professional directory, not patient data); DOCTOR cannot create schedules under the current map; `POST /api/alerts` has no UI consumer.
+
+**Remaining risks after Phase 4:** no route-level runtime authorization tests (guard wiring proven at source, not over live HTTP); no rate limiting on auth endpoints (Phase B scope); no CSRF-specific tests beyond Auth.js defaults; session/JWT invalidation and account-state rejection untested; `tests/patient-approval-concurrency.test.ts` still unwired to any package script; dependency advisories unreviewed.
+
+### Phase 5 — Live API authorization and isolation tests (2026-10-24)
+
+Runtime verification of the Phase 4 source audit. A new route-level suite (`tests/runtime-authorization.test.ts`, `npm run test:runtime`) sends real HTTP requests against a production server (`next start` on a random loopback port) backed by a disposable, seeded PostgreSQL database. Sessions are obtained through the real NextAuth credentials flow (CSRF fetch + credentials callback) for ADMIN, DOCTOR, OT_STAFF, and two PATIENT accounts — no bypass, no test-only endpoint, no weakened policy. No route handler, service, repository, schema, migration, permission rule, or auth policy was changed, and **no new runtime defect was found**: every observed response matched the policy documented in Phase 4.
+
+**Infrastructure:** disposable Docker container `medorch-phase5-b3f71d29` (tmpfs data, loopback-only `127.0.0.1:6631`), databases `medorch_runtime_test_b3f71d29` (runtime suite, seeded with `SEED_VERIFIED_PATIENTS=1`) and `medorch_alerts_test_b3f71d29` (database suite). The suite itself asserts `DATABASE_URL` names a local `medorch_runtime_test_*` database and that a current production build exists. The primary development container, its database, and all pre-existing containers/volumes were never touched; the container and its two databases are removed during phase cleanup and `docker ps -a` is re-verified.
+
+**Result: 13 tests, 0 failures (final run).** Expected values were derived from `ROLE_PERMISSIONS`, the route handlers, and the service-level ownership checks — none were invented to fit the app.
+
+| # | Test | Boundary exercised (expected → actual) |
+|---|---|---|
+| 1 | Unauthenticated 401s | 12 endpoints (schedules, users, audit, alerts, patients, departments, `me/appointments`, `me/staff-schedules`, schedule detail, status PATCH, department POST, alert POST): 401 + `success:false` + `Unauthorized` everywhere |
+| 2 | ADMIN reads | `/api/schedules`, `/users`, `/patients`, `/departments`, `/alerts` → 200; `/api/audit` → 200 with `items` + `pagination` |
+| 3 | ADMIN department lifecycle | POST → 200; created record visible to an OT_STAFF reader → 200; DELETE → 200 soft-delete (`isActive:false`) and the record stays listed |
+| 4 | DOCTOR boundaries | 5 permitted reads → 200; `/audit`, `/users`, schedule create, user approve → 403 |
+| 5 | DOCTOR transitions | SCHEDULED → COMPLETED → 409 `Invalid schedule status transition.`; SCHEDULED → CONFIRMED → 200 |
+| 6 | OT list scoping | only assignment-derived schedules; `clinicalNotes` null on every row |
+| 7 | OT detail redaction | assigned → 200 with `clinicalNotes` and patient `email`/`phone`/`dateOfBirth`/`gender` all null (name + patientCode kept); unassigned detail and `staff`/`equipment` sub-resources → non-disclosing 404 |
+| 8 | OT 403 matrix | 11 forbidden surfaces (patients, users, audit, patient detail, `me/schedules`, notes read, schedule create, status change, note create, staff assign, user approve) → 403; 6 permitted reads → 200; `/me/schedules` carries the documented doctor-only message |
+| 9 | PATIENT portal isolation | each patient's `/me/appointments` returns only their own record; the other patient's name appears nowhere in the response body (and vice versa) |
+| 10 | PATIENT 403 matrix | 12 non-owned reads/mutations → 403 |
+| 11 | PATIENT alert ownership | own list shows the targeted alert, the foreign list does not; foreign GET/PATCH/DELETE → 403 with the documented messages; owner PATCH → 200 |
+| 12 | ID manipulation | unknown schedule id (ADMIN and OT_STAFF) → 404 `Schedule not found.`; malformed UUID → 400; status PATCH on unknown id → 404; unknown alert id → 404; malformed user id → 400 |
+| 13 | ADMIN approval gate | ADMIN reaches the approval service (409 `Only patient accounts can be approved.` on a DOCTOR id); DOCTOR/OT_STAFF/PATIENT → 403 |
+
+**Endpoints actually exercised over HTTP:** the `auth/*` login flow (`/api/auth/csrf`, `/api/auth/callback/credentials`), `GET|POST /api/schedules`, `GET|PATCH /api/schedules/{id}`, `PATCH /api/schedules/{id}/status`, `GET /api/schedules/{id}/staff`, `GET /api/schedules/{id}/equipment`, `GET|POST /api/schedules/{id}/notes`, `GET /api/me/schedules`, `GET /api/me/staff-schedules`, `GET /api/me/appointments`, `GET /api/users`, `POST /api/users/{id}/approve`, `GET /api/patients`, `GET /api/patients/{id}`, `GET|POST /api/departments`, `DELETE /api/departments/{id}`, `GET /api/audit`, `GET|POST /api/alerts`, `GET|PATCH|DELETE /api/alerts/{id}`, `GET /api/ot-rooms`, `GET /api/equipment`, `GET /api/doctors`, `GET /login`.
+
+**Not exercised over HTTP (no runtime claim made):** malformed/oversized/missing-field JSON bodies, invalid enum values at the wire, note PATCH/DELETE mutations, staff/equipment assignment mutations, doctors/ot-rooms/equipment management mutations, `PATCH /api/patients/{id}`, user status changes, `GET /api/alerts/read-all`, and the register/verify/reset/throttle flows (Phase B scope).
 
 ## Repository inventory
 
@@ -280,7 +334,7 @@ Not verified by this pass: actual browser rendering, responsive breakpoints at r
 | `tests/api-request-validation.test.ts` | Shared JSON-body parsing | `VERIFIED` — included in 15 passing focused tests. |
 | `tests/foundation-validation.test.ts` | Query and user-input validation | `VERIFIED` — included in 15 passing focused tests. |
 | `tests/permissions.test.ts` | Role permission map | `VERIFIED` — included in 15 passing focused tests. |
-| `tests/schedule-access.test.ts` | Status transitions, OT access and redaction helpers | `VERIFIED` — included in 15 passing focused tests. |
+| `tests/schedule-access.test.ts` | Status transitions, OT access and redaction helpers | `VERIFIED` — in the focused suite; Phase 4 added the OT `patient.phone` redaction regression test (file now has 6 tests; aggregate focused run 16/16). |
 | `tests/schedule-constraints.test.ts` | PostgreSQL overlap exclusion constraints | `VERIFIED` — 8 tests passed on the isolated disposable database. |
 | `tests/schedule-status-concurrency.test.ts` | Concurrent compare-and-set through `schedule.repository.updateScheduleStatus`, including exactly one success, stale conflict, and atomic audit | `VERIFIED` — passed through `npm run test:database`. |
 | `tests/schedule-audit-atomicity.test.ts` | Database-backed schedule/audit atomicity | `VERIFIED` — passed through `npm run test:database`. |
@@ -291,6 +345,7 @@ Not verified by this pass: actual browser rendering, responsive breakpoints at r
 | `tests/me-read-handlers.test.ts` | `handlePatientAppointments` / `handleStaffSchedules` scoping from a synthetic session | Runs via `test:me-read-handlers`; no database. Not recorded in this table until 2026-10-23. |
 | `tests/patient-approval-concurrency.test.ts` | Concurrent patient approval through `user.service.approvePatient` on `pg` | Requires `DATABASE_URL` but is **not** included in the `test:database` script, so it is not exercised by any package script today. Not recorded in this table until 2026-10-23. |
 | `tests/accessibility.test.tsx` | SSR-renders `Header`/`Sidebar`/`ScheduleCard`/`ScheduleStatusActions` with `react-dom/server` and asserts accessible-name uniqueness/contextuality and nav-toggle disclosure state | `VERIFIED` — added in Phase 3; runs via `test:accessibility`, no database. |
+| `tests/runtime-authorization.test.ts` | Live HTTP authorization/isolation suite: spawns `next start`, logs every role in through the real NextAuth credentials flow, probes role/ownership/redaction/transition boundaries over HTTP, then tears the server down | `VERIFIED` — added in Phase 5; runs via `test:runtime`; requires a disposable local `medorch_runtime_test_*` database and a current production build. |
 
 ## Role-by-role permissions and workflows
 
@@ -319,7 +374,7 @@ This matrix reflects the current permission constants and the inspected routes. 
 - [x] `VERIFIED` — OT schedule detail handler checks assigned-user access and applies `redactScheduleDetailsForOT`; schedule list handler nulls `clinicalNotes` for OT_STAFF. Evidence: handler source.
 - [x] `VERIFIED` — Patient appointment endpoint authorizes `schedules:read:own` and passes current session user ID to patient-portal service. Evidence: handler/service call source.
 - [x] `VERIFIED` — Synthetic-fixture service test confirms OT_STAFF receives only schedules assigned to that user and selected patient fields; patient portal data is filtered by linked user ID and returns no record for an unlinked account. Evidence: `tests/privacy-boundary.test.ts`, passed on isolated PostgreSQL.
-- [ ] `NOT_STARTED` — Test every alternate read path for equivalent sensitive-field exposure and every direct unauthorized mutation.
+- [ ] `IN_PROGRESS` — Test every alternate read path for equivalent sensitive-field exposure and every direct unauthorized mutation. Phase 4 (2026-10-24) compared collection, detail, sub-resource, and mutation paths for schedules, alerts, patients, users, doctors, departments, OT rooms, and equipment: the schedule-detail `patient.phone` discrepancy was the only field-level mismatch found and is fixed. Phase 5 executed live unauthorized-mutation probes for all four roles (schedule create/status/notes/staff, department create/delete, user approve, alert create/update/delete) plus detail/sub-resource reads and ID manipulation, and re-verified redaction over HTTP including `phone`. Remaining unprobed runtime mutations: doctors/ot-rooms/equipment management endpoints, note PATCH/DELETE, `PATCH /api/patients/{id}`, and user status changes — source-verified only.
 - [ ] `NOT_STARTED` — Test user/alert/patient/schedule ownership, invalid IDs, malformed/oversized bodies, and error response leakage.
 - [ ] `NOT_STARTED` — Verify token expiry, replay prevention, account-status restrictions, rate-limit boundaries, session invalidation, and SMTP failures.
 - [ ] `NOT_STARTED` — Audit all dependency advisories and deployment configuration; `npm ci` reported 15 high-severity advisories, but no advisory-level audit was run during Phase A.
@@ -329,12 +384,12 @@ This matrix reflects the current permission constants and the inspected routes. 
 ## Automated and manual QA checklist
 
 - [x] `VERIFIED` — Focused non-database suite passes 15/15 tests: shared request parsing, validation, role permission definitions, schedule access/transitions, and OT redaction helper behavior.
-- [ ] `NOT_STARTED` — Route-level authorization and ownership tests for all four roles.
+- [x] `VERIFIED` — Route-level authorization and ownership tests for all four roles. Phase 5: `npm run test:runtime` → 13/13 pass over live HTTP on a disposable database (ADMIN, DOCTOR, OT_STAFF, two PATIENT accounts, plus unauthenticated probes).
 - [ ] `NOT_STARTED` — Auth/account lifecycle tests for verification and password-reset tokens, session invalidation, rate limiting, and generic responses.
 - [x] `VERIFIED` — Database-backed constraint, transactionality, repository-audit, status concurrency, and privacy-boundary tests ran on a confirmed disposable database. Evidence: `npm run test:database` now runs 31 tests: 30 pass, 1 fails only on its own environment precondition (see the alerts-suite finding below); the previously recorded figure of 30 predates `alerts-repository-audit.test.ts`.
 - [ ] `NOT_STARTED` — Critical-form component or browser E2E tests, using existing tooling if present and only adding tooling if required.
 - [x] `VERIFIED` — Manual role acceptance tests for all four roles (Admin, Doctor, OT_STAFF, PATIENT), cross-role direct URLs, browser console/network failures, and responsive layouts are complete (evidence in Phase J).
-- [ ] `NOT_STARTED` — Regression tests for each confirmed defect fixed.
+- [ ] `IN_PROGRESS` — Regression tests for each confirmed defect fixed. Phase 4 added a dedicated regression test for the OT_STAFF `patient.phone` leak plus extended redaction-shape assertions in `tests/schedule-access.test.ts`; Phase 3 accessibility defects are covered by `tests/accessibility.test.tsx`. The Phase G `scheduledDate` payload fix and the P2 frontend fixes still have no automated regression test.
 
 ## Deployment and demo readiness checklist
 
@@ -366,6 +421,7 @@ This matrix reflects the current permission constants and the inspected routes. 
 - [x] `VERIFIED` — **Not a defect — `/api/alerts` polling frequency:** measured 57 requests over 570s via the Resource Timing API, i.e. exactly the intended 30s interval. An earlier apparent burst was accumulation in the captured log buffer, not a runaway poll loop.
 - [x] `VERIFIED` — **P2, `npm run test:database` failed 1 of 31 in a normal dev environment — PREREQUISITE NOW DOCUMENTED, suite green (Phase 3):** `tests/alerts-repository-audit.test.ts` asserts that `DATABASE_URL` points at a **localhost** database whose name matches `medorch_alerts_test_*` before it will run (the safety assertion was not weakened). Run against a disposable PostgreSQL container with a database named `medorch_alerts_test_<suffix>` on a loopback port, `npm run test:database` passes **34/34** (31 previously counted + the alerts test's 4 subtests that previously never ran). The prerequisite is now recorded in `docs/development.md`. Related: `tests/patient-approval-concurrency.test.ts` needs `DATABASE_URL` but is still not referenced by any package script.
 - [x] `VERIFIED` — **P3, stale test inventory in the tracker — CORRECTED:** the repository held thirteen top-level test files while this document recorded ten; `alerts-repository-audit.test.ts`, `me-read-handlers.test.ts`, and `patient-approval-concurrency.test.ts` were undocumented and the script list omitted `test:me-read-handlers`. Corrected in Phase 2 and updated again in Phase 3 for `accessibility.test.tsx` (fourteen files) and `test:accessibility`. Re-check whenever a test file is added.
+- [x] `VERIFIED` — **P2, patient phone number leaked to OT_STAFF on schedule detail — FIXED (Phase 4):** `findScheduleById` selects `patient.phone`, and `GET /api/schedules/{id}` passes the result through `redactScheduleDetailsForOT`, which nulled `email`, `dateOfBirth`, and `gender` but not `phone`. Any assigned OT_STAFF account therefore received the patient's phone number on the detail endpoint — contradicting the same role's collection path (`findSchedulesForStaff` selects only `name` + `patientCode`, asserted by `tests/privacy-boundary.test.ts`), the helper's own redaction policy, the Phase E evidence that the schedule UI consumes none of these demographics, and foundation-audit finding #9 (phone flagged as beyond UI need). Source search confirms no schedule UI reads `patient.phone`. Fix: `src/modules/schedules/schedule-access.ts` now nulls `phone` alongside the other demographics (type + output). Evidence: `node --import tsx --test tests/schedule-access.test.ts` → **6/6 pass** including the new regression test "OT detail redaction nulls every patient demographic the detail query selects"; `npx tsc --noEmit` → 0; `npm run lint` → 0; `npm run test:database` → 34/34 on a disposable database (privacy-boundary field-shape assertions unchanged and still passing).
 
 ### Potential missing integrations (not yet approved feature work)
 
@@ -377,7 +433,7 @@ This matrix reflects the current permission constants and the inspected routes. 
 ### Untested behavior
 
 - [x] `VERIFIED` — Database-backed tests and migration state: all nine migrations applied; PostgreSQL overlap constraints and status concurrency passed on the isolated disposable database.
-- [ ] `NOT_STARTED` — Direct API role/ownership behavior and remaining alternate-path patient/OT_STAFF redaction. Service-level schedule scoping has focused coverage, but this does not prove route authorization or all read paths.
+- [x] `VERIFIED` — Direct API role/ownership behavior and patient/OT_STAFF redaction over HTTP: Phase 5's live suite proved route authorization, ownership scoping, cross-account isolation, and redaction (including `phone`) for all four roles on a disposable database. Remaining runtime gaps are account-lifecycle endpoints and malformed/oversized/invalid-enum body abuse cases.
 - [ ] `NOT_STARTED` — Authentication/account lifecycle, SMTP behavior, operational UI error/loading/empty states, and all four role browser journeys.
 - [ ] `NOT_STARTED` — Dependency advisory impact; install output alone does not identify exploitable runtime exposure or a remediation.
 
@@ -464,6 +520,29 @@ Commands were executed on the audited source revision. “Not run” means no re
 | Isolated second `next dev -p 3211` instance (temporary worktree copy, acceptance `DATABASE_URL`) | PASS; served the PATIENT browser acceptance, then stopped (port verified dead). Primary dev server on 3210 verified answering 200 before and after. |
 | `git diff --check` (Phase 3) | PASS after the current changes. |
 | `npm run build` (Phase 3) | NOT RUN — a production build writes the same `.next` directory the running dev server uses, which would risk the live session; `tsc`, lint, and all suites cover the changes instead. |
+| `npx tsc --noEmit` (Phase 4) | PASS; exit code 0 after the redaction fix and regression tests (first run flagged property access on the helper's intersection return type in the new test; restructured to the suite's whole-object `deepEqual` pattern and rerun clean). |
+| `npm run lint` (Phase 4) | PASS; exit code 0, rerun after the final test edit. |
+| `npm run test:permissions` (Phase 4) | PASS; 5 tests, 0 failures. |
+| `npm run test:me-read-handlers` (Phase 4) | PASS; 9 tests, 0 failures. |
+| `node --import tsx --test tests/api-request-validation.test.ts tests/schedule-access.test.ts tests/permissions.test.ts tests/foundation-validation.test.ts` (Phase 4) | PASS; 16 tests, 0 failures (the focused suite grew from 15 by one — the new OT `patient.phone` regression test). |
+| `docker run ... postgres:17` (Phase 4) | PASS; created `medorch-phase4-a71f3c9d`, loopback-only port `127.0.0.1:6627`, tmpfs `/var/lib/postgresql/data`, no persistent mounts (`MSYS_NO_PATHCONV=1`), `POSTGRES_HOST_AUTH_METHOD=trust` scoped to that loopback port. Docker Desktop's engine had to be started first (it was down). The existing `medorch-phase2-ephemeral` container (exited) was never started, touched, or connected to; the disposable container was removed afterwards and `docker ps -a` re-verified showing only `medorch-phase2-ephemeral` (exited, unchanged). |
+| `npx prisma migrate deploy` (Phase 4) | PASS; all migrations applied to the disposable `medorch_alerts_test_74192836` database only. |
+| `DATABASE_URL=<disposable> npm run test:database` (Phase 4) | PASS; **34 tests, 0 failures**; the safety assertion in `tests/alerts-repository-audit.test.ts` was not weakened. |
+| `npm run build` (Phase 4) | PASS; Next.js production build completed and enumerated the full route set (no dev server was running). The previously recorded `.next/cache` permission issue did not reproduce — no files were deleted, moved, or re-permissioned. |
+| `git diff --check` (Phase 4) | PASS after the current changes. |
+| `npx tsc --noEmit` (Phase 5) | PASS; exit code 0, rerun after every test-file edit. |
+| `npm run lint` (Phase 5) | PASS; exit code 0 (one `prefer-const` error in the new suite was found and fixed, then rerun clean). |
+| `npm run test:permissions` (Phase 5) | PASS; 5 tests, 0 failures. |
+| `npm run test:me-read-handlers` (Phase 5) | PASS; 9 tests, 0 failures. |
+| `node --import tsx --test tests/schedule-access.test.ts` (Phase 5) | PASS; 6 tests, 0 failures (Phase 4 redaction regression coverage intact). |
+| `npm run test:accessibility` (Phase 5) | PASS; 5 tests, 0 failures. |
+| `docker run ... postgres:17` (Phase 5) | PASS; created `medorch-phase5-b3f71d29`, loopback-only port `127.0.0.1:6631`, tmpfs `/var/lib/postgresql/data`, no persistent mounts (`MSYS_NO_PATHCONV=1`). Databases: `medorch_runtime_test_b3f71d29` and `medorch_alerts_test_b3f71d29`. The primary development container and its database were never touched. |
+| `npx prisma migrate deploy` (Phase 5) | PASS; all migrations applied to both disposable databases only. |
+| `DATABASE_URL=<runtime-db> SEED_VERIFIED_PATIENTS=1 npx prisma db seed` | PASS; seeded only `medorch_runtime_test_b3f71d29` (verified PATIENT accounts required for sign-in; development-only flag, auth policy untouched). |
+| `DATABASE_URL=<runtime-db> npm run test:runtime` (Phase 5, final run) | PASS; **13 tests, 0 failures** — the suite spawns and stops its own `next start` server and establishes all five sessions per run. |
+| `DATABASE_URL=<alerts-db> npm run test:database` (Phase 5) | PASS; **34 tests, 0 failures** on the disposable database; the alerts-suite safety assertion was not weakened. |
+| `npm run build` (Phase 5) | NOT RUN — no `src/` or `prisma/` file is newer than the existing Phase 4 production build (`.next/BUILD_ID`, checked with `find src prisma -newer`), and the runtime suite's live `patient.phone` redaction assertion proves that build contains the Phase 4 fix. |
+| `git diff --check` (Phase 5) | PASS after the current changes. |
 
 ## Files changed by phase
 
@@ -475,13 +554,15 @@ Commands were executed on the audited source revision. “Not run” means no re
 | G — frontend completion pass | `src/components/schedules/ScheduleForm.tsx` (scheduledDate payload contract fix), `src/app/patients/PatientRegistry.tsx` (table column order fix), `src/components/users/UserList.tsx` (admin user-provisioning form), `src/components/auth/LoginForm.tsx` (forgot-password link), `src/components/layout/AppShell.tsx`, `src/app/dashboard/page.tsx`, `src/components/schedules/SchedulePage.tsx`, `src/components/dashboard/PatientDashboard.tsx` (single `<main>` landmark), and this tracker. Frontend-only; no API handler, service, repository, schema, or auth logic was modified. |
 | Phase 2 — browser acceptance & doc reconciliation (no code) | `docs/MEDORCH_COMPLETION_MASTER_PLAN.md`, `docs/development.md` only. Evidence recorded for Admin/Doctor/OT_STAFF role acceptance, cross-role guards, responsive/a11y sweeps, and new findings. |
 | Phase 3 — accessibility, patient acceptance setup, test reliability | `src/components/schedules/ScheduleCard.tsx` and `src/components/schedules/ScheduleStatusActions.tsx` (contextual accessible names), `src/components/layout/Header.tsx`, `src/components/layout/Sidebar.tsx`, `src/components/layout/AppShell.tsx` (nav toggle disclosure state), `src/app/schedules/[id]/ScheduleDetails.tsx` (passes schedule label), `prisma/seed.ts` (dev-only `SEED_VERIFIED_PATIENTS` flag — auth policy untouched), `tests/accessibility.test.tsx` (new), `package.json` (`test:accessibility` script), `docs/MEDORCH_COMPLETION_MASTER_PLAN.md`, `docs/development.md`. No API handler, service, repository, schema, migration, or authorization rule was modified. |
+| Phase 4 — API authorization audit | `src/modules/schedules/schedule-access.ts` (OT detail redaction now also nulls `patient.phone`), `tests/schedule-access.test.ts` (regression test + extended redaction-shape assertions), and this tracker. No route handler, service, repository, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
+| Phase 5 — live API authorization tests | `tests/runtime-authorization.test.ts` (new suite), `package.json` (`test:runtime` script), and this tracker. No application code, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
 | B–C, E–H (remaining), J–K (remaining) | None yet. Record exact files after each phase; do not commit unless explicitly requested. |
 
 ## Current phase, next task, and exact resume instructions
 
-**Current phase:** Phase 3 (accessibility remediation, development-only patient acceptance, test reliability) is complete: both confirmed a11y defects fixed and browser+test verified, PATIENT role acceptance executed on a disposable isolated database via the dev-only seed flag, and `npm run test:database` green (34/34) against a correctly named disposable alerts database. Phase 2 browser acceptance is complete for all four roles.
+**Current phase:** Phase 5 (live API authorization and isolation tests) is complete: a 13-test route-level suite exercised ADMIN, DOCTOR, OT_STAFF, two PATIENT accounts, and unauthenticated requests over live HTTP against a production build and a disposable seeded database — 401/403/404/409/200 boundaries, cross-account isolation for appointments and alerts, OT assignment scoping and patient-field redaction (including `phone`), and ID manipulation all behaved per policy, with **no new runtime defect**. All checks green: tsc, lint, runtime 13/13, database 34/34, permissions 5/5, me-read-handlers 9/9, schedule-access 6/6, accessibility 5/5, `git diff --check`.
 
-**Next task:** Add route-level authorization and ownership tests for `/api/me/staff-schedules` and `/api/me/appointments` (Phase H); keep service-level data scoping tests distinct from endpoint authorization. Follow-ups: fix the `NEXTAUTH_URL`/dev-port mismatch (operator config), P3 heading-level skips, wire `patient-approval-concurrency.test.ts` into a package script.
+**Next task:** Phase B account-lifecycle token tests (verification/reset token expiry, replay, single-use, session invalidation, throttling), then the remaining Phase H abuse cases (malformed/oversized JSON bodies, invalid enum values, the unprobed admin resource mutations). Follow-ups unchanged: fix the `NEXTAUTH_URL`/dev-port mismatch (operator config), P3 heading-level skips, wire `patient-approval-concurrency.test.ts` into a package script.
 
 **Resume instructions:**
 
