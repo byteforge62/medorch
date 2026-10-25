@@ -1,50 +1,72 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/*
+ * MedOrch design system — tokens
+ * Style: Minimalism & Swiss (docs/design-system/medorch/MASTER.md)
+ * Every color pair below is measured against WCAG 2.1:
+ *   - text: 4.5:1 minimum (AA body)
+ *   - fills used as button/badge backgrounds with white text: 4.5:1
+ *   - control boundaries (inputs): 3:1 minimum (non-text contrast)
+ */
 
 :root {
   /* Surfaces */
-  --background: #ffffff;
-  --surface: #ffffff;
-  --surface-subtle: #f7f9fc;
-  --surface-muted: #eef2f6;
-  --surface-inverse: #111827;
+  --background: #f8fafc; /* app canvas */
+  --surface: #ffffff; /* cards, panels, inputs */
+  --surface-subtle: #f8fafc;
+  --surface-muted: #e9eef6; /* wells, secondary fills */
+  --surface-inverse: #1e3a8a; /* inverse panels */
 
-  /* Content */
-  --foreground: #111827;
-  --foreground-secondary: #475467;
-  --foreground-muted: #667085;
-  --foreground-subtle: #98a2b3;
+  /* Content (all AA on white and on --background) */
+  --foreground: #172554; /* primary text/headings — 16.2:1 */
+  --foreground-secondary: #334155; /* body — 10.4:1 */
+  --foreground-muted: #475569; /* meta — 7.2:1 */
+  --foreground-subtle: #64748b; /* hints — 4.8:1 */
   --foreground-inverse: #ffffff;
 
   /* Brand / actions */
-  --primary: #1769e0;
-  --primary-hover: #1258bd;
-  --primary-active: #0f4ca8;
-  --primary-soft: #eaf2ff;
+  --primary: #1e40af; /* white text on it: 8.7:1 */
+  --primary-hover: #1e3a8a; /* navy — 10.4:1 */
+  --primary-active: #172554;
+  --primary-soft: #dbeafe; /* --primary text on it: 7.8:1 */
+
+  /* Accent — attention/urgent highlight, always with dark ink */
+  --accent: #d97706; /* white on it fails (3.2:1) — dark ink only */
+  --accent-ink: #111827; /* on accent: 5.6:1 */
 
   /* Structure */
-  --border: #e4e7ec;
-  --border-strong: #d0d5dd;
-  --ring: #1769e0;
+  --border: #e2e8f0; /* dividers, card edges (decorative) */
+  --border-strong: #74829a; /* control boundaries — 3.9:1 on white */
+  --ring: #1e40af;
 
-  /* Semantic states */
-  --success: #12b76a;
-  --success-soft: #ecfdf3;
-  --warning: #f79009;
-  --warning-soft: #fffaeb;
-  --danger: #d92d20;
-  --danger-soft: #fef3f2;
-  --info: #2e90fa;
-  --info-soft: #eff8ff;
+  /* Semantic states — each passes 4.5:1 both as fill+white and ink-on-soft */
+  --success: #047857;
+  --success-soft: #ecfdf5;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+  --danger: #b91c1c;
+  --danger-hover: #991b1b;
+  --danger-soft: #fef2f2;
+  --danger-border: #d92d20; /* error input boundary — 4.8:1 on white */
+  --info: #0369a1;
+  --info-soft: #f0f9ff;
 
-  /* Typography */
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  /* Typography — Fira Sans (UI) + Fira Code (tabular numerics), set as
+     next/font variables on <html>; quoted fallbacks if absent. */
+  --font-sans:
+    var(--font-fira-sans, 'Fira Sans'), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:
+    var(--font-fira-code, 'Fira Code'), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
 
   /* Geometry */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+  --radius-control: 0.5rem; /* inputs, buttons (referenced but undefined before) */
+  --radius-card: 0.75rem; /* cards (referenced but undefined before) */
 
   /* Layout */
   --container-max: 80rem;
@@ -63,11 +85,16 @@
   --color-foreground-muted: var(--foreground-muted);
   --color-foreground-subtle: var(--foreground-subtle);
   --color-foreground-inverse: var(--foreground-inverse);
+  /* Legacy alias used by patient pages */
+  --color-text-muted: var(--foreground-muted);
 
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
   --color-primary-soft: var(--primary-soft);
+
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
 
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
@@ -78,11 +105,14 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
   --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
 
   --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -110,10 +140,32 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Headings inherit body font with tightened leading for hierarchy */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+/* Tabular numerics helper (times, IDs, metrics) */
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Accessible keyboard focus */
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+/* Interactive elements are always clickable (design-system checklist) */
+button:not(:disabled) {
+  cursor: pointer;
 }
 
 /* Respect users who prefer reduced motion. */

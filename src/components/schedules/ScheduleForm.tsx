@@ -199,29 +199,30 @@ export function ScheduleForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900 my-8">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-2xl border border-border-strong bg-surface p-6 shadow-xl my-8">
+        <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {isEditing ? "Edit Surgery Schedule" : "Create Surgery Schedule"}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-sm text-foreground-muted">
               {isEditing
                 ? "Update surgical procedure details and assignments."
                 : "Schedule a new surgical operation in an available OT room."}
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground"
           >
             ✕
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg bg-rose-50 p-3 text-xs font-medium text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-400">
+          <div className="mt-4 rounded-lg bg-danger-soft border border-danger-border p-3 text-sm font-medium text-danger">
             {error}
           </div>
         )}
@@ -229,7 +230,7 @@ export function ScheduleForm({
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {/* Procedure Name */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Procedure Name *
             </label>
             <input
@@ -238,22 +239,22 @@ export function ScheduleForm({
               placeholder="e.g. Laparoscopic Cholecystectomy"
               value={procedure}
               onChange={(e) => setProcedure(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Patient Select */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Patient *
               </label>
-              <select
-                required
-                value={patientId}
-                onChange={(e) => setPatientId(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              >
+            <select
+              required
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
                 <option value="">Select Patient</option>
                 {patients.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -265,15 +266,9 @@ export function ScheduleForm({
 
             {/* Surgeon Select */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Surgeon / Doctor *
-              </label>
-              <select
-                required
-                value={surgeonId}
-                onChange={(e) => setSurgeonId(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              >
+              </label>            <select required value={surgeonId} onChange={(e) => setSurgeonId(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 <option value="">Select Surgeon</option>
                 {doctors.map((doc) => {
                   const targetUserId = doc.user?.id || doc.userId;
@@ -290,15 +285,9 @@ export function ScheduleForm({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Department Select */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Department *
-              </label>
-              <select
-                required
-                value={departmentId}
-                onChange={(e) => handleDepartmentChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              >
+              </label>            <select required value={departmentId} onChange={(e) => handleDepartmentChange(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 <option value="">Select Department</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -310,15 +299,9 @@ export function ScheduleForm({
 
             {/* OT Room Select */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 OT Room *
-              </label>
-              <select
-                required
-                value={otRoomId}
-                onChange={(e) => setOtRoomId(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              >
+              </label>            <select required value={otRoomId} onChange={(e) => setOtRoomId(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 <option value="">Select OT Room</option>
                 {availableOtRooms.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -332,7 +315,7 @@ export function ScheduleForm({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Scheduled Date */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Scheduled Date *
               </label>
               <input
@@ -340,13 +323,13 @@ export function ScheduleForm({
                 required
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
 
             {/* Start Time */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Start Time *
               </label>
               <input
@@ -354,13 +337,13 @@ export function ScheduleForm({
                 required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
 
             {/* End Time */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 End Time *
               </label>
               <input
@@ -368,20 +351,20 @@ export function ScheduleForm({
                 required
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Priority
             </label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as SchedulePriority)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <option value="ELECTIVE">Elective</option>
               <option value="URGENT">Urgent</option>
@@ -391,7 +374,7 @@ export function ScheduleForm({
 
           {/* Clinical Notes */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Clinical Notes
             </label>
             <textarea
@@ -399,7 +382,7 @@ export function ScheduleForm({
               placeholder="Additional medical instructions, precautions, or procedure notes..."
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             />
           </div>
 

@@ -1,13 +1,25 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import type { UserRole } from "@/generated/prisma/client";
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import {
+  Buildings,
+  CalendarBlank,
+  CalendarCheck,
+  ClipboardText,
+  DoorOpen,
+  FirstAidKit,
+  SquaresFour,
+  Stethoscope,
+  UserList,
+  Users,
+} from '@phosphor-icons/react';
+import type { UserRole } from '@/generated/prisma/client';
 
 /** Stable id shared with the Header toggle so `aria-controls` resolves. */
-export const PRIMARY_NAVIGATION_ID = "primary-navigation";
+export const PRIMARY_NAVIGATION_ID = 'primary-navigation';
 
 interface NavItem {
   name: string;
@@ -21,207 +33,61 @@ const navItems: NavItem[] = [
     name: 'Dashboard',
     href: '/dashboard',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF', 'PATIENT'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-        />
-      </svg>
-    ),
+    icon: <SquaresFour size={16} weight="regular" />,
   },
   {
     name: 'Schedules',
     href: '/schedules',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    ),
+    icon: <CalendarBlank size={16} weight="regular" />,
   },
   {
     name: 'Departments',
     href: '/departments',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 19V7.5A1.5 1.5 0 015.5 6H8l2-2h6.5A1.5 1.5 0 0118 5.5V19M4 19h16M8 10h8M8 14h8"
-        />
-      </svg>
-    ),
+    icon: <Buildings size={16} weight="regular" />,
   },
   {
     name: 'Patients',
     href: '/patients',
     roles: ['ADMIN', 'DOCTOR'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 20v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M9.5 7a3.5 3.5 0 107 0 3.5 3.5 0 00-7 0zM19 8h2m-1-1v2"
-        />
-      </svg>
-    ),
+    icon: <Users size={16} weight="regular" />,
   },
   {
     name: 'Doctors',
     href: '/doctors',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M10 19v-1a4 4 0 014-4h2a4 4 0 014 4v1M16 11a4 4 0 100-8 4 4 0 000 8zM6 11a4 4 0 100-8 4 4 0 000 8z"
-        />
-      </svg>
-    ),
+    icon: <Stethoscope size={16} weight="regular" />,
   },
   {
     name: 'Equipment',
     href: '/equipment',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 6h10l1 10H6L7 6zm2 10h6M9 6V4h6v2M9 14v2m6-2v2"
-        />
-      </svg>
-    ),
+    icon: <FirstAidKit size={16} weight="regular" />,
   },
   {
     name: 'OT Rooms',
     href: '/ot-rooms',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 19V5h18v14M6 8h12M6 12h12M9 19v-2m6 2v-2"
-        />
-      </svg>
-    ),
+    icon: <DoorOpen size={16} weight="regular" />,
   },
   {
     name: 'My Appointments',
     href: '/patients/appointments',
     roles: ['PATIENT'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"
-        />
-      </svg>
-    ),
+    icon: <CalendarCheck size={16} weight="regular" />,
   },
   {
     name: 'Users',
     href: '/users',
     roles: ['ADMIN'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-        />
-      </svg>
-    ),
+    icon: <UserList size={16} weight="regular" />,
   },
   {
     name: 'Audit Trails',
     href: '/audit',
     roles: ['ADMIN'],
-    icon: (
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h4m2-10H9a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V8.414a2 2 0 00-.586-1.414l-2.414-2.414A2 2 0 0012.586 4H11"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 4v4h6"
-        />
-      </svg>
-    ),
+    icon: <ClipboardText size={16} weight="regular" />,
   },
 ];
 
@@ -233,7 +99,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const userRole = session?.user?.role || "PATIENT";
+  const userRole = session?.user?.role || 'PATIENT';
 
   const allowedNavItems = navItems.filter((item) =>
     item.roles.includes(userRole as UserRole),
@@ -244,7 +110,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile backdrop */}
       {isOpen ? (
         <div
-          className="fixed inset-0 z-40 bg-[var(--color-foreground)]/40 backdrop-blur-[2px] lg:hidden"
+          className="bg-foreground/40 fixed inset-0 z-40 backdrop-blur-[2px] lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -253,12 +119,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         id={PRIMARY_NAVIGATION_ID}
         aria-label="Primary navigation"
-        className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-[var(--color-border)] bg-[var(--color-surface)] transition-transform duration-200 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`border-border bg-surface fixed top-16 bottom-0 left-0 z-40 w-64 border-r transition-transform duration-200 lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div className="flex h-full flex-col justify-between p-4">
           <div className="space-y-1">
-            <div className="px-3 py-2 text-[10px] font-semibold tracking-wider text-[var(--color-foreground-muted)] uppercase">
+            <div className="text-foreground-muted px-3 py-2 text-[10px] font-semibold tracking-wider uppercase">
               Operations Navigation
             </div>
             <nav className="space-y-1">
@@ -271,17 +138,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2.5 text-xs font-semibold transition-colors ${isActive
-                      ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
-                      : 'text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)]'
-                      }`}
+                    className={`flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-primary-soft text-primary'
+                        : 'text-foreground-secondary hover:bg-surface-muted hover:text-foreground'
+                    }`}
                   >
                     <span
                       className={
-                        isActive
-                          ? 'text-[var(--color-primary)]'
-                          : 'text-[var(--color-foreground-muted)]'
+                        isActive ? 'text-primary' : 'text-foreground-muted'
                       }
+                      aria-hidden="true"
                     >
                       {item.icon}
                     </span>
@@ -292,14 +159,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </nav>
           </div>
 
-          <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3.5">
+          <div className="border-border bg-surface-muted rounded-[var(--radius-card)] border p-3.5">
             <div className="flex items-center space-x-2">
-              <span className="h-2 w-2 rounded-full bg-[var(--color-success)]" />
-              <span className="text-xs font-semibold text-[var(--color-foreground-secondary)]">
+              <span
+                className="bg-success h-2 w-2 rounded-full"
+                aria-hidden="true"
+              />
+              <span className="text-foreground-secondary text-xs font-semibold">
                 System Operational
               </span>
             </div>
-            <p className="mt-1 text-[11px] text-[var(--color-foreground-muted)]">
+            <p className="text-foreground-muted mt-1 text-[11px]">
               MedOrch v0.1.0
             </p>
           </div>

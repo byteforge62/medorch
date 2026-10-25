@@ -49,12 +49,12 @@ function VerifyEmailContent() {
 
   return (
     <main className="bg-background flex min-h-screen items-center justify-center px-4 py-12">
-      <section className="border-border bg-card w-full max-w-md rounded-2xl border p-8 shadow-sm">
+      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
         <h1 className="text-foreground text-2xl font-semibold tracking-tight">
           Verify your email
         </h1>
 
-        <p className="text-muted-foreground mt-3 text-sm leading-6">
+        <p className="text-foreground-muted mt-3 text-sm leading-6">
           Confirm your email address to continue with your MedOrch registration.
         </p>
 
@@ -64,8 +64,8 @@ function VerifyEmailContent() {
             aria-live="polite"
             className={`mt-5 rounded-lg border p-3 text-sm leading-6 ${
               state === 'success'
-                ? 'text-foreground border-green-500/30 bg-green-500/10'
-                : 'border-destructive/30 bg-destructive/10 text-foreground'
+                ? 'border-success/40 bg-success-soft text-success'
+                : 'border-danger-border bg-danger-soft text-danger'
             }`}
           >
             {message}
@@ -77,7 +77,7 @@ function VerifyEmailContent() {
             type="button"
             onClick={handleVerify}
             disabled={state === 'loading'}
-            className="bg-primary text-primary-foreground mt-6 w-full rounded-lg px-4 py-3 text-sm font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-6 w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             {state === 'loading'
               ? 'Verifying...'
@@ -90,7 +90,7 @@ function VerifyEmailContent() {
         {state === 'success' && (
           <a
             href="/login"
-            className="bg-primary text-primary-foreground mt-6 block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-6 block w-full rounded-[var(--radius-control)] px-4 py-3 text-center text-sm font-semibold transition-colors"
           >
             Continue to login
           </a>
@@ -105,7 +105,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <main className="bg-background flex min-h-screen items-center justify-center">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-foreground-muted text-sm">
             Loading verification page...
           </p>
         </main>

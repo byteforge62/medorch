@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Header } from "./Header";
-import { Sidebar } from "./Sidebar";
+import React, { useState } from 'react';
+import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface-subtle)] text-[var(--color-foreground)]">
+    <div className="bg-background text-foreground min-h-screen">
       <Header
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}

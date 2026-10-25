@@ -12,7 +12,9 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
-    '.kilo/**'
+    '.kilo/**',
+    // Installed agent skill tooling (CommonJS node scripts, not app source):
+    '.agents/**',
   ]),
 ]);
 

@@ -38,10 +38,10 @@ export function ScheduleFilters({
   );
 
   const labelClassName =
-    "mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400";
+    "mb-1.5 block text-xs font-medium text-foreground-muted";
 
   const controlClassName =
-    "block min-h-10 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-400";
+    "block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
   return (
     <section
@@ -49,7 +49,7 @@ export function ScheduleFilters({
       className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-foreground-subtle">
           Filter Schedules
         </h4>
 
@@ -57,7 +57,7 @@ export function ScheduleFilters({
           <button
             type="button"
             onClick={onReset}
-            className="rounded-md text-xs font-medium text-blue-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-400"
+            className="rounded-md text-xs font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             Clear all filters
           </button>

@@ -14,11 +14,10 @@ export default function ResendVerificationPage() {
     setMessage('');
     setError('');
 
-
     try {
-      const response = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
       });
 
@@ -28,45 +27,45 @@ export default function ResendVerificationPage() {
       if (response.status === 429 || payload?.rateLimited) {
         setError(
           payload?.message ||
-          "You've reached the resend limit. Please wait 15 minutes before trying again.",
+            "You've reached the resend limit. Please wait 15 minutes before trying again.",
         );
         return;
       }
 
       if (!response.ok || result?.success === false) {
         throw new Error(
-          result?.message || "Unable to process your request. Please try again.",
+          result?.message ||
+            'Unable to process your request. Please try again.',
         );
       }
 
       setMessage(
         payload?.message ||
-        "If an eligible account exists, a verification email will be sent.",
+          'If an eligible account exists, a verification email will be sent.',
       );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Something went wrong. Please try again.",
+          : 'Something went wrong. Please try again.',
       );
     } finally {
       setLoading(false);
     }
-
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-white">
-      <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
+      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
         <a
           href="/login"
-          className="text-sm text-sky-400 transition hover:text-sky-300"
+          className="text-primary text-sm transition hover:underline"
         >
           ← Back to login
         </a>
 
         <div className="mt-8">
-          <p className="text-sm font-medium tracking-[0.2em] text-sky-400 uppercase">
+          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
             MedOrch
           </p>
 
@@ -74,7 +73,7 @@ export default function ResendVerificationPage() {
             Resend verification
           </h1>
 
-          <p className="mt-3 text-sm leading-6 text-slate-400">
+          <p className="text-foreground-muted mt-3 text-sm leading-6">
             Enter the email address you registered with. If your account
             requires verification, we’ll send you a new verification link.
           </p>
@@ -84,7 +83,7 @@ export default function ResendVerificationPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-200"
+              className="text-foreground mb-2 block text-sm font-medium"
             >
               Email address
             </label>
@@ -99,14 +98,14 @@ export default function ResendVerificationPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm transition outline-none placeholder:text-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2"
             />
           </div>
 
           {message && (
             <p
               role="status"
-              className="rounded-xl border border-emerald-800 bg-emerald-950/50 p-3 text-sm leading-6 text-emerald-300"
+              className="border-success/40 bg-success-soft text-success rounded-[var(--radius-control)] border p-3 text-sm leading-6"
             >
               {message}
             </p>
@@ -115,7 +114,7 @@ export default function ResendVerificationPage() {
           {error && (
             <p
               role="alert"
-              className="rounded-xl border border-red-800 bg-red-950/50 p-3 text-sm leading-6 text-red-300"
+              className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
             >
               {error}
             </p>
@@ -124,13 +123,13 @@ export default function ResendVerificationPage() {
           <button
             type="submit"
             disabled={loading || !email.trim()}
-            className="w-full rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Sending request...' : 'Send verification link'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs leading-5 text-slate-500">
+        <p className="text-foreground-muted mt-6 text-center text-xs leading-5">
           For your security, the response won’t reveal whether an account exists
           or is eligible for verification.
         </p>

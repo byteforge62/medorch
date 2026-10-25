@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { apiClient } from "@/lib/api/client";
-import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { LoadingState } from "@/components/ui/LoadingState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { EmptyState } from "@/components/ui/EmptyState";
+import React, { useEffect, useState, useCallback } from 'react';
+import { apiClient } from '@/lib/api/client';
+import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 type Schedule = {
   id: string;
@@ -14,8 +14,14 @@ type Schedule = {
   scheduledDate: string;
   startTime: string;
   endTime: string;
-  status: "SCHEDULED" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "DELAYED";
-  priority: "ELECTIVE" | "URGENT" | "EMERGENCY";
+  status:
+    | 'SCHEDULED'
+    | 'CONFIRMED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'DELAYED';
+  priority: 'ELECTIVE' | 'URGENT' | 'EMERGENCY';
   patient?: {
     name: string;
     patientCode: string;
@@ -28,16 +34,13 @@ type Schedule = {
   };
 };
 
-type ScheduleFilter = "TODAY" | "UPCOMING" | "ALL";
-
+type ScheduleFilter = 'TODAY' | 'UPCOMING' | 'ALL';
 
 export function RecentSchedulesList() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] =
-    useState<ScheduleFilter>("TODAY");
-
+  const [activeFilter, setActiveFilter] = useState<ScheduleFilter>('TODAY');
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -75,37 +78,35 @@ export function RecentSchedulesList() {
     };
   }, [refreshKey]);
 
-
-  const getStatusBadge = (status: Schedule["status"]) => {
+  const getStatusBadge = (status: Schedule['status']) => {
     switch (status) {
-      case "IN_PROGRESS":
+      case 'IN_PROGRESS':
         return <Badge variant="warning">In Progress</Badge>;
-      case "CONFIRMED":
+      case 'CONFIRMED':
         return <Badge variant="info">Confirmed</Badge>;
-      case "COMPLETED":
+      case 'COMPLETED':
         return <Badge variant="success">Completed</Badge>;
-      case "CANCELLED":
+      case 'CANCELLED':
         return <Badge variant="danger">Cancelled</Badge>;
-      case "DELAYED":
+      case 'DELAYED':
         return <Badge variant="warning">Delayed</Badge>;
-      case "SCHEDULED":
+      case 'SCHEDULED':
       default:
         return <Badge variant="neutral">Scheduled</Badge>;
     }
   };
 
-  const getPriorityBadge = (priority: Schedule["priority"]) => {
+  const getPriorityBadge = (priority: Schedule['priority']) => {
     switch (priority) {
-      case "EMERGENCY":
+      case 'EMERGENCY':
         return <Badge variant="danger">Emergency</Badge>;
-      case "URGENT":
+      case 'URGENT':
         return <Badge variant="warning">Urgent</Badge>;
-      case "ELECTIVE":
+      case 'ELECTIVE':
       default:
         return <Badge variant="neutral">Elective</Badge>;
     }
   };
-
 
   const sortedSchedules = [...schedules].sort((a, b) => {
     const priorityOrder = {
@@ -114,13 +115,11 @@ export function RecentSchedulesList() {
       ELECTIVE: 2,
     };
 
-    const activeOrder = (status: Schedule["status"]) =>
-      status === "IN_PROGRESS" ? 0 : 1;
+    const activeOrder = (status: Schedule['status']) =>
+      status === 'IN_PROGRESS' ? 0 : 1;
 
-    const aTerminal =
-      a.status === "COMPLETED" || a.status === "CANCELLED";
-    const bTerminal =
-      b.status === "COMPLETED" || b.status === "CANCELLED";
+    const aTerminal = a.status === 'COMPLETED' || a.status === 'CANCELLED';
+    const bTerminal = b.status === 'COMPLETED' || b.status === 'CANCELLED';
 
     if (aTerminal !== bTerminal) {
       return aTerminal ? 1 : -1;
@@ -134,21 +133,17 @@ export function RecentSchedulesList() {
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     }
 
-    return (
-      new Date(a.startTime).getTime() -
-      new Date(b.startTime).getTime()
-    );
+    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
   });
-
 
   const toLocalDateKey = (value: string) => {
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) return "";
+    if (Number.isNaN(date.getTime())) return '';
 
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
   };
@@ -157,34 +152,32 @@ export function RecentSchedulesList() {
 
   const todayKey = [
     now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-");
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
 
   const filteredSchedules = sortedSchedules.filter((schedule) => {
     const scheduleDate = toLocalDateKey(schedule.scheduledDate);
 
-    if (activeFilter === "ALL") return true;
+    if (activeFilter === 'ALL') return true;
 
-    if (activeFilter === "TODAY") {
+    if (activeFilter === 'TODAY') {
       return scheduleDate === todayKey;
     }
 
     return (
       scheduleDate > todayKey &&
-      schedule.status !== "COMPLETED" &&
-      schedule.status !== "CANCELLED"
+      schedule.status !== 'COMPLETED' &&
+      schedule.status !== 'CANCELLED'
     );
   });
-
-
 
   return (
     <Card className="h-full">
       <CardHeader>
         <div>
           <CardTitle>Surgical Procedures Schedule</CardTitle>
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="text-foreground-subtle mt-0.5 text-xs">
             Upcoming & active operations
           </p>
         </div>
@@ -194,44 +187,45 @@ export function RecentSchedulesList() {
             setError(null);
             fetchSchedules();
           }}
-          className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+          className="text-primary text-xs font-medium hover:underline"
         >
           Refresh
         </button>
 
-
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
-            {(["TODAY", "UPCOMING", "ALL"] as ScheduleFilter[]).map((filter) => {
-              const isActive = activeFilter === filter;
+            {(['TODAY', 'UPCOMING', 'ALL'] as ScheduleFilter[]).map(
+              (filter) => {
+                const isActive = activeFilter === filter;
 
-              return (
-                <button
-                  key={filter}
-                  type="button"
-                  onClick={() => setActiveFilter(filter)}
-                  aria-pressed={isActive}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${isActive
-                    ? "border-blue-600 bg-blue-600 text-white"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                return (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setActiveFilter(filter)}
+                    aria-pressed={isActive}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'border-primary bg-primary text-foreground-inverse'
+                        : 'border-border bg-surface text-foreground-muted hover:bg-surface-muted'
                     }`}
-                >
-                  {filter === "TODAY"
-                    ? "Today"
-                    : filter === "UPCOMING"
-                      ? "Upcoming"
-                      : "All"}
-                </button>
-              );
-            })}
+                  >
+                    {filter === 'TODAY'
+                      ? 'Today'
+                      : filter === 'UPCOMING'
+                        ? 'Upcoming'
+                        : 'All'}
+                  </button>
+                );
+              },
+            )}
           </div>
 
-          <span className="text-xs text-slate-500 dark:text-slate-400">
-            {filteredSchedules.length}{" "}
-            {filteredSchedules.length === 1 ? "schedule" : "schedules"}
+          <span className="text-foreground-subtle text-xs">
+            {filteredSchedules.length}{' '}
+            {filteredSchedules.length === 1 ? 'schedule' : 'schedules'}
           </span>
         </div>
-
       </CardHeader>
 
       {isLoading ? (
@@ -242,11 +236,11 @@ export function RecentSchedulesList() {
         <EmptyState
           title="No Schedules Found"
           description={
-            activeFilter === "TODAY"
-              ? "No procedures are scheduled for today."
-              : activeFilter === "UPCOMING"
-                ? "No upcoming procedures found."
-                : "No procedures are currently available."
+            activeFilter === 'TODAY'
+              ? 'No procedures are scheduled for today.'
+              : activeFilter === 'UPCOMING'
+                ? 'No upcoming procedures found.'
+                : 'No procedures are currently available.'
           }
         />
       ) : (
@@ -254,16 +248,16 @@ export function RecentSchedulesList() {
           {filteredSchedules.map((schedule) => (
             <div
               key={schedule.id}
-              className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
+              className="border-border bg-surface hover:bg-surface-muted flex flex-col justify-between rounded-lg border p-3 transition-colors sm:flex-row sm:items-center"
             >
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white">
+                  <span className="text-foreground text-xs font-bold">
                     {schedule.procedure}
                   </span>
                   {getPriorityBadge(schedule.priority)}
                 </div>
-                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                <div className="text-foreground-subtle mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   {schedule.otRoom?.name && (
                     <span>Room: {schedule.otRoom.name}</span>
                   )}
@@ -280,8 +274,11 @@ export function RecentSchedulesList() {
 
               <div className="mt-2 flex items-center justify-between space-y-1 sm:mt-0 sm:flex-col sm:items-end">
                 {getStatusBadge(schedule.status)}
-                <span className="font-mono text-[11px] text-slate-400">
-                  {new Date(schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <span className="text-foreground-subtle font-mono text-[11px]">
+                  {new Date(schedule.startTime).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
             </div>

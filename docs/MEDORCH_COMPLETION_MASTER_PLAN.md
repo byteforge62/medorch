@@ -1,12 +1,13 @@
 # MedOrch Completion Master Plan
 
-**Status:** `IN_PROGRESS` — Phase 5 live API authorization and isolation tests complete: 13 route-level runtime tests covering all four roles plus unauthenticated requests passed over live HTTP against a production build and a disposable seeded database; no new runtime defects found. Account-lifecycle (Phase B) verification remains outstanding.
+**Status:** `IN_PROGRESS` — Phase 6 (complete UI overhaul) underway: batch 1 (design system, fonts, shared primitives, app shell) complete with all checks green. Phase 5 live API authorization and isolation tests remain complete and intact: 13 route-level runtime tests covering all four roles plus unauthenticated requests passed over live HTTP against a production build and a disposable seeded database; no new runtime defects found. Account-lifecycle (Phase B) verification remains outstanding.
 **Last audited:** 2026-10-24 (Phase 5 — live API authorization and isolation tests)
+**Last updated:** 2026-10-25 (Phase 6 batch 1 — UI design system + shared shell)
 **Repository:** `byteforge62/medorch`
 **Branch:** `master`
 **Working tree at audit start:** clean (Phase 3 work committed in `00ae18e`)
-**Current phase:** Phase 5 — live HTTP verification of authorization, role boundaries, ownership, isolation, redaction, and status transitions across all four roles; Phase 4's source-level findings confirmed at runtime with no new defect.
-**Next task:** Phase B account-lifecycle token tests (verification/reset token expiry, replay, session invalidation, throttling); then the remaining Phase H abuse-case probes (malformed/oversized bodies, invalid enum values).
+**Current phase:** Phase 6 batch 1 — UI design system + shared shell (tokens, Fira fonts via `next/font`, restyled primitives, light app shell, on-token header `AlertCenter`); Phase 5's runtime verification remains complete with no regressions.
+**Next task:** Phase 6 batch 3 — ADMIN surfaces (users, departments, patients, doctors, OT rooms, equipment, audit + admin dashboard widgets); then batches 4–6 (schedules+DOCTOR, OT_STAFF+PATIENT, responsive/a11y polish + full verification). Security-track follow-ups (Phase B account-lifecycle tests, remaining Phase H abuse probes) stay in the backlog unchanged.
 
 This document is the working source of truth for project completion. A `VERIFIED` status describes only the evidence written beside that item; source inspection does not prove runtime behavior. Use synthetic data only. Never point a database test or migration at a valuable development or production database.
 
@@ -543,6 +544,60 @@ Commands were executed on the audited source revision. “Not run” means no re
 | `DATABASE_URL=<alerts-db> npm run test:database` (Phase 5) | PASS; **34 tests, 0 failures** on the disposable database; the alerts-suite safety assertion was not weakened. |
 | `npm run build` (Phase 5) | NOT RUN — no `src/` or `prisma/` file is newer than the existing Phase 4 production build (`.next/BUILD_ID`, checked with `find src prisma -newer`), and the runtime suite's live `patient.phone` redaction assertion proves that build contains the Phase 4 fix. |
 | `git diff --check` (Phase 5) | PASS after the current changes. |
+| `npx tsc --noEmit` (Phase 6 batch 1) | PASS; exit code 0 after each edit round. |
+| `npm run lint` (Phase 6 batch 1) | PASS; exit code 0. The first run reported 15 errors, all inside vendored `.agents/skills/*/scripts/*.cjs` CommonJS skill tooling; `eslint.config.mjs` now ignores `.agents/**`. No project source file produced a lint error. |
+| `npm run test:accessibility` (Phase 6 batch 1) | PASS; 5 tests, 0 failures, rerun after the final edit round. |
+| `npx prettier --write` (Phase 6 batch 1 files) | PASS; batch-1 files formatted with the repository prettier config (including `prettier-plugin-tailwindcss`). |
+| `git diff --check` (Phase 6 batch 1) | PASS after normalizing `src/components/layout/Sidebar.tsx` from CRLF to LF (it was the only CRLF file in the tree; every added line was flagged as trailing whitespace). |
+| Browser DOM verification (Phase 6 batch 1) | PASS; live dev server at `localhost:3000` — Fira Sans/Fira Code loaded, `--primary`/`--radius-control`/`--radius-card` resolving (the radius pair was referenced but undefined before this batch), body `#f8fafc`, landing/login/dashboard rendering, ADMIN badge `#dbeafe`/`#1e40af` = 7.8:1, nav links 14px with pointer cursors, header alert control on-token; no console errors. Sign-in verified with the documented local development account (credentials intentionally not recorded here). |
+| `docker compose up -d` (Phase 6 batch 1) | PASS; the Docker engine was down at session start, so Docker Desktop was started and the existing `medorch-postgres` container was started with its existing volume. No reset, no migrate, no seed; the unrelated exited `medorch-phase2-ephemeral` container was left untouched. |
+| `npx tsc --noEmit` (Phase 6 batch 2) | PASS; exit code 0. |
+| `npm run lint` (Phase 6 batch 2) | PASS; exit code 0. |
+| `npm run test:accessibility` (Phase 6 batch 2) | PASS; 5 tests, 0 failures. |
+| `git diff --check` (Phase 6 batch 2) | PASS after the current changes. |
+| Browser DOM verification (Phase 6 batch 2) | PASS; `/forgot-password` card on `#ffffff` over `#f8fafc` canvas, inputs with `#74829a` 3.9:1 boundaries at 8px radius, submit `#1e40af`+white (8.7:1); `/register` submit now white-on-blue (the undefined `text-primary-foreground` previously inherited near-black text on blue at ~1.7:1), placeholder `#64748b` = 4.8:1; `/verify-email` button fixed the same way; no console errors. |
+| `npx tsc --noEmit` (Phase 6 batch 3) | PASS; exit code 0 after each edit round. |
+| `npm run lint` (Phase 6 batch 3) | PASS; exit code 0. |
+| `npx prettier --write` (Phase 6 batch 3 files) | PASS; all batch-3 files formatted with the repository config. |
+| `npm run test:accessibility` (Phase 6 batch 3) | PASS; 5 tests, 0 failures. |
+| `npm run test:permissions` (Phase 6 batch 3) | PASS; 5 tests, 0 failures (auth policy untouched). |
+| `npm run test:me-read-handlers` (Phase 6 batch 3) | PASS; 9 tests, 0 failures. |
+| `git diff --check` (Phase 6 batch 3) | PASS after the current changes. |
+| Browser DOM verification (Phase 6 batch 3) | PASS; live dev server at `localhost:3000`, signed in as ADMIN. `/users` renders its 14-row table with zero raw palette classes; `/patients` search input computed `border-top: rgb(116,130,154)` = `#74829a` 3.9:1 and `::placeholder` `rgb(100,116,139)` = `#64748b` 4.8:1; `/ot-rooms` renders 7 selects all at the 3.9:1 boundary; no console errors (Fast Refresh logs only). |
+
+## Phase 6 — UI overhaul (in progress)
+
+### Step 1 — design system (complete)
+
+The installed ui-ux-pro-max skill was read in full and its workflow executed:
+
+- `search.py --design-system` (query: hospital/clinical-operations) first returned **Neumorphism** — rejected per the skill's own retry rule because its profile flags `Accessibility: risk:high` and targets meditation/fitness UIs, not a dense clinical console.
+- The retry with explicit design dials (`--variance 3 --motion 2 --density 8`) returned **Minimalism & Swiss Style** (best fit: enterprise apps/dashboards; `risk:low`), the Enterprise Gateway landing pattern, and a blue/amber palette — persisted via `--persist` to `docs/design-system/medorch/MASTER.md` (master + `pages/` override structure).
+- Supplementary searches: `--domain ux` (dense-table overflow/card fallback, line-height 1.5–1.75, focusable error summary, blur-time inline validation) and `--domain color` (healthcare/patient-portal palettes); `--stack nextjs` for App Router guidance.
+- Every generated color pair was then measured against the skill's own 4.5:1 / 3:1 checklist. The generated file contradicts itself (white-on-amber `#D97706` = 3.19:1, soft borders 1.2:1, raw status inks below AA), so the calibrated token layer in `src/app/globals.css` supersedes those specs; measured ratios are recorded inline next to each token.
+
+Approved direction: Minimalism & Swiss, calibrated blue/amber palette, Fira Sans (UI) + Fira Code (tabular numerics) via `next/font`, **light sidebar** (user's explicit choice over the proposed navy rail), `@phosphor-icons/react` for icons, CSS-only motion (the skill's GSAP snippet deliberately not adopted — motion dial 2/10, no new animation dependency), light mode only (dark mode out of scope).
+
+### Batch 1 — tokens, fonts, primitives, shell (complete)
+
+- `src/app/globals.css`: full token rewrite with measured AA palette; added `--accent`/`--accent-ink`, `--danger-hover`, `--danger-border`, and the previously **referenced-but-undefined** `--radius-control`, `--radius-card`, `--color-danger-border`, `--color-text-muted` aliases (the first two silently rendered square corners before); Fira font variables; global `button:not(:disabled) { cursor:pointer }` from the skill checklist.
+- `src/app/layout.tsx`: `next/font/google` Fira Sans (400/500/600/700) + Fira Code, self-hosted, exposed as `--font-fira-sans`/`--font-fira-code` on `<html>` (verified against `node_modules/next/dist/docs/01-app/.../font.md` first, per AGENTS.md).
+- Primitives on-token: `Button` (5 variants, no layout-shifting hover, global visible focus), `Badge` (soft/ink pairs, all ≥ 4.5:1, label text always present), `Card`, `EmptyState` (Phosphor `Tray`), `ErrorState` (`role="alert"`, danger tokens), `LoadingState` (`role="status"`). Dark-mode variants dropped (light-only design).
+- Shell: `AppShell`, `Header`, `Sidebar` (light surface per user choice) — Phosphor icons replace 11 hand-drawn SVGs; test-locked behavior untouched (`PRIMARY_NAVIGATION_ID`, aria-expanded + label swap verified by `test:accessibility` 5/5).
+- `AlertCenter` (header dropdown): moved off raw slate/rose/blue classes — including `text-slate-400` at 2.8:1 — onto tokens; all fetch/mutation behavior untouched.
+- `eslint.config.mjs`: ignore `.agents/**` (vendored CommonJS skill tooling, not app source). This was the only lint failure in the batch.
+
+Checks: tsc 0, lint 0, `test:accessibility` 5/5, prettier clean, `git diff --check` PASS, plus live-browser DOM verification (computed styles, loaded fonts, no console errors). See the command log rows above for exact outcomes.
+
+### Remaining batches
+
+2. Public landing + auth pages (login/register/forgot/reset/verify/resend, unauthorized/not-found) — **complete.** The three password-flow pages were restyled from a hardcoded dark theme (`bg-slate-950`/sky/emerald) onto the light token card matching login; inputs moved to `border-border-strong` (3.9:1); register and verify-email were converted from the undefined shadcn-style vocabulary (`bg-card`, `text-primary-foreground`, `border-destructive`, `bg-muted`) to real tokens — this fixed a genuine contrast defect where primary buttons rendered near-black text on blue (~1.7:1). Landing and login were already token-clean and picked up Fira fonts/radius fixes automatically.
+3. ADMIN — dashboard admin widgets, users, departments, patients, doctors, OT rooms, equipment, audit tables/filters/detail views. — **complete.** A reviewed codemod converted ~132 raw palette class lines and every dead `dark:` variant across the twelve batch-3 files; the audit action/status map and `QuickActions` accents moved from `indigo`/raw pairs onto semantic tokens; every input, select, textarea and outline button moved to `border-border-strong` (3.9:1 control boundary) with `placeholder:text-foreground-subtle` (4.8:1) and a `focus:ring-primary/20` focus ring; icon-only shell controls (header nav toggle, alerts bell, sign out) got the same 3.9:1 boundary since their border is their only affordance. Two stray raw `text-white` occurrences on the landing mobile nav were normalized as batch-2 cleanup.
+4. Schedules family + DOCTOR — list/detail/form/filters/calendar/status actions, doctor dashboard.
+5. OT_STAFF + PATIENT — role dashboards, patient portal/appointments, alert views, mobile navigation.
+6. Responsive/a11y polish sweep (375/768/1024/1440, reduced motion, focus order) + full verification (tsc, lint, all suites incl. `test:runtime`, production build) + final master-plan update.
+
+After each batch: `npx tsc --noEmit`, `npm run lint`, `npm run test:accessibility`, `git diff --check`, and a live-browser check of the touched surfaces. No API, schema, auth, or permission changes in any batch.
 
 ## Files changed by phase
 
@@ -556,13 +611,16 @@ Commands were executed on the audited source revision. “Not run” means no re
 | Phase 3 — accessibility, patient acceptance setup, test reliability | `src/components/schedules/ScheduleCard.tsx` and `src/components/schedules/ScheduleStatusActions.tsx` (contextual accessible names), `src/components/layout/Header.tsx`, `src/components/layout/Sidebar.tsx`, `src/components/layout/AppShell.tsx` (nav toggle disclosure state), `src/app/schedules/[id]/ScheduleDetails.tsx` (passes schedule label), `prisma/seed.ts` (dev-only `SEED_VERIFIED_PATIENTS` flag — auth policy untouched), `tests/accessibility.test.tsx` (new), `package.json` (`test:accessibility` script), `docs/MEDORCH_COMPLETION_MASTER_PLAN.md`, `docs/development.md`. No API handler, service, repository, schema, migration, or authorization rule was modified. |
 | Phase 4 — API authorization audit | `src/modules/schedules/schedule-access.ts` (OT detail redaction now also nulls `patient.phone`), `tests/schedule-access.test.ts` (regression test + extended redaction-shape assertions), and this tracker. No route handler, service, repository, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
 | Phase 5 — live API authorization tests | `tests/runtime-authorization.test.ts` (new suite), `package.json` (`test:runtime` script), and this tracker. No application code, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
+| Phase 6 batch 1 — design system + shared shell | `src/app/globals.css`, `src/app/layout.tsx`, `src/components/ui/Button.tsx`, `Badge.tsx`, `Card.tsx`, `EmptyState.tsx`, `ErrorState.tsx`, `LoadingState.tsx`, `src/components/layout/AppShell.tsx`, `Header.tsx`, `Sidebar.tsx`, `src/components/alerts/AlertCenter.tsx`, `eslint.config.mjs`, `package.json` + `package-lock.json` (added `@phosphor-icons/react`), `docs/design-system/medorch/MASTER.md` (new), and this tracker. Frontend-only; no API handler, service, repository, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
+| Phase 6 batch 2 — public landing + auth pages | `src/app/forgot-password/page.tsx`, `src/app/reset-password/page.tsx`, `src/app/resend-verification/page.tsx`, `src/app/verify-email/page.tsx`, `src/app/register/page.tsx`, `src/components/auth/LoginForm.tsx`, `src/components/landing/LandingMobileNav.tsx`, and this tracker. Frontend-only; no API handler, service, repository, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
+| Phase 6 batch 3 — ADMIN surfaces | `src/app/(dashboard)/users/page.tsx`, `src/app/dashboard/page.tsx`, `src/components/dashboard/OperationalOverview.tsx`, `QuickActions.tsx`, `RecentSchedulesList.tsx`, `OTRoomsGrid.tsx`, `AlertsSummaryWidget.tsx`, `src/components/users/UserList.tsx`, `UserFilters.tsx`, `src/components/departments/DepartmentManagement.tsx`, `src/app/patients/PatientRegistry.tsx`, `src/app/patients/[id]/PatientDetail.tsx`, `src/app/doctors/DoctorDirectory.tsx`, `src/app/doctors/[id]/DoctorDetail.tsx`, `src/app/ot-rooms/OtRoomManagement.tsx`, `src/app/equipment/EquipmentManagement.tsx`, `src/components/audit/AuditLogViewer.tsx`, `src/components/layout/Header.tsx`, `src/components/alerts/AlertCenter.tsx`, and this tracker. Frontend-only; no API handler, service, repository, schema, migration, permission rule, or auth policy was modified; nothing was committed or pushed. |
 | B–C, E–H (remaining), J–K (remaining) | None yet. Record exact files after each phase; do not commit unless explicitly requested. |
 
 ## Current phase, next task, and exact resume instructions
 
-**Current phase:** Phase 5 (live API authorization and isolation tests) is complete: a 13-test route-level suite exercised ADMIN, DOCTOR, OT_STAFF, two PATIENT accounts, and unauthenticated requests over live HTTP against a production build and a disposable seeded database — 401/403/404/409/200 boundaries, cross-account isolation for appointments and alerts, OT assignment scoping and patient-field redaction (including `phone`), and ID manipulation all behaved per policy, with **no new runtime defect**. All checks green: tsc, lint, runtime 13/13, database 34/34, permissions 5/5, me-read-handlers 9/9, schedule-access 6/6, accessibility 5/5, `git diff --check`.
+**Current phase:** Phase 6 (complete UI overhaul); **batches 1–3 complete** — design system + shared shell (batch 1), public landing + authentication pages (batch 2), and ADMIN surfaces (batch 3: dashboard widgets, users, departments, patients, doctors, OT rooms, equipment, audit). All checks green after each batch: tsc, lint, prettier, `test:accessibility` 5/5, `git diff --check`, plus live-browser DOM verification (batch 1: landing/login/dashboard; batch 2: forgot-password/register/verify-email computed styles; batch 3: `/users`, `/patients`, `/ot-rooms` computed control boundaries and console). Batch 3 fixed control-boundary contrast (inputs/selects/outline buttons/icon-only header controls at 1.2:1 → 3.9:1) and finished the raw-palette/`dark:` sweep for every ADMIN surface. Phase 3/4/5 work remains intact; nothing committed or pushed.
 
-**Next task:** Phase B account-lifecycle token tests (verification/reset token expiry, replay, single-use, session invalidation, throttling), then the remaining Phase H abuse cases (malformed/oversized JSON bodies, invalid enum values, the unprobed admin resource mutations). Follow-ups unchanged: fix the `NEXTAUTH_URL`/dev-port mismatch (operator config), P3 heading-level skips, wire `patient-approval-concurrency.test.ts` into a package script.
+**Next task:** Phase 6 batch 4 — schedules family + DOCTOR: `ScheduleForm`/`ScheduleFilters`/`ScheduleCalendar`/`ScheduleCard`/`SchedulePage`/`ScheduleDetails` and the doctor dashboard (the last files with raw slate/blue classes and dead `dark:` variants), then batch 5 (OT_STAFF + PATIENT) and batch 6 (responsive/a11y sweep + full verification incl. `test:runtime` and the production build). Security-track follow-ups (Phase B account-lifecycle token tests, remaining Phase H abuse cases, the `NEXTAUTH_URL`/dev-port mismatch, P3 heading-level skips, wiring `patient-approval-concurrency.test.ts` into a package script) remain in the backlog above and are unchanged by this phase.
 
 **Resume instructions:**
 

@@ -192,7 +192,7 @@ export function DoctorDashboard({
 
   return (
     <main className="space-y-6">
-      <header className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center">
+      <header className="flex flex-col justify-between gap-4 rounded-[var(--radius-xl)] border border-border-strong bg-surface p-6 shadow-sm sm:flex-row sm:items-center">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Clinical workspace
@@ -207,7 +207,7 @@ export function DoctorDashboard({
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 px-4 py-3 dark:border-slate-700">
+        <div className="rounded-[var(--radius-xl)] border border-border-strong bg-surface px-4 py-3">
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Urgent or emergency priority
           </p>
@@ -261,7 +261,7 @@ export function DoctorDashboard({
               </div>
             </div>
 
-            <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 dark:border-slate-700 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid gap-4 border-t border-border-strong pt-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Scheduled date
@@ -366,7 +366,7 @@ export function DoctorDashboard({
 
                       <Link
                         href={`/schedules/${schedule.id}`}
-                        className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+                        className="text-sm font-semibold text-primary hover:underline"
                       >
                         View Schedule →
                       </Link>

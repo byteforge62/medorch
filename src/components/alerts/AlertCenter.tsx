@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { apiClient } from "@/lib/api/client";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Bell, X } from '@phosphor-icons/react';
+import { apiClient } from '@/lib/api/client';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 export type AlertItem = {
   id: string;
-  type: "SCHEDULE" | "RESOURCE" | "SYSTEM" | "MAINTENANCE";
+  type: 'SCHEDULE' | 'RESOURCE' | 'SYSTEM' | 'MAINTENANCE';
   title: string;
   message: string;
-  severity: "INFO" | "WARNING" | "CRITICAL";
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
   isRead: boolean;
   readAt: string | null;
   createdAt: string;
@@ -29,11 +30,11 @@ export function AlertCenter() {
   const fetchAlerts = useCallback(async () => {
     try {
       setError(null);
-      const data = await apiClient.get<AlertItem[]>("/api/alerts");
+      const data = await apiClient.get<AlertItem[]>('/api/alerts');
       setAlerts(data || []);
     } catch (err) {
-      console.error("Failed to fetch alerts:", err);
-      setError("Failed to load alerts");
+      console.error('Failed to fetch alerts:', err);
+      setError('Failed to load alerts');
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +43,7 @@ export function AlertCenter() {
   useEffect(() => {
     let isMounted = true;
     apiClient
-      .get<AlertItem[]>("/api/alerts")
+      .get<AlertItem[]>('/api/alerts')
       .then((data) => {
         if (isMounted) {
           setAlerts(data || []);
@@ -51,15 +52,15 @@ export function AlertCenter() {
       })
       .catch((err) => {
         if (isMounted) {
-          console.error("Failed to fetch alerts:", err);
-          setError("Failed to load alerts");
+          console.error('Failed to fetch alerts:', err);
+          setError('Failed to load alerts');
           setIsLoading(false);
         }
       });
 
     const interval = setInterval(() => {
       apiClient
-        .get<AlertItem[]>("/api/alerts")
+        .get<AlertItem[]>('/api/alerts')
         .then((data) => {
           if (isMounted) {
             setAlerts(data || []);
@@ -80,19 +81,29 @@ export function AlertCenter() {
     try {
       await apiClient.patch(`/api/alerts/${id}/read`);
       setAlerts((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, isRead: true, readAt: new Date().toISOString() } : a)),
+        prev.map((a) =>
+          a.id === id
+            ? { ...a, isRead: true, readAt: new Date().toISOString() }
+            : a,
+        ),
       );
     } catch (err) {
-      console.error("Failed to mark alert read:", err);
+      console.error('Failed to mark alert read:', err);
     }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
-      await apiClient.patch("/api/alerts/read-all");
-      setAlerts((prev) => prev.map((a) => ({ ...a, isRead: true, readAt: new Date().toISOString() })));
+      await apiClient.patch('/api/alerts/read-all');
+      setAlerts((prev) =>
+        prev.map((a) => ({
+          ...a,
+          isRead: true,
+          readAt: new Date().toISOString(),
+        })),
+      );
     } catch (err) {
-      console.error("Failed to mark all alerts read:", err);
+      console.error('Failed to mark all alerts read:', err);
     }
   };
 
@@ -101,17 +112,17 @@ export function AlertCenter() {
       await apiClient.delete(`/api/alerts/${id}`);
       setAlerts((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {
-      console.error("Failed to delete alert:", err);
+      console.error('Failed to delete alert:', err);
     }
   };
 
-  const getSeverityBadge = (severity: AlertItem["severity"]) => {
+  const getSeverityBadge = (severity: AlertItem['severity']) => {
     switch (severity) {
-      case "CRITICAL":
+      case 'CRITICAL':
         return <Badge variant="danger">Critical</Badge>;
-      case "WARNING":
+      case 'WARNING':
         return <Badge variant="warning">Warning</Badge>;
-      case "INFO":
+      case 'INFO':
       default:
         return <Badge variant="info">Info</Badge>;
     }
@@ -121,37 +132,37 @@ export function AlertCenter() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+        className="border-border-strong bg-surface text-foreground-muted hover:bg-surface-muted hover:text-foreground relative flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border transition-colors"
         aria-label="Alerts"
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
+        <Bell size={18} weight="regular" aria-hidden="true" />
         {unreadCount > 0 ? (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white">
-            {unreadCount > 9 ? "9+" : unreadCount}
+          <span className="bg-danger text-foreground-inverse absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-0.5 text-[10px] font-bold">
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         ) : null}
       </button>
 
       {isOpen ? (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-80 sm:w-96 rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
-            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="border-border bg-surface absolute right-0 z-50 mt-2 w-80 rounded-[var(--radius-card)] border shadow-lg sm:w-96">
+            <div className="border-border flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center space-x-2">
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Alert Center</h4>
-                {unreadCount > 0 ? <Badge variant="danger">{unreadCount} unread</Badge> : null}
+                <h4 className="text-foreground text-sm font-semibold">
+                  Alert Center
+                </h4>
+                {unreadCount > 0 ? (
+                  <Badge variant="danger">{unreadCount} unread</Badge>
+                ) : null}
               </div>
               {unreadCount > 0 ? (
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium dark:text-blue-400"
+                  className="text-primary cursor-pointer text-xs font-medium hover:underline"
                 >
                   Mark all as read
                 </button>
@@ -160,11 +171,20 @@ export function AlertCenter() {
 
             <div className="max-h-96 overflow-y-auto p-2">
               {isLoading && alerts.length === 0 ? (
-                <div className="p-4 text-center text-xs text-slate-500">Loading alerts...</div>
+                <div className="text-foreground-muted p-4 text-center text-xs">
+                  Loading alerts...
+                </div>
               ) : error ? (
-                <div className="p-4 text-center text-xs text-rose-500">{error}</div>
+                <div
+                  role="alert"
+                  className="text-danger p-4 text-center text-xs"
+                >
+                  {error}
+                </div>
               ) : alerts.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-400">No alerts found</div>
+                <div className="text-foreground-muted p-6 text-center text-xs">
+                  No alerts found
+                </div>
               ) : (
                 <div className="space-y-1">
                   {alerts.map((alert) => (
@@ -172,14 +192,14 @@ export function AlertCenter() {
                       key={alert.id}
                       className={`relative rounded-lg p-3 transition-colors ${
                         !alert.isRead
-                          ? "bg-blue-50/60 border-l-2 border-blue-600 dark:bg-blue-950/30 dark:border-blue-500"
-                          : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          ? 'border-primary bg-primary-soft/60 border-l-2'
+                          : 'hover:bg-surface-muted'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-2">
                           {getSeverityBadge(alert.severity)}
-                          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                          <span className="text-foreground-muted text-[10px] font-semibold tracking-wider uppercase">
                             {alert.type}
                           </span>
                         </div>
@@ -187,7 +207,7 @@ export function AlertCenter() {
                           {!alert.isRead ? (
                             <button
                               onClick={() => handleMarkAsRead(alert.id)}
-                              className="text-[11px] text-blue-600 hover:underline dark:text-blue-400 font-medium"
+                              className="text-primary cursor-pointer text-[11px] font-medium hover:underline"
                               title="Mark read"
                             >
                               Read
@@ -195,24 +215,23 @@ export function AlertCenter() {
                           ) : null}
                           <button
                             onClick={() => handleDeleteAlert(alert.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                            className="text-foreground-muted hover:text-danger cursor-pointer p-1 transition-colors"
                             title="Dismiss"
+                            aria-label="Dismiss alert"
                           >
-                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <X size={14} weight="bold" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
 
-                      <h5 className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                      <h5 className="text-foreground mt-1 text-xs font-semibold">
                         {alert.title}
                       </h5>
-                      <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+                      <p className="text-foreground-secondary mt-0.5 line-clamp-2 text-xs">
                         {alert.message}
                       </p>
 
-                      <div className="mt-2 text-[10px] text-slate-400">
+                      <div className="text-foreground-muted mt-2 text-[10px]">
                         {new Date(alert.createdAt).toLocaleString()}
                       </div>
                     </div>
@@ -221,8 +240,13 @@ export function AlertCenter() {
               )}
             </div>
 
-            <div className="border-t border-slate-200 p-2 text-center dark:border-slate-800">
-              <Button variant="ghost" size="sm" className="w-full text-xs" onClick={fetchAlerts}>
+            <div className="border-border border-t p-2 text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs"
+                onClick={fetchAlerts}
+              >
                 Refresh Alerts
               </Button>
             </div>

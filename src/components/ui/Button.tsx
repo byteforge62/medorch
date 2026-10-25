@@ -1,34 +1,44 @@
-import React from "react";
+import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;
 }
 
+/*
+ * Design system (docs/design-system/medorch/MASTER.md):
+ * - every variant meets 4.5:1 for text-on-fill (or 3:1 control boundary)
+ * - cursor-pointer, 150-250ms color transitions, visible focus (global outline)
+ * - no layout-shifting transforms on hover
+ */
 const variantStyles = {
-  primary: "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500",
-  secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 active:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
-  outline: "border border-slate-300 text-slate-700 hover:bg-slate-50 active:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800",
-  ghost: "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800",
-  danger: "bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800",
+  primary:
+    'bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active',
+  secondary:
+    'bg-surface-muted text-foreground hover:bg-border active:bg-border-strong',
+  outline:
+    'border border-border-strong text-foreground-secondary hover:bg-surface hover:text-foreground',
+  ghost: 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
+  danger:
+    'bg-danger text-foreground-inverse hover:bg-danger-hover active:bg-danger-hover',
 };
 
 const sizeStyles = {
-  sm: "px-2.5 py-1.5 text-xs font-medium rounded-lg",
-  md: "px-4 py-2 text-sm font-medium rounded-lg",
-  lg: "px-5 py-2.5 text-base font-medium rounded-xl",
+  sm: 'px-3 py-1.5 text-xs font-medium rounded-[var(--radius-control)]',
+  md: 'px-4 py-2 text-sm font-medium rounded-[var(--radius-control)]',
+  lg: 'px-5 py-2.5 text-base font-semibold rounded-[var(--radius-control)]',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
-      variant = "primary",
-      size = "md",
+      variant = 'primary',
+      size = 'md',
       isLoading = false,
       disabled,
-      className = "",
+      className = '',
       children,
       ...props
     },
@@ -38,11 +48,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        className={`inline-flex items-center justify-center font-medium transition-colors focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        className={`inline-flex cursor-pointer items-center justify-center transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         {...props}
       >
         {isLoading ? (
-          <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span
+            className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            aria-hidden="true"
+          />
         ) : null}
         {children}
       </button>

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { apiClient, ApiClientError } from "@/lib/api/client";
-import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { LoadingState } from "@/components/ui/LoadingState";
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { apiClient, ApiClientError } from '@/lib/api/client';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 interface Patient {
   id: string;
@@ -22,11 +22,11 @@ interface Patient {
 
 function formatDate(value?: string | null) {
   if (!value) {
-    return "—";
+    return '—';
   }
 
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
+  return new Intl.DateTimeFormat('en-IN', {
+    dateStyle: 'medium',
   }).format(new Date(value));
 }
 
@@ -52,9 +52,9 @@ const EMPTY_PATIENT_FORM: PatientFormData = {
 
 export function PatientRegistry() {
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const { data: session } = useSession();
 
@@ -69,8 +69,7 @@ export function PatientRegistry() {
 
     async function fetchPatients() {
       try {
-        const response =
-          await apiClient.get<Patient[]>("/api/patients");
+        const response = await apiClient.get<Patient[]>('/api/patients');
 
         if (!cancelled) {
           setPatients(response ?? []);
@@ -80,7 +79,7 @@ export function PatientRegistry() {
           setError(
             fetchError instanceof ApiClientError
               ? fetchError.message
-              : "Failed to load patients.",
+              : 'Failed to load patients.',
           );
         }
       } finally {
@@ -105,13 +104,8 @@ export function PatientRegistry() {
     }
 
     return patients.filter((patient) =>
-      [
-        patient.patientCode,
-        patient.name,
-        patient.email,
-        patient.phone,
-      ].some((value) =>
-        value?.toLowerCase().includes(normalizedSearch),
+      [patient.patientCode, patient.name, patient.email, patient.phone].some(
+        (value) => value?.toLowerCase().includes(normalizedSearch),
       ),
     );
   }, [patients, search]);
@@ -265,7 +259,7 @@ export function PatientRegistry() {
               setForm(EMPTY_PATIENT_FORM);
               setFormError('');
             }}
-            className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="text-foreground-inverse inline-flex min-h-10 items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
           >
             {createOpen ? 'Close form' : 'Add patient'}
           </button>
@@ -285,7 +279,7 @@ export function PatientRegistry() {
             {formError && (
               <div
                 role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="border-danger-soft bg-danger-soft text-danger rounded-lg border px-4 py-3 text-sm"
               >
                 {formError}
               </div>
@@ -307,7 +301,7 @@ export function PatientRegistry() {
                   onChange={(event) =>
                     updateForm('patientCode', event.target.value)
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -324,7 +318,7 @@ export function PatientRegistry() {
                   maxLength={150}
                   value={form.name}
                   onChange={(event) => updateForm('name', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -340,7 +334,7 @@ export function PatientRegistry() {
                   type="email"
                   value={form.email}
                   onChange={(event) => updateForm('email', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -357,7 +351,7 @@ export function PatientRegistry() {
                   maxLength={30}
                   value={form.phone}
                   onChange={(event) => updateForm('phone', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -375,7 +369,7 @@ export function PatientRegistry() {
                   onChange={(event) =>
                     updateForm('dateOfBirth', event.target.value)
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -391,7 +385,7 @@ export function PatientRegistry() {
                   maxLength={30}
                   value={form.gender}
                   onChange={(event) => updateForm('gender', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -409,7 +403,7 @@ export function PatientRegistry() {
                   onChange={(event) =>
                     updateForm('medicalHistory', event.target.value)
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
             </div>
@@ -423,7 +417,7 @@ export function PatientRegistry() {
                   setForm(EMPTY_PATIENT_FORM);
                   setFormError('');
                 }}
-                className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+                className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -431,7 +425,7 @@ export function PatientRegistry() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Create patient'}
               </button>
@@ -452,7 +446,7 @@ export function PatientRegistry() {
             {formError && (
               <div
                 role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="border-danger-soft bg-danger-soft text-danger rounded-lg border px-4 py-3 text-sm"
               >
                 {formError}
               </div>
@@ -472,7 +466,7 @@ export function PatientRegistry() {
                   maxLength={150}
                   value={form.name}
                   onChange={(event) => updateForm('name', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -488,7 +482,7 @@ export function PatientRegistry() {
                   type="email"
                   value={form.email}
                   onChange={(event) => updateForm('email', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -505,7 +499,7 @@ export function PatientRegistry() {
                   maxLength={30}
                   value={form.phone}
                   onChange={(event) => updateForm('phone', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -523,7 +517,7 @@ export function PatientRegistry() {
                   onChange={(event) =>
                     updateForm('dateOfBirth', event.target.value)
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
 
@@ -539,7 +533,7 @@ export function PatientRegistry() {
                   maxLength={30}
                   value={form.gender}
                   onChange={(event) => updateForm('gender', event.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
                 />
               </div>
             </div>
@@ -553,7 +547,7 @@ export function PatientRegistry() {
                   setForm(EMPTY_PATIENT_FORM);
                   setFormError('');
                 }}
-                className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+                className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -561,7 +555,7 @@ export function PatientRegistry() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save changes'}
               </button>
@@ -600,7 +594,7 @@ export function PatientRegistry() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Patient code, name, email, or phone"
-          className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm transition outline-none focus:border-[var(--color-primary)]"
+          className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
         />
       </Card>
 
@@ -638,8 +632,8 @@ export function PatientRegistry() {
                   <th className="px-3 py-3 font-medium">Gender</th>
                   {(session?.user?.role === 'ADMIN' ||
                     session?.user?.role === 'DOCTOR') && (
-                      <th className="px-3 py-3 font-medium">Actions</th>
-                    )}
+                    <th className="px-3 py-3 font-medium">Actions</th>
+                  )}
                 </tr>
               </thead>
 
@@ -672,27 +666,27 @@ export function PatientRegistry() {
                     </td>
                     {(session?.user?.role === 'ADMIN' ||
                       session?.user?.role === 'DOCTOR') && (
-                        <td className="px-3 py-4">
-                          <div className="flex flex-wrap gap-2">
-                            <Link
-                              href={`/patients/${patient.id}`}
-                              className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
-                            >
-                              Details
-                            </Link>
+                      <td className="px-3 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/patients/${patient.id}`}
+                            className="border-border-strong rounded-md border px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
+                          >
+                            Details
+                          </Link>
 
-                            {session.user.role === 'ADMIN' && (
-                              <button
-                                type="button"
-                                onClick={() => openEditForm(patient)}
-                                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
-                              >
-                                Edit
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      )}
+                          {session.user.role === 'ADMIN' && (
+                            <button
+                              type="button"
+                              onClick={() => openEditForm(patient)}
+                              className="border-border-strong rounded-md border px-3 py-2 text-sm font-medium hover:bg-[var(--color-surface)]"
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

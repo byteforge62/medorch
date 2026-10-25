@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
       if (response.status === 429 || result?.data?.rateLimited) {
         setError(
           result?.data?.message ||
-          "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
+            "You've reached the password reset request limit. Please wait 15 minutes before trying again.",
         );
         return;
       }
@@ -35,13 +35,13 @@ export default function ForgotPasswordPage() {
       if (!response.ok || result?.success === false) {
         throw new Error(
           result?.message ||
-          'Unable to process your request. Please try again.',
+            'Unable to process your request. Please try again.',
         );
       }
 
       setMessage(
         result?.data?.message ||
-        'If an account exists for this email, password reset instructions will be sent.',
+          'If an account exists for this email, password reset instructions will be sent.',
       );
     } catch (err) {
       setError(
@@ -55,17 +55,17 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-white">
-      <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
+      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
         <Link
           href="/login"
-          className="text-sm text-sky-400 transition hover:text-sky-300"
+          className="text-primary text-sm transition hover:underline"
         >
           ← Back to login
         </Link>
 
         <div className="mt-8">
-          <p className="text-sm font-medium tracking-[0.2em] text-sky-400 uppercase">
+          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
             MedOrch
           </p>
 
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
             Forgot password?
           </h1>
 
-          <p className="mt-3 text-sm leading-6 text-slate-400">
+          <p className="text-foreground-muted mt-3 text-sm leading-6">
             Enter your registered email address. If an account exists,
             we&apos;ll send instructions to reset your password.
           </p>
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-200"
+              className="text-foreground mb-2 block text-sm font-medium"
             >
               Email address
             </label>
@@ -99,14 +99,14 @@ export default function ForgotPasswordPage() {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
               disabled={loading}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm transition outline-none placeholder:text-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60"
+              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
             />
           </div>
 
           {message && (
             <p
               role="status"
-              className="rounded-xl border border-emerald-800 bg-emerald-950/50 p-3 text-sm leading-6 text-emerald-300"
+              className="border-success/40 bg-success-soft text-success rounded-[var(--radius-control)] border p-3 text-sm leading-6"
             >
               {message}
             </p>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
           {error && (
             <p
               role="alert"
-              className="rounded-xl border border-red-800 bg-red-950/50 p-3 text-sm leading-6 text-red-300"
+              className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
             >
               {error}
             </p>
@@ -124,13 +124,13 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading || !email.trim()}
-            className="w-full rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Sending request...' : 'Send reset link'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs leading-5 text-slate-500">
+        <p className="text-foreground-muted mt-6 text-center text-xs leading-5">
           For your security, this page does not reveal whether an account
           exists.
         </p>

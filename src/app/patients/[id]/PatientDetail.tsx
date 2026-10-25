@@ -9,7 +9,6 @@ import { Card } from '@/components/ui/Card';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
 
-
 interface PatientSchedule {
   id: string;
   procedure: string;

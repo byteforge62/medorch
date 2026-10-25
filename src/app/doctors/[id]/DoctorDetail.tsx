@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { LoadingState } from "@/components/ui/LoadingState";
-import { apiClient, ApiClientError } from "@/lib/api/client";
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { apiClient, ApiClientError } from '@/lib/api/client';
 
 interface DoctorSchedule {
   id: string;
@@ -55,11 +55,11 @@ function formatDate(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "—";
+    return '—';
   }
 
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
+  return new Intl.DateTimeFormat('en-IN', {
+    dateStyle: 'medium',
   }).format(date);
 }
 
@@ -67,27 +67,23 @@ function formatTime(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "—";
+    return '—';
   }
 
-  return new Intl.DateTimeFormat("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Intl.DateTimeFormat('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(date);
 }
 
 function formatStatus(value: string) {
-  return value.replaceAll("_", " ");
+  return value.replaceAll('_', ' ');
 }
 
-export function DoctorDetail({
-  doctorId,
-}: {
-  doctorId: string;
-}) {
+export function DoctorDetail({ doctorId }: { doctorId: string }) {
   const [doctor, setDoctor] = useState<DoctorDetailRecord | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +102,7 @@ export function DoctorDetail({
           setError(
             fetchError instanceof ApiClientError
               ? fetchError.message
-              : "Failed to load doctor details.",
+              : 'Failed to load doctor details.',
           );
         }
       } finally {
@@ -151,7 +147,7 @@ export function DoctorDetail({
           </p>
 
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            {doctor.user.name || "Unnamed doctor"}
+            {doctor.user.name || 'Unnamed doctor'}
           </h1>
 
           <p className="mt-2 text-sm text-[var(--color-text-muted)]">
@@ -171,11 +167,9 @@ export function DoctorDetail({
         </Card>
 
         <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Department
-          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">Department</p>
           <p className="mt-2 font-semibold">
-            {doctor.department?.name || "Unassigned"}
+            {doctor.department?.name || 'Unassigned'}
           </p>
         </Card>
 
@@ -184,7 +178,7 @@ export function DoctorDetail({
             Specialization
           </p>
           <p className="mt-2 font-semibold">
-            {doctor.specialization || "Not specified"}
+            {doctor.specialization || 'Not specified'}
           </p>
         </Card>
 
@@ -206,7 +200,7 @@ export function DoctorDetail({
             <dt className="text-sm text-[var(--color-text-muted)]">
               Email address
             </dt>
-            <dd className="mt-1 break-all text-sm font-medium">
+            <dd className="mt-1 text-sm font-medium break-all">
               {doctor.user.email}
             </dd>
           </div>
@@ -216,7 +210,7 @@ export function DoctorDetail({
               Phone number
             </dt>
             <dd className="mt-1 text-sm font-medium">
-              {doctor.user.phone || "Not provided"}
+              {doctor.user.phone || 'Not provided'}
             </dd>
           </div>
 
@@ -225,7 +219,7 @@ export function DoctorDetail({
               License number
             </dt>
             <dd className="mt-1 text-sm font-medium">
-              {doctor.licenseNumber || "Not provided"}
+              {doctor.licenseNumber || 'Not provided'}
             </dd>
           </div>
 
@@ -288,18 +282,16 @@ export function DoctorDetail({
                         {schedule.procedure}
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-4">
+                      <td className="px-3 py-4 whitespace-nowrap">
                         {formatDate(schedule.scheduledDate)}
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-4">
-                        {formatTime(schedule.startTime)} –{" "}
+                      <td className="px-3 py-4 whitespace-nowrap">
+                        {formatTime(schedule.startTime)} –{' '}
                         {formatTime(schedule.endTime)}
                       </td>
 
-                      <td className="px-3 py-4">
-                        {schedule.department.name}
-                      </td>
+                      <td className="px-3 py-4">{schedule.department.name}</td>
 
                       <td className="px-3 py-4">
                         <p>{schedule.otRoom.name}</p>

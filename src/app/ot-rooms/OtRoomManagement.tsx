@@ -1,20 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState, type FormEvent } from "react";
-import { useSession } from "next-auth/react";
+import { useEffect, useState, type FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
 
-import { apiClient, ApiClientError } from "@/lib/api/client";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { LoadingState } from "@/components/ui/LoadingState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { apiClient, ApiClientError } from '@/lib/api/client';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
-type OTRoomStatus =
-  | "AVAILABLE"
-  | "OCCUPIED"
-  | "MAINTENANCE"
-  | "DISABLED";
+type OTRoomStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
 
 interface OTRoom {
   id: string;
@@ -42,36 +38,36 @@ interface OTRoomForm {
 }
 
 const EMPTY_FORM: OTRoomForm = {
-  name: "",
-  code: "",
-  departmentId: "",
-  capacity: "",
+  name: '',
+  code: '',
+  departmentId: '',
+  capacity: '',
 };
 
 const STATUS_OPTIONS: OTRoomStatus[] = [
-  "AVAILABLE",
-  "OCCUPIED",
-  "MAINTENANCE",
-  "DISABLED",
+  'AVAILABLE',
+  'OCCUPIED',
+  'MAINTENANCE',
+  'DISABLED',
 ];
 
 function statusLabel(status: OTRoomStatus) {
-  return status.replace("_", " ");
+  return status.replace('_', ' ');
 }
 
 export function OTRoomManagement() {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin = session?.user?.role === 'ADMIN';
   const [rooms, setRooms] = useState<OTRoom[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [updatingRoomId, setUpdatingRoomId] = useState<string | null>(null);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
-  const [departmentError, setDepartmentError] = useState("");
+  const [departmentError, setDepartmentError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingRoom, setEditingRoom] = useState<OTRoom | null>(null);
   const [form, setForm] = useState<OTRoomForm>(EMPTY_FORM);
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -111,7 +107,7 @@ export function OTRoomManagement() {
     let cancelled = false;
 
     apiClient
-      .get<DepartmentOption[]>("/api/departments")
+      .get<DepartmentOption[]>('/api/departments')
       .then((response) => {
         if (!cancelled) setDepartments(response);
       })
@@ -120,7 +116,7 @@ export function OTRoomManagement() {
           setDepartmentError(
             error instanceof ApiClientError
               ? error.message
-              : "Failed to load departments.",
+              : 'Failed to load departments.',
           );
         }
       });
@@ -133,7 +129,7 @@ export function OTRoomManagement() {
   function openCreateForm() {
     setEditingRoom(null);
     setForm({ ...EMPTY_FORM });
-    setFormError("");
+    setFormError('');
     setShowForm(true);
   }
 
@@ -142,17 +138,17 @@ export function OTRoomManagement() {
     setForm({
       name: room.name,
       code: room.code,
-      departmentId: room.department?.id ?? "",
-      capacity: room.capacity?.toString() ?? "",
+      departmentId: room.department?.id ?? '',
+      capacity: room.capacity?.toString() ?? '',
     });
-    setFormError("");
+    setFormError('');
     setShowForm(true);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setFormError("");
+    setFormError('');
 
     const capacity = form.capacity ? Number(form.capacity) : undefined;
     const payload = editingRoom
@@ -174,7 +170,7 @@ export function OTRoomManagement() {
             `/api/ot-rooms/${editingRoom.id}`,
             payload,
           )
-        : await apiClient.post<OTRoom>("/api/ot-rooms", payload);
+        : await apiClient.post<OTRoom>('/api/ot-rooms', payload);
       setRooms((current) =>
         editingRoom
           ? current.map((item) =>
@@ -189,20 +185,17 @@ export function OTRoomManagement() {
       setFormError(
         submitError instanceof ApiClientError
           ? submitError.message
-          : `Failed to ${editingRoom ? "update" : "create"} operating theatre.`,
+          : `Failed to ${editingRoom ? 'update' : 'create'} operating theatre.`,
       );
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleStatusChange(
-    roomId: string,
-    status: OTRoomStatus,
-  ) {
+  async function handleStatusChange(roomId: string, status: OTRoomStatus) {
     try {
       setUpdatingRoomId(roomId);
-      setError("");
+      setError('');
 
       const response = await apiClient.patch<OTRoom>(
         `/api/ot-rooms/${roomId}/status`,
@@ -211,16 +204,14 @@ export function OTRoomManagement() {
 
       setRooms((currentRooms) =>
         currentRooms.map((room) =>
-          room.id === roomId
-            ? { ...room, ...response }
-            : room,
+          room.id === roomId ? { ...room, ...response } : room,
         ),
       );
     } catch (error) {
       setError(
         error instanceof ApiClientError
           ? error.message
-          : "Failed to update operating theatre status.",
+          : 'Failed to update operating theatre status.',
       );
     } finally {
       setUpdatingRoomId(null);
@@ -229,13 +220,13 @@ export function OTRoomManagement() {
 
   async function handleActiveChange(room: OTRoom) {
     const isActive = !room.isActive;
-    const action = isActive ? "reactivate" : "deactivate";
+    const action = isActive ? 'reactivate' : 'deactivate';
     if (!window.confirm(`Are you sure you want to ${action} "${room.name}"?`)) {
       return;
     }
 
     setUpdatingRoomId(room.id);
-    setError("");
+    setError('');
     try {
       const response = await apiClient.patch<OTRoom>(
         `/api/ot-rooms/${room.id}/active`,
@@ -269,18 +260,18 @@ export function OTRoomManagement() {
     <main className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-        <p className="text-sm font-medium text-[var(--color-foreground-muted)]">
-          Infrastructure
-        </p>
+          <p className="text-sm font-medium text-[var(--color-foreground-muted)]">
+            Infrastructure
+          </p>
 
-        <h1 className="mt-1 text-2xl font-semibold text-[var(--color-foreground)]">
-          Operating Theatres
-        </h1>
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--color-foreground)]">
+            Operating Theatres
+          </h1>
 
-        <p className="mt-2 text-sm text-[var(--color-foreground-secondary)]">
-          Monitor theatre availability, operational status, and assigned
-          departments.
-        </p>
+          <p className="mt-2 text-sm text-[var(--color-foreground-secondary)]">
+            Monitor theatre availability, operational status, and assigned
+            departments.
+          </p>
         </div>
         {isAdmin && (
           <button
@@ -297,7 +288,7 @@ export function OTRoomManagement() {
         <Card>
           <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="text-lg font-semibold">
-              {editingRoom ? "Edit operating theatre" : "Add operating theatre"}
+              {editingRoom ? 'Edit operating theatre' : 'Add operating theatre'}
             </h2>
             {departmentError ? (
               <p role="alert" className="text-sm text-[var(--color-danger)]">
@@ -322,9 +313,12 @@ export function OTRoomManagement() {
                   maxLength={100}
                   value={form.name}
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, name: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -336,9 +330,12 @@ export function OTRoomManagement() {
                   disabled={Boolean(editingRoom)}
                   value={form.code}
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, code: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      code: event.target.value,
+                    }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 disabled:opacity-60"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2 disabled:opacity-60"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -352,7 +349,7 @@ export function OTRoomManagement() {
                       departmentId: event.target.value,
                     }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 >
                   <option value="">Choose a department</option>
                   {departments.map((department) => (
@@ -375,7 +372,7 @@ export function OTRoomManagement() {
                       capacity: event.target.value,
                     }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
             </div>
@@ -384,7 +381,7 @@ export function OTRoomManagement() {
                 type="button"
                 disabled={saving}
                 onClick={() => setShowForm(false)}
-                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="border-border-strong rounded-lg border px-3 py-2 text-sm"
               >
                 Cancel
               </button>
@@ -393,7 +390,7 @@ export function OTRoomManagement() {
                 disabled={saving || departments.length === 0}
                 className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
               >
-                {saving ? "Saving…" : editingRoom ? "Save changes" : "Create"}
+                {saving ? 'Saving…' : editingRoom ? 'Save changes' : 'Create'}
               </button>
             </div>
           </form>
@@ -412,109 +409,109 @@ export function OTRoomManagement() {
           description="There are currently no operating theatre rooms registered."
         />
       ) : (
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {rooms.map((room) => {
-          const isUpdating = updatingRoomId === room.id;
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {rooms.map((room) => {
+            const isUpdating = updatingRoomId === room.id;
 
-          return (
-            <Card key={room.id} className="space-y-5 p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-foreground-muted)]">
-                    {room.code}
-                  </p>
+            return (
+              <Card key={room.id} className="space-y-5 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.08em] text-[var(--color-foreground-muted)] uppercase">
+                      {room.code}
+                    </p>
 
-                  <h2 className="mt-1 text-lg font-semibold text-[var(--color-foreground)]">
-                    {room.name}
-                  </h2>
-                </div>
+                    <h2 className="mt-1 text-lg font-semibold text-[var(--color-foreground)]">
+                      {room.name}
+                    </h2>
+                  </div>
 
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => openEditForm(room)}
-                    className="text-sm font-medium text-[var(--color-primary)]"
-                  >
-                    Edit details
-                  </button>
-                )}
-
-                <div className="flex flex-col items-end gap-2">
-                  <Badge>{room.isActive ? "ACTIVE" : "INACTIVE"}</Badge>
                   {isAdmin && (
                     <button
                       type="button"
-                      disabled={isUpdating}
-                      onClick={() => void handleActiveChange(room)}
-                      className="text-xs font-medium text-[var(--color-primary)] disabled:opacity-50"
+                      onClick={() => openEditForm(room)}
+                      className="text-sm font-medium text-[var(--color-primary)]"
                     >
-                      {room.isActive ? "Deactivate" : "Reactivate"}
+                      Edit details
                     </button>
                   )}
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge>{room.isActive ? 'ACTIVE' : 'INACTIVE'}</Badge>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => void handleActiveChange(room)}
+                        className="text-xs font-medium text-[var(--color-primary)] disabled:opacity-50"
+                      >
+                        {room.isActive ? 'Deactivate' : 'Reactivate'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-[var(--color-foreground-muted)]">
+                      Department
+                    </p>
+
+                    <p className="mt-1 font-medium text-[var(--color-foreground)]">
+                      {room.department?.name ?? 'Unassigned'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[var(--color-foreground-muted)]">
+                      Capacity
+                    </p>
+
+                    <p className="mt-1 font-medium text-[var(--color-foreground)]">
+                      {room.capacity ?? '—'}
+                    </p>
+                  </div>
+                </div>
+
                 <div>
-                  <p className="text-[var(--color-foreground-muted)]">
-                    Department
+                  <p className="text-sm font-medium text-[var(--color-foreground)]">
+                    Operational status
                   </p>
-
-                  <p className="mt-1 font-medium text-[var(--color-foreground)]">
-                    {room.department?.name ?? "Unassigned"}
-                  </p>
+                  {isAdmin ? (
+                    <select
+                      id={`status-${room.id}`}
+                      aria-label={`Operational status for ${room.name}`}
+                      value={room.status}
+                      disabled={isUpdating}
+                      onChange={(event) =>
+                        void handleStatusChange(
+                          room.id,
+                          event.target.value as OTRoomStatus,
+                        )
+                      }
+                      className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 mt-2 h-10 w-full rounded-[var(--radius-control)] border px-3 text-sm transition outline-none focus:ring-2"
+                    >
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {statusLabel(status)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="mt-2 font-medium text-[var(--color-foreground)]">
+                      {statusLabel(room.status)}
+                    </p>
+                  )}
+                  {isUpdating ? (
+                    <p className="mt-2 text-xs text-[var(--color-foreground-muted)]">
+                      Updating…
+                    </p>
+                  ) : null}
                 </div>
-
-                <div>
-                  <p className="text-[var(--color-foreground-muted)]">
-                    Capacity
-                  </p>
-
-                  <p className="mt-1 font-medium text-[var(--color-foreground)]">
-                    {room.capacity ?? "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-[var(--color-foreground)]">
-                  Operational status
-                </p>
-                {isAdmin ? (
-                  <select
-                    id={`status-${room.id}`}
-                    aria-label={`Operational status for ${room.name}`}
-                    value={room.status}
-                    disabled={isUpdating}
-                    onChange={(event) =>
-                      void handleStatusChange(
-                        room.id,
-                        event.target.value as OTRoomStatus,
-                      )
-                    }
-                    className="mt-2 h-10 w-full rounded-[var(--radius-control)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-ring)]"
-                  >
-                    {STATUS_OPTIONS.map((status) => (
-                      <option key={status} value={status}>
-                        {statusLabel(status)}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="mt-2 font-medium text-[var(--color-foreground)]">
-                    {statusLabel(room.status)}
-                  </p>
-                )}
-                {isUpdating ? (
-                  <p className="mt-2 text-xs text-[var(--color-foreground-muted)]">
-                    Updating…
-                  </p>
-                ) : null}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+              </Card>
+            );
+          })}
+        </div>
       )}
     </main>
   );

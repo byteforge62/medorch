@@ -85,11 +85,11 @@ export default function RegisterPage() {
   }
 
   const inputClass =
-    'mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20';
+    'mt-1.5 w-full rounded-[var(--radius-control)] border border-border-strong bg-surface px-3.5 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
 
   return (
     <main className="bg-background flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="border-border bg-card w-full max-w-md rounded-2xl border p-6 shadow-sm sm:p-8">
+      <section className="border-border bg-surface w-full max-w-md rounded-2xl border p-6 shadow-sm sm:p-8">
         <div className="mb-7">
           <p className="text-primary text-sm font-semibold tracking-wide">
             MEDORCH
@@ -99,7 +99,7 @@ export default function RegisterPage() {
             Create your patient account
           </h1>
 
-          <p className="text-muted-foreground mt-2 text-sm leading-6">
+          <p className="text-foreground-muted mt-2 text-sm leading-6">
             Register to get started. You will need to verify your email before
             your account can be approved.
           </p>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
         {error && (
           <p
             role="alert"
-            className="border-destructive/30 bg-destructive/10 text-foreground mb-5 rounded-lg border p-3 text-sm leading-6"
+            className="border-danger-border bg-danger-soft text-danger mb-5 rounded-lg border p-3 text-sm leading-6"
           >
             {error}
           </p>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
           <div
             role="status"
             aria-live="polite"
-            className="border-border bg-muted text-foreground mb-5 rounded-lg border p-3 text-sm leading-6"
+            className="border-success/40 bg-success-soft text-success mb-5 rounded-lg border p-3 text-sm leading-6"
           >
             {success}
           </div>
@@ -174,7 +174,7 @@ export default function RegisterPage() {
                 className="text-foreground text-sm font-medium"
               >
                 Phone number{' '}
-                <span className="text-muted-foreground">(optional)</span>
+                <span className="text-foreground-muted">(optional)</span>
               </label>
               <input
                 id="phone"
@@ -237,14 +237,14 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-primary text-primary-foreground w-full rounded-lg px-4 py-3 text-sm font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
         )}
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
+        <p className="text-foreground-muted mt-6 text-center text-sm">
           Already registered?{' '}
           <Link
             href="/login"

@@ -24,27 +24,23 @@ export function LoginForm() {
         redirect: false,
       });
 
+      if (!result || result.error) {
+        const authCode = result?.code ?? '';
 
-      
-if (!result || result.error) {
-  const authCode = result?.code ?? "";
+        if (authCode === 'email_not_verified') {
+          setError(
+            'Please verify your email before signing in. Use the resend verification link below if needed.',
+          );
+        } else if (authCode === 'account_pending_approval') {
+          setError(
+            'Your email is verified, but your account is awaiting admin approval.',
+          );
+        } else {
+          setError('Invalid email or password');
+        }
 
-  if (authCode === "email_not_verified") {
-    setError(
-      "Please verify your email before signing in. Use the resend verification link below if needed.",
-    );
-  } else if (authCode === "account_pending_approval") {
-    setError(
-      "Your email is verified, but your account is awaiting admin approval.",
-    );
-  } else {
-    setError("Invalid email or password");
-  }
-
-  return;
-}
-
-
+        return;
+      }
 
       router.push('/dashboard');
       router.refresh();
@@ -74,7 +70,7 @@ if (!result || result.error) {
           placeholder="admin@medorch.local"
           required
           disabled={isLoading}
-          className="border-border bg-surface text-foreground placeholder:text-foreground-muted hover:border-border-strong focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle hover:border-primary focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
@@ -95,7 +91,7 @@ if (!result || result.error) {
           placeholder="Enter your password"
           required
           disabled={isLoading}
-          className="border-border bg-surface text-foreground placeholder:text-foreground-muted hover:border-border-strong focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle hover:border-primary focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
@@ -118,10 +114,7 @@ if (!result || result.error) {
       </button>
 
       <div className="flex flex-col gap-3 pt-2 text-center text-sm">
-        <Link
-          href="/forgot-password"
-          className="text-primary hover:underline"
-        >
+        <Link href="/forgot-password" className="text-primary hover:underline">
           Forgot your password?
         </Link>
 

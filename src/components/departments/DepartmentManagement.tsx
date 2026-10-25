@@ -62,7 +62,7 @@ const EMPTY_FORM: DepartmentForm = {
 };
 
 const inputClass =
-  'w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-primary)]';
+  'w-full rounded-lg border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof ApiClientError ? error.message : fallback;
@@ -88,7 +88,6 @@ export function DepartmentManagement() {
   const [saving, setSaving] = useState(false);
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
 
-  
   const fetchData = useCallback(async () => {
     const [departmentData, doctorData] = await Promise.all([
       apiClient.get<Department[]>('/api/departments'),
@@ -142,7 +141,6 @@ export function DepartmentManagement() {
       cancelled = true;
     };
   }, [fetchData]);
-
 
   const filteredDepartments = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -303,14 +301,14 @@ export function DepartmentManagement() {
   }
 
   if (error && departments.length === 0) {
-return (
-  <ErrorState
-    message={error}
-    onRetry={() => {
-      void refreshData();
-    }}
-  />
-);
+    return (
+      <ErrorState
+        message={error}
+        onRetry={() => {
+          void refreshData();
+        }}
+      />
+    );
   }
 
   return (
@@ -333,7 +331,7 @@ return (
           <button
             type="button"
             onClick={openCreateForm}
-            className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
           >
             + New department
           </button>
@@ -342,21 +340,22 @@ return (
 
       {!isAdmin && (
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3 text-sm text-[var(--color-foreground-secondary)]">
-          Read-only department access. Only administrators can create, edit, or deactivate departments.
+          Read-only department access. Only administrators can create, edit, or
+          deactivate departments.
         </div>
       )}
 
       {notice && (
         <div
           role="status"
-          className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400"
+          className="border-success/30 bg-success/10 text-success rounded-lg border px-4 py-3 text-sm"
         >
           {notice}
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-400">
+        <div className="border-danger/30 bg-danger/10 text-danger rounded-lg border px-4 py-3 text-sm">
           <p>{error}</p>
           <button
             type="button"
@@ -524,7 +523,7 @@ return (
                   <button
                     type="button"
                     onClick={() => openEditForm(department)}
-                    className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+                    className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
                   >
                     Edit department
                   </button>
@@ -533,7 +532,7 @@ return (
                     type="button"
                     onClick={() => void toggleDepartmentStatus(department)}
                     disabled={pendingActionId === department.id}
-                    className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
+                    className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
                   >
                     {pendingActionId === department.id
                       ? 'Updating...'
@@ -550,7 +549,7 @@ return (
 
       {showForm && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm"
+          className="bg-surface/50 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeForm();
           }}
@@ -658,7 +657,7 @@ return (
               {formError && (
                 <p
                   role="alert"
-                  className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-700 dark:text-rose-400"
+                  className="border-danger/30 bg-danger/10 text-danger rounded-lg border px-3 py-2 text-sm"
                 >
                   {formError}
                 </p>
@@ -669,7 +668,7 @@ return (
                   type="button"
                   onClick={closeForm}
                   disabled={saving}
-                  className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
+                  className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -677,7 +676,7 @@ return (
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                  className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
                 >
                   {saving
                     ? 'Saving...'

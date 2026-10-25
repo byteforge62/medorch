@@ -70,17 +70,17 @@ function ResetPasswordForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-white">
-      <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
+      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
         <Link
           href="/login"
-          className="text-sm text-sky-400 transition hover:text-sky-300"
+          className="text-primary text-sm transition hover:underline"
         >
           ← Back to login
         </Link>
 
         <div className="mt-8">
-          <p className="text-sm font-medium tracking-[0.2em] text-sky-400 uppercase">
+          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
             MedOrch
           </p>
 
@@ -88,7 +88,7 @@ function ResetPasswordForm() {
             Reset password
           </h1>
 
-          <p className="mt-3 text-sm leading-6 text-slate-400">
+          <p className="text-foreground-muted mt-3 text-sm leading-6">
             Choose a new password for your MedOrch account.
           </p>
         </div>
@@ -96,7 +96,7 @@ function ResetPasswordForm() {
         {!token && (
           <p
             role="alert"
-            className="mt-6 rounded-xl border border-red-800 bg-red-950/50 p-3 text-sm text-red-300"
+            className="border-danger-border bg-danger-soft text-danger mt-6 rounded-[var(--radius-control)] border p-3 text-sm"
           >
             No reset token was found in this link. Open the latest reset email
             or request another link.
@@ -108,7 +108,7 @@ function ResetPasswordForm() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block text-sm font-medium text-slate-200"
+                className="text-foreground mb-2 block text-sm font-medium"
               >
                 New password
               </label>
@@ -124,9 +124,9 @@ function ResetPasswordForm() {
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={loading || !token}
                 placeholder="Enter your new password"
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm transition outline-none placeholder:text-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60"
+                className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
               />
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="text-foreground-subtle mt-2 text-xs">
                 Use between 12 and 128 characters.
               </p>
             </div>
@@ -134,7 +134,7 @@ function ResetPasswordForm() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="mb-2 block text-sm font-medium text-slate-200"
+                className="text-foreground mb-2 block text-sm font-medium"
               >
                 Confirm new password
               </label>
@@ -149,14 +149,14 @@ function ResetPasswordForm() {
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 disabled={loading || !token}
                 placeholder="Re-enter your new password"
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm transition outline-none placeholder:text-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60"
+                className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
               />
             </div>
 
             {error && (
               <p
                 role="alert"
-                className="rounded-xl border border-red-800 bg-red-950/50 p-3 text-sm leading-6 text-red-300"
+                className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
               >
                 {error}
               </p>
@@ -165,7 +165,7 @@ function ResetPasswordForm() {
             <button
               type="submit"
               disabled={loading || !token}
-              className="w-full rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Resetting password...' : 'Reset password'}
             </button>
@@ -175,7 +175,7 @@ function ResetPasswordForm() {
         {message && (
           <p
             role="status"
-            className="mt-6 rounded-xl border border-emerald-800 bg-emerald-950/50 p-3 text-sm leading-6 text-emerald-300"
+            className="border-success/40 bg-success-soft text-success mt-6 rounded-[var(--radius-control)] border p-3 text-sm leading-6"
           >
             {message}
           </p>
@@ -184,7 +184,7 @@ function ResetPasswordForm() {
         {completed && (
           <Link
             href="/login"
-            className="mt-5 block w-full rounded-xl bg-sky-500 px-4 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-5 block w-full rounded-[var(--radius-control)] px-4 py-3 text-center text-sm font-semibold transition-colors"
           >
             Return to login
           </Link>
@@ -198,7 +198,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-slate-950 text-sm text-slate-400">
+        <main className="bg-background text-foreground-muted flex min-h-screen items-center justify-center text-sm">
           Loading password reset...
         </main>
       }

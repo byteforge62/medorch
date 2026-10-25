@@ -76,10 +76,14 @@ export function EquipmentManagement() {
   const [status, setStatus] = useState<EquipmentStatus | 'ALL'>('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [updatingEquipmentId, setUpdatingEquipmentId] = useState<string | null>(null);
+  const [updatingEquipmentId, setUpdatingEquipmentId] = useState<string | null>(
+    null,
+  );
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
+    null,
+  );
   const [form, setForm] = useState<EquipmentForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -195,7 +199,9 @@ export function EquipmentManagement() {
         { status: nextStatus },
       );
       setEquipment((current) =>
-        current.map((item) => (item.id === id ? { ...item, ...updated } : item)),
+        current.map((item) =>
+          item.id === id ? { ...item, ...updated } : item,
+        ),
       );
     } catch (updateError) {
       setError(
@@ -320,9 +326,12 @@ export function EquipmentManagement() {
                   maxLength={150}
                   value={form.name}
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, name: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -332,9 +341,12 @@ export function EquipmentManagement() {
                   maxLength={100}
                   value={form.category}
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, category: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      category: event.target.value,
+                    }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -348,7 +360,7 @@ export function EquipmentManagement() {
                       serialNumber: event.target.value,
                     }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -361,7 +373,7 @@ export function EquipmentManagement() {
                       departmentId: event.target.value,
                     }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 >
                   <option value="">Unassigned</option>
                   {departments.map((department) => (
@@ -382,7 +394,7 @@ export function EquipmentManagement() {
                       maintenanceDueAt: event.target.value,
                     }))
                   }
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
             </div>
@@ -391,7 +403,7 @@ export function EquipmentManagement() {
                 type="button"
                 disabled={saving}
                 onClick={() => setShowForm(false)}
-                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="border-border-strong rounded-lg border px-3 py-2 text-sm"
               >
                 Cancel
               </button>
@@ -400,7 +412,11 @@ export function EquipmentManagement() {
                 disabled={saving}
                 className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
               >
-                {saving ? 'Saving…' : editingEquipment ? 'Save changes' : 'Create'}
+                {saving
+                  ? 'Saving…'
+                  : editingEquipment
+                    ? 'Save changes'
+                    : 'Create'}
               </button>
             </div>
           </form>
@@ -453,7 +469,7 @@ export function EquipmentManagement() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Name, category, serial number, department"
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm transition outline-none focus:border-[var(--color-primary)]"
+              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
             />
           </div>
 
@@ -470,7 +486,7 @@ export function EquipmentManagement() {
               onChange={(event) =>
                 setStatus(event.target.value as EquipmentStatus | 'ALL')
               }
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm transition outline-none focus:border-[var(--color-primary)]"
+              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
             >
               <option value="ALL">All statuses</option>
               {STATUS_OPTIONS.map((option) => (
@@ -511,7 +527,7 @@ export function EquipmentManagement() {
                         event.target.value as EquipmentStatus,
                       )
                     }
-                    className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-xs"
+                    className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 rounded-lg border px-2 py-1 text-xs transition outline-none focus:ring-2"
                   >
                     {STATUS_OPTIONS.map((option) => (
                       <option

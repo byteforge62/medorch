@@ -19,6 +19,7 @@
     "test:accessibility": "node --import tsx --test tests/accessibility.test.tsx"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "bcryptjs": "^3.0.3",

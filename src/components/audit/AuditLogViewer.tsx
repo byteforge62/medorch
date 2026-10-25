@@ -68,18 +68,18 @@ const EMPTY_FILTERS: AuditFilters = {
 };
 
 const inputClass =
-  'w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]';
+  'w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
 
 const actionStyles: Record<AuditAction, string> = {
-  CREATE: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-  UPDATE: 'bg-amber-500/10 text-amber-700 dark:text-amber-400',
-  DELETE: 'bg-rose-500/10 text-rose-700 dark:text-rose-400',
-  LOGIN: 'bg-sky-500/10 text-sky-700 dark:text-sky-400',
-  LOGOUT: 'bg-slate-500/10 text-slate-700 dark:text-slate-300',
-  APPROVE: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-  REJECT: 'bg-rose-500/10 text-rose-700 dark:text-rose-400',
-  CANCEL: 'bg-orange-500/10 text-orange-700 dark:text-orange-400',
-  COMPLETE: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400',
+  CREATE: 'bg-success/10 text-success ',
+  UPDATE: 'bg-warning/10 text-warning ',
+  DELETE: 'bg-danger/10 text-danger ',
+  LOGIN: 'bg-info/10 text-info ',
+  LOGOUT: 'bg-surface-muted/10 text-foreground-secondary ',
+  APPROVE: 'bg-success/10 text-success ',
+  REJECT: 'bg-danger/10 text-danger ',
+  CANCEL: 'bg-warning/10 text-warning ',
+  COMPLETE: 'bg-primary/10 text-primary ',
 };
 
 function formatDateTime(value: string) {
@@ -384,7 +384,7 @@ export function AuditLogViewer() {
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button
               type="submit"
-              className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
             >
               Apply filters
             </button>
@@ -392,7 +392,7 @@ export function AuditLogViewer() {
             <button
               type="button"
               onClick={resetFilters}
-              className="rounded-lg border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)]"
+              className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)]"
             >
               Reset
             </button>
@@ -417,7 +417,7 @@ export function AuditLogViewer() {
             type="button"
             onClick={() => setRetryCount((count) => count + 1)}
             disabled={loading}
-            className="self-start rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50 sm:self-auto"
+            className="border-border-strong self-start rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50 sm:self-auto"
           >
             Refresh
           </button>
@@ -520,7 +520,7 @@ export function AuditLogViewer() {
                           )
                         }
                         aria-label={`View details for ${log.action} ${log.entity}`}
-                        className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+                        className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
                       >
                         {selectedLog?.id === log.id ? 'Close' : 'Inspect'}
                       </button>
@@ -547,7 +547,7 @@ export function AuditLogViewer() {
                   setOffset((current) => Math.max(0, current - PAGE_SIZE))
                 }
                 disabled={offset === 0}
-                className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="border-border-strong rounded-lg border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
               </button>
@@ -556,7 +556,7 @@ export function AuditLogViewer() {
                 type="button"
                 onClick={() => setOffset((current) => current + PAGE_SIZE)}
                 disabled={!pagination.hasMore}
-                className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="border-border-strong rounded-lg border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>
@@ -589,7 +589,7 @@ export function AuditLogViewer() {
             <button
               type="button"
               onClick={() => setSelectedLog(null)}
-              className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+              className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
             >
               Close details
             </button>

@@ -10,10 +10,10 @@ export default async function UsersPage() {
     <AppShell>
       <main className="p-6 lg:p-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             Users
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-foreground-muted">
             Manage and monitor MedOrch users and their access.
           </p>
         </div>

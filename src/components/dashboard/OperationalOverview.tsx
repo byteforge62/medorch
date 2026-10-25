@@ -1,26 +1,32 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { apiClient } from "@/lib/api/client";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import React, { useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api/client';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 type OTRoomSummary = {
   id: string;
   name: string;
-  status: "AVAILABLE" | "OCCUPIED" | "MAINTENANCE" | "DISABLED";
+  status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
   isActive: boolean;
 };
 
 type ScheduleSummary = {
   id: string;
-  status: "SCHEDULED" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "DELAYED";
+  status:
+    | 'SCHEDULED'
+    | 'CONFIRMED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'DELAYED';
   scheduledDate: string;
 };
 
 type EquipmentSummary = {
   id: string;
-  status: "AVAILABLE" | "IN_USE" | "MAINTENANCE" | "RETIRED";
+  status: 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED';
 };
 
 type AlertSummary = {
@@ -47,12 +53,11 @@ export function OperationalOverview() {
       try {
         setIsLoading(true);
         const results = await Promise.allSettled([
-          apiClient.get<OTRoomSummary[]>("/api/ot-rooms"),
-          apiClient.get<ScheduleSummary[]>("/api/schedules"),
-          apiClient.get<EquipmentSummary[]>("/api/equipment"),
-          apiClient.get<AlertSummary[]>("/api/alerts"),
+          apiClient.get<OTRoomSummary[]>('/api/ot-rooms'),
+          apiClient.get<ScheduleSummary[]>('/api/schedules'),
+          apiClient.get<EquipmentSummary[]>('/api/equipment'),
+          apiClient.get<AlertSummary[]>('/api/alerts'),
         ]);
-
 
         const [rooms, schedules, equipment, alerts] = results;
 
@@ -69,57 +74,56 @@ export function OperationalOverview() {
 
         const failedMetrics: string[] = [];
 
-        if (rooms.status === "fulfilled") {
+        if (rooms.status === 'fulfilled') {
           const roomData = rooms.value;
           nextStats.totalRooms = roomData.length;
           nextStats.availableRooms = roomData.filter(
-            (room) => room.status === "AVAILABLE" && room.isActive
+            (room) => room.status === 'AVAILABLE' && room.isActive,
           ).length;
           nextStats.occupiedRooms = roomData.filter(
-            (room) => room.status === "OCCUPIED"
+            (room) => room.status === 'OCCUPIED',
           ).length;
         } else {
-          failedMetrics.push("room");
+          failedMetrics.push('room');
         }
 
-        if (schedules.status === "fulfilled") {
+        if (schedules.status === 'fulfilled') {
           const scheduleData = schedules.value;
           nextStats.totalSchedules = scheduleData.length;
           nextStats.inProgressSchedules = scheduleData.filter(
-            (schedule) => schedule.status === "IN_PROGRESS"
+            (schedule) => schedule.status === 'IN_PROGRESS',
           ).length;
         } else {
-          failedMetrics.push("schedule");
+          failedMetrics.push('schedule');
         }
 
-        if (equipment.status === "fulfilled") {
+        if (equipment.status === 'fulfilled') {
           const equipmentData = equipment.value;
           nextStats.totalEquipment = equipmentData.length;
           nextStats.availableEquipment = equipmentData.filter(
-            (item) => item.status === "AVAILABLE"
+            (item) => item.status === 'AVAILABLE',
           ).length;
         } else {
-          failedMetrics.push("equipment");
+          failedMetrics.push('equipment');
         }
 
-        if (alerts.status === "fulfilled") {
+        if (alerts.status === 'fulfilled') {
           nextStats.unreadAlerts = alerts.value.filter(
-            (alert) => !alert.isRead
+            (alert) => !alert.isRead,
           ).length;
         } else {
-          failedMetrics.push("alert");
+          failedMetrics.push('alert');
         }
 
         setStats(nextStats);
         setError(
           failedMetrics.length > 0
-            ? `Unable to load ${failedMetrics.join(", ")} metrics.`
-            : null
+            ? `Unable to load ${failedMetrics.join(', ')} metrics.`
+            : null,
         );
-
       } catch (err) {
-        console.error("Error loading operational overview:", err);
-        setError("Unable to load operational metrics.");
+        console.error('Error loading operational overview:', err);
+        setError('Unable to load operational metrics.');
       } finally {
         setIsLoading(false);
       }
@@ -133,7 +137,7 @@ export function OperationalOverview() {
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300"
+          className="border-warning-soft bg-warning-soft text-warning rounded-lg border px-4 py-3 text-sm"
         >
           {error}
         </div>
@@ -141,59 +145,77 @@ export function OperationalOverview() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">OT Operating Rooms</span>
+            <span className="text-foreground-subtle text-xs font-medium">
+              OT Operating Rooms
+            </span>
             <Badge variant="neutral">Current snapshot</Badge>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {isLoading ? "..." : error ? "-" : `${stats.availableRooms} / ${stats.totalRooms}`}
+            <span className="text-foreground text-2xl font-bold">
+              {isLoading
+                ? '...'
+                : error
+                  ? '-'
+                  : `${stats.availableRooms} / ${stats.totalRooms}`}
             </span>
-            <span className="text-xs text-slate-500">
-              {error ? "Unavailable" : `${stats.occupiedRooms} occupied`}
+            <span className="text-foreground-subtle text-xs">
+              {error ? 'Unavailable' : `${stats.occupiedRooms} occupied`}
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500">Available for immediate surgery</div>
+          <div className="text-foreground-subtle mt-2 text-xs">
+            Available for immediate surgery
+          </div>
         </Card>
 
         <Card>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-foreground-subtle text-xs font-medium">
               Total Schedules
             </span>
             <Badge variant="neutral">All records</Badge>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {isLoading ? "..." : error ? "-" : stats.totalSchedules}
+            <span className="text-foreground text-2xl font-bold">
+              {isLoading ? '...' : error ? '-' : stats.totalSchedules}
             </span>
-            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-              {error ? "Unavailable" : `${stats.inProgressSchedules} In Progress`}
+            <span className="text-warning text-xs font-medium">
+              {error
+                ? 'Unavailable'
+                : `${stats.inProgressSchedules} In Progress`}
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500">Surgeries scheduled & active</div>
+          <div className="text-foreground-subtle mt-2 text-xs">
+            Surgeries scheduled & active
+          </div>
         </Card>
 
         <Card>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Equipment Readiness</span>
+            <span className="text-foreground-subtle text-xs font-medium">
+              Equipment Readiness
+            </span>
             <Badge variant="purple">Ready</Badge>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">
+            <span className="text-foreground text-2xl font-bold">
               {isLoading
-                ? "..."
+                ? '...'
                 : error
-                  ? "—"
+                  ? '—'
                   : `${stats.availableEquipment} / ${stats.totalEquipment}`}
             </span>
-            <span className="text-xs text-slate-500">Available</span>
+            <span className="text-foreground-subtle text-xs">Available</span>
           </div>
-          <div className="mt-2 text-xs text-slate-500">Tracked medical equipment</div>
+          <div className="text-foreground-subtle mt-2 text-xs">
+            Tracked medical equipment
+          </div>
         </Card>
 
         <Card>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Alert Notifications</span>
+            <span className="text-foreground-subtle text-xs font-medium">
+              Alert Notifications
+            </span>
             {error ? (
               <Badge variant="neutral">Unavailable</Badge>
             ) : stats.unreadAlerts > 0 ? (
@@ -203,12 +225,16 @@ export function OperationalOverview() {
             )}
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {isLoading ? "..." : stats.unreadAlerts}
+            <span className="text-foreground text-2xl font-bold">
+              {isLoading ? '...' : stats.unreadAlerts}
             </span>
-            <span className="text-xs text-slate-500">Requires attention</span>
+            <span className="text-foreground-subtle text-xs">
+              Requires attention
+            </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500">System & schedule notifications</div>
+          <div className="text-foreground-subtle mt-2 text-xs">
+            System & schedule notifications
+          </div>
         </Card>
       </div>
     </div>

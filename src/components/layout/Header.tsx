@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import { signOut, useSession } from "next-auth/react";
-import { AlertCenter } from "@/components/alerts/AlertCenter";
-import { Badge } from "@/components/ui/Badge";
-import { PRIMARY_NAVIGATION_ID } from "./Sidebar";
+import React from 'react';
+import { signOut, useSession } from 'next-auth/react';
+import { List, SignOut } from '@phosphor-icons/react';
+import { AlertCenter } from '@/components/alerts/AlertCenter';
+import { Badge } from '@/components/ui/Badge';
+import { PRIMARY_NAVIGATION_ID } from './Sidebar';
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -18,51 +19,38 @@ export function Header({ onToggleSidebar, sidebarOpen = false }: HeaderProps) {
 
   const getRoleBadgeVariant = (role?: string) => {
     switch (role) {
-      case "ADMIN":
-        return "purple";
-      case "DOCTOR":
-        return "info";
-      case "OT_STAFF":
-        return "warning";
-      case "PATIENT":
+      case 'ADMIN':
+        return 'purple';
+      case 'DOCTOR':
+        return 'info';
+      case 'OT_STAFF':
+        return 'warning';
+      case 'PATIENT':
       default:
-        return "neutral";
+        return 'neutral';
     }
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 sm:px-6">
+    <header className="border-border bg-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 sm:px-6">
       <div className="flex items-center space-x-3">
         <button
           onClick={onToggleSidebar}
-          className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] lg:hidden"
+          className="border-border-strong text-foreground-secondary hover:bg-surface-muted focus-visible:outline-ring flex h-9 w-9 cursor-pointer items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 lg:hidden"
           aria-label={
-            sidebarOpen ? "Close navigation menu" : "Open navigation menu"
+            sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'
           }
           aria-expanded={sidebarOpen}
           aria-controls={PRIMARY_NAVIGATION_ID}
         >
-          <svg
-            aria-hidden="true"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <List size={20} weight="bold" aria-hidden="true" />
         </button>
 
         <div className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 font-bold text-white shadow-xs">
+          <div className="bg-primary text-foreground-inverse flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold shadow-xs">
             M
           </div>
-          <span className="text-base font-bold text-slate-900 dark:text-white">
+          <span className="text-foreground text-base font-bold tracking-tight">
             MedOrch
           </span>
         </div>
@@ -71,43 +59,31 @@ export function Header({ onToggleSidebar, sidebarOpen = false }: HeaderProps) {
       <div className="flex items-center space-x-3">
         <AlertCenter />
 
-        <div className="h-5 w-px bg-[var(--color-border)]" />
+        <div className="bg-border h-5 w-px" aria-hidden="true" />
 
         {user ? (
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
               <div className="flex items-center justify-end space-x-1.5">
-                <span className="text-xs font-semibold text-[var(--color-foreground)]">
+                <span className="text-foreground text-xs font-semibold">
                   {user.name || 'User'}
                 </span>
                 <Badge variant={getRoleBadgeVariant(user.role)}>
                   {user.role}
                 </Badge>
               </div>
-              <span className="block max-w-[160px] truncate text-[11px] text-[var(--color-foreground-muted)]">
+              <span className="text-foreground-muted block max-w-[160px] truncate text-[11px]">
                 {user.email}
               </span>
             </div>
 
             <button
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-foreground-muted)] transition-colors hover:border-[var(--color-danger-border)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)]"
+              className="border-border-strong text-foreground-muted hover:border-danger-border hover:bg-danger-soft hover:text-danger focus-visible:outline-ring flex h-9 w-9 cursor-pointer items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2"
               title="Sign Out"
               aria-label="Sign out"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              <SignOut size={16} weight="bold" aria-hidden="true" />
             </button>
           </div>
         ) : null}

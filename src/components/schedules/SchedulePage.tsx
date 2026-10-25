@@ -253,16 +253,15 @@ export function SchedulePage() {
 
   return (
     <main className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
+      {/* Header Banner */}          <div className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-surface p-6 shadow-xs sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-semibold text-foreground">
               Surgical Schedules
             </h1>
-            <Badge variant="purple">{schedules.length} Total</Badge>
+            <Badge variant="info">{schedules.length} Total</Badge>
           </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-foreground-muted">
             View, schedule, and manage operating theatre procedures and room
             allocations.
           </p>
@@ -272,15 +271,15 @@ export function SchedulePage() {
           <div
             role="group"
             aria-label="Schedule view"
-            className="inline-flex rounded-lg border border-slate-200 p-1 dark:border-slate-700"
+            className="inline-flex rounded-lg border border-border-strong p-1"
           >
             <button
               type="button"
               aria-pressed={viewMode === 'list'}
               onClick={() => setViewMode('list')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition ${viewMode === 'list'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'list'
+                ? 'bg-primary text-foreground-inverse'
+                : 'text-foreground-secondary hover:bg-surface-muted'
                 }`}
             >
               List
@@ -290,9 +289,9 @@ export function SchedulePage() {
               type="button"
               aria-pressed={viewMode === 'calendar'}
               onClick={() => setViewMode('calendar')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition ${viewMode === 'calendar'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'calendar'
+                ? 'bg-primary text-foreground-inverse'
+                : 'text-foreground-secondary hover:bg-surface-muted'
                 }`}
             >
               Calendar
@@ -324,13 +323,13 @@ export function SchedulePage() {
             key={metric.label}
             className={`rounded-xl border border-slate-200 border-l-4 ${metric.accent} bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900`}
           >
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            <p className="text-sm font-medium text-foreground-muted">
               {metric.label}
             </p>
             <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               {metric.value}
             </p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-xs text-foreground-muted">
               {metric.detail}
             </p>
           </div>
