@@ -186,28 +186,28 @@ export function SchedulePage() {
   const scheduleMetrics = useMemo(
     () => [
       {
-        label: "Total procedures",
+        label: 'Total procedures',
         value: schedules.length,
         detail: "All accessible schedules",
-        accent: "border-l-slate-400",
+        accent: "border-l-foreground-muted",
       },
       {
         label: "Scheduled",
         value: schedules.filter((item) => item.status === "SCHEDULED").length,
         detail: "Awaiting confirmation",
-        accent: "border-l-sky-500",
+        accent: "border-l-primary",
       },
       {
         label: "In progress",
         value: schedules.filter((item) => item.status === "IN_PROGRESS").length,
         detail: "Currently underway",
-        accent: "border-l-amber-500",
+        accent: "border-l-warning",
       },
       {
         label: "Completed",
         value: schedules.filter((item) => item.status === "COMPLETED").length,
         detail: "Finished procedures",
-        accent: "border-l-emerald-500",
+        accent: "border-l-success",
       },
     ],
     [schedules],
@@ -253,7 +253,7 @@ export function SchedulePage() {
 
   return (
     <main className="space-y-6">
-      {/* Header Banner */}          <div className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-surface p-6 shadow-xs sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 rounded-[var(--radius-xl)] border border-border bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-2xl font-semibold text-foreground">
@@ -271,13 +271,12 @@ export function SchedulePage() {
           <div
             role="group"
             aria-label="Schedule view"
-            className="inline-flex rounded-lg border border-border-strong p-1"
-          >
-            <button
+            className="inline-flex rounded-md border border-border-strong p-1"
+          >              <button
               type="button"
               aria-pressed={viewMode === 'list'}
               onClick={() => setViewMode('list')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'list'
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${viewMode === 'list'
                 ? 'bg-primary text-foreground-inverse'
                 : 'text-foreground-secondary hover:bg-surface-muted'
                 }`}
@@ -289,7 +288,7 @@ export function SchedulePage() {
               type="button"
               aria-pressed={viewMode === 'calendar'}
               onClick={() => setViewMode('calendar')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'calendar'
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${viewMode === 'calendar'
                 ? 'bg-primary text-foreground-inverse'
                 : 'text-foreground-secondary hover:bg-surface-muted'
                 }`}
@@ -321,15 +320,15 @@ export function SchedulePage() {
         {scheduleMetrics.map((metric) => (
           <div
             key={metric.label}
-            className={`rounded-xl border border-slate-200 border-l-4 ${metric.accent} bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900`}
+            className={`rounded-xl border border-border border-l-4 ${metric.accent} bg-surface p-4 shadow-xs`}
           >
-            <p className="text-sm font-medium text-foreground-muted">
+            <p            className="text-sm font-medium text-foreground-muted">
               {metric.label}
             </p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
+            <p className="mt-2 tabular-nums text-3xl font-semibold tracking-tight text-foreground">
               {metric.value}
             </p>
-            <p className="mt-1 text-xs text-foreground-muted">
+            <p className="mt-1 text-xs text-foreground-subtle">
               {metric.detail}
             </p>
           </div>
@@ -346,21 +345,16 @@ export function SchedulePage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p
-          className="text-sm text-slate-600 dark:text-slate-400"
+          className="text-sm text-foreground-muted"
           aria-live="polite"
-        >
-          Showing{" "}
-          <span className="font-semibold text-slate-900 dark:text-white">
-            {filteredSchedules.length}
-          </span>{" "}
-          of {schedules.length} procedures
+        >              Showing {filteredSchedules.length} of {schedules.length} procedures
         </p>
 
         {hasActiveFilters && (
           <button
             type="button"
             onClick={handleResetFilters}
-            className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-400 dark:hover:bg-slate-800"
+            className="rounded-md px-3 py-2 text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             Clear filters
           </button>
@@ -368,6 +362,7 @@ export function SchedulePage() {
       </div>
 
       {/* Schedules List */}
+      <h2 className="sr-only">Schedules</h2>
       {viewMode === "calendar" ? (
         <ScheduleCalendar
           schedules={filteredSchedules}

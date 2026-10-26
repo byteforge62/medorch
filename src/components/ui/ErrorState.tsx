@@ -6,12 +6,14 @@ interface ErrorStateProps {
   title?: string;
   message?: string;
   onRetry?: () => void;
+  action?: React.ReactNode;
 }
 
 export function ErrorState({
   title = 'Something went wrong',
   message = 'Failed to load data. Please try again.',
   onRetry,
+  action,
 }: ErrorStateProps) {
   return (
     <div
@@ -23,11 +25,14 @@ export function ErrorState({
       </div>
       <h4 className="text-danger mt-3 text-sm font-semibold">{title}</h4>
       <p className="text-foreground-secondary mt-1 text-sm">{message}</p>
-      {onRetry ? (
-        <div className="mt-4">
-          <Button variant="outline" size="sm" onClick={onRetry}>
-            Try Again
-          </Button>
+      {onRetry || action ? (
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          {action}
+          {onRetry ? (
+            <Button variant="outline" size="sm" onClick={onRetry}>
+              Try Again
+            </Button>
+          ) : null}
         </div>
       ) : null}
     </div>

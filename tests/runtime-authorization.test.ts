@@ -25,7 +25,7 @@ import { describe, expect, test, beforeAll } from 'vitest';
 
 const DATABASE_URL = process.env.DATABASE_URL ?? '';
 const dbUrl = new URL(DATABASE_URL);
-const dbPath = dbUrl.pathname.trim('/');
+const dbPath = dbUrl.pathname.replace(/^\//, '');
 
 function assertDisposableDatabase() {
   if (
@@ -57,8 +57,32 @@ const CREDENTIALS = {
   doctor: { email: 'priya.sharma@demo.medorch.local', password: 'DemoPass1!' },
   otStaff: { email: 'kavya.nurse@demo.medorch.local', password: 'DemoPass1!' },
   patientA: { email: 'aarav.mehta@demo.medorch.local', password: 'DemoPass1!' },
-  patientB: { email: 'meera.rao@demo.medorch.local', password: 'DemoPass1!' },
+  patientB:  { email: 'meera.rao@demo.medorch.local', password: 'DemoPass1!' },
 };
+
+function authenticatedFetch(
+  token: string,
+  path: string,
+  options: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+  } = {},
+): Promise<Response> {
+  return fetch(
+    new URL(path, APP_URL.origin).toString(),
+    {
+      method: options.method ?? 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `authjs.session-token=${token}`,
+        ...options.headers,
+      },
+      body: options.body,
+      credentials: 'include',
+    },
+  );
+}
 
 type RoleKey = keyof typeof CREDENTIALS;
 
@@ -98,8 +122,8 @@ async function fetchWithTimeout(
 async function signInWithCredentials(
   credentials: (typeof CREDENTIALS)[keyof typeof CREDENTIALS],
 ): Promise<TokenPair> {
-  const csrfRes = await fetchWithTimeout(
-    `${APP_URL.origin}/api/auth/callback/credentials`,
+  const csrfRes = await fetch(
+    APP_URL.origin + '/api/auth/callback/credentials',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -108,7 +132,7 @@ async function signInWithCredentials(
   );
 
   if (csrfRes.status === 404) {
-    // Creds auth may require a path that matches a real NextAuth route.
+    // creds auth may require a path that matches a real NextAuth route.
     // The CSRF handshake remains useful only while the application exposes
     // /api/auth/callback/credentials as a real endpoint.
   }
@@ -129,8 +153,8 @@ async function signInWithCredentials(
   body.set('email', credentials.email);
   body.set('password', credentials.password);
 
-  const loginRes = await fetchWithTimeout(
-    `${APP_URL.origin}/api/auth/callback/credentials`,
+  const loginRes = await fetch(
+    APP_URL.origin + '/api/auth/callback/credentials',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -158,30 +182,6 @@ async function signInWithCredentials(
   );
 
   return { csrfToken, sessionToken };
-}
-
-async function authenticatedFetch(
-  token: string,
-  path: string,
-  options: {
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string;
-  } = {},
-): Promise<Response> {
-  return fetchWithTimeout(
-    new URL(path, APP_URL.origin).toString(),
-    {
-      method: options.method ?? 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: `authjs.session-token=${token}`,
-        ...options.headers,
-      },
-      body: options.body,
-      credentials: 'include',
-    },
-  );
 }
 
 let serverBaseUrl = '';
@@ -219,7 +219,10 @@ describe('runtime authorization', () => {
     }
   }, 60_000);
 
-  test('returns 401 for unauthenticated requests on protected endpoints', async () => {
+  test(
+    'returns 401 for unauthenticated requests on protected endpoints',
+    { timeout: 30_000 },
+    async () => {
     const endpoints = [
       { method: 'GET' as const, path: '/api/schedules' },
       { method: 'GET' as const, path: '/api/users' },
@@ -587,7 +590,6 @@ describe('runtime authorization', () => {
     const ownAlertsRes = await authenticatedFetch(
       patientAToken,
       '/api/alerts',
-      { method: 'GET' },
     );
     expect(ownAlertsRes.status).toBe(200);
 

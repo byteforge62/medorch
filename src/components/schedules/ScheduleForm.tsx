@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { apiClient, ApiClientError } from "@/lib/api/client";
-import { Button } from "@/components/ui/Button";
-import { ScheduleItem } from "./ScheduleCard";
-import { SchedulePriority } from "./ScheduleStatusBadge";
+import React, { useState } from 'react';
+import { apiClient, ApiClientError } from '@/lib/api/client';
+import { Button } from '@/components/ui/Button';
+import { ScheduleItem } from './ScheduleCard';
+import { SchedulePriority } from './ScheduleStatusBadge';
 
 export interface PatientOption {
   id: string;
@@ -59,44 +59,44 @@ export function ScheduleForm({
 }: ScheduleFormProps) {
   const isEditing = Boolean(initialSchedule?.id);
 
-  const [patientId, setPatientId] = useState(() => initialSchedule?.patientId || "");
-  const [departmentId, setDepartmentId] = useState(() => initialSchedule?.departmentId || "");
-  const [otRoomId, setOtRoomId] = useState(() => initialSchedule?.otRoomId || "");
-  const [surgeonId, setSurgeonId] = useState(() => initialSchedule?.surgeonId || "");
-  const [procedure, setProcedure] = useState(() => initialSchedule?.procedure || "");
-  const [priority, setPriority] = useState<SchedulePriority>(() => initialSchedule?.priority || "ELECTIVE");
-  const [clinicalNotes, setClinicalNotes] = useState(() => initialSchedule?.clinicalNotes || "");
+  const [patientId, setPatientId] = useState(() => initialSchedule?.patientId ?? '');
+  const [departmentId, setDepartmentId] = useState(() => initialSchedule?.departmentId ?? '');
+  const [otRoomId, setOtRoomId] = useState(() => initialSchedule?.otRoomId ?? '');
+  const [surgeonId, setSurgeonId] = useState(() => initialSchedule?.surgeonId ?? '');
+  const [procedure, setProcedure] = useState(() => initialSchedule?.procedure ?? '');
+  const [priority, setPriority] = useState<SchedulePriority>(() => initialSchedule?.priority ?? 'ELECTIVE');
+  const [clinicalNotes, setClinicalNotes] = useState(() => initialSchedule?.clinicalNotes ?? '');
 
   const [scheduledDate, setScheduledDate] = useState(() => {
     if (!initialSchedule?.scheduledDate) {
-      return new Date().toISOString().split("T")[0];
+      return new Date().toISOString().slice(0, 10);
     }
     try {
-      return new Date(initialSchedule.scheduledDate).toISOString().split("T")[0];
+      return new Date(initialSchedule.scheduledDate).toISOString().slice(0, 10);
     } catch {
-      return "";
+      return '';
     }
   });
 
   const [startTime, setStartTime] = useState(() => {
     if (!initialSchedule?.startTime) {
-      return "09:00";
+      return '09:00';
     }
     try {
-      return new Date(initialSchedule.startTime).toTimeString().split(" ")[0].substring(0, 5);
+      return new Date(initialSchedule.startTime).toTimeString().slice(0, 5);
     } catch {
-      return "";
+      return '';
     }
   });
 
   const [endTime, setEndTime] = useState(() => {
     if (!initialSchedule?.endTime) {
-      return "10:00";
+      return '10:00';
     }
     try {
-      return new Date(initialSchedule.endTime).toTimeString().split(" ")[0].substring(0, 5);
+      return new Date(initialSchedule.endTime).toTimeString().slice(0, 5);
     } catch {
-      return "";
+      return '';
     }
   });
 
@@ -115,7 +115,7 @@ export function ScheduleForm({
     if (newDeptId && otRoomId) {
       const room = otRooms.find((r) => r.id === otRoomId);
       if (room && room.departmentId !== newDeptId) {
-        setOtRoomId("");
+        setOtRoomId('');
       }
     }
   };
@@ -125,27 +125,27 @@ export function ScheduleForm({
     setError(null);
 
     if (!patientId) {
-      setError("Please select a patient.");
+      setError('Please select a patient.');
       return;
     }
     if (!departmentId) {
-      setError("Please select a department.");
+      setError('Please select a department.');
       return;
     }
     if (!otRoomId) {
-      setError("Please select an OT room.");
+      setError('Please select an OT room.');
       return;
     }
     if (!surgeonId) {
-      setError("Please select a surgeon.");
+      setError('Please select a surgeon.');
       return;
     }
     if (!procedure.trim()) {
-      setError("Please enter procedure name.");
+      setError('Please enter procedure name.');
       return;
     }
     if (!scheduledDate || !startTime || !endTime) {
-      setError("Please specify scheduled date, start time, and end time.");
+      setError('Please specify scheduled date, start time, and end time.');
       return;
     }
 
@@ -153,7 +153,7 @@ export function ScheduleForm({
     const endDateTime = new Date(`${scheduledDate}T${endTime}:00`);
 
     if (endDateTime <= startDateTime) {
-      setError("End time must be after start time.");
+      setError('End time must be after start time.');
       return;
     }
 
@@ -179,19 +179,19 @@ export function ScheduleForm({
       if (isEditing && initialSchedule) {
         await apiClient.patch(`/api/schedules/${initialSchedule.id}`, payload);
       } else {
-        await apiClient.post("/api/schedules", payload);
+        await apiClient.post('/api/schedules', payload);
       }
 
       onSuccess();
       onClose();
     } catch (err) {
-      console.error("Failed to save schedule:", err);
+      console.error('Failed to save schedule:', err);
       if (err instanceof ApiClientError) {
         setError(err.message);
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unexpected error occurred while saving the schedule.");
+        setError('An unexpected error occurred while saving the schedule.');
       }
     } finally {
       setIsSubmitting(false);
@@ -200,16 +200,16 @@ export function ScheduleForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-2xl border border-border-strong bg-surface p-6 shadow-xl my-8">
+      <div className="w-full max-w-2xl rounded-2xl border border-border-strong bg-surface p-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
             <h3 className="text-lg font-semibold text-foreground">
-              {isEditing ? "Edit Surgery Schedule" : "Create Surgery Schedule"}
+              {isEditing ? 'Edit schedule' : 'Create schedule'}
             </h3>
             <p className="mt-1 text-sm text-foreground-muted">
               {isEditing
-                ? "Update surgical procedure details and assignments."
-                : "Schedule a new surgical operation in an available OT room."}
+                ? 'Update the procedure, date, time, and assignments.'
+                : 'Schedule a new surgical procedure in an available theatre.'}
             </p>
           </div>
           <button
@@ -222,59 +222,66 @@ export function ScheduleForm({
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg bg-danger-soft border border-danger-border p-3 text-sm font-medium text-danger">
+          <div
+            className="mt-4 rounded-lg border border-danger-border bg-danger-soft p-3 text-sm font-medium text-danger"
+            role="alert"
+          >
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          {/* Procedure Name */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">
-              Procedure Name *
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold text-foreground">
+              Procedure {isEditing ? 'update' : 'details'}
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. Laparoscopic Cholecystectomy"
+              placeholder="e.g. Laparoscopic cholecystectomy"
               value={procedure}
               onChange={(e) => setProcedure(e.target.value)}
-              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground placeholder-foreground-muted px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Patient Select */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                Patient *
+              <label className="block text-xs font-semibold text-foreground">
+                Patient {isEditing ? 'update' : 'details'}
               </label>
-            <select
-              required
-              value={patientId}
-              onChange={(e) => setPatientId(e.target.value)}
-              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-                <option value="">Select Patient</option>
+              <select
+                required
+                value={patientId}
+                onChange={(e) => setPatientId(e.target.value)}
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <option value="">Select patient</option>
                 {patients.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} {p.patientCode ? `(${p.patientCode})` : ""}
+                    {p.name}{' '}
+                    {p.patientCode ? `(${p.patientCode})` : ''}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Surgeon Select */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                Surgeon / Doctor *
-              </label>            <select required value={surgeonId} onChange={(e) => setSurgeonId(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-                <option value="">Select Surgeon</option>
+              <label className="block text-xs font-semibold text-foreground">
+                Surgeon {isEditing ? 'update' : 'details'}
+              </label>
+              <select
+                required
+                value={surgeonId}
+                onChange={(e) => setSurgeonId(e.target.value)}
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <option value="">Select surgeon</option>
                 {doctors.map((doc) => {
-                  const targetUserId = doc.user?.id || doc.userId;
+                  const targetUserId = doc.user?.id ?? doc.userId;
                   return (
                     <option key={doc.id} value={targetUserId}>
-                      {doc.user?.name || "Doctor"}
+                      {doc.user?.name ?? 'Doctor'}
                     </option>
                   );
                 })}
@@ -283,12 +290,17 @@ export function ScheduleForm({
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Department Select */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                Department *
-              </label>            <select required value={departmentId} onChange={(e) => handleDepartmentChange(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-                <option value="">Select Department</option>
+              <label className="block text-xs font-semibold text-foreground">
+                Department {isEditing ? 'update' : 'details'}
+              </label>
+              <select
+                required
+                value={departmentId}
+                onChange={(e) => handleDepartmentChange(e.target.value)}
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <option value="">Select department</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -297,15 +309,22 @@ export function ScheduleForm({
               </select>
             </div>
 
-            {/* OT Room Select */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                OT Room *
-              </label>            <select required value={otRoomId} onChange={(e) => setOtRoomId(e.target.value)} className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-                <option value="">Select OT Room</option>
+              <label className="block text-xs font-semibold text-foreground">
+                OT room {isEditing ? 'update' : 'details'}
+              </label>
+              <select
+                required
+                value={otRoomId}
+                onChange={(e) => setOtRoomId(e.target.value)}
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                disabled={isSubmitting || availableOtRooms.length === 0}
+              >
+                <option value="">Select OT room</option>
                 {availableOtRooms.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name} {r.code ? `[${r.code}]` : ""}
+                    {r.name}{' '}
+                    {r.code ? `[${r.code}]` : ''}
                   </option>
                 ))}
               </select>
@@ -313,58 +332,54 @@ export function ScheduleForm({
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Scheduled Date */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                Scheduled Date *
+              <label className="block text-xs font-semibold text-foreground">
+                Scheduled date {isEditing ? 'update' : 'details'}
               </label>
               <input
                 type="date"
                 required
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
 
-            {/* Start Time */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                Start Time *
+              <label className="block text-xs font-semibold text-foreground">
+                Start time {isEditing ? 'update' : 'details'}
               </label>
               <input
                 type="time"
                 required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
 
-            {/* End Time */}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
-                End Time *
+              <label className="block text-xs font-semibold text-foreground">
+                End time {isEditing ? 'update' : 'details'}
               </label>
               <input
                 type="time"
                 required
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
             </div>
           </div>
 
-          {/* Priority */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold text-foreground">
               Priority
             </label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as SchedulePriority)}
-              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <option value="ELECTIVE">Elective</option>
               <option value="URGENT">Urgent</option>
@@ -372,32 +387,30 @@ export function ScheduleForm({
             </select>
           </div>
 
-          {/* Clinical Notes */}
-          <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">
-              Clinical Notes
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold text-foreground">
+              Clinical notes
             </label>
             <textarea
               rows={3}
               placeholder="Additional medical instructions, precautions, or procedure notes..."
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              className="block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground placeholder-foreground-muted px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             />
           </div>
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {isEditing ? 'Cancel changes' : 'Cancel'}
             </Button>
             <Button type="submit" isLoading={isSubmitting}>
-              {isEditing ? "Save Changes" : "Create Schedule"}
+              {isEditing ? 'Save changes' : 'Create schedule'}
             </Button>
           </div>
         </form>

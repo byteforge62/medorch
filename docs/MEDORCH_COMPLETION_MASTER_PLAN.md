@@ -622,7 +622,10 @@ After each batch: `npx tsc --noEmit`, `npm run lint`, `npm run test:accessibilit
 
 **Next task:** Phase 6 batch 4 — schedules family + DOCTOR: `ScheduleForm`/`ScheduleFilters`/`ScheduleCalendar`/`ScheduleCard`/`SchedulePage`/`ScheduleDetails` and the doctor dashboard (the last files with raw slate/blue classes and dead `dark:` variants), then batch 5 (OT_STAFF + PATIENT) and batch 6 (responsive/a11y sweep + full verification incl. `test:runtime` and the production build). Security-track follow-ups (Phase B account-lifecycle token tests, remaining Phase H abuse cases, the `NEXTAUTH_URL`/dev-port mismatch, P3 heading-level skips, wiring `patient-approval-concurrency.test.ts` into a package script) remain in the backlog above and are unchanged by this phase.
 
-**Resume instructions:**
+**Resume instructions:
+
+Current status (restart diagnosis): `git status --short` shows the working tree is not empty. The actively modified files for Batch 4 are the schedule family and doctor dashboard already on disk (`SchedulePage`, `ScheduleFilters`, `ScheduleForm`, `ScheduleStatusActions`, `ScheduleCalendar`, `ScheduleCard`, `ScheduleDetails`, `DoctorDashboard`). Raw-Tailwind remnants have been confirmed absent from the project (`border-slate-200`, `bg-slate-900`, `text-slate-900`, and similar return 0 matches across `src`). The remaining Batch 4 work is therefore finish-level polish on those already-edited screens and then the OT Staff and Patient screens, not a ground-up re-edit of the schedule files. The 14 modified files in `src/app/schedules`, `src/components/schedules`, `src/components/dashboard`, `src/app/doctors`, and `src/app/patients` are the current batch's real diff, and the runtime authorization test (`tests/runtime-authorization.test.ts`) was also touched in the earlier Phase 5 checkpoint and must be preserved.
+**
 
 1. Read this tracker, especially [Security and privacy checklist](#security-and-privacy-checklist), [Findings](#findings-and-prioritized-backlog), and [Role-by-role permissions and workflows](#role-by-role-permissions-and-workflows).
 2. Doctor schedule-write policy and backlog approval are recorded: Doctors may update/status any schedule; the user approved proceeding phase-by-phase.

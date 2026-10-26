@@ -76,31 +76,77 @@ function formatLabel(value: string) {
   return value.replaceAll('_', ' ');
 }
 
-function StatusBadge({ status }: { status: ScheduleStatus }) {
+interface StatusBadgeProps {
+  status: ScheduleStatus;
+  className?: string;
+}
+
+function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   switch (status) {
     case 'IN_PROGRESS':
-      return <Badge variant="warning">In Progress</Badge>;
+      return (
+        <Badge variant="warning" className={className}>
+          In Progress
+        </Badge>
+      );
     case 'CONFIRMED':
-      return <Badge variant="info">Confirmed</Badge>;
+      return (
+        <Badge variant="info" className={className}>
+          Confirmed
+        </Badge>
+      );
     case 'COMPLETED':
-      return <Badge variant="success">Completed</Badge>;
+      return (
+        <Badge variant="success" className={className}>
+          Completed
+        </Badge>
+      );
     case 'CANCELLED':
-      return <Badge variant="danger">Cancelled</Badge>;
+      return (
+        <Badge variant="danger" className={className}>
+          Cancelled
+        </Badge>
+      );
     case 'DELAYED':
-      return <Badge variant="warning">Delayed</Badge>;
+      return (
+        <Badge variant="warning" className={className}>
+          Delayed
+        </Badge>
+      );
     default:
-      return <Badge variant="neutral">Scheduled</Badge>;
+      return (
+        <Badge variant="neutral" className={className}>
+          Scheduled
+        </Badge>
+      );
   }
 }
 
-function PriorityBadge({ priority }: { priority: SchedulePriority }) {
+interface PriorityBadgeProps {
+  priority: SchedulePriority;
+  className?: string;
+}
+
+function PriorityBadge({ priority, className = '' }: PriorityBadgeProps) {
   switch (priority) {
     case 'EMERGENCY':
-      return <Badge variant="danger">Emergency</Badge>;
+      return (
+        <Badge variant="danger" className={className}>
+          Emergency
+        </Badge>
+      );
     case 'URGENT':
-      return <Badge variant="warning">Urgent</Badge>;
+      return (
+        <Badge variant="warning" className={className}>
+          Urgent
+        </Badge>
+      );
     default:
-      return <Badge variant="neutral">Elective</Badge>;
+      return (
+        <Badge variant="neutral" className={className}>
+          Elective
+        </Badge>
+      );
   }
 }
 
@@ -170,49 +216,51 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
     {
       label: 'Total assignments',
       value: assignments.length,
+      description: 'Assigned procedures',
     },
     {
       label: 'Open assignments',
       value: openAssignments.length,
+      description: 'Not finished or cancelled',
     },
     {
       label: 'In progress',
       value: inProgressCount,
+      description: 'Operating now',
     },
     {
       label: 'Urgent or emergency',
       value: highPriorityCount,
+      description: 'Priority cases',
     },
   ];
 
   const sortedAssignments = [...assignments].sort(
-    (a, b) =>
-      Date.parse(a.schedule.startTime) - Date.parse(b.schedule.startTime),
+    (a, b) => Date.parse(a.schedule.startTime) - Date.parse(b.schedule.startTime),
   );
 
   return (
     <main className="space-y-6">
-      <header className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
+      <header className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-border-strong bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">
+          <p className="text-xs font-semibold uppercase tracking-wider text-foreground-subtle">
             Operating theatre workspace
           </p>
 
-          <h1 className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="mt-2 text-2xl font-bold text-foreground">
             Welcome, {userName}
           </h1>
 
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-foreground-secondary">
             Review your assigned procedures, responsibilities, and theatre
             schedules.
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 px-4 py-3 dark:border-slate-700">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Your assigned procedures
-          </p>
-          <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+        <div className="shrink-0 rounded-[var(--radius-xl)] border border-border-strong bg-surface-muted p-4">
+          <p className="text-xs text-foreground-muted">Assigned procedures</p>
+
+          <p className="mt-1 tabular-nums text-3xl font-bold text-foreground">
             {assignments.length}
           </p>
         </div>
@@ -220,15 +268,18 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
 
       <section
         aria-label="Assignment summary"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        className="grid grid-cols-2 gap-4 sm:grid-cols-4"
       >
         {metrics.map((metric) => (
-          <Card key={metric.label}>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {metric.label}
-            </p>
-            <p className="mt-3 text-3xl font-bold text-slate-900 dark:text-white">
+          <Card key={metric.label} className="p-4">
+            <p className="text-xs text-foreground-muted">{metric.label}</p>
+
+            <p className="mt-2 tabular-nums text-2xl font-bold text-foreground">
               {metric.value}
+            </p>
+
+            <p className="mt-0.5 text-[11px] text-foreground-subtle">
+              {metric.description}
             </p>
           </Card>
         ))}
@@ -236,10 +287,9 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            My procedure assignments
-          </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <h2 className="text-lg font-bold text-foreground">My procedure assignments</h2>
+
+          <p className="mt-1 text-sm text-foreground-secondary">
             Procedures linked to your staff account, including completed
             assignments.
           </p>
@@ -248,85 +298,79 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
         {sortedAssignments.length === 0 ? (
           <EmptyState
             title="No assignments found"
-            description="Procedures assigned to your staff account will appear here."
+            description="Procedures assigned to your staff account will appear here when available."
           />
         ) : (
           <div className="space-y-3">
             {sortedAssignments.map(({ id, role, schedule }) => (
-              <Card key={id}>
-                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                  <div className="space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-slate-900 dark:text-white">
-                        {schedule.procedure}
-                      </h3>
+              <Card key={id} className="p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-foreground">
+                      {schedule.procedure}
+                    </h3>
 
-                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        {schedule.department.name} · {schedule.otRoom.name}
-                      </p>
-                    </div>
+                    <p className="mt-1 text-sm text-foreground-secondary">
+                      {schedule.department.name} · {schedule.otRoom.name}
+                    </p>
 
-                    <div className="grid gap-3 text-sm sm:grid-cols-2">
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Patient
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                    <dl className="mt-3 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
+                      <div className="grid gap-1">
+                        <dt className="text-xs text-foreground-muted">Patient</dt>
+
+                        <dd className="font-medium text-foreground">
                           {schedule.patient.name}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        </dd>
+
+                        <dd className="text-xs text-foreground-muted">
                           {schedule.patient.patientCode}
-                        </p>
+                        </dd>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Your assignment
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                      <div className="grid gap-1">
+                        <dt className="text-xs text-foreground-muted">Your assignment</dt>
+
+                        <dd className="font-medium text-foreground">
                           {formatLabel(role)}
-                        </p>
+                        </dd>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Scheduled date
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                      <div className="grid gap-1">
+                        <dt className="text-xs text-foreground-muted">Scheduled date</dt>
+
+                        <dd className="font-medium text-foreground">
                           {formatDate(schedule.scheduledDate)}
-                        </p>
+                        </dd>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Procedure time
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                      <div className="grid gap-1">
+                        <dt className="text-xs text-foreground-muted">Procedure time</dt>
+
+                        <dd className="font-medium text-foreground">
                           {formatTime(schedule.startTime)} –{' '}
                           {formatTime(schedule.endTime)}
-                        </p>
+                        </dd>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Theatre code
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                      <div className="grid gap-1">
+                        <dt className="text-xs text-foreground-muted">Theatre code</dt>
+
+                        <dd className="font-medium text-foreground">
                           {schedule.otRoom.code}
-                        </p>
+                        </dd>
                       </div>
-                    </div>
+                    </dl>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <PriorityBadge priority={schedule.priority} />
                     <StatusBadge status={schedule.status} />
 
                     <Link
                       href={`/schedules/${schedule.id}`}
-                      className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+                      className="text-sm font-semibold text-primary underline-offset-2 hover:underlinefocus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
-                      View Schedule →
+                      View schedule →
                     </Link>
                   </div>
                 </div>

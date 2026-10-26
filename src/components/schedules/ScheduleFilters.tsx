@@ -15,7 +15,12 @@ interface ScheduleFiltersProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
   departments: { id: string; name: string }[];
-  otRooms: { id: string; name: string; code?: string }[];
+  otRooms: {
+    id: string;
+    name: string;
+    code?: string;
+    departmentId?: string;
+  }[];
   onReset: () => void;
 }
 
@@ -41,17 +46,21 @@ export function ScheduleFilters({
     "mb-1.5 block text-xs font-medium text-foreground-muted";
 
   const controlClassName =
-    "block min-h-10 w-full min-w-0 rounded-lg border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+    "block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+
+  const availableRoomsCount = otRooms.filter(
+    (room) => !filters.departmentId || room.departmentId === filters.departmentId,
+  ).length;
 
   return (
     <section
       aria-label="Filter schedules"
-      className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:p-5"
+      className="min-w-0 space-y-4 rounded-xl border border-border bg-surface p-4 sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-foreground-subtle">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-foreground-subtle">
           Filter Schedules
-        </h4>
+        </h2>
 
         {hasActiveFilters && (
           <button
@@ -59,26 +68,12 @@ export function ScheduleFilters({
             onClick={onReset}
             className="rounded-md text-xs font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            Clear all filters
+            Reset filters
           </button>
         )}
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-        <div className="min-w-0 xl:col-span-2">
-          <label htmlFor="schedule-search" className={labelClassName}>
-            Search procedures
-          </label>
-          <input
-            id="schedule-search"
-            type="search"
-            placeholder="Procedure, patient, surgeon..."
-            value={filters.search}
-            onChange={(e) => handleChange("search", e.target.value)}
-            className={controlClassName}
-          />
-        </div>
-
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0">
           <label htmlFor="schedule-status" className={labelClassName}>
             Status
@@ -89,7 +84,7 @@ export function ScheduleFilters({
             onChange={(e) => handleChange("status", e.target.value)}
             className={controlClassName}
           >
-            <option value="">All Statuses</option>
+            <option value="">All statuses</option>
             <option value="SCHEDULED">Scheduled</option>
             <option value="CONFIRMED">Confirmed</option>
             <option value="IN_PROGRESS">In Progress</option>
@@ -109,13 +104,15 @@ export function ScheduleFilters({
             onChange={(e) => handleChange("priority", e.target.value)}
             className={controlClassName}
           >
-            <option value="">All Priorities</option>
+            <option value="">All priorities</option>
             <option value="ELECTIVE">Elective</option>
             <option value="URGENT">Urgent</option>
             <option value="EMERGENCY">Emergency</option>
           </select>
         </div>
+      </div>
 
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0">
           <label htmlFor="schedule-date" className={labelClassName}>
             Date
@@ -147,26 +144,38 @@ export function ScheduleFilters({
             ))}
           </select>
         </div>
+      </div>
 
-        <div className="min-w-0">
-          <label htmlFor="schedule-room" className={labelClassName}>
-            OT Room
-          </label>
-          <select
-            id="schedule-room"
-            value={filters.otRoomId}
-            onChange={(e) => handleChange("otRoomId", e.target.value)}
-            className={controlClassName}
-          >
-            <option value="">All OT Rooms</option>
-            {otRooms.map((room) => (
+      <div className="min-w-0">
+        <label htmlFor="schedule-room" className={labelClassName}>
+          OT Room
+        </label>
+        <select
+          id="schedule-room"
+          value={filters.otRoomId}
+          onChange={(e) => handleChange("otRoomId", e.target.value)}
+          className={controlClassName}
+        >
+          <option value="">All OT Rooms</option>
+          {otRooms
+            .filter(
+              (room) =>
+                !filters.departmentId || room.departmentId === filters.departmentId,
+            )
+            .map((room) => (
               <option key={room.id} value={room.id}>
-                {room.name} {room.code ? `(${room.code})` : ""}
+                {room.name}
+                {room.code ? ` (${room.code})` : ''}
               </option>
             ))}
-          </select>
-        </div>
+        </select>
       </div>
+
+      {availableRoomsCount === 0 && filters.departmentId !== '' && (
+        <p className="text-sm text-danger">
+          No OT rooms available for the selected department.
+        </p>
+      )}
     </section>
   );
 }

@@ -147,11 +147,11 @@ export function ScheduleCalendar({
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-foreground">
             {formatMonth(visibleMonth)}
           </h2>
 
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-foreground-muted">
             Procedures are arranged by scheduled date and start time.
           </p>
         </div>
@@ -163,7 +163,7 @@ export function ScheduleCalendar({
               setVisibleMonth(new Date(Date.UTC(year, month - 1, 1)))
             }
             aria-label="Previous month"
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            className="rounded-md border border-border-strong px-3 py-2 text-sm hover:bg-surface-hoverfocus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             ←
           </button>
@@ -177,7 +177,7 @@ export function ScheduleCalendar({
                 new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
               );
             }}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            className="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-surface-hover"
           >
             Today
           </button>
@@ -188,7 +188,7 @@ export function ScheduleCalendar({
               setVisibleMonth(new Date(Date.UTC(year, month + 1, 1)))
             }
             aria-label="Next month"
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            className="rounded-md border border-border-strong px-3 py-2 text-sm hover:bg-surface-hoverfocus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             →
           </button>
@@ -197,25 +197,25 @@ export function ScheduleCalendar({
 
       <div className="overflow-x-auto rounded-xl">
         <div className="min-w-[980px]">
-          <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
+          <div className="grid grid-cols-7 border-b border-border bg-surface-muted">
             {WEEKDAYS.map((weekday) => (
               <div
                 key={weekday}
-                className="px-3 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400"
+                className="px-3 py-3 text-center text-xs font-semibold text-foreground-muted"
               >
                 {weekday}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-px border border-slate-200 bg-slate-200 dark:border-slate-700 dark:bg-slate-700">
+          <div className="grid grid-cols-7 gap-px border border-border bg-border">
             {cells.map((cell) => {
               if (cell.day === null) {
                 return (
                   <div
                     key={cell.key}
                     aria-hidden="true"
-                    className="min-h-36 bg-slate-50/70 dark:bg-slate-900/50"
+                    className="min-h-36 bg-surface-subtle"
                   />
                 );
               }
@@ -225,23 +225,22 @@ export function ScheduleCalendar({
               return (
                 <div
                   key={cell.key}
-                  className="min-h-36 bg-white p-2 dark:bg-slate-950"
+                  className="min-h-36 bg-surface p-2"
                 >
-                  <div className="mb-2 flex items-center justify-between">
+                  <div className="mb-2 flex items-center justify-between gap-2">
                     <span
                       className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
                         cell.dateKey === todayKey
-                          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                          : 'text-slate-700 dark:text-slate-300'
+                          ? 'bg-primary text-foreground-inverse'
+                          : 'text-foreground-secondary'
                       }`}
                     >
                       {cell.day}
                     </span>
 
                     {daySchedules.length > 0 && (
-                      <span className="text-[10px] text-slate-500">
-                        {daySchedules.length}{' '}
-                        {daySchedules.length === 1 ? 'case' : 'cases'}
+                      <span className="text-[10px] font-medium text-foreground-subtle">
+                        {daySchedules.length} {daySchedules.length === 1 ? 'case' : 'cases'}
                       </span>
                     )}
                   </div>
@@ -252,22 +251,22 @@ export function ScheduleCalendar({
                         key={schedule.id}
                         href={`/schedules/${schedule.id}`}
                         title={`${schedule.procedure} — ${schedule.surgeon?.name || 'Unassigned'}`}
-                        className="block space-y-1.5 rounded-md border border-slate-200 bg-slate-50 p-2 text-xs transition hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                        className="block space-y-1.5 rounded-md border border-border p-2 text-xs transition-colors hover:border-border-strong hover:bg-surface-hover"
                       >
-                        <p className="line-clamp-2 font-semibold text-slate-800 dark:text-slate-100">
+                        <p className="line-clamp-2 font-semibold text-foreground">
                           {schedule.procedure}
                         </p>
 
-                        <p className="font-mono text-slate-500 dark:text-slate-400">
+                        <p className="font-mono text-foreground-muted">
                           {formatTime(schedule.startTime)} –{' '}
                           {formatTime(schedule.endTime)}
                         </p>
 
-                        <p className="truncate text-slate-600 dark:text-slate-300">
+                        <p className="truncate text-foreground-secondary">
                           {schedule.surgeon?.name || 'Unassigned'}
                         </p>
 
-                        <p className="truncate text-slate-500 dark:text-slate-400">
+                        <p className="truncate text-foreground-muted">
                           OT: {schedule.otRoom?.name || 'Unassigned'}
                         </p>
 
@@ -279,7 +278,7 @@ export function ScheduleCalendar({
                     ))}
 
                     {daySchedules.length > 3 && (
-                      <p className="px-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                      <p className="px-1 text-xs font-medium text-foreground-muted">
                         +{daySchedules.length - 3} more · See list view
                       </p>
                     )}
@@ -292,9 +291,9 @@ export function ScheduleCalendar({
       </div>
 
       {schedules.length === 0 && (
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          No schedules match the current filters. Use the filters or navigate to
-          another month to explore the calendar.
+        <p className="text-sm text-foreground-muted">
+          No schedules match the current filters. Adjust the filters or navigate
+          to another month to explore the calendar.
         </p>
       )}
     </section>

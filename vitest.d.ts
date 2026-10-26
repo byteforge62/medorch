@@ -12,8 +12,14 @@
 declare module 'vitest' {
   export function afterAll(callback: () => void | Promise<void>): void;
   export function afterEach(callback: () => void | Promise<void>): void;
-  export function beforeAll(callback: () => void | Promise<void>): void;
-  export function beforeEach(callback: () => void | Promise<void>): void;
+  export function beforeAll(
+    callback: () => void | Promise<void>,
+    timeout?: number,
+  ): void;
+  export function beforeEach(
+    callback: () => void | Promise<void>,
+    timeout?: number,
+  ): void;
   export function describe(description: string, callback: () => void): void;
   export function expect<T>(value: T): {
     toBe(expected: T): void;
@@ -27,6 +33,20 @@ declare module 'vitest' {
     toHaveLength(length: number): void;
     toMatchObject(expected: T): void;
     toStrictEqual(expected: T): void;
+    toBeGreaterThan(expected: number): void;
+    toBeGreaterThanOrEqual(expected: number): void;
+    toBeLessThan(expected: number): void;
+    toBeInstanceOf(constructor: unknown): void;
+    toHaveProperty(key: string, value?: unknown): void;
+    not: {
+      toBe(expected: T): void;
+      toEqual(expected: T): void;
+      toContain(item: unknown): void;
+      toBeNull(): void;
+      toBeTruthy(): void;
+      toBeFalsy(): void;
+      [key: string]: unknown;
+    };
     [key: string]: unknown;
   };
   export function expectTypeOf<T>(value: T): {
@@ -34,10 +54,15 @@ declare module 'vitest' {
     [key: string]: unknown;
   };
   export function test(description: string, callback: () => void | Promise<void>): void;
+  export function test(
+    description: string,
+    options: { timeout?: number },
+    callback: () => void | Promise<void>,
+  ): void;
   export function test(callback: () => void | Promise<void>): void;
-  export function test<TData>(callback: (data: TData) => void | Promise<void>,_options?: { data: TData }): void;
+  export function test<TData>(callback: (data: TData) => void | Promise<void>, options?: { data: TData }): void;
   export const vi: {
-    mock<T extends (...args: any[]) => any>(fn: T): T;
+    mock<T extends (...args: never[]) => unknown>(fn: T): T;
     clearAllMocks(): void;
     resetAllMocks(): void;
     restoreAllMocks(): void;

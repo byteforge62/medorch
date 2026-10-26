@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
-    <main>
-      <p>Loading MedOrch</p>
+    <main className="flex min-h-screen items-center justify-center px-6 py-12">
+      <p className="text-foreground-secondary">Loading MedOrch</p>
     </main>
   );
 }

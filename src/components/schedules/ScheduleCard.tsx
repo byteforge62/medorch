@@ -32,7 +32,6 @@ export type ScheduleItem = {
     id: string;
     patientCode?: string;
     name: string;
-    phone?: string;
   };
   department?: {
     id: string;
@@ -63,7 +62,7 @@ interface ScheduleCardProps {
 }
 
 const formatDate = (dateStr: string): string => {
-  if (!dateStr) return "Date unavailable";
+  if (!dateStr) return 'Date unavailable';
 
   const date = new Date(dateStr);
 
@@ -72,25 +71,24 @@ const formatDate = (dateStr: string): string => {
   }
 
   return date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
 };
 
 const formatTime = (timeStr: string): string => {
-  if (!timeStr) return "Time unavailable";
+  if (!timeStr) return 'Time unavailable';
 
   const date = new Date(timeStr);
 
   if (Number.isNaN(date.getTime())) {
-    // Preserve values already formatted as HH:mm or similar.
     return timeStr;
   }
 
   return date.toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: true,
   });
 };
@@ -102,104 +100,85 @@ export function ScheduleCard({
   onStatusUpdated,
 }: ScheduleCardProps) {
   return (
-    <Card className="transition-all hover:border-slate-300 dark:hover:border-slate-700">
+    <Card className="transition-colors hover:border-border-strong" data-card="schedule">
       <div className="space-y-4">
-        {/* Procedure header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="break-words text-base font-semibold text-slate-900 dark:text-slate-100">
-              {schedule.procedure}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="break-words text-base font-semibold text-foreground">
+                {schedule.procedure}
+              </h3>
+              <div className="flex flex-wrap gap-1">
+                <ScheduleStatusBadge status={schedule.status} />
+                <SchedulePriorityBadge priority={schedule.priority} />
+              </div>
+            </div>
 
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Scheduled for {formatDate(schedule.scheduledDate)}
+            <p className="mt-1 text-sm text-foreground-secondary">
+              {formatDate(schedule.scheduledDate)}
+              {' · '}
+              {formatTime(schedule.startTime)}–{formatTime(schedule.endTime)}
             </p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <ScheduleStatusBadge status={schedule.status} />
-            <SchedulePriorityBadge priority={schedule.priority} />
-          </div>
         </div>
 
-        {/* Schedule details */}
-        <div className="grid grid-cols-1 gap-4 border-t border-slate-100 pt-4 dark:border-slate-800 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Patient
-            </span>
-            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
-              {schedule.patient?.name || "Not assigned"}
-            </span>
-            {schedule.patient?.patientCode && (
-              <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
-                ID: {schedule.patient.patientCode}
-              </span>
-            )}
-          </div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-border pt-4 text-sm">
+          <dl className="min-w-0">
+            <div className="grid gap-0.5">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground-muted">Patient</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {schedule.patient?.name || 'Not assigned'}
+              </dd>
+              {schedule.patient?.patientCode && (
+                <dd className="text-xs text-foreground-muted font-mono">
+                  {schedule.patient.patientCode}
+                </dd>
+              )}
+            </div>
+          </dl>
 
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Surgeon
-            </span>
-            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
-              {schedule.surgeon?.name || "Not assigned"}
-            </span>
-          </div>
+          <dl className="min-w-0">
+            <div className="grid gap-0.5">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground-muted">Surgeon</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {schedule.surgeon?.name || 'Not assigned'}
+              </dd>
+            </div>
+          </dl>
 
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Department
-            </span>
-            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
-              {schedule.department?.name || "Not assigned"}
-            </span>
-          </div>
+          <dl className="min-w-0">
+            <div className="grid gap-0.5">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground-muted">Department</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {schedule.department?.name || 'Not assigned'}
+              </dd>
+            </div>
+          </dl>
 
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Operating room
-            </span>
-            <span className="mt-1 block break-words text-sm font-medium text-slate-900 dark:text-slate-100">
-              {schedule.otRoom?.name || "Not assigned"}
-              {schedule.otRoom?.code ? ` (${schedule.otRoom.code})` : ""}
-            </span>
-          </div>
-
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Start time
-            </span>
-            <span className="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">
-              {formatTime(schedule.startTime)}
-            </span>
-          </div>
-
-          <div className="min-w-0">
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              End time
-            </span>
-            <span className="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">
-              {formatTime(schedule.endTime)}
-            </span>
-          </div>
+          <dl className="min-w-0">
+            <div className="grid gap-0.5">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground-muted">Operating theatre</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {schedule.otRoom?.name || 'Not assigned'}
+                {schedule.otRoom?.code ? ` (${schedule.otRoom.code})` : ''}
+              </dd>
+            </div>
+          </dl>
         </div>
 
-        {/* Clinical notes, when available to this user */}
         {schedule.clinicalNotes && (
-          <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-900/50">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <div className="rounded-lg bg-surface-muted/60 border border-border p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-foreground-muted">
               Clinical notes
             </p>
-            <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-700 dark:text-slate-300">
+            <p className="mt-1 whitespace-pre-wrap break-words text-sm text-foreground-secondary">
               {schedule.clinicalNotes}
             </p>
           </div>
         )}
 
-        {/* Status transitions and schedule edits require schedules:manage. */}
         {canManageSchedules && onStatusUpdated && (
-          <div className="border-t border-slate-100 pt-3 dark:border-slate-800">
+          <div className="border-t border-border pt-3">
             <ScheduleStatusActions
               scheduleId={schedule.id}
               scheduleLabel={schedule.procedure}
@@ -212,12 +191,11 @@ export function ScheduleCard({
         )}
       </div>
 
-      {/* Card actions */}
-      <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
+      <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-border pt-3">
         <Link
           href={`/schedules/${schedule.id}`}
           aria-label={`View details for ${schedule.procedure}`}
-          className="inline-flex min-h-9 items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+          className="inline-flex min-h-9 items-center justify-center rounded-md border border-border-strong px-3 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-hover hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           View details
         </Link>

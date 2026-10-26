@@ -1,0 +1,89 @@
+
+> medorch@0.1.0 build
+> next build
+
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local, .env
+✓ Running next.config.ts took 347ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 24.4s
+  Running TypeScript ...
+  Finished TypeScript in 28.7s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/39) ...
+  Generating static pages using 7 workers (9/39) 
+  Generating static pages using 7 workers (19/39) 
+  Generating static pages using 7 workers (29/39) 
+✓ Generating static pages using 7 workers (39/39) in 3.4s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/alerts
+├ ƒ /api/alerts/[id]
+├ ƒ /api/alerts/[id]/read
+├ ƒ /api/alerts/read-all
+├ ƒ /api/audit
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/register
+├ ƒ /api/auth/resend-verification
+├ ƒ /api/auth/reset-password
+├ ƒ /api/auth/verify-email
+├ ƒ /api/departments
+├ ƒ /api/departments/[id]
+├ ƒ /api/doctors
+├ ƒ /api/doctors/[id]
+├ ƒ /api/doctors/[id]/status
+├ ƒ /api/equipment
+├ ƒ /api/equipment/[id]
+├ ƒ /api/equipment/[id]/status
+├ ƒ /api/me/appointments
+├ ƒ /api/me/schedules
+├ ƒ /api/me/staff-schedules
+├ ƒ /api/ot-rooms
+├ ƒ /api/ot-rooms/[id]
+├ ƒ /api/ot-rooms/[id]/active
+├ ƒ /api/ot-rooms/[id]/status
+├ ƒ /api/patients
+├ ƒ /api/patients/[id]
+├ ƒ /api/schedules
+├ ƒ /api/schedules/[id]
+├ ƒ /api/schedules/[id]/equipment
+├ ƒ /api/schedules/[id]/equipment/[equipmentId]
+├ ƒ /api/schedules/[id]/notes
+├ ƒ /api/schedules/[id]/notes/[noteId]
+├ ƒ /api/schedules/[id]/staff
+├ ƒ /api/schedules/[id]/staff/[staffId]
+├ ƒ /api/schedules/[id]/status
+├ ƒ /api/users
+├ ƒ /api/users/[id]
+├ ƒ /api/users/[id]/approve
+├ ƒ /audit
+├ ƒ /dashboard
+├ ƒ /departments
+├ ƒ /doctors
+├ ƒ /doctors/[id]
+├ ƒ /equipment
+├ ○ /forgot-password
+├ ○ /login
+├ ƒ /ot-rooms
+├ ƒ /patients
+├ ƒ /patients/[id]
+├ ƒ /patients/appointments
+├ ƒ /patients/appointments/[id]
+├ ○ /register
+├ ○ /resend-verification
+├ ○ /reset-password
+├ ƒ /schedules
+├ ƒ /schedules/[id]
+├ ○ /unauthorized
+├ ƒ /users
+└ ○ /verify-email
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
