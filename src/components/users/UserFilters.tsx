@@ -37,7 +37,7 @@ export function UserFilters({
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search by name or email..."
-          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 text-sm transition outline-none focus:ring-2"
+          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 text-sm transition outline-none focus:ring-2"
         />
       </div>
 
@@ -55,7 +55,7 @@ export function UserFilters({
           onChange={(event) =>
             onRoleChange(event.target.value as UserRole | 'ALL')
           }
-          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 text-sm transition outline-none focus:ring-2"
+          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 text-sm transition outline-none focus:ring-2"
         >
           <option value="ALL">All roles</option>
           <option value="ADMIN">Admin</option>
@@ -79,7 +79,7 @@ export function UserFilters({
           onChange={(event) =>
             onStatusChange(event.target.value as UserStatus | 'ALL')
           }
-          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 text-sm transition outline-none focus:ring-2"
+          className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 text-sm transition outline-none focus:ring-2"
         >
           <option value="ALL">All statuses</option>
           <option value="PENDING">Pending</option>

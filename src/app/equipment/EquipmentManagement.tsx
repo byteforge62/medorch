@@ -4,11 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { Button } from '@/components/ui/Button';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 type EquipmentStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED';
 
@@ -66,6 +67,37 @@ function formatDate(value?: string | null) {
   return new Intl.DateTimeFormat('en-IN', {
     dateStyle: 'medium',
   }).format(new Date(value));
+}
+
+/**
+ * Readiness derived from the maintenance date the record already carries.
+ * Nothing is invented: if there is no date, the register says so.
+ */
+function readinessFor(value?: string | null) {
+  if (!value) {
+    return { label: 'no date', className: 'text-foreground-subtle' };
+  }
+
+  const due = new Date(value);
+
+  if (Number.isNaN(due.getTime())) {
+    return { label: 'no date', className: 'text-foreground-subtle' };
+  }
+
+  const days = Math.ceil((due.getTime() - Date.now()) / 86_400_000);
+
+  if (days < 0) {
+    return {
+      label: `overdue ${Math.abs(days)}d`,
+      className: 'text-danger font-semibold',
+    };
+  }
+
+  if (days <= 14) {
+    return { label: `due in ${days}d`, className: 'text-warning' };
+  }
+
+  return { label: `due in ${days}d`, className: 'text-foreground-secondary' };
 }
 
 export function EquipmentManagement() {
@@ -284,28 +316,19 @@ export function EquipmentManagement() {
 
   return (
     <main className="space-y-6">
-      <section className="space-y-2">
-        <p className="text-sm font-medium text-[var(--color-primary)]">
-          Resource Registry
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight">Equipment</h1>
-        <p className="max-w-2xl text-sm text-[var(--color-text-muted)]">
-          View equipment availability, category, assignment state, and
-          maintenance information.
-        </p>
-      </section>
-
-      {isAdmin && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={openCreateForm}
-            className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white"
-          >
-            Add equipment
-          </button>
-        </div>
-      )}
+      <PageHeader
+        eyebrow="Resource registry"
+        title="Equipment"
+        meta={`${counts.total} items · ${counts.available} available · ${counts.maintenance} in maintenance`}
+        description="View equipment availability, category, assignment state, and maintenance information."
+        actions={
+          isAdmin ? (
+            <Button type="button" onClick={openCreateForm}>
+              Add equipment
+            </Button>
+          ) : null
+        }
+      />
 
       {showForm && isAdmin && (
         <Card>
@@ -331,7 +354,7 @@ export function EquipmentManagement() {
                       name: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -346,7 +369,7 @@ export function EquipmentManagement() {
                       category: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -360,7 +383,7 @@ export function EquipmentManagement() {
                       serialNumber: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
               <label className="space-y-1 text-sm">
@@ -373,7 +396,7 @@ export function EquipmentManagement() {
                       departmentId: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 >
                   <option value="">Unassigned</option>
                   {departments.map((department) => (
@@ -394,7 +417,7 @@ export function EquipmentManagement() {
                       maintenanceDueAt: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2 transition outline-none focus:ring-2"
+                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
               </label>
             </div>
@@ -403,21 +426,17 @@ export function EquipmentManagement() {
                 type="button"
                 disabled={saving}
                 onClick={() => setShowForm(false)}
-                className="border-border-strong rounded-lg border px-3 py-2 text-sm"
+                className="border-border-strong border px-3 py-2 text-sm"
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving
                   ? 'Saving…'
                   : editingEquipment
                     ? 'Save changes'
                     : 'Create'}
-              </button>
+              </Button>
             </div>
           </form>
         </Card>
@@ -426,78 +445,47 @@ export function EquipmentManagement() {
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-[var(--color-danger-border)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]"
+          className="border border-[var(--color-danger-border)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]"
         >
           {error}
         </div>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Total</p>
-          <p className="mt-2 text-2xl font-semibold">{counts.total}</p>
-        </Card>
 
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Available</p>
-          <p className="mt-2 text-2xl font-semibold">{counts.available}</p>
-        </Card>
+      <div className="border-border bg-surface flex flex-col gap-2 border px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4">
+        <label htmlFor="equipment-search" className="eyebrow shrink-0">
+          Find item
+        </label>
 
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">In Use</p>
-          <p className="mt-2 text-2xl font-semibold">{counts.inUse}</p>
-        </Card>
+        <input
+          id="equipment-search"
+          type="search"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Name, category, serial number, department"
+          className="text-foreground placeholder:text-foreground-subtle w-full min-w-0 border-0 bg-transparent px-0 py-1 text-sm sm:flex-1"
+        />
 
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Maintenance</p>
-          <p className="mt-2 text-2xl font-semibold">{counts.maintenance}</p>
-        </Card>
-      </section>
+        <label htmlFor="equipment-status" className="sr-only">
+          Filter by status
+        </label>
 
-      <Card>
-        <div className="grid gap-4 md:grid-cols-[1fr_220px]">
-          <div>
-            <label
-              htmlFor="equipment-search"
-              className="mb-2 block text-sm font-medium"
-            >
-              Search equipment
-            </label>
-            <input
-              id="equipment-search"
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Name, category, serial number, department"
-              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="equipment-status"
-              className="mb-2 block text-sm font-medium"
-            >
-              Status
-            </label>
-            <select
-              id="equipment-status"
-              value={status}
-              onChange={(event) =>
-                setStatus(event.target.value as EquipmentStatus | 'ALL')
-              }
-              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-2"
-            >
-              <option value="ALL">All statuses</option>
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {formatStatus(option)}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </Card>
+        <select
+          id="equipment-status"
+          value={status}
+          onChange={(event) =>
+            setStatus(event.target.value as EquipmentStatus | 'ALL')
+          }
+          className="border-border-strong bg-surface text-foreground focus:border-primary h-8 shrink-0 rounded-[var(--radius-control)] border px-2 font-mono text-[11px] tracking-[0.08em] uppercase outline-none"
+        >
+          <option value="ALL">All states</option>
+          {STATUS_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {formatStatus(option)}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {filteredEquipment.length === 0 ? (
         <EmptyState
@@ -505,80 +493,122 @@ export function EquipmentManagement() {
           description="Try changing the search or status filter."
         />
       ) : (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredEquipment.map((item) => (
-            <Card key={item.id}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h2 className="truncate font-semibold">{item.name}</h2>
-                  <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                    {item.category}
-                  </p>
-                </div>
+        <section className="border-border border">
+          <header className="border-border flex flex-wrap items-baseline justify-between gap-2 border-b px-4 py-2.5">
+            <h2 className="eyebrow">Inventory register</h2>
 
-                {isAdmin ? (
-                  <select
-                    aria-label={`Status for ${item.name}`}
-                    value={item.status}
-                    disabled={updatingEquipmentId === item.id}
-                    onChange={(event) =>
-                      void handleStatusChange(
-                        item.id,
-                        event.target.value as EquipmentStatus,
-                      )
-                    }
-                    className="border-border-strong bg-surface text-foreground focus:border-primary focus:ring-primary/20 rounded-lg border px-2 py-1 text-xs transition outline-none focus:ring-2"
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option
-                        key={option}
-                        value={option}
-                        disabled={option === 'IN_USE'}
-                      >
-                        {formatStatus(option)}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <Badge>{formatStatus(item.status)}</Badge>
-                )}
-              </div>
+            <p className="text-foreground-muted font-mono text-[11px] tabular-nums">
+              {filteredEquipment.length} of {equipment.length} items
+            </p>
+          </header>
 
-              <dl className="mt-5 space-y-3 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[var(--color-text-muted)]">
-                    Serial number
-                  </dt>
-                  <dd className="text-right">{item.serialNumber ?? '—'}</dd>
-                </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[840px] text-left">
+              <thead>
+                <tr className="border-border border-b">
+                  <th className="eyebrow px-4 py-2 font-normal">Item</th>
+                  <th className="eyebrow px-4 py-2 font-normal">Category</th>
+                  <th className="eyebrow px-4 py-2 font-normal whitespace-nowrap">
+                    Serial
+                  </th>
+                  <th className="eyebrow px-4 py-2 font-normal">Location</th>
+                  <th className="eyebrow px-4 py-2 font-normal whitespace-nowrap">
+                    Readiness
+                  </th>
+                  <th className="eyebrow px-4 py-2 font-normal">State</th>
+                  <th className="eyebrow px-4 py-2 text-right font-normal">
+                    Manage
+                  </th>
+                </tr>
+              </thead>
 
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[var(--color-text-muted)]">Department</dt>
-                  <dd className="text-right">
-                    {item.department?.name ?? 'Unassigned'}
-                  </dd>
-                </div>
+              <tbody className="divide-rule-soft divide-y">
+                {filteredEquipment.map((item) => {
+                  const readiness = readinessFor(item.maintenanceDueAt);
 
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[var(--color-text-muted)]">
-                    Maintenance due
-                  </dt>
-                  <dd className="text-right">
-                    {formatDate(item.maintenanceDueAt)}
-                  </dd>
-                </div>
-              </dl>
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => openEditForm(item)}
-                  className="mt-4 text-sm font-medium text-[var(--color-primary)]"
-                >
-                  Edit details
-                </button>
-              )}
-            </Card>
-          ))}
+                  return (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-surface-subtle transition-colors"
+                    >
+                      <td className="px-4 py-3.5 align-baseline">
+                        <p className="text-[14px] leading-tight font-medium">
+                          {item.name}
+                        </p>
+                      </td>
+
+                      <td className="text-foreground-secondary px-4 py-3.5 align-baseline text-[13px]">
+                        {item.category}
+                      </td>
+
+                      <td className="text-foreground-muted px-4 py-3.5 align-baseline font-mono text-[11px] whitespace-nowrap tabular-nums">
+                        {item.serialNumber ?? '—'}
+                      </td>
+
+                      <td className="text-foreground-muted px-4 py-3.5 align-baseline font-mono text-[10px] tracking-[0.12em] uppercase">
+                        {item.department?.name ?? 'Unassigned'}
+                      </td>
+
+                      <td className="px-4 py-3.5 align-baseline whitespace-nowrap">
+                        <p
+                          className={`font-mono text-[11px] tabular-nums ${readiness.className}`}
+                        >
+                          {readiness.label}
+                        </p>
+
+                        <p className="text-foreground-subtle mt-0.5 font-mono text-[10px] tabular-nums">
+                          {formatDate(item.maintenanceDueAt)}
+                        </p>
+                      </td>
+
+                      <td className="px-4 py-3.5 align-baseline">
+                        {isAdmin ? (
+                          <select
+                            aria-label={`Status for ${item.name}`}
+                            value={item.status}
+                            disabled={updatingEquipmentId === item.id}
+                            onChange={(event) =>
+                              void handleStatusChange(
+                                item.id,
+                                event.target.value as EquipmentStatus,
+                              )
+                            }
+                            className="border-border-strong bg-surface text-foreground focus:border-primary h-8 rounded-[var(--radius-control)] border px-2 text-[12px] transition outline-none disabled:opacity-50"
+                          >
+                            {STATUS_OPTIONS.map((option) => (
+                              <option
+                                key={option}
+                                value={option}
+                                disabled={option === 'IN_USE'}
+                              >
+                                {formatStatus(option)}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-[11px] tracking-[0.14em] uppercase">
+                            {formatStatus(item.status)}
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-3.5 text-right align-baseline whitespace-nowrap">
+                        {isAdmin ? (
+                          <button
+                            type="button"
+                            onClick={() => openEditForm(item)}
+                            className="text-primary link-draw text-[13px] font-medium"
+                          >
+                            Edit
+                          </button>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </main>

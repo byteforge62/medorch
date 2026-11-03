@@ -26,6 +26,7 @@ export function AlertCenter() {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const fetchAlerts = useCallback(async () => {
     try {
@@ -77,22 +78,25 @@ export function AlertCenter() {
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
 
-  const handleMarkAsRead = async (id: string) => {
+  const handleMarkAsRead = async (alert: AlertItem) => {
+    setActionError(null);
     try {
-      await apiClient.patch(`/api/alerts/${id}/read`);
+      await apiClient.patch(`/api/alerts/${alert.id}/read`);
       setAlerts((prev) =>
         prev.map((a) =>
-          a.id === id
+          a.id === alert.id
             ? { ...a, isRead: true, readAt: new Date().toISOString() }
             : a,
         ),
       );
     } catch (err) {
       console.error('Failed to mark alert read:', err);
+      setActionError(`Could not mark “${alert.title}” as read. Please retry.`);
     }
   };
 
   const handleMarkAllAsRead = async () => {
+    setActionError(null);
     try {
       await apiClient.patch('/api/alerts/read-all');
       setAlerts((prev) =>
@@ -104,15 +108,18 @@ export function AlertCenter() {
       );
     } catch (err) {
       console.error('Failed to mark all alerts read:', err);
+      setActionError('Could not mark all alerts as read. Please retry.');
     }
   };
 
-  const handleDeleteAlert = async (id: string) => {
+  const handleDeleteAlert = async (alert: AlertItem) => {
+    setActionError(null);
     try {
-      await apiClient.delete(`/api/alerts/${id}`);
-      setAlerts((prev) => prev.filter((a) => a.id !== id));
+      await apiClient.delete(`/api/alerts/${alert.id}`);
+      setAlerts((prev) => prev.filter((a) => a.id !== alert.id));
     } catch (err) {
       console.error('Failed to delete alert:', err);
+      setActionError(`Could not dismiss “${alert.title}”. Please retry.`);
     }
   };
 
@@ -137,7 +144,7 @@ export function AlertCenter() {
       >
         <Bell size={18} weight="regular" aria-hidden="true" />
         {unreadCount > 0 ? (
-          <span className="bg-danger text-foreground-inverse absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-0.5 text-[10px] font-bold">
+          <span className="bg-danger text-foreground-inverse absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-none px-0.5 text-[10px] font-bold">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         ) : null}
@@ -149,7 +156,7 @@ export function AlertCenter() {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="border-border bg-surface absolute right-0 z-50 mt-2 w-80 rounded-[var(--radius-card)] border shadow-lg sm:w-96">
+          <div className="border-border bg-surface fixed top-16 right-3 left-3 z-50 border sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:mt-2 sm:w-96">
             <div className="border-border flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center space-x-2">
                 <h4 className="text-foreground text-sm font-semibold">
@@ -168,6 +175,15 @@ export function AlertCenter() {
                 </button>
               ) : null}
             </div>
+
+            {actionError ? (
+              <p
+                role="alert"
+                className="text-danger border-danger/30 border-b px-4 py-2 text-xs"
+              >
+                {actionError}
+              </p>
+            ) : null}
 
             <div className="max-h-96 overflow-y-auto p-2">
               {isLoading && alerts.length === 0 ? (
@@ -190,23 +206,35 @@ export function AlertCenter() {
                   {alerts.map((alert) => (
                     <div
                       key={alert.id}
-                      className={`relative rounded-lg p-3 transition-colors ${
+                      className={`relative border-l-2 py-2.5 pr-2 pl-3 transition-colors ${
                         !alert.isRead
-                          ? 'border-primary bg-primary-soft/60 border-l-2'
+                          ? 'bg-primary-soft/50'
                           : 'hover:bg-surface-muted'
                       }`}
+                      style={{
+                        borderLeftColor:
+                          alert.severity === 'CRITICAL'
+                            ? 'var(--danger)'
+                            : alert.severity === 'WARNING'
+                              ? 'var(--warning)'
+                              : 'var(--info)',
+                      }}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
                           {getSeverityBadge(alert.severity)}
-                          <span className="text-foreground-muted text-[10px] font-semibold tracking-wider uppercase">
-                            {alert.type}
-                          </span>
+
+                          {!alert.isRead ? (
+                            <span
+                              className="bg-primary h-1.5 w-1.5 shrink-0"
+                              aria-label="Unread"
+                            />
+                          ) : null}
                         </div>
                         <div className="flex items-center space-x-1">
                           {!alert.isRead ? (
                             <button
-                              onClick={() => handleMarkAsRead(alert.id)}
+                              onClick={() => handleMarkAsRead(alert)}
                               className="text-primary cursor-pointer text-[11px] font-medium hover:underline"
                               title="Mark read"
                             >
@@ -214,25 +242,29 @@ export function AlertCenter() {
                             </button>
                           ) : null}
                           <button
-                            onClick={() => handleDeleteAlert(alert.id)}
+                            onClick={() => handleDeleteAlert(alert)}
                             className="text-foreground-muted hover:text-danger cursor-pointer p-1 transition-colors"
                             title="Dismiss"
-                            aria-label="Dismiss alert"
+                            aria-label={`Dismiss alert: ${alert.title}`}
                           >
                             <X size={14} weight="bold" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
 
-                      <h5 className="text-foreground mt-1 text-xs font-semibold">
+                      <h5 className="text-foreground mt-1.5 text-[13px] leading-snug font-semibold">
                         {alert.title}
                       </h5>
-                      <p className="text-foreground-secondary mt-0.5 line-clamp-2 text-xs">
+                      <p className="text-foreground-secondary mt-1 line-clamp-2 text-xs">
                         {alert.message}
                       </p>
 
-                      <div className="text-foreground-muted mt-2 text-[10px]">
-                        {new Date(alert.createdAt).toLocaleString()}
+                      <div className="text-foreground-muted mt-2 flex items-center gap-2 font-mono text-[10px] tracking-[0.08em] uppercase">
+                        <span>{alert.type}</span>
+                        <span aria-hidden="true">·</span>
+                        <time dateTime={alert.createdAt}>
+                          {new Date(alert.createdAt).toLocaleString()}
+                        </time>
                       </div>
                     </div>
                   ))}

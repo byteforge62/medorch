@@ -147,11 +147,11 @@ export function ScheduleCalendar({
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
+          <h2 className="text-foreground text-lg font-semibold">
             {formatMonth(visibleMonth)}
           </h2>
 
-          <p className="mt-1 text-xs text-foreground-muted">
+          <p className="text-foreground-muted mt-1 text-xs">
             Procedures are arranged by scheduled date and start time.
           </p>
         </div>
@@ -163,7 +163,7 @@ export function ScheduleCalendar({
               setVisibleMonth(new Date(Date.UTC(year, month - 1, 1)))
             }
             aria-label="Previous month"
-            className="rounded-md border border-border-strong px-3 py-2 text-sm hover:bg-surface-hoverfocus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="border-border-strong hover:bg-surface-muted focus-visible:outline-primary rounded-md border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             ←
           </button>
@@ -177,7 +177,7 @@ export function ScheduleCalendar({
                 new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
               );
             }}
-            className="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-surface-hover"
+            className="border-border-strong hover:bg-surface-muted focus-visible:outline-primary rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             Today
           </button>
@@ -188,34 +188,92 @@ export function ScheduleCalendar({
               setVisibleMonth(new Date(Date.UTC(year, month + 1, 1)))
             }
             aria-label="Next month"
-            className="rounded-md border border-border-strong px-3 py-2 text-sm hover:bg-surface-hoverfocus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="border-border-strong hover:bg-surface-muted focus-visible:outline-primary rounded-md border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             →
           </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl">
+      <section className="space-y-5 md:hidden" aria-label="Schedule agenda">
+        {[...schedulesByDate.entries()]
+          .filter(([dateKey]) =>
+            dateKey.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`),
+          )
+          .sort(([left], [right]) => left.localeCompare(right))
+          .map(([dateKey, daySchedules]) => (
+            <section key={dateKey} aria-labelledby={`agenda-${dateKey}`}>
+              <div className="border-border-strong flex items-baseline justify-between border-b pb-2">
+                <h3
+                  id={`agenda-${dateKey}`}
+                  className="text-foreground font-mono text-sm font-semibold tabular-nums"
+                >
+                  {new Intl.DateTimeFormat('en-IN', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    timeZone: 'UTC',
+                  }).format(new Date(`${dateKey}T00:00:00Z`))}
+                </h3>
+                <span className="text-foreground-muted font-mono text-[11px] tabular-nums">
+                  {daySchedules.length}{' '}
+                  {daySchedules.length === 1 ? 'case' : 'cases'}
+                </span>
+              </div>
+              <div className="divide-border divide-y">
+                {daySchedules.map((schedule) => (
+                  <Link
+                    key={schedule.id}
+                    href={`/schedules/${schedule.id}`}
+                    className="focus-visible:outline-primary grid min-h-14 grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-3 py-3 focus-visible:outline-2 focus-visible:outline-offset-2"
+                  >
+                    <span className="text-foreground-secondary font-mono text-xs tabular-nums">
+                      {formatTime(schedule.startTime)}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="text-foreground block truncate text-sm font-semibold">
+                        {schedule.procedure}
+                      </span>
+                      <span className="text-foreground-muted mt-0.5 block truncate text-xs">
+                        {schedule.otRoom?.name || 'Unassigned'} ·{' '}
+                        {schedule.surgeon?.name || 'Unassigned'}
+                      </span>
+                    </span>
+                    <ScheduleStatusBadge status={schedule.status} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
+        {schedules.length === 0 && (
+          <p className="text-foreground-muted border-border border px-4 py-5 text-sm">
+            No schedules match the current filters. Adjust the filters or
+            navigate to another month.
+          </p>
+        )}
+      </section>
+
+      <div className="hidden overflow-x-auto md:block">
         <div className="min-w-[980px]">
-          <div className="grid grid-cols-7 border-b border-border bg-surface-muted">
+          <div className="border-border bg-surface-muted grid grid-cols-7 border-b">
             {WEEKDAYS.map((weekday) => (
               <div
                 key={weekday}
-                className="px-3 py-3 text-center text-xs font-semibold text-foreground-muted"
+                className="text-foreground-muted px-3 py-3 text-center text-xs font-semibold"
               >
                 {weekday}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-px border border-border bg-border">
+          <div className="border-border bg-border grid grid-cols-7 gap-px border">
             {cells.map((cell) => {
               if (cell.day === null) {
                 return (
                   <div
                     key={cell.key}
                     aria-hidden="true"
-                    className="min-h-36 bg-surface-subtle"
+                    className="bg-surface-subtle min-h-36"
                   />
                 );
               }
@@ -223,13 +281,10 @@ export function ScheduleCalendar({
               const daySchedules = schedulesByDate.get(cell.dateKey) ?? [];
 
               return (
-                <div
-                  key={cell.key}
-                  className="min-h-36 bg-surface p-2"
-                >
+                <div key={cell.key} className="bg-surface min-h-36 p-2">
                   <div className="mb-2 flex items-center justify-between gap-2">
                     <span
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                      className={`flex h-7 w-7 items-center justify-center rounded-none text-xs font-semibold ${
                         cell.dateKey === todayKey
                           ? 'bg-primary text-foreground-inverse'
                           : 'text-foreground-secondary'
@@ -239,8 +294,9 @@ export function ScheduleCalendar({
                     </span>
 
                     {daySchedules.length > 0 && (
-                      <span className="text-[10px] font-medium text-foreground-subtle">
-                        {daySchedules.length} {daySchedules.length === 1 ? 'case' : 'cases'}
+                      <span className="text-foreground-subtle text-[10px] font-medium">
+                        {daySchedules.length}{' '}
+                        {daySchedules.length === 1 ? 'case' : 'cases'}
                       </span>
                     )}
                   </div>
@@ -251,22 +307,22 @@ export function ScheduleCalendar({
                         key={schedule.id}
                         href={`/schedules/${schedule.id}`}
                         title={`${schedule.procedure} — ${schedule.surgeon?.name || 'Unassigned'}`}
-                        className="block space-y-1.5 rounded-md border border-border p-2 text-xs transition-colors hover:border-border-strong hover:bg-surface-hover"
+                        className="border-border hover:border-border-strong hover:bg-surface-hover block space-y-1.5 rounded-md border p-2 text-xs transition-colors"
                       >
-                        <p className="line-clamp-2 font-semibold text-foreground">
+                        <p className="text-foreground line-clamp-2 font-semibold">
                           {schedule.procedure}
                         </p>
 
-                        <p className="font-mono text-foreground-muted">
+                        <p className="text-foreground-muted font-mono">
                           {formatTime(schedule.startTime)} –{' '}
                           {formatTime(schedule.endTime)}
                         </p>
 
-                        <p className="truncate text-foreground-secondary">
+                        <p className="text-foreground-secondary truncate">
                           {schedule.surgeon?.name || 'Unassigned'}
                         </p>
 
-                        <p className="truncate text-foreground-muted">
+                        <p className="text-foreground-muted truncate">
                           OT: {schedule.otRoom?.name || 'Unassigned'}
                         </p>
 
@@ -278,7 +334,7 @@ export function ScheduleCalendar({
                     ))}
 
                     {daySchedules.length > 3 && (
-                      <p className="px-1 text-xs font-medium text-foreground-muted">
+                      <p className="text-foreground-muted px-1 text-xs font-medium">
                         +{daySchedules.length - 3} more · See list view
                       </p>
                     )}
@@ -290,10 +346,13 @@ export function ScheduleCalendar({
         </div>
       </div>
 
-      {schedules.length === 0 && (
-        <p className="text-sm text-foreground-muted">
-          No schedules match the current filters. Adjust the filters or navigate
-          to another month to explore the calendar.
+      {(schedules.length === 0 ||
+        ![...schedulesByDate.keys()].some((dateKey) =>
+          dateKey.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`),
+        )) && (
+        <p className="text-foreground-muted border-border border px-4 py-5 text-sm">
+          No procedures are scheduled in this month. Use the month controls to
+          review another period.
         </p>
       )}
     </section>

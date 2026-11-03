@@ -201,7 +201,7 @@ export function PatientDetail({ patientId }: { patientId: string }) {
       <Card>
         <h2 className="font-semibold">Medical history</h2>
 
-        <div className="mt-4 rounded-lg border border-[var(--color-border)] p-4">
+        <div className="mt-4 border border-[var(--color-border)] p-4">
           <p className="text-sm leading-6 whitespace-pre-wrap">
             {patient.medicalHistory?.trim() ||
               'No medical history has been recorded.'}
@@ -227,7 +227,7 @@ export function PatientDetail({ patientId }: { patientId: string }) {
             {patient.schedules.map((schedule) => (
               <article
                 key={schedule.id}
-                className="rounded-lg border border-[var(--color-border)] p-4"
+                className="border border-[var(--color-border)] p-4"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">

@@ -1,14 +1,14 @@
-'use client';
+'use client'
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-
-import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { ErrorState } from '@/components/ui/ErrorState';
-import { LoadingState } from '@/components/ui/LoadingState';
-import { apiClient, ApiClientError } from '@/lib/api/client';
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { apiClient, ApiClientError } from '@/lib/api/client'
+import { LoadingState } from '@/components/ui/LoadingState'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { ScheduleStatusBadge } from '@/components/schedules/ScheduleStatusBadge'
 
 type AppointmentStatus =
   | 'SCHEDULED'
@@ -16,85 +16,82 @@ type AppointmentStatus =
   | 'IN_PROGRESS'
   | 'COMPLETED'
   | 'CANCELLED'
-  | 'DELAYED';
+  | 'DELAYED'
 
 interface Appointment {
-  id: string;
-  procedure: string;
-  scheduledDate: string;
-  startTime: string;
-  endTime: string;
-  status: AppointmentStatus;
-  priority: 'ELECTIVE' | 'URGENT' | 'EMERGENCY';
+  id: string
+  procedure: string
+  scheduledDate: string
+  startTime: string
+  endTime: string
+  status: AppointmentStatus
+  priority: 'ELECTIVE' | 'URGENT' | 'EMERGENCY'
   department: {
-    name: string;
-  };
+    name: string
+  }
   otRoom: {
-    name: string;
-    code: string;
-  };
+    name: string
+    code: string
+  }
 }
 
 interface PatientAppointmentsResponse {
-  id: string;
-  patientCode: string;
-  name: string;
-  schedules: Appointment[];
-  currentTime: number;
+  id: string
+  patientCode: string
+  name: string
+  schedules: Appointment[]
+  currentTime: number
 }
 
-type AppointmentFilter = 'ALL' | 'UPCOMING' | 'PAST';
+type AppointmentFilter = 'ALL' | 'UPCOMING' | 'PAST'
 
 function formatDate(value: string) {
-  const date = new Date(value);
+  const date = new Date(value)
 
   if (Number.isNaN(date.getTime())) {
-    return '—';
+    return '—'
   }
 
   return new Intl.DateTimeFormat('en-IN', {
     dateStyle: 'full',
-  }).format(date);
+  }).format(date)
 }
 
 function formatTime(value: string) {
-  const date = new Date(value);
+  const date = new Date(value)
 
   if (Number.isNaN(date.getTime())) {
-    return '—';
+    return '—'
   }
 
   return new Intl.DateTimeFormat('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
-  }).format(date);
+  }).format(date)
 }
 
 function formatLabel(value: string) {
-  return value.replaceAll('_', ' ');
+  return value.replaceAll('_', ' ')
 }
 
 export function MyAppointments() {
-  const [patient, setPatient] = useState<PatientAppointmentsResponse | null>(
-    null,
-  );
+  const [patient, setPatient] = useState<PatientAppointmentsResponse | null>(null)
 
-  const [filter, setFilter] = useState<AppointmentFilter>('ALL');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const [filter, setFilter] = useState<AppointmentFilter>('ALL')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false
 
     async function loadAppointments() {
       try {
         const response = await apiClient.get<PatientAppointmentsResponse>(
           '/api/me/appointments',
-        );
+        )
 
         if (!cancelled) {
-          setPatient(response);
+          setPatient(response)
         }
       } catch (fetchError) {
         if (!cancelled) {
@@ -102,51 +99,51 @@ export function MyAppointments() {
             fetchError instanceof ApiClientError
               ? fetchError.message
               : 'Failed to load your appointments.',
-          );
+          )
         }
       } finally {
         if (!cancelled) {
-          setLoading(false);
+          setLoading(false)
         }
       }
     }
 
-    void loadAppointments();
+    void loadAppointments()
 
     return () => {
-      cancelled = true;
-    };
-  }, []);
+      cancelled = true
+    }
+  }, [])
 
   const appointments = useMemo(() => {
-    if (!patient) return [];
+    if (!patient) return []
 
-    const schedules = patient.schedules;
-    const now = patient.currentTime;
+    const schedules = patient.schedules
+    const now = patient.currentTime
     return schedules.filter((appointment) => {
       const isPast =
         new Date(appointment.endTime).getTime() < now ||
         appointment.status === 'COMPLETED' ||
-        appointment.status === 'CANCELLED';
+        appointment.status === 'CANCELLED'
 
       if (filter === 'UPCOMING') {
-        return !isPast;
+        return !isPast
       }
 
       if (filter === 'PAST') {
-        return isPast;
+        return isPast
       }
 
-      return true;
-    });
-  }, [patient, filter]);
+      return true
+    })
+  }, [patient, filter])
 
   if (loading) {
-    return <LoadingState message="Loading your appointments..." />;
+    return <LoadingState message="Loading your appointments..." />
   }
 
   if (error) {
-    return <ErrorState message={error} />;
+    return <ErrorState message={error} />
   }
 
   if (!patient) {
@@ -155,183 +152,83 @@ export function MyAppointments() {
         title="Patient record unavailable"
         description="Your account does not have a linked patient record."
       />
-    );
+    )
   }
 
-  const filterOptions: {
-    label: string;
-    value: AppointmentFilter;
-  }[] = [
-      { label: 'All', value: 'ALL' },
-      { label: 'Upcoming', value: 'UPCOMING' },
-      { label: 'Past', value: 'PAST' },
-    ];
+  const filterOptions = [
+    { label: 'All', value: 'ALL' },
+    { label: 'Upcoming', value: 'UPCOMING' },
+    { label: 'Past', value: 'PAST' },
+  ]
 
   return (
-    <main className="space-y-6">
-      <section>
-        <p className="text-sm font-medium text-[var(--color-primary)]">
-          Patient Portal
+    <main className="space-y-6 space-y-4 md:space-y-8">
+      <PageHeader
+        eyebrow="Patient portal"
+        title="My Appointments"
+        description={
+          <>
+            Welcome,{' '}
+            <span className="text-primary font-semibold">
+              {patient.name}
+            </span>. Here is your upcoming operating-theatre appointment.
+          </>
+        }
+      />
+
+      {/* Patient-specific appointment summary - cool clinical composition */}
+      <div className="border-border bg-surface px-4 py-3 sm:px-6">
+        <p className="text-foreground-muted text-sm">Upcoming appointment</p>
+        <p className="text-primary font-medium mt-1">
+          {appointments.length > 0
+            ? formatLabel(appointments[0].procedure)
+            : 'No upcoming appointments'}
         </p>
-
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          My Appointments
-        </h1>
-
-        <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          Welcome, {patient.name}. Review your operating-theatre appointments
-          and their current status.
-        </p>
-
-        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          Patient ID: {patient.patientCode}
-        </p>
-      </section>
-
-      <section className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Total appointments
-          </p>
-          <p className="mt-2 text-2xl font-semibold">
-            {patient.schedules.length}
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Upcoming</p>
-          <p className="mt-2 text-2xl font-semibold">
-            {
-              patient.schedules.filter(
-                (appointment) =>
-                  new Date(appointment.endTime).getTime() >=
-                    patient.currentTime &&
-                  appointment.status !== 'CANCELLED' &&
-                  appointment.status !== 'COMPLETED',
-              ).length
-            }
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Completed</p>
-          <p className="mt-2 text-2xl font-semibold">
-            {
-              patient.schedules.filter(
-                (appointment) => appointment.status === 'COMPLETED',
-              ).length
-            }
-          </p>
-        </Card>
-      </section>
-
-      <div
-        className="flex flex-wrap gap-2"
-        role="group"
-        aria-label="Filter appointments"
-      >
-        {filterOptions.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={filter === option.value}
-            onClick={() => setFilter(option.value)}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-              filter === option.value
-                ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
-                : 'border-[var(--color-border)] hover:bg-[var(--color-surface)]'
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
       </div>
 
-      {appointments.length === 0 ? (
-        <EmptyState
-          title={
-            filter === 'UPCOMING'
-              ? 'No upcoming appointments'
-              : filter === 'PAST'
-                ? 'No past appointments'
-                : 'No appointments found'
-          }
-          description="Appointments associated with your patient record will appear here."
-        />
-      ) : (
-        <section className="space-y-4">
-          {appointments.map((appointment) => (
-            <Card key={appointment.id}>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-3">
-                  <div>
-                    <h2 className="text-base font-semibold">
-                      {appointment.procedure}
-                    </h2>
-
-                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                      {appointment.department.name}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-3 text-sm sm:grid-cols-2">
-                    <div>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        Scheduled date
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {formatDate(appointment.scheduledDate)}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        Time
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {formatTime(appointment.startTime)} –{' '}
-                        {formatTime(appointment.endTime)}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        Operating theatre
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {appointment.otRoom.name}
-                      </p>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        {appointment.otRoom.code}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        Priority
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {formatLabel(appointment.priority)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-  <Badge>{formatLabel(appointment.status)}</Badge>
-
-  <Link
-    href={`/patients/appointments/${appointment.id}`}
-    className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
-  >
-    View Details →
-  </Link>
-</div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" style={{ gap: '1rem' }}>
+        {appointments.map((appointment) => (
+          <div
+            key={appointment.id}
+            className="border border-border-line bg-surface/50 rounded-0 p-4 sm:p-6 hover:bg-primary-soft/30 transition-colors"
+          >
+            <div className="flex flex-col gap-2">
+              <p className="text-primary font-medium">{formatLabel(appointment.procedure)}</p>
+              <div className="text-muted-foreground text-xs font-mono tracking-[0.1em] uppercase">
+                {formatDate(appointment.scheduledDate)}
               </div>
-            </Card>
-          ))}
-        </section>
-      )}
+              <p className="text-muted-foreground text-sm">
+                {formatTime(appointment.startTime)} – {formatTime(appointment.endTime)}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {appointment.department.name} · {appointment.otRoom.name}
+              </p>
+            </div>
+            <ScheduleStatusBadge status={appointment.status} />
+            <Link
+              href={`/patients/appointments/${appointment.id}`}
+              className="mt-2 text-primary text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              View details →
+            </Link>
+          </div>
+        ))}
+
+        {appointments.length === 0 ? (
+          <EmptyState
+            title="No appointments found"
+            description="Appointments associated with your patient record will appear here."
+          />
+        ) : null}
+      </div>
+
+      <div className="mt-6">
+        <Button className="text-primary flex-1">
+          <Link href="/patients/appointments">
+            ← Back to all appointments
+          </Link>
+        </Button>
+      </div>
     </main>
-  );
+  )
 }

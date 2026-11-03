@@ -200,7 +200,7 @@ export function ScheduleForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-2xl border border-border-strong bg-surface p-6 shadow-xl">
+      <div className="w-full max-w-2xl rounded-none border border-border-strong bg-surface p-6">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
             <h3 className="text-lg font-semibold text-foreground">
@@ -223,7 +223,7 @@ export function ScheduleForm({
 
         {error && (
           <div
-            className="mt-4 rounded-lg border border-danger-border bg-danger-soft p-3 text-sm font-medium text-danger"
+            className="mt-4 border border-danger-border bg-danger-soft p-3 text-sm font-medium text-danger"
             role="alert"
           >
             {error}

@@ -5,6 +5,8 @@ import { apiClient, ApiClientError } from '@/lib/api/client';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
 
 type AuditAction =
   | 'CREATE'
@@ -68,7 +70,7 @@ const EMPTY_FILTERS: AuditFilters = {
 };
 
 const inputClass =
-  'w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
+  'w-full border border-border-strong bg-surface px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
 
 const actionStyles: Record<AuditAction, string> = {
   CREATE: 'bg-success/10 text-success ',
@@ -212,34 +214,22 @@ export function AuditLogViewer() {
   const lastRecord = Math.min(offset + logs.length, pagination.total);
 
   return (
-    <main className="space-y-6 p-6 lg:p-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="mb-2 text-xs font-semibold tracking-[0.18em] text-[var(--color-primary)] uppercase">
-            Security &amp; Compliance
-          </p>
+    <main className="space-y-6">
+      <PageHeader
+        eyebrow="Security & compliance"
+        title="Audit Trails"
+        description="Review recorded system activity, identify the actor, and inspect changes across MedOrch."
+        actions={
+          <div className="border-border bg-surface px-4 py-3">
+            <p className="text-foreground-muted text-xs">Matching events</p>
+            <p className="text-foreground mt-1 text-xl font-semibold tabular-nums">
+              {pagination.total.toLocaleString()}
+            </p>
+          </div>
+        }
+      />
 
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-foreground)]">
-            Audit Trails
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm text-[var(--color-foreground-muted)]">
-            Review recorded system activity, identify the actor, and inspect
-            changes across MedOrch.
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-          <p className="text-xs text-[var(--color-foreground-muted)]">
-            Matching events
-          </p>
-          <p className="mt-1 text-xl font-semibold text-[var(--color-foreground)] tabular-nums">
-            {pagination.total.toLocaleString()}
-          </p>
-        </div>
-      </header>
-
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+      <section className="border-border bg-surface border p-5">
         <div className="mb-5">
           <h2 className="font-semibold text-[var(--color-foreground)]">
             Filter events
@@ -382,17 +372,12 @@ export function AuditLogViewer() {
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-            >
-              Apply filters
-            </button>
+            <Button type="submit">Apply filters</Button>
 
             <button
               type="button"
               onClick={resetFilters}
-              className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)]"
+              className="border-border-strong border px-4 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)]"
             >
               Reset
             </button>
@@ -400,7 +385,7 @@ export function AuditLogViewer() {
         </form>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <section className="overflow-hidden rounded-none border border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="flex flex-col gap-2 border-b border-[var(--color-border)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-semibold text-[var(--color-foreground)]">
@@ -417,7 +402,7 @@ export function AuditLogViewer() {
             type="button"
             onClick={() => setRetryCount((count) => count + 1)}
             disabled={loading}
-            className="border-border-strong self-start rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50 sm:self-auto"
+            className="border-border-strong self-start border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50 sm:self-auto"
           >
             Refresh
           </button>
@@ -476,7 +461,7 @@ export function AuditLogViewer() {
                   >
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${actionStyles[log.action]}`}
+                        className={`inline-flex rounded-none px-2.5 py-1 text-[11px] font-semibold ${actionStyles[log.action]}`}
                       >
                         {formatAction(log.action)}
                       </span>
@@ -520,7 +505,7 @@ export function AuditLogViewer() {
                           )
                         }
                         aria-label={`View details for ${log.action} ${log.entity}`}
-                        className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+                        className="border-border-strong border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
                       >
                         {selectedLog?.id === log.id ? 'Close' : 'Inspect'}
                       </button>
@@ -547,7 +532,7 @@ export function AuditLogViewer() {
                   setOffset((current) => Math.max(0, current - PAGE_SIZE))
                 }
                 disabled={offset === 0}
-                className="border-border-strong rounded-lg border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="border-border-strong border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
               </button>
@@ -556,7 +541,7 @@ export function AuditLogViewer() {
                 type="button"
                 onClick={() => setOffset((current) => current + PAGE_SIZE)}
                 disabled={!pagination.hasMore}
-                className="border-border-strong rounded-lg border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="border-border-strong border px-4 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>
@@ -568,7 +553,7 @@ export function AuditLogViewer() {
       {selectedLog && (
         <section
           aria-labelledby="audit-event-details"
-          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5"
+          className="rounded-none border border-[var(--color-border)] bg-[var(--color-surface)] p-5"
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -589,7 +574,7 @@ export function AuditLogViewer() {
             <button
               type="button"
               onClick={() => setSelectedLog(null)}
-              className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
+              className="border-border-strong border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
             >
               Close details
             </button>
@@ -650,7 +635,7 @@ export function AuditLogViewer() {
               Event metadata
             </h3>
 
-            <pre className="mt-2 max-h-96 overflow-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4 text-xs leading-5 break-words whitespace-pre-wrap text-[var(--color-foreground-secondary)]">
+            <pre className="mt-2 max-h-96 overflow-auto border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4 text-xs leading-5 break-words whitespace-pre-wrap text-[var(--color-foreground-secondary)]">
               {selectedLog.metadata == null
                 ? 'No additional metadata was recorded.'
                 : JSON.stringify(selectedLog.metadata, null, 2)}

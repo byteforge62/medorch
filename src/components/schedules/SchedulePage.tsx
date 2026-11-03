@@ -1,28 +1,86 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { apiClient } from "@/lib/api/client";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { ScheduleItem } from "./ScheduleCard";
-import { ScheduleStatus } from "./ScheduleStatusBadge";
-import { ScheduleFilters, FilterState } from "./ScheduleFilters";
-import { ScheduleList } from "./ScheduleList";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
+import { apiClient } from '@/lib/api/client';
+import { Button } from '@/components/ui/Button';
+import { ScheduleItem } from './ScheduleCard';
+import { ScheduleStatus } from './ScheduleStatusBadge';
+import { ScheduleFilters, FilterState } from './ScheduleFilters';
+import { ScheduleList } from './ScheduleList';
 import {
   ScheduleForm,
   PatientOption,
   DepartmentOption,
   OTRoomOption,
   DoctorOption,
-} from "./ScheduleForm";
+} from './ScheduleForm';
 import { ScheduleCalendar } from './ScheduleCalendar';
+import { PageHeader } from '@/components/ui/PageHeader';
+
+type StatusCount = { status: string; count: number };
+
+const statusTone: Record<string, string> = {
+  SCHEDULED: 'bg-border-strong',
+  CONFIRMED: 'bg-primary',
+  IN_PROGRESS: 'bg-danger',
+  COMPLETED: 'bg-success',
+  DELAYED: 'bg-warning',
+  CANCELLED: 'bg-border',
+};
+
+/**
+ * StatusDistribution — one stacked bar showing how the accessible cases are
+ * distributed across their lifecycle, with a printed legend beneath. Built
+ * from the same records the list shows; no invented metrics.
+ */
+function StatusDistribution({ counts, total }: { counts: StatusCount[]; total: number }) {
+  if (total === 0) return null;
+
+  return (
+    <section
+      aria-label="Case status distribution"
+      className="border border-border bg-surface"
+    >
+      <div className="flex h-2.5 w-full" aria-hidden="true">
+        {counts
+          .filter((item) => item.count > 0)
+          .map((item) => (
+            <div
+              key={item.status}
+              className={`h-full ${statusTone[item.status] || 'bg-border-strong'}`}
+              style={{ width: `${(item.count / total) * 100}%` }}
+            />
+          ))}
+      </div>
+
+      <ul className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-2.5">
+        {counts.map((item) => (
+          <li
+            key={item.status}
+            className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase"
+          >
+            <span
+              className={`h-2 w-2 ${statusTone[item.status] || 'bg-border-strong'}`}
+              aria-hidden="true"
+            />
+            <span className="text-foreground-muted">
+              {item.status.replaceAll('_', ' ')}
+            </span>
+            <span className="text-foreground font-semibold tabular-nums">
+              {item.count}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 export function SchedulePage() {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "ADMIN";
-  const canManageSchedules =
-    isAdmin || session?.user?.role === "DOCTOR";
+  const isAdmin = session?.user?.role === 'ADMIN';
+  const canManageSchedules = isAdmin || session?.user?.role === 'DOCTOR';
 
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
@@ -34,16 +92,18 @@ export function SchedulePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
+  const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(
+    null,
+  );
 
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
   const initialFilters: FilterState = {
-    status: "",
-    priority: "",
-    date: "",
-    departmentId: "",
-    otRoomId: "",
-    search: "",
+    status: '',
+    priority: '',
+    date: '',
+    departmentId: '',
+    otRoomId: '',
+    search: '',
   };
 
   const [filters, setFilters] = useState<FilterState>(initialFilters);
@@ -52,11 +112,11 @@ export function SchedulePage() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<ScheduleItem[]>("/api/schedules");
+      const data = await apiClient.get<ScheduleItem[]>('/api/schedules');
       setSchedules(data || []);
     } catch (err) {
-      console.error("Failed to fetch schedules:", err);
-      setError("Failed to load surgery schedules from server.");
+      console.error('Failed to fetch schedules:', err);
+      setError('Failed to load surgery schedules from server.');
     } finally {
       setIsLoading(false);
     }
@@ -67,15 +127,15 @@ export function SchedulePage() {
 
     async function loadSchedules() {
       try {
-        const data = await apiClient.get<ScheduleItem[]>("/api/schedules");
+        const data = await apiClient.get<ScheduleItem[]>('/api/schedules');
 
         if (isMounted) {
           setSchedules(data || []);
         }
       } catch (err) {
         if (isMounted) {
-          console.error("Failed to fetch schedules:", err);
-          setError("Failed to load surgery schedules from server.");
+          console.error('Failed to fetch schedules:', err);
+          setError('Failed to load surgery schedules from server.');
         }
       } finally {
         if (isMounted) {
@@ -85,45 +145,41 @@ export function SchedulePage() {
     }
 
     async function loadReferenceData() {
-      const departmentRequest = apiClient.get<DepartmentOption[]>("/api/departments");
-      const roomRequest = apiClient.get<OTRoomOption[]>("/api/ot-rooms");
+      const departmentRequest =
+        apiClient.get<DepartmentOption[]>('/api/departments');
+      const roomRequest = apiClient.get<OTRoomOption[]>('/api/ot-rooms');
 
       const patientRequest = canManageSchedules
-        ? apiClient.get<PatientOption[]>("/api/patients")
+        ? apiClient.get<PatientOption[]>('/api/patients')
         : Promise.resolve(null);
 
       const doctorRequest = canManageSchedules
-        ? apiClient.get<DoctorOption[]>("/api/doctors")
+        ? apiClient.get<DoctorOption[]>('/api/doctors')
         : Promise.resolve(null);
 
-      const [deptRes, roomRes, patientRes, doctorRes] = await Promise.allSettled([
-        departmentRequest,
-        roomRequest,
-        patientRequest,
-        doctorRequest,
-      ]);
+      const [deptRes, roomRes, patientRes, doctorRes] =
+        await Promise.allSettled([
+          departmentRequest,
+          roomRequest,
+          patientRequest,
+          doctorRequest,
+        ]);
 
       if (!isMounted) return;
 
-      if (deptRes.status === "fulfilled" && deptRes.value) {
+      if (deptRes.status === 'fulfilled' && deptRes.value) {
         setDepartments(deptRes.value);
       }
 
-      if (roomRes.status === "fulfilled" && roomRes.value) {
+      if (roomRes.status === 'fulfilled' && roomRes.value) {
         setOtRooms(roomRes.value);
       }
 
-      if (
-        patientRes.status === "fulfilled" &&
-        patientRes.value
-      ) {
+      if (patientRes.status === 'fulfilled' && patientRes.value) {
         setPatients(patientRes.value);
       }
 
-      if (
-        doctorRes.status === "fulfilled" &&
-        doctorRes.value
-      ) {
+      if (doctorRes.status === 'fulfilled' && doctorRes.value) {
         setDoctors(doctorRes.value);
       }
     }
@@ -152,7 +208,7 @@ export function SchedulePage() {
         try {
           const itemDate = new Date(item.scheduledDate)
             .toISOString()
-            .split("T")[0];
+            .split('T')[0];
           if (itemDate !== filters.date) {
             return false;
           }
@@ -183,33 +239,19 @@ export function SchedulePage() {
     });
   }, [schedules, filters]);
 
-  const scheduleMetrics = useMemo(
-    () => [
-      {
-        label: 'Total procedures',
-        value: schedules.length,
-        detail: "All accessible schedules",
-        accent: "border-l-foreground-muted",
-      },
-      {
-        label: "Scheduled",
-        value: schedules.filter((item) => item.status === "SCHEDULED").length,
-        detail: "Awaiting confirmation",
-        accent: "border-l-primary",
-      },
-      {
-        label: "In progress",
-        value: schedules.filter((item) => item.status === "IN_PROGRESS").length,
-        detail: "Currently underway",
-        accent: "border-l-warning",
-      },
-      {
-        label: "Completed",
-        value: schedules.filter((item) => item.status === "COMPLETED").length,
-        detail: "Finished procedures",
-        accent: "border-l-success",
-      },
-    ],
+  const statusCounts = useMemo<StatusCount[]>(
+    () =>
+      [
+        'SCHEDULED',
+        'CONFIRMED',
+        'IN_PROGRESS',
+        'DELAYED',
+        'COMPLETED',
+        'CANCELLED',
+      ].map((status) => ({
+        status,
+        count: schedules.filter((item) => item.status === status).length,
+      })),
     [schedules],
   );
 
@@ -240,12 +282,12 @@ export function SchedulePage() {
       );
       // Background refetch — no loading spinner, filters stay intact
       apiClient
-        .get<ScheduleItem[]>("/api/schedules")
+        .get<ScheduleItem[]>('/api/schedules')
         .then((data) => {
           if (data) setSchedules(data);
         })
         .catch((err) => {
-          console.error("Background schedule refresh failed:", err);
+          console.error('Background schedule refresh failed:', err);
         });
     },
     [],
@@ -253,87 +295,63 @@ export function SchedulePage() {
 
   return (
     <main className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 rounded-[var(--radius-xl)] border border-border bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-semibold text-foreground">
-              Surgical Schedules
-            </h1>
-            <Badge variant="info">{schedules.length} Total</Badge>
-          </div>
-          <p className="mt-1 text-xs text-foreground-muted">
-            View, schedule, and manage operating theatre procedures and room
-            allocations.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <div
-            role="group"
-            aria-label="Schedule view"
-            className="inline-flex rounded-md border border-border-strong p-1"
-          >              <button
-              type="button"
-              aria-pressed={viewMode === 'list'}
-              onClick={() => setViewMode('list')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${viewMode === 'list'
-                ? 'bg-primary text-foreground-inverse'
-                : 'text-foreground-secondary hover:bg-surface-muted'
-                }`}
+      <PageHeader
+        eyebrow="Operating theatre"
+        title="Surgical schedules"
+        meta={`${schedules.length} total`}
+        description="Every procedure the role can access, with room allocation and status. Filter the board, then open a case to manage it."
+        actions={
+          <>
+            <div
+              role="group"
+              aria-label="Schedule view"
+              className="border-border bg-surface inline-flex border"
             >
-              List
-            </button>
-
-            <button
-              type="button"
-              aria-pressed={viewMode === 'calendar'}
-              onClick={() => setViewMode('calendar')}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${viewMode === 'calendar'
-                ? 'bg-primary text-foreground-inverse'
-                : 'text-foreground-secondary hover:bg-surface-muted'
+              <button
+                type="button"
+                aria-pressed={viewMode === 'list'}
+                onClick={() => setViewMode('list')}
+                className={`border-border -ml-px border-l px-3.5 py-2 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors first:border-l-0 ${
+                  viewMode === 'list'
+                    ? 'bg-foreground text-foreground-inverse'
+                    : 'text-foreground-muted hover:bg-surface-subtle hover:text-foreground'
                 }`}
-            >
-              Calendar
-            </button>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchSchedules}
-            isLoading={isLoading}
-          >
-            Refresh
-          </Button>
+              >
+                List
+              </button>
+              <button
+                type="button"
+                aria-pressed={viewMode === 'calendar'}
+                onClick={() => setViewMode('calendar')}
+                className={`border-border -ml-px border-l px-3.5 py-2 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors first:border-l-0 ${
+                  viewMode === 'calendar'
+                    ? 'bg-foreground text-foreground-inverse'
+                    : 'text-foreground-muted hover:bg-surface-subtle hover:text-foreground'
+                }`}
+              >
+                Calendar
+              </button>
+            </div>
 
-          {isAdmin && (
-            <Button size="sm" onClick={handleOpenCreate}>
-              + Create Schedule
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchSchedules}
+              isLoading={isLoading}
+            >
+              Refresh
             </Button>
-          )}
-        </div>
-      </div>
 
-      <section
-        aria-label="Schedule overview"
-        className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"
-      >
-        {scheduleMetrics.map((metric) => (
-          <div
-            key={metric.label}
-            className={`rounded-xl border border-border border-l-4 ${metric.accent} bg-surface p-4 shadow-xs`}
-          >
-            <p            className="text-sm font-medium text-foreground-muted">
-              {metric.label}
-            </p>
-            <p className="mt-2 tabular-nums text-3xl font-semibold tracking-tight text-foreground">
-              {metric.value}
-            </p>
-            <p className="mt-1 text-xs text-foreground-subtle">
-              {metric.detail}
-            </p>
-          </div>
-        ))}
-      </section>
+            {isAdmin && (
+              <Button size="sm" onClick={handleOpenCreate}>
+                New schedule
+              </Button>
+            )}
+          </>
+        }
+      />
+
+      <StatusDistribution counts={statusCounts} total={schedules.length} />
       {/* Filter Section */}
       <ScheduleFilters
         filters={filters}
@@ -345,16 +363,17 @@ export function SchedulePage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p
-          className="text-sm text-foreground-muted"
+          className="text-foreground-muted font-mono text-[11px] tracking-[0.08em] uppercase tabular-nums"
           aria-live="polite"
-        >              Showing {filteredSchedules.length} of {schedules.length} procedures
+        >
+          {filteredSchedules.length} of {schedules.length} procedures
         </p>
 
         {hasActiveFilters && (
           <button
             type="button"
             onClick={handleResetFilters}
-            className="rounded-md px-3 py-2 text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="text-primary focus-visible:outline-primary rounded-md px-3 py-2 text-sm font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             Clear filters
           </button>
@@ -363,7 +382,7 @@ export function SchedulePage() {
 
       {/* Schedules List */}
       <h2 className="sr-only">Schedules</h2>
-      {viewMode === "calendar" ? (
+      {viewMode === 'calendar' ? (
         <ScheduleCalendar
           schedules={filteredSchedules}
           isLoading={isLoading}

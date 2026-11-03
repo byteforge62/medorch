@@ -2,10 +2,23 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import type { AlertItem } from '@/components/alerts/AlertCenter';
 
+const severityRail: Record<AlertItem['severity'], string> = {
+  CRITICAL: 'bg-danger',
+  WARNING: 'bg-warning',
+  INFO: 'bg-info',
+};
+
+/**
+ * AlertsSummaryWidget — the exception column.
+ *
+ * Operational software earns its keep by surfacing what is wrong, so this
+ * panel lists only unread alerts as ruled rows with a severity rail and the
+ * time it was raised. Severity is never colour-only: the word is always
+ * printed beside it. Cleared state is stated explicitly rather than left as an
+ * empty box.
+ */
 export function AlertsSummaryWidget() {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,94 +47,111 @@ export function AlertsSummaryWidget() {
     return () => window.clearTimeout(timeoutId);
   }, [loadAlerts]);
 
-  const unreadAlerts = alerts.filter((a) => !a.isRead).slice(0, 4);
-  const unreadAlertsAll = alerts.filter((alert) => !alert.isRead);
-
-  const criticalCount = unreadAlertsAll.filter(
+  const unread = alerts.filter((alert) => !alert.isRead);
+  const criticalCount = unread.filter(
     (alert) => alert.severity === 'CRITICAL',
   ).length;
-
-  const warningCount = unreadAlertsAll.filter(
+  const warningCount = unread.filter(
     (alert) => alert.severity === 'WARNING',
   ).length;
 
-  return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Critical & Recent Alerts</CardTitle>
-        <Badge variant={unreadAlerts.length > 0 ? 'danger' : 'neutral'}>
-          {unreadAlerts.length} Active
-        </Badge>
-      </CardHeader>
+  const stamp = (value: string) => {
+    const date = new Date(value);
 
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <div className="border-danger-soft bg-danger-soft rounded-lg border p-3">
-          <p className="text-danger text-xs font-medium">Critical</p>
-          <p className="text-danger mt-1 text-xl font-semibold">
-            {isLoading ? '—' : criticalCount}
-          </p>
+    if (Number.isNaN(date.getTime())) return '';
+
+    return new Intl.DateTimeFormat('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
+  return (
+    <section
+      aria-labelledby="exceptions-title"
+      className="border border-border"
+    >
+      <div className="border-border flex items-end justify-between gap-3 border-b px-4 py-3.5 sm:px-5">
+        <div>
+          <p className="eyebrow">Requires attention</p>
+          <h2
+            id="exceptions-title"
+            className="text-foreground mt-1.5 text-base font-semibold tracking-tight"
+          >
+            Exceptions
+          </h2>
         </div>
 
-        <div className="border-warning-soft bg-warning-soft rounded-lg border p-3">
-          <p className="text-warning text-xs font-medium">Warnings</p>
-          <p className="text-warning mt-1 text-xl font-semibold">
-            {isLoading ? '—' : warningCount}
-          </p>
+        <div className="text-right font-mono text-[10px] tracking-[0.14em] uppercase">
+          <p className="text-danger">{criticalCount} critical</p>
+          <p className="text-warning mt-0.5">{warningCount} warning</p>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-foreground-subtle p-4 text-center text-xs">
-          Loading alerts...
-        </div>
+        <p className="text-foreground-muted bg-surface px-4 py-5 font-mono text-[11px] tracking-[0.14em] uppercase sm:px-5">
+          Loading alerts…
+        </p>
       ) : error ? (
-        <div
-          role="alert"
-          className="border-danger-soft bg-danger-soft text-danger rounded-lg border p-4 text-sm"
-        >
-          {error}
+        <div role="alert" className="bg-surface px-4 py-4 sm:px-5">
+          <p className="text-danger text-sm">{error}</p>
           <button
             type="button"
             onClick={() => void loadAlerts()}
-            className="ml-2 font-semibold underline"
+            className="text-primary mt-2 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase underline underline-offset-4"
           >
             Retry
           </button>
         </div>
-      ) : unreadAlerts.length === 0 ? (
-        <div className="text-foreground-subtle p-6 text-center text-xs">
-          All system alerts cleared
+      ) : unread.length === 0 ? (
+        <div className="bg-surface px-4 py-5 sm:px-5">
+          <p className="text-foreground font-medium">Nothing outstanding</p>
+          <p className="text-foreground-muted mt-1 text-sm">
+            All operational alerts have been read.
+          </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {unreadAlerts.map((alert) => (
-            <div
-              key={alert.id}
-              className="border-border bg-surface-muted rounded-lg border p-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-foreground text-xs font-semibold">
-                  {alert.title}
-                </span>
-                <Badge
-                  variant={
-                    alert.severity === 'CRITICAL'
-                      ? 'danger'
-                      : alert.severity === 'WARNING'
-                        ? 'warning'
-                        : 'info'
-                  }
-                >
-                  {alert.severity}
-                </Badge>
+        <ul className="bg-border divide-y divide-border">
+          {unread.map((alert) => (
+            <li key={alert.id} className="bg-surface">
+              <div className="relative py-3 pr-4 pl-5 sm:pr-5">
+                <span
+                  className={`absolute top-0 bottom-0 left-0 w-[3px] ${severityRail[alert.severity]}`}
+                  aria-hidden="true"
+                />
+
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-foreground text-sm font-semibold">
+                    {alert.title}
+                  </p>
+
+                  <span
+                    className={`shrink-0 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase ${
+                      alert.severity === 'CRITICAL'
+                        ? 'text-danger'
+                        : alert.severity === 'WARNING'
+                          ? 'text-warning'
+                          : 'text-info'
+                    }`}
+                  >
+                    {alert.severity}
+                  </span>
+                </div>
+
+                <p className="text-foreground-muted mt-1 line-clamp-2 text-xs leading-relaxed">
+                  {alert.message}
+                </p>
+
+                <p className="text-foreground-subtle mt-1.5 font-mono text-[10px] tracking-[0.12em] uppercase">
+                  {alert.type} · {stamp(alert.createdAt)}
+                </p>
               </div>
-              <p className="text-foreground-muted mt-1 line-clamp-2 text-xs">
-                {alert.message}
-              </p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-    </Card>
+    </section>
   );
 }

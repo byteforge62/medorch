@@ -1,23 +1,22 @@
+'use client';
 
-"use client";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-
-import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { LoadingState } from "@/components/ui/LoadingState";
-import { apiClient, ApiClientError } from "@/lib/api/client";
+import { ScheduleStatusBadge } from '@/components/schedules/ScheduleStatusBadge';
+import { Ledger, LedgerRow } from '@/components/ui/Ledger';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { apiClient, ApiClientError } from '@/lib/api/client';
 
 type AppointmentStatus =
-  | "SCHEDULED"
-  | "CONFIRMED"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED"
-  | "DELAYED";
+  | 'SCHEDULED'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'DELAYED';
 
 interface Appointment {
   id: string;
@@ -26,7 +25,7 @@ interface Appointment {
   startTime: string;
   endTime: string;
   status: AppointmentStatus;
-  priority: "ELECTIVE" | "URGENT" | "EMERGENCY";
+  priority: 'ELECTIVE' | 'URGENT' | 'EMERGENCY';
   department: {
     name: string;
   };
@@ -48,11 +47,11 @@ function formatDate(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Date unavailable";
+    return 'Date unavailable';
   }
 
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "full",
+  return new Intl.DateTimeFormat('en-IN', {
+    dateStyle: 'full',
   }).format(date);
 }
 
@@ -60,17 +59,17 @@ function formatTime(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Time unavailable";
+    return 'Time unavailable';
   }
 
-  return new Intl.DateTimeFormat("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Intl.DateTimeFormat('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(date);
 }
 
 function formatLabel(value: string) {
-  return value.replaceAll("_", " ");
+  return value.replaceAll('_', ' ');
 }
 
 export function AppointmentDetail({
@@ -78,20 +77,18 @@ export function AppointmentDetail({
 }: {
   appointmentId: string;
 }) {
-  const [appointment, setAppointment] =
-    useState<Appointment | null>(null);
+  const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadAppointment() {
       try {
-        const patient =
-          await apiClient.get<PatientAppointmentsResponse>(
-            "/api/me/appointments",
-          );
+        const patient = await apiClient.get<PatientAppointmentsResponse>(
+          '/api/me/appointments',
+        );
 
         const ownAppointment = patient.schedules.find(
           (item) => item.id === appointmentId,
@@ -105,7 +102,7 @@ export function AppointmentDetail({
           setError(
             caught instanceof ApiClientError
               ? caught.message
-              : "Unable to load this appointment.",
+              : 'Unable to load this appointment.',
           );
         }
       } finally {
@@ -159,31 +156,31 @@ export function AppointmentDetail({
 
   const details = [
     {
-      label: "Scheduled date",
+      label: 'Scheduled date',
       value: formatDate(appointment.scheduledDate),
     },
     {
-      label: "Start time",
+      label: 'Start time',
       value: formatTime(appointment.startTime),
     },
     {
-      label: "End time",
+      label: 'End time',
       value: formatTime(appointment.endTime),
     },
     {
-      label: "Department",
+      label: 'Department',
       value: appointment.department.name,
     },
     {
-      label: "Operating theatre",
+      label: 'Operating theatre',
       value: appointment.otRoom.name,
     },
     {
-      label: "Room code",
+      label: 'Room code',
       value: appointment.otRoom.code,
     },
     {
-      label: "Priority",
+      label: 'Priority',
       value: formatLabel(appointment.priority),
     },
   ];
@@ -207,7 +204,7 @@ export function AppointmentDetail({
             Appointment Details
           </h1>
 
-          <Badge>{formatLabel(appointment.status)}</Badge>
+          <ScheduleStatusBadge status={appointment.status} />
         </div>
 
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">
@@ -215,28 +212,28 @@ export function AppointmentDetail({
         </p>
       </section>
 
-      <Card>
-        <h2 className="text-lg font-semibold">
-          {appointment.procedure}
-        </h2>
-
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+      <section className="border-border bg-surface border">
+        <header className="border-border-strong bg-surface-muted border-b px-4 py-4 sm:px-6">
+          <p className="text-foreground-subtle font-mono text-[11px] tracking-[0.16em] uppercase">
+            Appointment record
+          </p>
+          <h2 className="text-foreground mt-1 text-lg font-semibold">
+            {appointment.procedure}
+          </h2>
+        </header>
+        <Ledger className="border-0 border-b-0 sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           {details.map((detail) => (
-            <div
-              key={detail.label}
-              className="border-b border-[var(--color-border)] pb-3"
-            >
-              <p className="text-xs text-[var(--color-text-muted)]">
+            <LedgerRow key={detail.label} className="px-4 py-3 sm:px-6">
+              <p className="text-foreground-muted font-mono text-[10px] tracking-[0.12em] uppercase">
                 {detail.label}
               </p>
-
-              <p className="mt-1 text-sm font-medium">
+              <p className="text-foreground mt-1 text-sm font-medium">
                 {detail.value}
               </p>
-            </div>
+            </LedgerRow>
           ))}
-        </div>
-      </Card>
+        </Ledger>
+      </section>
     </main>
   );
 }

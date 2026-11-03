@@ -1,13 +1,31 @@
-import { AppShell } from '@/components/layout/AppShell';
-import { requireRole } from '@/lib/auth/authorization';
-import { AuditLogViewer } from '@/components/audit/AuditLogViewer';
+import { AppShell } from '@/components/layout/AppShell'
+import { requireRole } from '@/lib/auth/authorization'
+import { AuditLogViewer } from '@/components/audit/AuditLogViewer'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { Card } from '@/components/ui/Card'
 
 export default async function AuditPage() {
-  await requireRole(['ADMIN']);
-
+  await requireRole(['ADMIN'])
   return (
     <AppShell>
-      <AuditLogViewer />
+      <main className="space-y-6 space-y-4 md:space-y-8">
+        <PageHeader
+          eyebrow="Security & compliance"
+          title="Audit Trails"
+          description="Review recorded system activity, identify the actor, and inspect changes across MedOrch."
+        />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <AuditLogViewer />
+
+          <div>
+            <Card className="p-6 border-border border-b-0">
+              <p className="text-foreground-muted text-sm">Audit investigation workspace</p>
+              <p className="text-foreground font-medium mt-2">Review recorded system activity, identify the actor, and inspect changes across MedOrch.</p>
+            </Card>
+          </div>
+        </div>
+      </main>
     </AppShell>
-  );
+  )
 }

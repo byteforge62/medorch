@@ -12,7 +12,7 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
  * Status pills: soft background + dark ink pairs, every pair measured at
  * >= 4.5:1 (docs/design-system/medorch/MASTER.md). Status is never conveyed
  * by color alone — the label text is always present.
- * Note: "purple" is retained as the ADMIN role variant key (now brand blue).
+ * Note: "purple" is retained as the ADMIN role variant key (now brand teal).
  */
 const variantStyles: Record<BadgeVariant, string> = {
   success: 'bg-success-soft text-success',
@@ -31,7 +31,7 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] leading-none font-semibold whitespace-nowrap ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

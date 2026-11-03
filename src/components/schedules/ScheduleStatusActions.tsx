@@ -81,7 +81,7 @@ function ConfirmDialog({
       aria-modal="true"
       aria-labelledby="status-confirm-title"
     >
-      <div className="w-full max-w-sm rounded-xl border border-border-strong bg-surface p-6 shadow-lg">
+      <div className="w-full max-w-sm border border-border-strong bg-surface p-6">
         <h3
           id="status-confirm-title"
           className="mt-1 text-center text-sm font-semibold text-foreground"

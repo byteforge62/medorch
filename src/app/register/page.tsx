@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { AuthShell } from '@/components/auth/AuthShell';
 
 type RegistrationResponse = {
   message?: string;
@@ -10,6 +11,12 @@ type RegistrationResponse = {
     message: string;
   }>;
 };
+
+const fieldClass =
+  'mt-2 w-full border border-rule bg-sheet px-3.5 py-3 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-subtle focus:border-pine disabled:cursor-not-allowed disabled:opacity-60';
+
+const labelClass =
+  'font-mono text-[8px] uppercase tracking-[0.22em] text-ink-muted';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -84,117 +91,107 @@ export default function RegisterPage() {
     }
   }
 
-  const inputClass =
-    'mt-1.5 w-full rounded-[var(--radius-control)] border border-border-strong bg-surface px-3.5 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
-
   return (
-    <main className="bg-background flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="border-border bg-surface w-full max-w-md rounded-2xl border p-6 shadow-sm sm:p-8">
-        <div className="mb-7">
-          <p className="text-primary text-sm font-semibold tracking-wide">
-            MEDORCH
-          </p>
+    <AuthShell
+      plate="Enrolment · Plate 02"
+      title={
+        <>
+          Request patient <em className="text-pine italic">access</em>.
+        </>
+      }
+      description="Patient accounts are verified by email and approved by an administrator before the first sign-in."
+      asideNote="Patient enrolment is gated by verification and approval. Records remain invisible until the account is active."
+      footer={
+        <>
+          Already registered?{' '}
+          <Link href="/login" className="link-draw text-ink">
+            Sign in
+          </Link>
+          . Staff accounts are issued by an administrator.
+        </>
+      }
+    >
+      {error ? (
+        <p
+          role="alert"
+          className="border-danger bg-danger-soft text-danger mb-5 border-l-2 px-3 py-2.5 text-[11px] leading-relaxed"
+        >
+          {error}
+        </p>
+      ) : null}
 
-          <h1 className="text-foreground mt-3 text-2xl font-semibold tracking-tight">
-            Create your patient account
-          </h1>
-
-          <p className="text-foreground-muted mt-2 text-sm leading-6">
-            Register to get started. You will need to verify your email before
-            your account can be approved.
+      {success ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="border-success bg-success-soft text-success border-l-2 px-3 py-3 text-[11px] leading-relaxed"
+        >
+          <p className="mb-1 font-mono text-[8px] tracking-[0.22em] uppercase">
+            Registration received
           </p>
+          {success}
         </div>
+      ) : null}
 
-        {error && (
-          <p
-            role="alert"
-            className="border-danger-border bg-danger-soft text-danger mb-5 rounded-lg border p-3 text-sm leading-6"
-          >
-            {error}
-          </p>
-        )}
-
-        {success && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="border-success/40 bg-success-soft text-success mb-5 rounded-lg border p-3 text-sm leading-6"
-          >
-            {success}
+      {!success ? (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className={labelClass}>
+              Full name
+            </label>
+            <input
+              id="name"
+              name="name"
+              autoComplete="name"
+              required
+              minLength={2}
+              maxLength={100}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Enter your full name"
+              className={fieldClass}
+            />
           </div>
-        )}
 
-        {!success && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="name"
-                className="text-foreground text-sm font-medium"
-              >
-                Full name
-              </label>
-              <input
-                id="name"
-                name="name"
-                autoComplete="name"
-                required
-                minLength={2}
-                maxLength={100}
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Enter your full name"
-                className={inputClass}
-              />
-            </div>
+          <div>
+            <label htmlFor="email" className={labelClass}>
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              maxLength={254}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              className={fieldClass}
+            />
+          </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="text-foreground text-sm font-medium"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                maxLength={254}
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@example.com"
-                className={inputClass}
-              />
-            </div>
+          <div>
+            <label htmlFor="phone" className={labelClass}>
+              Phone <span className="normal-case">(optional)</span>
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              minLength={7}
+              maxLength={20}
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder="Enter your phone number"
+              className={fieldClass}
+            />
+          </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label
-                htmlFor="phone"
-                className="text-foreground text-sm font-medium"
-              >
-                Phone number{' '}
-                <span className="text-foreground-muted">(optional)</span>
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                minLength={7}
-                maxLength={20}
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder="Enter your phone number"
-                className={inputClass}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="text-foreground text-sm font-medium"
-              >
+              <label htmlFor="password" className={labelClass}>
                 Password
               </label>
               <input
@@ -207,17 +204,14 @@ export default function RegisterPage() {
                 maxLength={128}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="At least 12 characters"
-                className={inputClass}
+                placeholder="12 characters minimum"
+                className={fieldClass}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="text-foreground text-sm font-medium"
-              >
-                Confirm password
+              <label htmlFor="confirmPassword" className={labelClass}>
+                Confirm
               </label>
               <input
                 id="confirmPassword"
@@ -229,31 +223,27 @@ export default function RegisterPage() {
                 maxLength={128}
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                placeholder="Re-enter your password"
-                className={inputClass}
+                placeholder="Re-enter password"
+                className={fieldClass}
               />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? 'Creating account...' : 'Create account'}
-            </button>
-          </form>
-        )}
-
-        <p className="text-foreground-muted mt-6 text-center text-sm">
-          Already registered?{' '}
-          <Link
-            href="/login"
-            className="text-primary font-medium underline-offset-4 hover:underline"
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-pine text-chalk hover:bg-pine-deep group mt-2 flex h-12 w-full items-center justify-between px-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Sign in
-          </Link>
-        </p>
-      </section>
-    </main>
+            {loading ? 'Submitting…' : 'Request access'}
+            <span
+              className="transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            >
+              →
+            </span>
+          </button>
+        </form>
+      ) : null}
+    </AuthShell>
   );
 }

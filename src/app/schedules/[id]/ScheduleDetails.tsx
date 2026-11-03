@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { Button } from '@/components/ui/Button';
+import { ScheduleStatusBadge, SchedulePriorityBadge } from '@/components/schedules/ScheduleStatusBadge';
 import { ScheduleStatusActions } from '@/components/schedules/ScheduleStatusActions';
 
 type ScheduleStatus =
@@ -476,99 +477,111 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
 
   return (
     <main className="space-y-6">
-      <section className="space-y-2">
-        <p className="text-sm font-medium text-[var(--color-primary)]">
-          Surgical Schedule
-        </p>
+      <section className="border-t-2 border-foreground pt-4 pb-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="bg-primary h-2 w-2" aria-hidden="true" />
+              <p className="eyebrow">Case record</p>
+              <span className="border-border-strong text-foreground-muted border px-1.5 py-0.5 font-mono text-[10px] tracking-[0.14em] uppercase">
+                {schedule.otRoom?.code ?? 'OT'} · {formatDate(schedule.scheduledDate)}
+              </span>
+            </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-foreground mt-3 text-[clamp(1.6rem,3vw,2.4rem)] leading-[1.05] font-semibold tracking-[-0.03em]">
               {schedule.procedure}
             </h1>
 
-            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-              {schedule.patient?.patientCode ?? 'Patient'} ·{' '}
-              {schedule.otRoom?.name ?? 'OT room'}
+            <p className="text-foreground-secondary mt-3 max-w-[58ch] text-sm leading-relaxed">
+              {schedule.patient?.name ??
+                schedule.patient?.patientCode ??
+                'Patient'}{' '}
+              · {schedule.otRoom?.name ?? 'OT room'} ·{' '}
+              {formatDateTime(schedule.startTime)} —{' '}
+              {formatDateTime(schedule.endTime)}
             </p>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <ScheduleStatusBadge status={schedule.status} />
+              <SchedulePriorityBadge priority={schedule.priority} />
+            </div>
+
+            {error ? (
+              <p role="alert" className="text-danger mt-3 text-sm">
+                {error}
+              </p>
+            ) : null}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Badge>{formatLabel(schedule.status)}</Badge>
-            <Badge>{formatLabel(schedule.priority)}</Badge>
-          </div>
+          {canManageSchedules ? (
+            <div className="shrink-0 lg:max-w-md">
+              <ScheduleStatusActions
+                scheduleId={schedule.id}
+                scheduleLabel={schedule.procedure}
+                currentStatus={schedule.status}
+                onStatusUpdated={(_scheduleId, status) =>
+                  setSchedule((current) =>
+                    current ? { ...current, status } : current,
+                  )
+                }
+              />
+            </div>
+          ) : null}
         </div>
-        {canManageSchedules && (
-          <ScheduleStatusActions
-            scheduleId={schedule.id}
-            scheduleLabel={schedule.procedure}
-            currentStatus={schedule.status}
-            onStatusUpdated={(_scheduleId, status) =>
-              setSchedule((current) =>
-                current ? { ...current, status } : current,
-              )
-            }
-          />
-        )}
-
-        {error ? (
-          <p className="text-sm text-[var(--color-danger)]">{error}</p>
-        ) : null}
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <h2 className="font-semibold">Schedule overview</h2>
+          <p className="eyebrow">Case facts</p>
+          <h2 className="text-foreground mt-1.5 text-base font-semibold tracking-tight">Schedule overview</h2>
 
-          <dl className="mt-4 space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">Date</dt>
-              <dd>{formatDate(schedule.scheduledDate)}</dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">Time</dt>
-              <dd>
-                {formatDateTime(schedule.startTime)} —{' '}
-                {formatDateTime(schedule.endTime)}
-              </dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">Patient</dt>
-              <dd className="text-right">
-                {schedule.patient?.name ??
-                  schedule.patient?.patientCode ??
-                  'Unassigned'}
-              </dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">Department</dt>
-              <dd>{schedule.department?.name ?? '—'}</dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">OT room</dt>
-              <dd>
-                {schedule.otRoom
-                  ? `${schedule.otRoom.name} (${schedule.otRoom.code})`
-                  : '—'}
-              </dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text-muted)]">Surgeon</dt>
-              <dd className="text-right">
-                {schedule.surgeon?.name ?? schedule.surgeon?.email ?? '—'}
-              </dd>
-            </div>
-          </dl>
+            <dl className="border-border divide-y divide-border border-t text-sm">
+              {[
+                { term: 'Date', value: formatDate(schedule.scheduledDate) },
+                {
+                  term: 'Time',
+                  value: `${formatDateTime(schedule.startTime)} — ${formatDateTime(schedule.endTime)}`,
+                },
+                {
+                  term: 'Patient',
+                  value:
+                    schedule.patient?.name ??
+                    schedule.patient?.patientCode ??
+                    'Unassigned',
+                },
+                {
+                  term: 'Department',
+                  value: schedule.department?.name ?? '—',
+                },
+                {
+                  term: 'OT room',
+                  value: schedule.otRoom
+                    ? `${schedule.otRoom.name} (${schedule.otRoom.code})`
+                    : '—',
+                },
+                {
+                  term: 'Surgeon',
+                  value:
+                    schedule.surgeon?.name ?? schedule.surgeon?.email ?? '—',
+                },
+              ].map((row) => (
+                <div
+                  key={row.term}
+                  className="flex items-baseline justify-between gap-4 py-2.5"
+                >
+                  <dt className="eyebrow">{row.term}</dt>
+                  <dd className="text-foreground text-right font-medium">
+                    {row.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
         </Card>
 
         {(isAdmin || session?.user?.role === 'DOCTOR') && (
           <Card>
-            <h2 className="font-semibold">Clinical notes</h2>
+            <p className="eyebrow">Record</p>
+            <h2 className="text-foreground mt-1.5 text-base font-semibold tracking-tight">Clinical notes</h2>
 
             <p className="mt-4 text-sm whitespace-pre-wrap text-[var(--color-text-muted)]">
               {schedule.clinicalNotes || 'No clinical notes recorded.'}
@@ -581,7 +594,8 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
         <Card>
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-semibold">Assigned staff</h2>
+              <p className="eyebrow">Theatre team</p>
+              <h2 className="text-foreground mt-1.5 text-base font-semibold tracking-tight">Assigned staff</h2>
               <p className="mt-1 text-sm text-[var(--color-text-muted)]">
                 {schedule.staff.length} assigned
               </p>
@@ -597,7 +611,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               schedule.staff.map((staff) => (
                 <div
                   key={staff.id}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-border)] p-3"
+                  className="flex items-center justify-between gap-4 border border-[var(--color-border)] p-3"
                 >
                   <div className="min-w-0">
                     <p className="font-medium">{staff.user.name}</p>
@@ -626,7 +640,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               <select
                 value={selectedUserId}
                 onChange={(event) => setSelectedUserId(event.target.value)}
-                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                className="border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
               >
                 <option value="">Select staff</option>
 
@@ -642,7 +656,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 onChange={(event) =>
                   setSelectedStaffRole(event.target.value as StaffRole)
                 }
-                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                className="border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
               >
                 {STAFF_ROLES.map((role) => (
                   <option key={role} value={role}>
@@ -651,21 +665,17 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 ))}
               </select>
 
-              <button
-                type="button"
-                disabled={!selectedUserId || actionLoading}
-                onClick={() => void handleAssignStaff()}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-              >
+              <Button type="button" disabled={!selectedUserId || actionLoading} onClick={() => void handleAssignStaff()}>
                 Assign
-              </button>
+              </Button>
             </div>
           ) : null}
         </Card>
 
         <Card>
           <div>
-            <h2 className="font-semibold">Assigned equipment</h2>
+            <p className="eyebrow">Equipment</p>
+            <h2 className="text-foreground mt-1.5 text-base font-semibold tracking-tight">Assigned equipment</h2>
             <p className="mt-1 text-sm text-[var(--color-text-muted)]">
               {schedule.equipment.filter((item) => !item.releasedAt).length}{' '}
               active assignments
@@ -681,7 +691,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               schedule.equipment.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-border)] p-3"
+                  className="flex items-center justify-between gap-4 border border-[var(--color-border)] p-3"
                 >
                   <div className="min-w-0">
                     <p className="font-medium">{assignment.equipment.name}</p>
@@ -722,7 +732,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               <select
                 value={selectedEquipmentId}
                 onChange={(event) => setSelectedEquipmentId(event.target.value)}
-                className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                className="min-w-0 flex-1 border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
               >
                 <option value="">Select available equipment</option>
 
@@ -733,14 +743,9 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 ))}
               </select>
 
-              <button
-                type="button"
-                disabled={!selectedEquipmentId || actionLoading}
-                onClick={() => void handleAssignEquipment()}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-              >
+              <Button type="button" disabled={!selectedEquipmentId || actionLoading} onClick={() => void handleAssignEquipment()}>
                 Assign
-              </button>
+              </Button>
             </div>
           ) : null}
         </Card>
@@ -763,7 +768,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
             schedule.notes.map((note) => (
               <article
                 key={note.id}
-                className="rounded-lg border border-[var(--color-border)] p-4"
+                className="border border-[var(--color-border)] p-4"
               >
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm font-medium">{note.author.name}</p>
@@ -782,7 +787,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                       maxLength={5000}
                       disabled={actionLoading}
                       aria-label="Edit schedule note"
-                      className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                      className="w-full resize-y border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
                     />
                     <div className="flex justify-end gap-2">
                       <button
@@ -792,18 +797,13 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                           setEditingNote(null);
                           setEditingNoteContent('');
                         }}
-                        className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-xs font-medium disabled:opacity-50"
+                        className="border border-[var(--color-border)] px-3 py-2 text-xs font-medium disabled:opacity-50"
                       >
                         Keep note
                       </button>
-                      <button
-                        type="button"
-                        disabled={!editingNoteContent.trim() || actionLoading}
-                        onClick={() => void handleUpdateNote()}
-                        className="rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
-                      >
+                      <Button type="button" disabled={!editingNoteContent.trim() || actionLoading} onClick={() => void handleUpdateNote()}>
                         Save note
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -847,18 +847,13 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               rows={4}
               maxLength={5000}
               placeholder="Add a clinical or operational note..."
-              className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
+              className="w-full resize-y border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
             />
 
             <div className="flex justify-end">
-              <button
-                type="button"
-                disabled={!noteContent.trim() || actionLoading}
-                onClick={() => void handleAddNote()}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-              >
+              <Button type="button" disabled={!noteContent.trim() || actionLoading} onClick={() => void handleAddNote()}>
                 Add note
-              </button>
+              </Button>
             </div>
           </div>
         )}

@@ -1,165 +1,167 @@
-'use client';
+'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
-import { useSession } from 'next-auth/react';
-import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { ErrorState } from '@/components/ui/ErrorState';
-import { LoadingState } from '@/components/ui/LoadingState';
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
+import { useSession } from 'next-auth/react'
+import { apiClient, ApiClientError } from '@/lib/api/client'
+import { Card } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { LoadingState } from '@/components/ui/LoadingState'
+import { Button } from '@/components/ui/Button'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { ScheduleStatusBadge } from '@/components/schedules/ScheduleStatusBadge'
 
 interface DoctorOption {
-  id: string;
-  specialization?: string | null;
+  id: string
+  specialization?: string | null
   user: {
-    id: string;
-    name: string;
-    email: string;
-    status: string;
-  };
+    id: string
+    name: string
+    email: string
+    status: string
+  }
 }
 
 interface Department {
-  id: string;
-  name: string;
-  description: string | null;
-  headDoctorId: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  name: string
+  description: string | null
+  headDoctorId: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
   headDoctor: {
-    id: string;
-    specialization: string | null;
-    licenseNumber: string | null;
+    id: string
+    specialization: string | null
+    licenseNumber: string | null
     user: {
-      id: string;
-      name: string;
-      email: string;
-    };
-  } | null;
+      id: string
+      name: string
+      email: string
+    }
+  } | null
   _count: {
-    doctors: number;
-    otRooms: number;
-    equipment: number;
-    schedules: number;
-  };
+    doctors: number
+    otRooms: number
+    equipment: number
+    schedules: number
+  }
 }
 
-type DepartmentStatus = 'ALL' | 'ACTIVE' | 'INACTIVE';
+type DepartmentStatus = 'ALL' | 'ACTIVE' | 'INACTIVE'
 
 interface DepartmentForm {
-  name: string;
-  description: string;
-  headDoctorId: string;
+  name: string
+  description: string
+  headDoctorId: string
 }
 
 const EMPTY_FORM: DepartmentForm = {
   name: '',
   description: '',
   headDoctorId: '',
-};
+}
 
 const inputClass =
-  'w-full rounded-lg border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20';
+  'w-full border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary/20'
 
 function getErrorMessage(error: unknown, fallback: string) {
-  return error instanceof ApiClientError ? error.message : fallback;
+  return error instanceof ApiClientError ? error.message : fallback
 }
 
 export function DepartmentManagement() {
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.role === 'ADMIN';
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === 'ADMIN'
 
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [doctors, setDoctors] = useState<DoctorOption[]>([]);
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<DepartmentStatus>('ALL');
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [doctors, setDoctors] = useState<DoctorOption[]>([])
+  const [search, setSearch] = useState('')
+  const [status, setStatus] = useState<DepartmentStatus>('ALL')
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<Department | null>(null);
-  const [form, setForm] = useState<DepartmentForm>({ ...EMPTY_FORM });
-  const [formError, setFormError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [pendingActionId, setPendingActionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<Department | null>(null)
+  const [form, setForm] = useState<DepartmentForm>({ ...EMPTY_FORM })
+  const [formError, setFormError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     const [departmentData, doctorData] = await Promise.all([
       apiClient.get<Department[]>('/api/departments'),
       apiClient.get<DoctorOption[]>('/api/doctors'),
-    ]);
+    ])
 
-    return { departmentData, doctorData };
-  }, []);
+    return { departmentData, doctorData }
+  }, [])
 
   const refreshData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
-      const { departmentData, doctorData } = await fetchData();
+      const { departmentData, doctorData } = await fetchData()
 
-      setDepartments(departmentData);
-      setDoctors(doctorData);
+      setDepartments(departmentData)
+      setDoctors(doctorData)
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : 'Failed to load department data.',
-      );
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [fetchData]);
+  }, [fetchData])
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false
 
     fetchData()
       .then(({ departmentData, doctorData }) => {
-        if (cancelled) return;
+        if (cancelled) return
 
-        setDepartments(departmentData);
-        setDoctors(doctorData);
-        setError(null);
+        setDepartments(departmentData)
+        setDoctors(doctorData)
+        setError(null)
       })
       .catch((err: unknown) => {
-        if (cancelled) return;
+        if (cancelled) return
 
-        setError(getErrorMessage(err, 'Failed to load departments.'));
+        setError(getErrorMessage(err, 'Failed to load departments.'))
       })
       .finally(() => {
         if (!cancelled) {
-          setLoading(false);
+          setLoading(false)
         }
-      });
+      })
 
     return () => {
-      cancelled = true;
-    };
-  }, [fetchData]);
+      cancelled = true
+    }
+  }, [fetchData])
 
   const filteredDepartments = useMemo(() => {
-    const query = search.trim().toLowerCase();
+    const query = search.trim().toLowerCase()
 
     return departments.filter((department) => {
       const matchesSearch =
         !query ||
         department.name.toLowerCase().includes(query) ||
         (department.description ?? '').toLowerCase().includes(query) ||
-        (department.headDoctor?.user.name ?? '').toLowerCase().includes(query);
+        (department.headDoctor?.user.name ?? '').toLowerCase().includes(query)
 
       const matchesStatus =
         status === 'ALL' ||
         (status === 'ACTIVE' && department.isActive) ||
-        (status === 'INACTIVE' && !department.isActive);
+        (status === 'INACTIVE' && !department.isActive)
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [departments, search, status]);
+      return matchesSearch && matchesStatus
+    })
+  }, [departments, search, status])
 
   const counts = useMemo(
     () => ({
@@ -169,135 +171,143 @@ export function DepartmentManagement() {
       doctors: departments.reduce((sum, item) => sum + item._count.doctors, 0),
     }),
     [departments],
-  );
+  )
 
   function openCreateForm() {
-    setEditing(null);
-    setForm({ ...EMPTY_FORM });
-    setFormError(null);
-    setNotice(null);
-    setShowForm(true);
+    setEditing(null)
+    setForm({ ...EMPTY_FORM })
+    setFormError(null)
+    setNotice(null)
+    setShowForm(true)
   }
 
   function openEditForm(department: Department) {
-    setEditing(department);
+    setEditing(department)
     setForm({
       name: department.name,
       description: department.description ?? '',
       headDoctorId: department.headDoctorId ?? '',
-    });
-    setFormError(null);
-    setNotice(null);
-    setShowForm(true);
+    })
+    setFormError(null)
+    setNotice(null)
+    setShowForm(true)
   }
 
   function closeForm() {
-    if (saving) return;
+    if (saving) return
 
-    setShowForm(false);
-    setEditing(null);
-    setFormError(null);
+    setShowForm(false)
+    setEditing(null)
+    setFormError(null)
   }
 
   function updateForm<K extends keyof DepartmentForm>(
     key: K,
     value: DepartmentForm[K],
   ) {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((current) => ({ ...current, [key]: value }))
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaving(true);
-    setFormError(null);
-    setNotice(null);
+    event.preventDefault()
+    setSaving(true)
+    setFormError(null)
+    setNotice(null)
 
-    const name = form.name.trim();
-    const description = form.description.trim();
+    const name = form.name.trim()
+    const description = form.description.trim()
 
     if (name.length < 2) {
-      setFormError('Department name must contain at least 2 characters.');
-      setSaving(false);
-      return;
+      setFormError('Department name must contain at least 2 characters.')
+      setSaving(false)
+      return
     }
 
     if (name.length > 100 || description.length > 500) {
-      setFormError('The name or description exceeds the permitted length.');
-      setSaving(false);
-      return;
+      setFormError('The name or description exceeds the permitted length.')
+      setSaving(false)
+      return
     }
 
     try {
       if (editing) {
-        await apiClient.patch<Department>(`/api/departments/${editing.id}`, {
-          name,
-          description: description || null,
-          headDoctorId: form.headDoctorId || null,
-        });
+        await apiClient.patch<Department>(
+          `/api/departments/${editing.id}`,
+          {
+            name,
+            description: description || null,
+            headDoctorId: form.headDoctorId || null,
+          },
+        )
 
-        setNotice('Department updated successfully.');
+        setNotice('Department updated successfully.')
       } else {
         await apiClient.post<Department>('/api/departments', {
           name,
           ...(description ? { description } : {}),
           ...(form.headDoctorId ? { headDoctorId: form.headDoctorId } : {}),
-        });
+        })
 
-        setNotice('Department created successfully.');
+        setNotice('Department created successfully.')
       }
 
-      setShowForm(false);
-      setEditing(null);
-      await refreshData();
+      setShowForm(false)
+      setEditing(null)
+      await refreshData()
     } catch (err) {
       setFormError(
         getErrorMessage(
           err,
-          editing
-            ? 'Failed to update department.'
-            : 'Failed to create department.',
+          editing ? 'Failed to update department.' : 'Failed to create department.',
         ),
-      );
+      )
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
   }
 
   async function toggleDepartmentStatus(department: Department) {
-    const action = department.isActive ? 'deactivate' : 'reactivate';
+    const action = department.isActive ? 'deactivate' : 'reactivate'
 
     if (
       !window.confirm(
-        `Are you sure you want to ${action} "${department.name}"?`,
+        `Are you sure you want to "${action}" "${department.name}"?`,
       )
     ) {
-      return;
+      return
     }
 
-    setPendingActionId(department.id);
-    setNotice(null);
-    setError(null);
+    setPendingActionId(department.id)
+    setNotice(null)
+    setError(null)
 
     try {
       if (department.isActive) {
-        await apiClient.delete<Department>(`/api/departments/${department.id}`);
+        await apiClient.delete<Department>(
+          `/api/departments/${department.id}`,
+        )
       } else {
-        await apiClient.patch<Department>(`/api/departments/${department.id}`, {
-          isActive: true,
-        });
+        await apiClient.patch<Department>(
+          `/api/departments/${department.id}`,
+          {
+            isActive: true,
+          },
+        )
       }
 
-      setNotice(`Department ${action}d successfully.`);
-      await refreshData();
+      setNotice(`Department ${action}d successfully.`)
+      await refreshData()
     } catch (err) {
-      setError(getErrorMessage(err, `Failed to ${action} department.`));
+      setError(
+        getErrorMessage(err, `Failed to ${action} department.`),
+      )
     } finally {
-      setPendingActionId(null);
+      setPendingActionId(null)
     }
   }
 
   if (loading) {
-    return <LoadingState message="Loading departments..." />;
+    return <LoadingState message="Loading departments..." />
   }
 
   if (error && departments.length === 0) {
@@ -305,57 +315,44 @@ export function DepartmentManagement() {
       <ErrorState
         message={error}
         onRetry={() => {
-          void refreshData();
+          void refreshData()
         }}
       />
-    );
+    )
   }
 
   return (
-    <main className="space-y-6 p-6 lg:p-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-[var(--color-primary)]">
-            Organisation
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
-            Department Management
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-[var(--color-foreground-muted)]">
-            Organise clinical departments, assign department heads, and monitor
-            their associated doctors, operating rooms, equipment, and schedules.
-          </p>
-        </div>
-
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={openCreateForm}
-            className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-          >
-            + New department
-          </button>
-        )}
-      </header>
+    <main className="space-y-6 sm:space-y-8 lg:space-y-10">
+      <PageHeader
+        eyebrow="Organisation"
+        title="Departments"
+        description="Organise clinical departments, assign department heads, and monitor their associated doctors, operating rooms, equipment, and schedules."
+        actions={
+          isAdmin ? (
+            <Button type="button" onClick={openCreateForm}>
+              New department
+            </Button>
+          ) : null
+        }
+      />
 
       {!isAdmin && (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3 text-sm text-[var(--color-foreground-secondary)]">
-          Read-only department access. Only administrators can create, edit, or
-          deactivate departments.
+        <div className="border border-border-line bg-surface-muted px-4 py-3 text-sm text-foreground-secondary">
+          Read-only department access. Only administrators can create, edit, or deactivate departments.
         </div>
       )}
 
       {notice && (
         <div
           role="status"
-          className="border-success/30 bg-success/10 text-success rounded-lg border px-4 py-3 text-sm"
+          className="border-primary-soft bg-primary-soft/10 border border-primary-soft text-primary/80 px-4 py-3 text-sm"
         >
           {notice}
         </div>
       )}
 
       {error && (
-        <div className="border-danger/30 bg-danger/10 text-danger rounded-lg border px-4 py-3 text-sm">
+        <div className="border-danger-soft bg-danger-soft border border-danger-soft text-danger border px-4 py-3 text-sm">
           <p>{error}</p>
           <button
             type="button"
@@ -367,51 +364,140 @@ export function DepartmentManagement() {
         </div>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <p className="text-sm text-[var(--color-foreground-muted)]">
-            Total departments
-          </p>
-          <p className="mt-2 text-2xl font-semibold text-[var(--color-foreground)]">
-            {counts.total}
-          </p>
-        </Card>
+      {/* Department grid with surgical-teal headers */}
+      <section className="space-y-4">
+        <h2 className="text-foreground font-semibold text-lg tracking-tight">
+          Department Overview
+        </h2>
 
-        <Card>
-          <p className="text-sm text-[var(--color-foreground-muted)]">Active</p>
-          <p className="mt-2 text-2xl font-semibold text-[var(--color-foreground)]">
-            {counts.active}
-          </p>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Active departments */}
+          <div>
+            <div className="border-border rounded-0 bg-primary-soft/20 border-b-2 border-primary p-4 mb-3">
+              <h3 className="text-primary font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+                {departments.filter((d) => d.isActive).length} Active
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Departments currently operating
+              </p>
+            </div>
 
-        <Card>
-          <p className="text-sm text-[var(--color-foreground-muted)]">
-            Inactive
-          </p>
-          <p className="mt-2 text-2xl font-semibold text-[var(--color-foreground)]">
-            {counts.inactive}
-          </p>
-        </Card>
+            <div className="border-border rounded-0 bg-surface p-4 space-y-3">
+              {departments
+                .filter((d) => d.isActive)
+                .map((department) => (
+                  <article
+                    key={department.id}
+                    className="border border-border-line rounded-0 p-3 hover:bg-primary-soft/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-foreground font-medium truncate">
+                          {department.name}
+                        </h3>
+                        <p className="text-foreground-secondary text-xs mt-1">
+                          {department.description || 'No description provided.'}
+                        </p>
+                      </div>
 
-        <Card>
-          <p className="text-sm text-[var(--color-foreground-muted)]">
-            Doctors across departments
-          </p>
-          <p className="mt-2 text-2xl font-semibold text-[var(--color-foreground)]">
-            {counts.doctors}
-          </p>
-        </Card>
+                      <div className="w-8 h-8 rounded-0 flex items-center justify-center flex-shrink-0">
+                        <Badge>{department.isActive ? 'Active' : 'Inactive'}</Badge>
+                      </div>
+                    </div>
+
+                    <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <dt className="text-foreground-muted">Doctors</dt>
+                        <dd className="font-mono">{department._count.doctors}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">OT Rooms</dt>
+                        <dd className="font-mono">{department._count.otRooms}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">Equipment</dt>
+                        <dd className="font-mono">{department._count.equipment}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">Schedules</dt>
+                        <dd className="font-mono">{department._count.schedules}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+            </div>
+          </div>
+
+          {/* Inactive departments */}
+          <div>
+            <div className="border-border rounded-0 bg-surface-muted/50 border-b-2 border-danger p-4 mb-3">
+              <h3 className="text-danger font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+                {departments.filter((d) => !d.isActive).length} Inactive
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Departments paused or closed
+              </p>
+            </div>
+
+            <div className="border-border rounded-0 bg-surface p-4 space-y-3">
+              {departments
+                .filter((d) => !d.isActive)
+                .map((department) => (
+                  <article
+                    key={department.id}
+                    className="border border-border-line rounded-0 p-3 hover:bg-primary-soft/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-foreground font-medium truncate">
+                          {department.name}
+                        </h3>
+                        <p className="text-foreground-secondary text-xs mt-1">
+                          {department.description || 'No description provided.'}
+                        </p>
+                      </div>
+
+                      <div className="w-8 h-8 rounded-0 flex items-center justify-center flex-shrink-0">
+                        <Badge variant="danger">{department.isActive ? 'Active' : 'Inactive'}</Badge>
+                      </div>
+                    </div>
+
+                    <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <dt className="text-foreground-muted">Doctors</dt>
+                        <dd className="font-mono">{department._count.doctors}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">OT Rooms</dt>
+                        <dd className="font-mono">{department._count.otRooms}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">Equipment</dt>
+                        <dd className="font-mono">{department._count.equipment}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-foreground-muted">Schedules</dt>
+                        <dd className="font-mono">{department._count.schedules}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+            </div>
+          </div>
+        </div>
       </section>
 
-      <Card>
+      {/* Filter controls */}
+      <section className="mt-6 pt-6 border-t border-border-line">
         <div className="grid gap-4 md:grid-cols-[1fr_220px]">
           <div>
             <label
               htmlFor="department-search"
-              className="mb-2 block text-sm font-medium text-[var(--color-foreground)]"
+              className="mb-2 block text-sm font-medium text-foreground"
             >
               Search departments
             </label>
+
             <input
               id="department-search"
               type="search"
@@ -425,16 +511,15 @@ export function DepartmentManagement() {
           <div>
             <label
               htmlFor="department-status"
-              className="mb-2 block text-sm font-medium text-[var(--color-foreground)]"
+              className="mb-2 block text-sm font-medium text-foreground"
             >
               Status
             </label>
+
             <select
               id="department-status"
               value={status}
-              onChange={(event) =>
-                setStatus(event.target.value as DepartmentStatus)
-              }
+              onChange={(event) => setStatus(event.target.value as DepartmentStatus)}
               className={inputClass}
             >
               <option value="ALL">All statuses</option>
@@ -443,252 +528,7 @@ export function DepartmentManagement() {
             </select>
           </div>
         </div>
-      </Card>
-
-      {filteredDepartments.length === 0 ? (
-        <EmptyState
-          title="No departments found"
-          description={
-            departments.length === 0
-              ? 'Create a department to start organising clinical operations.'
-              : 'Try a different search term or status filter.'
-          }
-        />
-      ) : (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredDepartments.map((department) => (
-            <Card key={department.id}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h2 className="truncate text-base font-semibold text-[var(--color-foreground)]">
-                    {department.name}
-                  </h2>
-                  <p className="mt-1 text-xs text-[var(--color-foreground-muted)]">
-                    Created{' '}
-                    {new Date(department.createdAt).toLocaleDateString('en-IN')}
-                  </p>
-                </div>
-
-                <Badge>{department.isActive ? 'Active' : 'Inactive'}</Badge>
-              </div>
-
-              <p className="mt-4 min-h-10 text-sm text-[var(--color-foreground-secondary)]">
-                {department.description || 'No description provided.'}
-              </p>
-
-              <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3">
-                <p className="text-xs text-[var(--color-foreground-muted)]">
-                  Department head
-                </p>
-                <p className="mt-1 text-sm font-medium text-[var(--color-foreground)]">
-                  {department.headDoctor?.user.name ?? 'Not assigned'}
-                </p>
-                {department.headDoctor?.user.email && (
-                  <p className="mt-0.5 text-xs break-all text-[var(--color-foreground-muted)]">
-                    {department.headDoctor.user.email}
-                  </p>
-                )}
-                {department.headDoctor?.specialization && (
-                  <p className="mt-1 text-xs text-[var(--color-foreground-secondary)]">
-                    {department.headDoctor.specialization}
-                  </p>
-                )}
-              </div>
-
-              <dl className="mt-4 grid grid-cols-2 gap-3">
-                {(
-                  [
-                    ['Doctors', department._count.doctors],
-                    ['OT rooms', department._count.otRooms],
-                    ['Equipment', department._count.equipment],
-                    ['Schedules', department._count.schedules],
-                  ] as const
-                ).map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-lg border border-[var(--color-border)] px-3 py-2"
-                  >
-                    <dt className="text-xs text-[var(--color-foreground-muted)]">
-                      {label}
-                    </dt>
-                    <dd className="mt-1 text-lg font-semibold text-[var(--color-foreground)]">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-
-              {isAdmin && (
-                <div className="mt-5 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-4">
-                  <button
-                    type="button"
-                    onClick={() => openEditForm(department)}
-                    className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)]"
-                  >
-                    Edit department
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => void toggleDepartmentStatus(department)}
-                    disabled={pendingActionId === department.id}
-                    className="border-border-strong rounded-lg border px-3 py-2 text-xs font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
-                  >
-                    {pendingActionId === department.id
-                      ? 'Updating...'
-                      : department.isActive
-                        ? 'Deactivate'
-                        : 'Reactivate'}
-                  </button>
-                </div>
-              )}
-            </Card>
-          ))}
-        </section>
-      )}
-
-      {showForm && (
-        <div
-          className="bg-surface/50 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 backdrop-blur-sm"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeForm();
-          }}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="department-form-title"
-            className="my-auto w-full max-w-xl rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2
-                  id="department-form-title"
-                  className="text-lg font-semibold text-[var(--color-foreground)]"
-                >
-                  {editing ? 'Edit department' : 'Create department'}
-                </h2>
-                <p className="mt-1 text-sm text-[var(--color-foreground-muted)]">
-                  Department names must be unique.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={closeForm}
-                disabled={saving}
-                aria-label="Close department form"
-                className="rounded-lg px-2 py-1 text-xl text-[var(--color-foreground-muted)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
-              >
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-              <div>
-                <label
-                  htmlFor="department-name"
-                  className="mb-1.5 block text-sm font-medium text-[var(--color-foreground)]"
-                >
-                  Department name <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="department-name"
-                  required
-                  minLength={2}
-                  maxLength={100}
-                  value={form.name}
-                  onChange={(event) => updateForm('name', event.target.value)}
-                  className={inputClass}
-                  placeholder="e.g. Cardiology"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="department-description"
-                  className="mb-1.5 block text-sm font-medium text-[var(--color-foreground)]"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="department-description"
-                  rows={3}
-                  maxLength={500}
-                  value={form.description}
-                  onChange={(event) =>
-                    updateForm('description', event.target.value)
-                  }
-                  className={inputClass}
-                  placeholder="Describe the department's scope..."
-                />
-                <p className="mt-1 text-right text-xs text-[var(--color-foreground-muted)]">
-                  {form.description.length}/500
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="department-head"
-                  className="mb-1.5 block text-sm font-medium text-[var(--color-foreground)]"
-                >
-                  Head doctor
-                </label>
-                <select
-                  id="department-head"
-                  value={form.headDoctorId}
-                  onChange={(event) =>
-                    updateForm('headDoctorId', event.target.value)
-                  }
-                  className={inputClass}
-                >
-                  <option value="">Not assigned</option>
-                  {doctors.map((doctor) => (
-                    <option key={doctor.id} value={doctor.id}>
-                      {doctor.user.name} — {doctor.user.email}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-xs text-[var(--color-foreground-muted)]">
-                  Choose a doctor profile. Each department can have one head.
-                </p>
-              </div>
-
-              {formError && (
-                <p
-                  role="alert"
-                  className="border-danger/30 bg-danger/10 text-danger rounded-lg border px-3 py-2 text-sm"
-                >
-                  {formError}
-                </p>
-              )}
-
-              <div className="flex justify-end gap-3 border-t border-[var(--color-border)] pt-4">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  disabled={saving}
-                  className="border-border-strong rounded-lg border px-4 py-2.5 text-sm font-semibold text-[var(--color-foreground-secondary)] hover:bg-[var(--color-surface-muted)] disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-                >
-                  {saving
-                    ? 'Saving...'
-                    : editing
-                      ? 'Save changes'
-                      : 'Create department'}
-                </button>
-              </div>
-            </form>
-          </section>
-        </div>
-      )}
+      </section>
     </main>
-  );
+  )
 }

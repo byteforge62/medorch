@@ -1,0 +1,44 @@
+
+> medorch@0.1.0 test:runtime
+> node --import tsx --test tests/runtime-authorization.test.ts
+
+TAP version 13
+# node:internal/url:818
+#       href = bindingUrl.parse(input, base, true);
+#                         ^
+# TypeError: Invalid URL
+#     at new URL (node:internal/url:818:25)
+#     at beforeAll (C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:33:15)
+#     at Object.<anonymous> (C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:747:2)
+#     at Module._compile (node:internal/modules/cjs/loader:1562:14)
+#     at Object.transformer (C:\\Users\\patel\\Desktop\\medorch\\node_modules\\tsx\\dist\\register-B1c7OH6V.cjs:22:2188)
+#     at Module.load (node:internal/modules/cjs/loader:1313:32)
+#     at Function._load (node:internal/modules/cjs/loader:1123:12)
+#     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#     at wrapModuleLoad (node:internal/modules/cjs/loader:217:24)
+#     at cjsLoader (node:internal/modules/esm/translators:263:5) {
+#   code: 'ERR_INVALID_URL',
+#   input: ''
+# }
+# Node.js v22.13.1
+# Subtest: tests\\runtime-authorization.test.ts
+not ok 1 - tests\\runtime-authorization.test.ts
+  ---
+  duration_ms: 394.5769
+  location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 413.4449
+runtime exit=1

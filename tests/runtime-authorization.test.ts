@@ -13,6 +13,11 @@
  * `medorch_runtime_test_*` database so it can never accidentally target a
  * development or production database by name.
  *
+ * The suite runs under Node's built-in test runner (`npm run test:runtime`),
+ * matching every other suite in `tests/`; `scripts/run-runtime-tests.mjs`
+ * provisions the disposable database, starts the production server, exports
+ * RUNTIME_APP_PORT/RUNTIME_SERVER_PID, and tears everything down.
+ *
  * Scope note: today this suite is limited to endpoints that accept an HTTP
  * request carrying the `authjs.session-token` cookie. The MedOrch
  * register/login flow sets a different cookie shape, so the suite does not
@@ -21,7 +26,8 @@
  * database-backed permission/read-handler suites.
  */
 
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, test, before as beforeAll } from 'node:test';
+import { expect } from './helpers/expect';
 
 const DATABASE_URL = process.env.DATABASE_URL ?? '';
 const dbUrl = new URL(DATABASE_URL);
@@ -52,12 +58,28 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
 
 const APP_URL = new URL(process.env.NEXT_PUBLIC_APP_URL);
 
+// Fixtures must match the deterministic seed in prisma/demo-data.ts (admin
+// password differs from the shared demo password). The two PATIENT accounts
+// must be distinct for the cross-account isolation probes and are seeded with
+// the development-only SEED_VERIFIED_PATIENTS=1 flag.
 const CREDENTIALS = {
-  admin: { email: 'admin@demo.medorch.local', password: 'DemoPass1!' },
-  doctor: { email: 'priya.sharma@demo.medorch.local', password: 'DemoPass1!' },
-  otStaff: { email: 'kavya.nurse@demo.medorch.local', password: 'DemoPass1!' },
-  patientA: { email: 'aarav.mehta@demo.medorch.local', password: 'DemoPass1!' },
-  patientB:  { email: 'meera.rao@demo.medorch.local', password: 'DemoPass1!' },
+  admin: { email: 'admin@medorch.local', password: 'MedOrch@Dev123!' },
+  doctor: {
+    email: 'ananya.shah@demo.medorch.local',
+    password: 'MedOrch@Demo123!',
+  },
+  otStaff: {
+    email: 'kavya.nurse@demo.medorch.local',
+    password: 'MedOrch@Demo123!',
+  },
+  patientA: {
+    email: 'aarav.mehta@demo.medorch.local',
+    password: 'MedOrch@Demo123!',
+  },
+  patientB: {
+    email: 'diya.shah@demo.medorch.local',
+    password: 'MedOrch@Demo123!',
+  },
 };
 
 function authenticatedFetch(
@@ -122,20 +144,12 @@ async function fetchWithTimeout(
 async function signInWithCredentials(
   credentials: (typeof CREDENTIALS)[keyof typeof CREDENTIALS],
 ): Promise<TokenPair> {
-  const csrfRes = await fetch(
-    APP_URL.origin + '/api/auth/callback/credentials',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ csrf: 'true' }),
-    },
-  );
-
-  if (csrfRes.status === 404) {
-    // creds auth may require a path that matches a real NextAuth route.
-    // The CSRF handshake remains useful only while the application exposes
-    // /api/auth/callback/credentials as a real endpoint.
-  }
+  // Auth.js v5 handshake: GET /api/auth/csrf returns the token in the JSON
+  // body and sets the matching `authjs.csrf-token` cookie (double-submit).
+  // Both must be replayed on the credentials callback.
+  const csrfRes = await fetch(APP_URL.origin + '/api/auth/csrf', {
+    redirect: 'manual',
+  });
 
   if (!csrfRes.ok) {
     throw new Error(
@@ -143,27 +157,37 @@ async function signInWithCredentials(
     );
   }
 
-  const csrfSet = csrfRes.headers
+  const csrfBody = (await csrfRes.json()) as { csrfToken?: string };
+  const csrfToken = csrfBody.csrfToken ?? '';
+  if (!csrfToken) {
+    throw new Error('CSRF endpoint did not return a csrfToken.');
+  }
+
+  const csrfCookie = csrfRes.headers
     .getSetCookie()
-    .find((c) => c.startsWith('csrfToken='));
-  const csrfToken = csrfSet?.split(';')[0].slice('csrfToken='.length) ?? '';
+    .find((c) => c.startsWith('authjs.csrf-token='));
 
   const body = new URLSearchParams();
   body.set('csrfToken', csrfToken);
   body.set('email', credentials.email);
   body.set('password', credentials.password);
 
+  // `redirect: 'manual'` keeps the 302 that carries Set-Cookie for the
+  // session; following the redirect would hide those headers.
   const loginRes = await fetch(
     APP_URL.origin + '/api/auth/callback/credentials',
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...(csrfCookie ? { Cookie: csrfCookie.split(';')[0] } : {}),
+      },
       body,
-      credentials: 'include',
+      redirect: 'manual',
     },
   );
 
-  if (!loginRes.ok) {
+  if (loginRes.status >= 400) {
     throw new Error(
       `Credentials login failed for ${credentials.email}: ${loginRes.status} ${loginRes.statusText}`,
     );
@@ -217,7 +241,7 @@ describe('runtime authorization', () => {
     for (const role of Object.keys(CREDENTIALS) as RoleKey[]) {
       tokens[role] = await signInWithCredentials(CREDENTIALS[role]);
     }
-  }, 60_000);
+  }, { timeout: 60_000 });
 
   test(
     'returns 401 for unauthenticated requests on protected endpoints',

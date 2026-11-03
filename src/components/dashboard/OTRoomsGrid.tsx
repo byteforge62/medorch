@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -20,6 +18,21 @@ type OTRoom = {
   };
 };
 
+const tone = {
+  AVAILABLE: { bar: 'bg-success', label: 'Ready', text: 'text-success' },
+  OCCUPIED: { bar: 'bg-danger', label: 'In use', text: 'text-danger' },
+  MAINTENANCE: { bar: 'bg-warning', label: 'Servicing', text: 'text-warning' },
+  DISABLED: { bar: 'bg-border-strong', label: 'Offline', text: 'text-foreground-muted' },
+} as const;
+
+/**
+ * OTRoomsGrid — the theatre floor plan.
+ *
+ * Every active theatre is a cell in one hairline-divided board, keyed by room
+ * code and carrying a status rail along its base. Scanning the board left to
+ * right reads like walking the theatre corridor: which rooms can take a case,
+ * which are running, which are out of service.
+ */
 export function OTRoomsGrid() {
   const [rooms, setRooms] = useState<OTRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,104 +74,103 @@ export function OTRoomsGrid() {
     };
   }, [refreshKey]);
 
-  const getStatusBadge = (status: OTRoom['status']) => {
-    switch (status) {
-      case 'AVAILABLE':
-        return <Badge variant="success">Available</Badge>;
-      case 'OCCUPIED':
-        return <Badge variant="danger">Occupied</Badge>;
-      case 'MAINTENANCE':
-        return <Badge variant="warning">Maintenance</Badge>;
-      case 'DISABLED':
-      default:
-        return <Badge variant="neutral">Disabled</Badge>;
-    }
-  };
-
-  const availableCount = rooms.filter(
-    (room) => room.isActive && room.status === 'AVAILABLE',
+  const activeRooms = rooms.filter((room) => room.isActive);
+  const availableCount = activeRooms.filter(
+    (room) => room.status === 'AVAILABLE',
   ).length;
-
-  const occupiedCount = rooms.filter(
+  const occupiedCount = activeRooms.filter(
     (room) => room.status === 'OCCUPIED',
   ).length;
-
   const maintenanceCount = rooms.filter(
-    (room) => room.status === 'MAINTENANCE',
+    (room) => room.status === 'MAINTENANCE' || room.status === 'DISABLED',
   ).length;
+
   return (
-    <Card className="h-full">
-      <CardHeader>
+    <section aria-labelledby="theatre-floor-title" className="border border-border">
+      <div className="border-border flex flex-wrap items-end justify-between gap-3 border-b px-4 py-3.5 sm:px-5">
         <div>
-          <CardTitle>Operating Rooms Status</CardTitle>
-          <p className="text-foreground-subtle mt-0.5 text-xs">
-            Latest room availability
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            setIsLoading(true);
-            fetchRooms();
-          }}
-          className="text-primary text-xs font-medium hover:underline"
-        >
-          Refresh
-        </button>
-      </CardHeader>
-
-      <div className="grid grid-cols-3 gap-2 pb-4">
-        <div className="border-success-soft bg-success-soft rounded-lg border p-3">
-          <p className="text-success text-xs">Available</p>
-          <p className="text-success mt-1 text-xl font-semibold">
-            {isLoading ? '—' : availableCount}
-          </p>
+          <p className="eyebrow">Floor status</p>
+          <h2
+            id="theatre-floor-title"
+            className="text-foreground mt-1.5 text-base font-semibold tracking-tight"
+          >
+            Theatre floor
+          </h2>
         </div>
 
-        <div className="border-warning-soft bg-warning-soft rounded-lg border p-3">
-          <p className="text-warning text-xs">Occupied</p>
-          <p className="text-warning mt-1 text-xl font-semibold">
-            {isLoading ? '—' : occupiedCount}
-          </p>
-        </div>
+        <div className="flex items-center gap-4 font-mono text-[10px] tracking-[0.14em] uppercase">
+          <span className="text-success">{availableCount} ready</span>
+          <span className="text-danger">{occupiedCount} live</span>
+          <span className="text-warning">{maintenanceCount} out</span>
 
-        <div className="border-danger-soft bg-danger-soft rounded-lg border p-3">
-          <p className="text-danger text-xs">Maintenance</p>
-          <p className="text-danger mt-1 text-xl font-semibold">
-            {isLoading ? '—' : maintenanceCount}
-          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setIsLoading(true);
+              fetchRooms();
+            }}
+            className="text-primary hover:text-primary-hover font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors"
+          >
+            Refresh
+          </button>
         </div>
       </div>
 
       {isLoading ? (
-        <LoadingState message="Loading OT rooms..." />
+        <div className="bg-surface">
+          <LoadingState message="Loading OT rooms..." />
+        </div>
       ) : error ? (
-        <ErrorState message={error} onRetry={fetchRooms} />
-      ) : rooms.length === 0 ? (
-        <EmptyState
-          title="No OT Rooms found"
-          description="No operating rooms configured in system."
-        />
+        <div className="bg-surface">
+          <ErrorState message={error} onRetry={fetchRooms} />
+        </div>
+      ) : activeRooms.length === 0 ? (
+        <div className="bg-surface">
+          <EmptyState
+            title="No OT rooms found"
+            description="No operating rooms are configured in the system."
+          />
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {rooms.map((room) => (
-            <div
-              key={room.id}
-              className="border-border bg-surface-muted/50 hover:border-border rounded-lg border p-3.5 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-foreground text-xs font-bold">
-                  {room.name} ({room.code})
-                </span>
-                {getStatusBadge(room.status)}
+        <div className="bg-border grid gap-px sm:grid-cols-2 xl:grid-cols-3">
+          {activeRooms.map((room) => {
+            const roomTone = tone[room.status];
+
+            return (
+              <div key={room.id} className="bg-surface p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-foreground font-mono text-lg leading-none font-semibold tracking-tight">
+                      {room.code}
+                    </p>
+                    <p className="text-foreground-secondary mt-1.5 truncate text-sm font-medium">
+                      {room.name}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`shrink-0 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase ${roomTone.text}`}
+                  >
+                    {roomTone.label}
+                  </span>
+                </div>
+
+                <div className="border-border-surface mt-3 flex items-center justify-between border-t pt-2.5">
+                  <span className="text-foreground-muted truncate text-[11px]">
+                    {room.department?.name || 'General surgery'}
+                    {room.capacity ? ` · capacity ${room.capacity}` : ''}
+                  </span>
+                </div>
+
+                <div
+                  className={`mt-2 h-1 w-full ${roomTone.bar}`}
+                  aria-hidden="true"
+                />
               </div>
-              <div className="text-foreground-subtle mt-2 flex items-center justify-between text-xs">
-                <span>Dept: {room.department?.name || 'General'}</span>
-                {room.capacity ? <span>Capacity: {room.capacity}</span> : null}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
-    </Card>
+    </section>
   );
 }

@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Button } from '@/components/ui/Button';
 import { UserStatusBadge } from './UserStatusBadge';
 import { UserFilters } from './UserFilters';
 
@@ -53,7 +54,7 @@ const STATUS_OPTIONS: UserStatus[] = [
 ];
 
 const inputClass =
-  'w-full rounded-lg border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20   ';
+  'w-full border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20   ';
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -256,29 +257,28 @@ export function UserList() {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Users</CardTitle>
+          <CardTitle>All accounts</CardTitle>
 
           <p className="text-foreground-subtle mt-1 text-xs">
             {filteredUsers.length} of {users.length} users
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={() => {
             setCreateOpen((current) => !current);
             setCreateError(null);
           }}
-          className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
         >
           {createOpen ? 'Close form' : '+ Create user'}
-        </button>
+        </Button>
       </CardHeader>
 
       {createOpen && (
         <form
           onSubmit={handleCreateUser}
-          className="border-border mb-6 space-y-4 rounded-xl border p-4"
+          className="border-border mb-6 space-y-4 border p-4"
         >
           <div>
             <h3 className="text-foreground text-sm font-semibold">
@@ -294,7 +294,7 @@ export function UserList() {
           {createError && (
             <p
               role="alert"
-              className="border-danger/30 bg-danger/10 text-danger rounded-lg border p-3 text-sm"
+              className="border-danger/30 bg-danger/10 text-danger border p-3 text-sm"
             >
               {createError}
             </p>
@@ -445,18 +445,14 @@ export function UserList() {
                 setCreateForm(EMPTY_CREATE_FORM);
                 setCreateError(null);
               }}
-              className="border-border text-foreground-muted hover:bg-surface-muted rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+              className="border-border text-foreground-muted hover:bg-surface-muted border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
 
-            <button
-              type="submit"
-              disabled={creating}
-              className="text-foreground-inverse rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-            >
+            <Button type="submit" disabled={creating}>
               {creating ? 'Creating...' : 'Create user'}
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -475,7 +471,7 @@ export function UserList() {
       {actionError && (
         <p
           role="alert"
-          className="border-danger/30 bg-danger/10 text-danger mb-4 rounded-lg border p-3 text-sm"
+          className="border-danger/30 bg-danger/10 text-danger mb-4 border p-3 text-sm"
         >
           {actionError}
         </p>
@@ -484,7 +480,7 @@ export function UserList() {
       {actionSuccess && (
         <p
           role="status"
-          className="border-success/30 bg-success/10 text-success mb-4 rounded-lg border p-3 text-sm"
+          className="border-success/30 bg-success/10 text-success mb-4 border p-3 text-sm"
         >
           {actionSuccess}
         </p>

@@ -1,995 +1,564 @@
 import Link from 'next/link';
+import { Wordmark, BrandMark } from '@/components/brand/Brand';
+import { TheatrePlan } from '@/components/visual/TheatrePlan';
+import { DeptGlyph } from '@/components/visual/DeptGlyph';
+import { Reveal } from '@/components/motion/Reveal';
 
-function IconCalendar({ className = 'h-6 w-6' }: { className?: string }) {
+/*======================================================================
+  MedOrch — title sheet
+  ======================================================================
+  The landing page is composed as the front matter of a surgical atlas:
+  a masthead, plate 01 (the hero), then numbered plates for the day sheet,
+  the suite, the access model and the instrumentation. Content is drawn from
+  the real system — the six schedule states, the ten operational modules and
+  the four role scopes are the application's own vocabulary, not invented
+  marketing metrics.
+====================================================================== */
+
+const modules = [
+  {
+    code: '01',
+    name: 'Dashboard',
+    note: 'Role-composed operational overview.',
+  },
+  { code: '02', name: 'Schedules', note: 'Bookings, status and conflict checks.' },
+  { code: '03', name: 'Departments', note: 'Clinical structure and theatre ownership.' },
+  { code: '04', name: 'Patients', note: 'Registry, records and clinical access.' },
+  { code: '05', name: 'Doctors', note: 'Surgeons, specialities and assignments.' },
+  { code: '06', name: 'Equipment', note: 'Instruments, availability and maintenance.' },
+  { code: '07', name: 'Theatres', note: 'Room state, occupancy and turnover.' },
+  { code: '08', name: 'Appointments', note: 'The patient-facing schedule view.' },
+  { code: '09', name: 'Accounts', note: 'Verification and approval control.' },
+  { code: '10', name: 'Audit trail', note: 'Every action, attributed and dated.' },
+];
+
+const statuses = [
+  { code: 'SC', label: 'Scheduled', note: 'Booked, resources held.' },
+  { code: 'CF', label: 'Confirmed', note: 'Team and theatre agreed.' },
+  { code: 'IP', label: 'In progress', note: 'Case open in theatre.' },
+  { code: 'DL', label: 'Delayed', note: 'Held with a reason.' },
+  { code: 'CN', label: 'Cancelled', note: 'Released, recorded.' },
+  { code: 'CP', label: 'Completed', note: 'Closed and auditable.' },
+];
+
+const roles = [
+  {
+    role: 'Administrator',
+    scope: '25 permissions',
+    glyph: 'theatre' as const,
+    lines: ['Accounts and approvals', 'Full schedule control', 'Audit trail access'],
+  },
+  {
+    role: 'Doctor',
+    scope: '13 permissions',
+    glyph: 'imaging' as const,
+    lines: ['Clinical patient record', 'Schedule and notes', 'Own alert management'],
+  },
+  {
+    role: 'OT staff',
+    scope: '9 permissions',
+    glyph: 'sterile' as const,
+    lines: ['Assigned theatres only', 'Redacted patient detail', 'Read-only resources'],
+  },
+  {
+    role: 'Patient',
+    scope: '4 permissions',
+    glyph: 'anaesthesia' as const,
+    lines: ['Own appointments', 'Own alert stream', 'No clinical exposure'],
+  },
+];
+
+const stack = [
+  ['Runtime', 'Next.js 16 · React 19'],
+  ['Data', 'Prisma 7 · PostgreSQL'],
+  ['Identity', 'NextAuth · JWT sessions'],
+  ['Validation', 'Zod · server-enforced'],
+  ['Audit', 'Attributed event log'],
+];
+
+function PlateMark({
+  index,
+  label,
+}: {
+  index: string;
+  label: string;
+}) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-      />
-    </svg>
-  );
-}
-
-function IconBuilding({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4"
-      />
-    </svg>
-  );
-}
-
-function IconCpu({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-      />
-    </svg>
-  );
-}
-
-function IconUsers({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-      />
-    </svg>
-  );
-}
-
-function IconPatient({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-      />
-    </svg>
-  );
-}
-
-function IconBell({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-      />
-    </svg>
-  );
-}
-
-function IconShield({ className = 'h-6 w-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-      />
-    </svg>
-  );
-}
-
-function IconLock({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-      />
-    </svg>
-  );
-}
-
-function IconEye({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-      />
-
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-      />
-    </svg>
-  );
-}
-
-function IconClipboardCheck({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-      />
-    </svg>
-  );
-}
-
-function IconKey({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-      />
-    </svg>
-  );
-}
-
-function IconArrowRight({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M14 5l7 7m0 0l-7 7m7-7H3"
-      />
-    </svg>
-  );
-}
-
-function IconCheck({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M5 13l4 4L19 7"
-      />
-    </svg>
-  );
-}
-
-/* ─── Mobile Nav Toggle (client island) ─── */
-
-import { LandingMobileNav } from '@/components/landing/LandingMobileNav';
-
-/* ─── Hero Dashboard Mock ─── */
-
-function HeroDashboardMock() {
-  return (
-    <div className="border-border bg-surface rounded-xl border shadow-none">
-      {/* Title bar */}
-
-      <div className="border-border flex items-center gap-2 border-b px-4 py-3">
-        <div className="flex gap-1.5">
-          <span className="bg-danger h-2.5 w-2.5 rounded-full" />
-
-          <span className="bg-warning h-2.5 w-2.5 rounded-full" />
-
-          <span className="bg-success h-2.5 w-2.5 rounded-full" />
-        </div>
-
-        <span className="text-foreground-subtle ml-2 text-[11px] font-medium">
-          MedOrch — Operations Dashboard
-        </span>
-      </div>
-
-      {/* Content */}
-
-      <div className="p-4">
-        {/* Stats row */}
-
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            {
-              label: 'OT Rooms',
-              value: '12',
-              sub: '3 Available',
-              color: 'bg-success',
-            },
-
-            {
-              label: 'Surgeries',
-              value: '8',
-              sub: '2 In Progress',
-              color: 'bg-primary',
-            },
-
-            {
-              label: 'Alerts',
-              value: '3',
-              sub: 'Action Needed',
-              color: 'bg-warning',
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-
-              className="border-border bg-surface-subtle/80 rounded-lg border p-3"
-            >
-              <div className="flex items-center gap-1.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${stat.color}`} />
-
-                <span className="text-foreground-muted text-[10px] font-medium">
-                  {stat.label}
-                </span>
-              </div>
-
-              <p className="text-foreground mt-1 text-lg font-bold">
-                {stat.value}
-              </p>
-
-              <p className="text-foreground-subtle text-[10px]">{stat.sub}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Schedule list mock */}
-
-        <div className="border-border bg-surface-subtle/80 mt-3 rounded-lg border p-3">
-          <p className="text-foreground-subtle mb-2 text-[10px] font-semibold tracking-wider uppercase">
-            Upcoming Procedures
-          </p>
-
-          <div className="space-y-2">
-            {[
-              {
-                time: '09:00',
-                procedure: 'Appendectomy',
-                room: 'OT-1',
-                status: 'Confirmed',
-              },
-
-              {
-                time: '11:30',
-                procedure: 'Knee Replacement',
-                room: 'OT-3',
-                status: 'Preparing',
-              },
-
-              {
-                time: '14:00',
-                procedure: 'Cardiac Bypass',
-                room: 'OT-2',
-                status: 'Scheduled',
-              },
-            ].map((item) => (
-              <div
-                key={item.time}
-
-                className="bg-surface flex items-center justify-between rounded-md px-2.5 py-2"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-foreground-muted font-mono text-[11px] font-medium">
-                    {item.time}
-                  </span>
-
-                  <span className="text-foreground text-xs font-medium">
-                    {item.procedure}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-foreground-subtle text-[10px]">
-                    {item.room}
-                  </span>
-
-                  <span className="bg-primary-soft text-primary rounded-full px-2 py-0.5 text-[10px] font-medium">
-                    {item.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="mb-8 flex items-baseline gap-4">
+      <span className="text-vermilion tnum font-mono text-[10px] tracking-[0.2em]">
+        {index}
+      </span>
+      <span className="bg-rule h-px flex-1" aria-hidden="true" />
+      <span className="eyebrow">{label}</span>
     </div>
   );
 }
 
-/* ─── Main Page ─── */
-
-export default function Home() {
-  const currentYear = new Date().getFullYear();
-
-  const navLinks = [
-    { label: 'Platform', href: '#capabilities' },
-
-    { label: 'Capabilities', href: '#workflow' },
-
-    { label: 'Security', href: '#security' },
-  ];
-
-  const trustItems = [
-    {
-      icon: <IconCalendar className="h-5 w-5" />,
-      label: 'Surgical Scheduling',
-    },
-
-    { icon: <IconBuilding className="h-5 w-5" />, label: 'OT Room Management' },
-
-    { icon: <IconCpu className="h-5 w-5" />, label: 'Equipment Readiness' },
-
-    { icon: <IconUsers className="h-5 w-5" />, label: 'Staff Coordination' },
-  ];
-
-  const capabilities = [
-    {
-      icon: <IconCalendar />,
-
-      title: 'OT Scheduling',
-
-      description:
-        'Centralized scheduling for surgical procedures across all operating theatres. Coordinate timing, resources, and staff in a single view.',
-    },
-
-    {
-      icon: <IconBuilding />,
-
-      title: 'Operating Rooms',
-
-      description:
-        'Monitor and manage operating room availability, status, and allocation. Track room readiness and maintenance cycles in real time.',
-    },
-
-    {
-      icon: <IconCpu />,
-
-      title: 'Equipment',
-
-      description:
-        'Track equipment readiness, availability, and allocation for each procedure. Ensure the right instruments are prepared and accounted for.',
-    },
-
-    {
-      icon: <IconUsers />,
-
-      title: 'Clinical Teams',
-
-      description:
-        'Coordinate surgeons, anaesthesiologists, and operating theatre staff. Manage assignments, availability, and team composition per procedure.',
-    },
-
-    {
-      icon: <IconPatient />,
-
-      title: 'Patients',
-
-      description:
-        'Organize patient information linked to surgical schedules. Maintain structured records of procedures, preparation status, and assignments.',
-    },
-
-    {
-      icon: <IconBell />,
-
-      title: 'Alerts',
-
-      description:
-        'Operational alerts for schedule conflicts, equipment issues, and events requiring immediate attention. Stay informed of critical changes.',
-    },
-  ];
-
-  const workflowSteps = [
-    {
-      step: '01',
-
-      title: 'Plan',
-
-      description:
-        'Define surgical schedules, assign operating rooms, and allocate equipment and staff.',
-    },
-
-    {
-      step: '02',
-
-      title: 'Coordinate',
-
-      description:
-        'Synchronize clinical teams, confirm resource availability, and resolve scheduling conflicts.',
-    },
-
-    {
-      step: '03',
-
-      title: 'Execute',
-
-      description:
-        'Track procedures in real time with live room status, staff assignments, and equipment readiness.',
-    },
-
-    {
-      step: '04',
-
-      title: 'Monitor',
-
-      description:
-        'Review operational alerts, audit completed procedures, and identify workflow improvements.',
-    },
-  ];
-
-  const securityFeatures = [
-    {
-      icon: <IconShield className="h-5 w-5" />,
-
-      title: 'Role-Based Access',
-
-      description:
-        'Granular permissions for administrators, doctors, OT staff, and patients. Each role sees only what they need.',
-    },
-
-    {
-      icon: <IconLock />,
-
-      title: 'Secure Authentication',
-
-      description:
-        'Credential-based authentication with session management. Access is controlled and verified at every interaction.',
-    },
-
-    {
-      icon: <IconEye />,
-
-      title: 'Controlled Operational Data',
-
-      description:
-        'Sensitive scheduling, patient, and equipment data is accessible only to authorized personnel within their scope.',
-    },
-
-    {
-      icon: <IconClipboardCheck />,
-
-      title: 'Auditability',
-
-      description:
-        'Actions within the system are traceable. Maintain operational accountability across all workflow stages.',
-    },
-  ];
-
+export default function HomePage() {
   return (
-    <div className="bg-surface text-foreground min-h-screen">
-      {/* ─── NAVBAR ─── */}
+    <div className="bg-paper text-ink relative min-h-screen">
+      {/* ————————————————————————— Masthead ————————————————————————— */}
+      <header className="border-rule bg-paper/95 sticky top-0 z-40 border-b backdrop-blur-[2px]">
+        <div className="mx-auto flex h-[72px] max-w-[90rem] items-center justify-between gap-3 px-5 sm:gap-6 sm:px-8 lg:px-12">
+          <Wordmark subtitle="Operating theatre orchestration" />
 
-      <header className="border-border bg-surface/95 sticky top-0 z-50 border-b backdrop-blur-sm">
-        <nav
-          className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
-          aria-label="Main navigation"
-        >
-          {/* Brand */}
-
-          <Link
-            href="/"
-            className="flex items-center gap-2"
-            aria-label="MedOrch home"
-          >
-            <div className="bg-primary text-foreground-inverse flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold shadow-none">
-              M
-            </div>
-
-            <span className="text-foreground text-base font-bold">MedOrch</span>
-          </Link>
-
-          {/* Desktop nav links */}
-
-          <div className="hidden items-center gap-8 md:flex">
-            {navLinks.map((link) => (
+          <nav aria-label="Sections" className="hidden items-center gap-9 lg:flex">
+            {[
+              ['01', 'Theatre', '#theatre'],
+              ['02', 'Suite', '#suite'],
+              ['03', 'Access', '#access'],
+              ['04', 'Build', '#build'],
+            ].map(([code, label, href]) => (
               <a
-                key={link.label}
-
-                href={link.href}
-
-                className="text-foreground-secondary hover:text-foreground text-sm font-medium transition-colors"
+                key={href}
+                href={href}
+                className="group link-draw flex items-baseline gap-2 font-mono text-[9px] tracking-[0.22em] uppercase"
               >
-                {link.label}
+                <span className="text-vermilion/70">{code}</span>
+                <span className="text-ink-muted group-hover:text-ink transition-colors">
+                  {label}
+                </span>
               </a>
             ))}
-          </div>
+          </nav>
 
-          {/* Desktop auth actions */}
-
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/register"
+              className="link-draw hidden font-mono text-[9px] tracking-[0.22em] text-ink-muted uppercase transition-colors hover:text-ink sm:inline"
+            >
+              Request access
+            </Link>
             <Link
               href="/login"
-
-              className="text-foreground-secondary hover:text-foreground text-sm font-medium transition-colors"
+              className="bg-pine text-chalk hover:bg-pine-deep inline-flex h-9 shrink-0 items-center gap-2 px-4 font-mono text-[9px] tracking-[0.2em] whitespace-nowrap uppercase transition-colors"
             >
-              Sign In
-            </Link>
-
-            <Link
-              href="/login"
-
-              className="bg-primary text-foreground-inverse hover:bg-primary-hover focus:ring-ring/20 active:bg-primary-active inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium shadow-none transition-colors focus:ring-2 focus:outline-none"
-            >
-              Get Started
+              Sign in
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
-
-          {/* Mobile menu toggle */}
-
-          <LandingMobileNav navLinks={navLinks} />
-        </nav>
+        </div>
       </header>
 
-      <main>
-        {/* ─── HERO ─── */}
-        <section className="border-border bg-surface relative overflow-hidden border-b">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-            <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,1.1fr)] lg:gap-16">
-              {/* Left: Product positioning */}
-              <div className="max-w-2xl">
-                <div className="border-primary text-foreground-secondary mb-5 inline-flex items-center gap-2 border-l-2 pl-3 text-xs font-semibold tracking-[0.16em] uppercase">
-                  <span className="bg-success h-1.5 w-1.5 rounded-full" />
-                  Operating Theatre Operations
+      <main id="main">
+        {/* ——————————————————— Plate 01 · Hero ——————————————————— */}
+        <section className="border-rule border-b" aria-labelledby="hero-title">
+          <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+            <div className="grid gap-x-12 gap-y-14 py-12 lg:grid-cols-12 lg:py-16">
+              {/* Title column */}
+              <div className="lg:col-span-7 lg:pt-6">
+                <div className="flex items-center gap-3">
+                  <BrandMark className="text-vermilion h-4 w-4" />
+                  <p className="eyebrow">Plate 01 · Theatre orchestration</p>
                 </div>
 
-                <h1 className="text-foreground max-w-2xl text-4xl font-bold tracking-[-0.03em] sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
-                  One system for the
-                  <span className="text-primary block">operating theatre.</span>
+                <h1
+                  id="hero-title"
+                  className="display mt-7 text-[clamp(2.75rem,6.4vw,5.4rem)]"
+                >
+                  The operating theatre,
+                  <br />
+                  in a <em>single field</em>
+                  <br />
+                  of view.
                 </h1>
 
-                <p className="text-foreground-secondary mt-6 max-w-xl text-base leading-7 sm:text-lg sm:leading-8">
-                  Coordinate rooms, surgical schedules, clinical teams,
-                  equipment, patients, and operational alerts from a single
-                  source of truth.
+                <p className="text-ink-secondary mt-8 max-w-[52ch] text-[15px] leading-[1.7]">
+                  MedOrch coordinates the schedule, the room, the clinical team,
+                  the instrument set and the patient record as one continuous
+                  operational object — with access scoped to the role that needs
+                  it, and every action attributed in the audit trail.
                 </p>
 
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Link
                     href="/login"
-                    className="bg-primary text-foreground-inverse hover:bg-primary-hover focus-visible:ring-ring active:bg-primary-active inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    className="bg-pine text-chalk hover:bg-pine-deep group inline-flex h-12 items-center justify-between gap-8 px-5 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors sm:justify-start"
                   >
-                    Get Started
-                    <IconArrowRight className="h-4 w-4" />
-                  </Link>
-
-                  <a
-                    href="#capabilities"
-                    className="border-border-strong bg-surface text-foreground-secondary hover:bg-surface-subtle hover:text-foreground focus-visible:ring-ring inline-flex min-h-11 items-center justify-center rounded-[var(--radius-control)] border px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  >
-                    Explore Platform
-                  </a>
-                </div>
-
-                <div className="text-foreground-muted mt-8 flex flex-wrap gap-x-5 gap-y-2 text-xs">
-                  <span className="inline-flex items-center gap-2">
-                    <IconCheck className="text-success h-3.5 w-3.5" />
-                    Scheduling
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <IconCheck className="text-success h-3.5 w-3.5" />
-                    Resource coordination
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <IconCheck className="text-success h-3.5 w-3.5" />
-                    Operational visibility
-                  </span>
-                </div>
-              </div>
-
-              {/* Right: Product interface */}
-              <div className="w-full">
-                <div className="relative">
-                  <div
-                    className="bg-primary-soft/50 absolute -inset-4 -z-10 blur-2xl"
-                    aria-hidden="true"
-                  />
-                  <HeroDashboardMock />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── TRUST / VALUE STRIP ─── */}
-
-        <section className="border-border bg-surface border-b">
-          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
-              {trustItems.map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <div className="bg-primary-soft text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                    {item.icon}
-                  </div>
-
-                  <span className="text-foreground text-sm font-semibold">
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ─── CORE CAPABILITIES ─── */}
-
-        <section
-          id="capabilities"
-          className="border-border scroll-mt-20 border-b"
-        >
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-                Core Capabilities
-              </h2>
-
-              <p className="text-foreground-secondary mt-3 text-sm leading-relaxed sm:text-base">
-                Everything your operating theatre needs — scheduling, rooms,
-                equipment, teams, patients, and alerts — managed in one place.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {capabilities.map((cap) => (
-                <div
-                  key={cap.title}
-
-                  className="group border-border bg-surface hover:border-border-strong rounded-xl border p-6 transition-colors"
-                >
-                  <div className="bg-primary-soft text-primary group-hover:bg-primary-soft mb-4 flex h-10 w-10 items-center justify-center rounded-lg transition-colors">
-                    {cap.icon}
-                  </div>
-
-                  <h3 className="text-foreground text-base font-semibold">
-                    {cap.title}
-                  </h3>
-
-                  <p className="text-foreground-secondary mt-2 text-sm leading-relaxed">
-                    {cap.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ─── OPERATIONAL WORKFLOW ─── */}
-
-        <section
-          id="workflow"
-          className="border-border bg-surface-subtle scroll-mt-20 border-b"
-        >
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-                Operational Workflow
-              </h2>
-
-              <p className="text-foreground-secondary mt-3 text-sm leading-relaxed sm:text-base">
-                MedOrch connects every stage of operating theatre operations —
-                from initial planning through post-procedure monitoring.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {workflowSteps.map((step, index) => (
-                <div key={step.title} className="relative">
-                  <div className="border-border bg-surface rounded-xl border p-6">
-                    <div className="mb-3 flex items-center gap-3">
-                      <span className="bg-primary text-foreground-inverse flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold">
-                        {step.step}
-                      </span>
-
-                      <h3 className="text-foreground text-base font-semibold">
-                        {step.title}
-                      </h3>
-                    </div>
-
-                    <p className="text-foreground-secondary text-sm leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-
-                  {/* Connector arrow (not on the last item) */}
-
-                  {index < workflowSteps.length - 1 && (
-                    <div
-                      className="text-foreground-subtle absolute top-1/2 -right-3 z-10 hidden -translate-y-1/2 lg:block"
+                    Enter the platform
+                    <span
+                      className="transition-transform duration-300 group-hover:translate-x-1"
                       aria-hidden="true"
                     >
-                      <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                      →
+                    </span>
+                  </Link>
 
-        {/* ─── SECURITY / ACCESS ─── */}
-
-        <section id="security" className="border-border scroll-mt-20 border-b">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
-              {/* Left: Copy */}
-
-              <div>
-                <div className="border-border bg-surface text-foreground-secondary mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-                  <IconKey className="h-3.5 w-3.5" />
-                  Access & Security
-                </div>
-
-                <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-                  Designed Around Controlled Access
-                </h2>
-
-                <p className="text-foreground-secondary mt-4 text-sm leading-relaxed sm:text-base">
-                  MedOrch is built with role-based access at its core. Every
-                  user — from administrators to clinical staff — sees only the
-                  data and actions relevant to their role. Operational data is
-                  structured, access is authenticated, and actions are
-                  traceable.
-                </p>
-              </div>
-
-              {/* Right: Feature cards */}
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                {securityFeatures.map((feature) => (
-                  <div
-                    key={feature.title}
-
-                    className="border-border bg-surface rounded-xl border p-5"
+                  <Link
+                    href="/register"
+                    className="border-ink text-ink hover:bg-sheet inline-flex h-12 items-center border px-5 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors"
                   >
-                    <div className="bg-surface-muted text-foreground-secondary mb-3 flex h-9 w-9 items-center justify-center rounded-lg">
-                      {feature.icon}
+                    Request an account
+                  </Link>
+                </div>
+
+                {/* Real system facts, not invented metrics */}
+                <dl className="border-rule mt-12 grid grid-cols-3 border-t">
+                  {[
+                    ['10', 'Operational modules'],
+                    ['6', 'Schedule states'],
+                    ['4', 'Role scopes'],
+                  ].map(([value, label], index) => (
+                    <div
+                      key={label}
+                      className={`py-4 ${index > 0 ? 'border-rule border-l pl-5' : ''}`}
+                    >
+                      <dt className="sr-only">{label}</dt>
+                      <dd>
+                        <span className="tnum block font-mono text-[15px] font-medium">
+                          {value}
+                        </span>
+                        <span className="text-ink-muted mt-1 block font-mono text-[8px] tracking-[0.18em] uppercase">
+                          {label}
+                        </span>
+                      </dd>
                     </div>
+                  ))}
+                </dl>
+              </div>
 
-                    <h3 className="text-foreground text-sm font-semibold">
-                      {feature.title}
-                    </h3>
+              {/* Plate column */}
+              <div className="lg:col-span-5">
+                <figure className="corner-ticks border-rule bg-sheet relative border p-4 sm:p-5">
+                  <figcaption className="mb-3 flex items-center justify-between font-mono text-[8px] tracking-[0.22em] uppercase">
+                    <span className="text-ink-muted">Fig. 1 — Theatre suite</span>
+                    <span className="text-vermilion">Plan</span>
+                  </figcaption>
 
-                    <p className="text-foreground-muted mt-1.5 text-xs leading-relaxed">
-                      {feature.description}
-                    </p>
+                  <div className="border-rule-soft bg-paper/60 border">
+                    <TheatrePlan className="text-ink h-auto w-full" />
                   </div>
-                ))}
+
+                  <div className="border-rule-soft text-ink-muted mt-3 flex items-center justify-between border-t pt-2.5 font-mono text-[8px] tracking-[0.18em] uppercase">
+                    <span>Suite 01</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Laminar flow</span>
+                    <span aria-hidden="true">·</span>
+                    <span>2 lamp heads</span>
+                  </div>
+                </figure>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ─── FINAL CTA ─── */}
+        {/* ——————————————— Plate 02 · The day sheet ——————————————— */}
+        <section id="theatre" aria-labelledby="day-sheet-title" className="border-rule border-b">
+          <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+            <PlateMark index="02" label="The day sheet" />
 
-        <section className="border-border bg-surface-subtle border-b">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-                Bring your operating theatre workflow into one system.
-              </h2>
-
-              <p className="text-foreground-secondary mt-4 text-sm leading-relaxed sm:text-base">
-                Stop coordinating across disconnected tools. MedOrch gives your
-                team a single, structured platform for every aspect of operating
-                theatre operations.
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Link
-                  href="/login"
-
-                  className="bg-primary text-foreground-inverse hover:bg-primary-hover focus:ring-ring/20 active:bg-primary-active inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium shadow-none transition-colors focus:ring-2 focus:outline-none"
+            <div className="grid gap-x-14 gap-y-12 lg:grid-cols-12">
+              <Reveal className="lg:col-span-5">
+                <h2
+                  id="day-sheet-title"
+                  className="display text-[clamp(2rem,3.6vw,3.1rem)]"
                 >
-                  Get Started
-                  <IconArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+                  Every case, from booking to close.
+                </h2>
+                <p className="text-ink-secondary mt-6 max-w-[44ch] text-[14px] leading-[1.75]">
+                  A theatre day is a sequence of states, not a list of cards.
+                  MedOrch models the schedule as a state machine with permitted
+                  transitions, conflict checks against the room and its window,
+                  and an audit event at every move.
+                </p>
+                <p className="text-ink-muted mt-5 max-w-[44ch] text-[13px] leading-[1.75]">
+                  Priority is recorded alongside time and theatre, so an
+                  emergency is visible as an emergency rather than a colour.
+                </p>
+
+                <div className="border-rule mt-9 border-t pt-5">
+                  <p className="eyebrow mb-3">Priority classes</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['ELECTIVE', 'URGENT', 'EMERGENCY'].map((priority) => (
+                      <span
+                        key={priority}
+                        className="border-rule text-ink-muted border px-2 py-1 font-mono text-[8px] tracking-[0.18em]"
+                      >
+                        {priority}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={120} className="lg:col-span-7">
+                <div className="border-rule bg-sheet border">
+                  <div className="border-rule-soft flex items-center justify-between border-b px-4 py-2.5">
+                    <span className="font-mono text-[8px] tracking-[0.22em] text-ink-muted uppercase">
+                      Schedule state machine
+                    </span>
+                    <span className="font-mono text-[8px] tracking-[0.22em] text-vermilion uppercase">
+                      6 states
+                    </span>
+                  </div>
+
+                  <ol className="divide-rule-soft divide-y">
+                    {statuses.map((status, index) => (
+                      <li
+                        key={status.code}
+                        className="hover:bg-paper/60 group flex items-center gap-4 px-4 py-3.5 transition-colors sm:gap-6"
+                      >
+                        <span className="text-ink-subtle tnum font-mono text-[9px]">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+
+                        <span className="border-rule bg-paper text-ink flex h-8 w-9 shrink-0 items-center justify-center border font-mono text-[9px] tracking-[0.08em]">
+                          {status.code}
+                        </span>
+
+                        <span className="min-w-0 flex-1">
+                          <span className="text-ink block text-[13px] font-medium">
+                            {status.label}
+                          </span>
+                          <span className="text-ink-muted block text-[11px]">
+                            {status.note}
+                          </span>
+                        </span>
+
+                        <span
+                          className="text-ink-subtle shrink-0 font-mono text-[10px] transition-transform duration-300 group-hover:translate-x-1"
+                          aria-hidden="true"
+                        >
+                          →
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </Reveal>
             </div>
+          </div>
+        </section>
+
+        {/* ————————————————— Plate 03 · The suite ————————————————— */}
+        <section id="suite" aria-labelledby="suite-title" className="border-rule border-b">
+          <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+            <PlateMark index="03" label="The suite" />
+
+            <div className="mb-12 grid gap-x-14 gap-y-6 lg:grid-cols-12">
+              <Reveal className="lg:col-span-7">
+                <h2 id="suite-title" className="display text-[clamp(2rem,3.6vw,3.1rem)]">
+                  Ten modules. One operational record.
+                </h2>
+              </Reveal>
+              <Reveal delay={80} className="lg:col-span-5 lg:pt-2">
+                <p className="text-ink-secondary max-w-[44ch] text-[13px] leading-[1.75]">
+                  Each module owns a domain and shares the same identity,
+                  authorisation and audit spine — so a change in one is
+                  immediately legible in the others.
+                </p>
+              </Reveal>
+            </div>
+
+            <Reveal>
+              <ul className="border-rule divide-rule-soft grid border-t border-b sm:grid-cols-2 lg:grid-cols-5">
+                {modules.map((module, index) => (
+                  <li
+                    key={module.code}
+                    className={`group hover:bg-sheet relative p-4 transition-colors ${
+                      index % 5 !== 0 ? 'lg:border-rule lg:border-l' : ''
+                    } ${index % 2 !== 0 ? 'sm:border-rule sm:border-l lg:border-l-0' : ''} ${
+                      index >= 2 ? 'border-rule border-t sm:border-t-0' : ''
+                    }`}
+                  >
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-vermilion tnum font-mono text-[9px]">
+                        {module.code}
+                      </span>
+                      <span
+                        className="text-ink-subtle font-mono text-[9px] opacity-0 transition-opacity group-hover:opacity-100"
+                        aria-hidden="true"
+                      >
+                        ↗
+                      </span>
+                    </div>
+                    <p className="text-ink mt-2 text-[13px] font-medium">{module.name}</p>
+                    <p className="text-ink-muted mt-1 text-[11px] leading-[1.5]">
+                      {module.note}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ————————————————— Plate 04 · Access ————————————————— */}
+        <section
+          id="access"
+          aria-labelledby="access-title"
+          className="bg-ink text-chalk relative overflow-hidden"
+        >
+          <div className="blueprint-ink absolute inset-0 opacity-40" aria-hidden="true" />
+
+          <div className="relative mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+            <div className="mb-10 flex items-baseline gap-4">
+              <span className="text-brass tnum font-mono text-[10px] tracking-[0.2em]">04</span>
+              <span className="bg-white/15 h-px flex-1" aria-hidden="true" />
+              <span className="font-mono text-[9px] tracking-[0.24em] text-rail-muted uppercase">
+                The access model
+              </span>
+            </div>
+
+            <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
+              <Reveal className="lg:col-span-5">
+                <h2 id="access-title" className="display text-[clamp(2rem,3.6vw,3.1rem)] text-chalk">
+                  Four scopes.
+                  <br />
+                  No <em className="text-brass italic">implicit</em> access.
+                </h2>
+                <p className="mt-6 max-w-[42ch] text-[13px] leading-[1.75] text-white/60">
+                  Authorisation is evaluated server-side on every request from a
+                  fixed permission matrix per role — not from what the interface
+                  chose to show.
+                </p>
+              </Reveal>
+
+              <Reveal delay={120} className="lg:col-span-7">
+                <ul className="grid gap-px bg-white/12 sm:grid-cols-2">
+                  {roles.map((role) => (
+                    <li key={role.role} className="bg-ink p-5">
+                      <div className="flex items-start justify-between">
+                        <DeptGlyph kind={role.glyph} className="h-7 w-7 text-brass/80" />
+                        <span className="font-mono text-[8px] tracking-[0.18em] text-white/40 uppercase">
+                          {role.scope}
+                        </span>
+                      </div>
+                      <p className="mt-4 font-mono text-[10px] tracking-[0.2em] text-chalk uppercase">
+                        {role.role}
+                      </p>
+                      <ul className="mt-3 space-y-1.5">
+                        {role.lines.map((line) => (
+                          <li
+                            key={line}
+                            className="flex items-start gap-2 text-[11px] leading-snug text-white/55"
+                          >
+                            <span
+                              className="bg-brass mt-1.5 h-[3px] w-[3px] shrink-0"
+                              aria-hidden="true"
+                            />
+                            {line}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ————————————————— Plate 05 · Build ————————————————— */}
+        <section id="build" aria-labelledby="build-title" className="border-rule border-b">
+          <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+            <PlateMark index="05" label="Instrumentation" />
+
+            <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
+              <Reveal className="lg:col-span-5">
+                <h2 id="build-title" className="display text-[clamp(2rem,3.6vw,3.1rem)]">
+                  Built to be trusted with the record.
+                </h2>
+                <p className="text-ink-secondary mt-6 max-w-[44ch] text-[13px] leading-[1.75]">
+                  Password hashing, attempt limiting, session versioning and
+                  server-enforced validation are part of the foundation, not a
+                  later hardening pass.
+                </p>
+              </Reveal>
+
+              <Reveal delay={100} className="lg:col-span-7">
+                <dl className="border-rule border-t">
+                  {stack.map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="border-rule-soft group flex items-baseline justify-between gap-6 border-b py-3.5"
+                    >
+                      <dt className="font-mono text-[8px] tracking-[0.22em] text-ink-muted uppercase">
+                        {key}
+                      </dt>
+                      <dd className="text-ink text-right text-[12px] transition-transform duration-300 group-hover:-translate-x-1">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {[
+                    'bcrypt · 12 rounds',
+                    'JWT session versioning',
+                    'Zod at the boundary',
+                    'Attributed audit log',
+                  ].map((item) => (
+                    <span
+                      key={item}
+                      className="border-rule text-ink-muted border px-2 py-1 font-mono text-[8px] tracking-[0.14em] uppercase"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ———————————————————— Closing ———————————————————— */}
+        <section className="mx-auto max-w-[90rem] px-5 py-14 sm:px-8 lg:px-12">
+          <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
+            <div>
+              <p className="eyebrow">Access</p>
+              <p className="display mt-3 text-[clamp(1.6rem,3vw,2.4rem)]">
+                Bring the theatre into one view.
+              </p>
+            </div>
+            <Link
+              href="/login"
+              className="bg-pine text-chalk hover:bg-pine-deep group inline-flex h-12 items-center gap-8 px-5 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors"
+            >
+              Sign in to MedOrch
+              <span
+                className="transition-transform duration-300 group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </Link>
           </div>
         </section>
       </main>
 
-      {/* ─── FOOTER ─── */}
-
-      <footer className="border-border bg-surface border-t">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Brand column */}
-
-            <div className="sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center gap-2">
-                <div className="bg-primary text-foreground-inverse flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold">
-                  M
-                </div>
-
-                <span className="text-foreground text-sm font-bold">
-                  MedOrch
-                </span>
-              </div>
-
-              <p className="text-foreground-muted mt-3 max-w-xs text-xs leading-relaxed">
-                Operating Theatre Management & Resource Orchestration Platform.
-                Centralizing surgical operations for healthcare teams.
+      {/* ————————————————————— Colophon ————————————————————— */}
+      <footer className="border-rule bg-paper-deep/60 border-t">
+        <div className="mx-auto max-w-[90rem] px-5 py-10 sm:px-8 lg:px-12">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="display text-[clamp(2.5rem,7vw,5rem)] leading-none">MedOrch</p>
+              <p className="text-ink-muted mt-3 max-w-[38ch] font-mono text-[8px] tracking-[0.2em] uppercase">
+                Operating theatre orchestration · v0.1.0
               </p>
             </div>
 
-            {/* Platform links */}
-
-            <div>
-              <h4 className="text-foreground-subtle text-xs font-semibold tracking-wider uppercase">
-                Platform
-              </h4>
-
-              <ul className="mt-3 space-y-2">
-                {[
-                  { label: 'Capabilities', href: '#capabilities' },
-
-                  { label: 'Workflow', href: '#workflow' },
-
-                  { label: 'Security', href: '#security' },
-                ].map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-
-                      className="text-foreground-secondary hover:text-foreground text-sm transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Access links */}
-
-            <div>
-              <h4 className="text-foreground-subtle text-xs font-semibold tracking-wider uppercase">
-                Access
-              </h4>
-
-              <ul className="mt-3 space-y-2">
-                <li>
-                  <Link
-                    href="/login"
-
-                    className="text-foreground-secondary hover:text-foreground text-sm transition-colors"
-                  >
-                    Sign In
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    href="/login"
-
-                    className="text-foreground-secondary hover:text-foreground text-sm transition-colors"
-                  >
-                    Get Started
-                  </Link>
-                </li>
-              </ul>
+            <div className="flex flex-wrap gap-x-8 gap-y-2">
+              {[
+                ['Sign in', '/login'],
+                ['Request access', '/register'],
+                ['Forgot password', '/forgot-password'],
+              ].map(([label, href]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="link-draw font-mono text-[9px] tracking-[0.2em] text-ink-muted uppercase hover:text-ink"
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Bottom bar */}
-
-          <div className="border-border mt-10 flex flex-col items-center justify-between gap-4 border-t pt-6 sm:flex-row">
-            <p className="text-foreground-subtle text-xs">
-              &copy; {currentYear} MedOrch. All rights reserved.
-            </p>
-
-            <div className="text-foreground-subtle flex items-center gap-1.5 text-xs">
-              <IconCheck className="text-success h-3.5 w-3.5" />
-
-              <span>System Operational</span>
-            </div>
+          <div className="border-rule-soft mt-8 flex flex-col gap-2 border-t pt-4 font-mono text-[8px] tracking-[0.16em] text-ink-subtle uppercase sm:flex-row sm:items-center sm:justify-between">
+            <span>Drawn as a surgical atlas · not a dashboard</span>
+            <span>Authorised clinical use only</span>
           </div>
         </div>
       </footer>

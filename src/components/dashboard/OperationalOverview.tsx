@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 
 type OTRoomSummary = {
   id: string;
@@ -24,31 +22,40 @@ type ScheduleSummary = {
   scheduledDate: string;
 };
 
-type EquipmentSummary = {
-  id: string;
-  status: 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED';
-};
+type EquipmentSummary = { id: string; status: string };
+type AlertSummary = { id: string; isRead: boolean };
 
-type AlertSummary = {
-  id: string;
-  isRead: boolean;
-};
-
+/**
+ * OperationalOverview — the readout band across the top of the control room.
+ *
+ * Four figures share one line (no stat cards), and theatre capacity is drawn
+ * as a segmented gauge: one block per theatre, coloured by its live status, so
+ * "how much of the department is usable" reads as a shape before it is a
+ * number. All four figures come from the same live endpoints as before.
+ */
 export function OperationalOverview() {
   const [stats, setStats] = useState({
     totalRooms: 0,
     availableRooms: 0,
     occupiedRooms: 0,
+    maintenanceRooms: 0,
     totalSchedules: 0,
+    todaySchedules: 0,
     inProgressSchedules: 0,
     availableEquipment: 0,
     totalEquipment: 0,
     unreadAlerts: 0,
   });
+  const [roomStatuses, setRoomStatuses] = useState<OTRoomSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadStats() {
       try {
         setIsLoading(true);
@@ -59,13 +66,17 @@ export function OperationalOverview() {
           apiClient.get<AlertSummary[]>('/api/alerts'),
         ]);
 
+        if (cancelled) return;
+
         const [rooms, schedules, equipment, alerts] = results;
 
         const nextStats = {
           totalRooms: 0,
           availableRooms: 0,
           occupiedRooms: 0,
+          maintenanceRooms: 0,
           totalSchedules: 0,
+          todaySchedules: 0,
           inProgressSchedules: 0,
           availableEquipment: 0,
           totalEquipment: 0,
@@ -76,12 +87,17 @@ export function OperationalOverview() {
 
         if (rooms.status === 'fulfilled') {
           const roomData = rooms.value;
-          nextStats.totalRooms = roomData.length;
+          setRoomStatuses(roomData.filter((room) => room.isActive));
+          nextStats.totalRooms = roomData.filter((room) => room.isActive).length;
           nextStats.availableRooms = roomData.filter(
             (room) => room.status === 'AVAILABLE' && room.isActive,
           ).length;
           nextStats.occupiedRooms = roomData.filter(
             (room) => room.status === 'OCCUPIED',
+          ).length;
+          nextStats.maintenanceRooms = roomData.filter(
+            (room) =>
+              room.status === 'MAINTENANCE' || room.status === 'DISABLED',
           ).length;
         } else {
           failedMetrics.push('room');
@@ -89,7 +105,14 @@ export function OperationalOverview() {
 
         if (schedules.status === 'fulfilled') {
           const scheduleData = schedules.value;
+          const dayKey = new Date().toISOString().slice(0, 10);
+
           nextStats.totalSchedules = scheduleData.length;
+          nextStats.todaySchedules = scheduleData.filter(
+            (schedule) =>
+              schedule.scheduledDate.slice(0, 10) === dayKey &&
+              schedule.status !== 'CANCELLED',
+          ).length;
           nextStats.inProgressSchedules = scheduleData.filter(
             (schedule) => schedule.status === 'IN_PROGRESS',
           ).length;
@@ -125,118 +148,117 @@ export function OperationalOverview() {
         console.error('Error loading operational overview:', err);
         setError('Unable to load operational metrics.');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
 
-    loadStats();
-  }, []);
+    void loadStats();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey]);
+
+  const readings = [
+    {
+      label: 'Cases today',
+      value: error ? '—' : stats.todaySchedules,
+      note: `${stats.inProgressSchedules} in theatre now`,
+    },
+    {
+      label: 'Theatres ready',
+      value: error ? '—' : `${stats.availableRooms}/${stats.totalRooms}`,
+      note: `${stats.occupiedRooms} occupied · ${stats.maintenanceRooms} out of service`,
+    },
+    {
+      label: 'Equipment ready',
+      value: error ? '—' : `${stats.availableEquipment}/${stats.totalEquipment}`,
+      note: 'Tracked plant inventory',
+    },
+    {
+      label: 'Open alerts',
+      value: error ? '—' : stats.unreadAlerts,
+      note: stats.unreadAlerts > 0 ? 'Needs review' : 'Inbox clear',
+    },
+  ];
+
+  const blockTone = (room: OTRoomSummary) => {
+    switch (room.status) {
+      case 'AVAILABLE':
+        return 'bg-success';
+      case 'OCCUPIED':
+        return 'bg-danger';
+      case 'MAINTENANCE':
+        return 'bg-warning';
+      default:
+        return 'bg-border-strong';
+    }
+  };
 
   return (
-    <div className="space-y-4">
-      {error && (
-        <div
+    <section aria-label="Operational readout" className="border border-border">
+      {error ? (
+        <p
           role="alert"
-          className="border-warning-soft bg-warning-soft text-warning rounded-lg border px-4 py-3 text-sm"
+          className="border-border bg-warning-soft text-warning border-b px-4 py-2.5 text-xs"
         >
-          {error}
-        </div>
-      )}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-subtle text-xs font-medium">
-              OT Operating Rooms
-            </span>
-            <Badge variant="neutral">Current snapshot</Badge>
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-foreground text-2xl font-bold">
-              {isLoading
-                ? '...'
-                : error
-                  ? '-'
-                  : `${stats.availableRooms} / ${stats.totalRooms}`}
-            </span>
-            <span className="text-foreground-subtle text-xs">
-              {error ? 'Unavailable' : `${stats.occupiedRooms} occupied`}
-            </span>
-          </div>
-          <div className="text-foreground-subtle mt-2 text-xs">
-            Available for immediate surgery
-          </div>
-        </Card>
+          {error} Live figures are partial.
+        </p>
+      ) : null}
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-subtle text-xs font-medium">
-              Total Schedules
-            </span>
-            <Badge variant="neutral">All records</Badge>
+      <div className="bg-surface grid grid-cols-2 divide-x divide-y lg:grid-cols-[repeat(4,minmax(0,1fr))_1.5fr] lg:divide-y-0">
+        {readings.map((reading) => (
+          <div key={reading.label} className="px-4 py-4 sm:px-5">
+            <p className="eyebrow">{reading.label}</p>
+            <p className="text-foreground mt-1.5 font-mono text-3xl leading-none font-semibold tabular-nums">
+              {isLoading ? '…' : reading.value}
+            </p>
+            <p className="text-foreground-muted mt-1.5 text-[11px] leading-snug">
+              {reading.note}
+            </p>
           </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-foreground text-2xl font-bold">
-              {isLoading ? '...' : error ? '-' : stats.totalSchedules}
-            </span>
-            <span className="text-warning text-xs font-medium">
-              {error
-                ? 'Unavailable'
-                : `${stats.inProgressSchedules} In Progress`}
-            </span>
-          </div>
-          <div className="text-foreground-subtle mt-2 text-xs">
-            Surgeries scheduled & active
-          </div>
-        </Card>
+        ))}
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-subtle text-xs font-medium">
-              Equipment Readiness
-            </span>
-            <Badge variant="purple">Ready</Badge>
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-foreground text-2xl font-bold">
-              {isLoading
-                ? '...'
-                : error
-                  ? '—'
-                  : `${stats.availableEquipment} / ${stats.totalEquipment}`}
-            </span>
-            <span className="text-foreground-subtle text-xs">Available</span>
-          </div>
-          <div className="text-foreground-subtle mt-2 text-xs">
-            Tracked medical equipment
-          </div>
-        </Card>
+        {/* Segmented gauge: one block per active theatre. */}
+        <div className="col-span-2 px-4 py-4 sm:px-5 lg:col-span-1">
+          <p className="eyebrow">Theatre capacity</p>
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-subtle text-xs font-medium">
-              Alert Notifications
-            </span>
-            {error ? (
-              <Badge variant="neutral">Unavailable</Badge>
-            ) : stats.unreadAlerts > 0 ? (
-              <Badge variant="danger">{stats.unreadAlerts} Unread</Badge>
+          <div className="mt-3 flex h-8 gap-1" aria-hidden="true">
+            {isLoading || roomStatuses.length === 0 ? (
+              <div className="bg-surface-muted w-full" />
             ) : (
-              <Badge variant="neutral">Clear</Badge>
+              roomStatuses.map((room) => (
+                <div
+                  key={room.id}
+                  title={`${room.name} — ${room.status}`}
+                  className={`h-full flex-1 ${blockTone(room)}`}
+                />
+              ))
             )}
           </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-foreground text-2xl font-bold">
-              {isLoading ? '...' : stats.unreadAlerts}
-            </span>
-            <span className="text-foreground-subtle text-xs">
-              Requires attention
-            </span>
-          </div>
-          <div className="text-foreground-subtle mt-2 text-xs">
-            System & schedule notifications
-          </div>
-        </Card>
+
+          <p className="text-foreground-muted mt-2.5 font-mono text-[10px] tracking-[0.12em] uppercase">
+            {isLoading
+              ? 'Reading theatre status…'
+              : `${stats.availableRooms} ready · ${stats.occupiedRooms} live · ${stats.maintenanceRooms} out of service`}
+          </p>
+        </div>
       </div>
-    </div>
+
+      <div className="border-border bg-surface-subtle flex items-center justify-between border-t px-4 py-2.5">
+        <p className="text-foreground-muted font-mono text-[10px] tracking-[0.14em] uppercase">
+          {stats.totalSchedules} schedule records · {stats.totalRooms} active
+          theatres
+        </p>
+
+        <button
+          type="button"
+          onClick={refresh}
+          className="text-primary hover:text-primary-hover font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors"
+        >
+          Re-scan
+        </button>
+      </div>
+    </section>
   );
 }

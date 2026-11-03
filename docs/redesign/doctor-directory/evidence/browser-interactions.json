@@ -1,0 +1,161 @@
+{
+  "generatedAt": "2026-11-03T06:57:22.475Z",
+  "baseUrl": "http://localhost:3100",
+  "passed": 17,
+  "total": 17,
+  "results": [
+    {
+      "feature": "Directory render + approval ledger",
+      "surface": "production component /preview/doctors",
+      "action": "Load /preview/doctors at 1440x900",
+      "expected": "Four ledger figures; read-only notice; no governance controls without an ADMIN session",
+      "before": "—",
+      "after": "ledger={\"Profiles\":\"6\",\"Approved\":\"4\",\"Awaiting review\":\"1\",\"Restricted\":\"1\"}, readOnlyNotice=true, governanceBlocks=0",
+      "status": "PASS"
+    },
+    {
+      "feature": "Search",
+      "surface": "production component /preview/doctors",
+      "action": "Type \"Vaz\" into the index search field",
+      "expected": "Index and profile narrow to the single matching clinician",
+      "before": "1 rows (unfiltered)",
+      "after": "1 row(s): 01 Dr. Meera Vaz Adult c, profile=\"Dr. Meera Vaz\"",
+      "status": "PASS"
+    },
+    {
+      "feature": "Empty state + reset",
+      "surface": "production component /preview/doctors",
+      "action": "Search a term with no match, then press \"Clear filters\"",
+      "expected": "Empty state replaces the index; reset restores every row and empties the search field",
+      "before": "0 row(s), emptyState=true",
+      "after": "6 row(s), searchField=\"\"",
+      "status": "PASS"
+    },
+    {
+      "feature": "Specialty filter",
+      "surface": "production component /preview/doctors",
+      "action": "Press the \"Adult cardiac surgery\" specialty rail entry",
+      "expected": "Index holds only that specialty; rail entry reports aria-pressed=true; profile follows",
+      "before": "6 rows, aria-pressed=false",
+      "after": "1 row(s): 01 Dr. Meera Vaz Adu; aria-pressed=true; profile=\"Dr. Meera Vaz\"",
+      "status": "PASS"
+    },
+    {
+      "feature": "Status filter",
+      "surface": "production component /preview/doctors",
+      "action": "Select \"Suspended\" in the status control",
+      "expected": "Only suspended clinicians remain in the index",
+      "before": "All statuses (6 rows)",
+      "after": "1 row(s): 01 Dr. Hana Ito Spec",
+      "status": "PASS"
+    },
+    {
+      "feature": "Clinician selection",
+      "surface": "production component /preview/doctors",
+      "action": "Click the Kabir Nair row",
+      "expected": "Row reports selected; profile pane shows that clinician",
+      "before": "profile pane=\"Dr. Kabir Nair\"",
+      "after": "profile pane=\"Dr. Kabir Nair\", aria-pressed=true",
+      "status": "PASS"
+    },
+    {
+      "feature": "Keyboard access",
+      "surface": "production component /preview/doctors",
+      "action": "Tab from the search field, focus the Meera Vaz row, press Enter",
+      "expected": "Focus continues into the status control; Enter selects the focused clinician",
+      "before": "focused element after Tab = doctor-status",
+      "after": "profile pane=\"Dr. Meera Vaz\"",
+      "status": "PASS"
+    },
+    {
+      "feature": "Profile sheet open / close",
+      "surface": "production component /preview/doctors (390x844)",
+      "action": "Open the profile sheet, press Close, reopen, press Escape",
+      "expected": "Dialog opens over the index with focus on Close; both Close and Escape dismiss it",
+      "before": "no dialog",
+      "after": "opened=true (Profile for Dr. Ivan Petrov), focus=\"Close\", afterClose=0, reopened=true, afterEscape=0",
+      "status": "PASS"
+    },
+    {
+      "feature": "Horizontal overflow",
+      "surface": "production component /preview/doctors (1440px)",
+      "action": "Measure scrollWidth - clientWidth at 1440px",
+      "expected": "No horizontal overflow",
+      "before": "—",
+      "after": "0px",
+      "status": "PASS"
+    },
+    {
+      "feature": "Horizontal overflow",
+      "surface": "production component /preview/doctors (1024px)",
+      "action": "Measure scrollWidth - clientWidth at 1024px",
+      "expected": "No horizontal overflow",
+      "before": "—",
+      "after": "0px",
+      "status": "PASS"
+    },
+    {
+      "feature": "Horizontal overflow",
+      "surface": "production component /preview/doctors (390px)",
+      "action": "Measure scrollWidth - clientWidth at 390px",
+      "expected": "No horizontal overflow",
+      "before": "—",
+      "after": "0px",
+      "status": "PASS"
+    },
+    {
+      "feature": "Admin session recognised (harness only)",
+      "surface": "harness /preview/doctors-admin",
+      "action": "Load the harness page and read the session the provider/data layer resolves",
+      "expected": "Synthetic session resolves as ADMIN, so governance + edit controls render and the read-only notice is absent",
+      "before": "—",
+      "after": "session.role=ADMIN, governanceRegion=1, editButton=1, readOnlyNotice=0",
+      "status": "PASS"
+    },
+    {
+      "feature": "Approval",
+      "surface": "harness /preview/doctors-admin (PATCH transport stubbed; nothing persisted)",
+      "action": "Select the pending clinician Ivan Petrov, press \"Approve\"",
+      "expected": "PATCH /api/doctors/doc-2/status {status:\"ACTIVE\"}; index chip and ledger move from pending to approved",
+      "before": "ledger={\"Profiles\":\"4\",\"Approved\":\"2\",\"Awaiting review\":\"1\",\"Restricted\":\"1\"}, row=\"02 Dr. Ivan Petrov awaiting approval Spinal neurosurgery / Unassigned MCI-55992 Pending →\"",
+      "after": "calls=[{\"method\":\"PATCH\",\"path\":\"/api/doctors/doc-2/status\",\"body\":{\"status\":\"ACTIVE\"}}], ledger={\"Profiles\":\"4\",\"Approved\":\"3\",\"Awaiting review\":\"0\",\"Restricted\":\"1\"}, row=\"02 Dr. Ivan Petrov Spinal neurosurgery / Unassigned MCI-55992 Active →\", profile chips=[\"Specialty recorded\",\"Licence number on file\",\"Contact email on record\"]",
+      "status": "PASS"
+    },
+    {
+      "feature": "Suspension",
+      "surface": "harness /preview/doctors-admin (PATCH transport stubbed; nothing persisted)",
+      "action": "Press \"Suspend\" for the same clinician",
+      "expected": "PATCH .../status {status:\"SUSPENDED\"}; index chip and Restricted ledger update",
+      "before": "ledger={\"Profiles\":\"4\",\"Approved\":\"3\",\"Awaiting review\":\"0\",\"Restricted\":\"1\"}, row=\"02 Dr. Ivan Petrov Spinal neurosurgery / Unassigned MCI-55992 Active →\"",
+      "after": "calls=[{\"method\":\"PATCH\",\"path\":\"/api/doctors/doc-2/status\",\"body\":{\"status\":\"SUSPENDED\"}}], ledger={\"Profiles\":\"4\",\"Approved\":\"2\",\"Awaiting review\":\"0\",\"Restricted\":\"2\"}, row=\"02 Dr. Ivan Petrov Spinal neurosurgery / Unassigned MCI-55992 Suspended →\"",
+      "status": "PASS"
+    },
+    {
+      "feature": "Profile editing",
+      "surface": "harness /preview/doctors-admin (PATCH transport stubbed; nothing persisted)",
+      "action": "Open the edit panel, change department + specialty + licence, press \"Save changes\"",
+      "expected": "Form is prefilled from the record; PATCH /api/doctors/doc-1 carries the new values; index updates; panel closes",
+      "before": "row=\"01 Dr. Anaya Sharma Hepatobiliary surgery / General Surgery MCI-88214 Active →\", prefilled={\"department\":\"dept-1\",\"specialization\":\"Hepatobiliary surgery\",\"license\":\"MCI-88214\"}",
+      "after": "calls=[{\"method\":\"PATCH\",\"path\":\"/api/doctors/doc-1\",\"body\":{\"departmentId\":\"dept-2\",\"specialization\":\"Hepatobiliary oncology\",\"licenseNumber\":\"MCI-99001\"}}], row=\"01 Dr. Anaya Sharma Hepatobiliary oncology / Cardiothoracic MCI-99001 Active →\", panelClosed=true",
+      "status": "PASS"
+    },
+    {
+      "feature": "Profile creation",
+      "surface": "harness /preview/doctors-admin (POST transport stubbed; nothing persisted)",
+      "action": "Open the create panel, pick an eligible doctor account, fill department/specialty/licence, submit",
+      "expected": "POST /api/doctors carries the chosen account + fields; the new clinician appears in the index",
+      "before": "candidate options=[\"Select a doctor account\",\"Dr. Leena Mathew — leena.mathew@medorch.test\"], Leena rows=0",
+      "after": "calls=[{\"method\":\"POST\",\"path\":\"/api/doctors\",\"body\":{\"userId\":\"usr-8\",\"departmentId\":\"dept-2\",\"specialization\":\"Paediatric surgery\",\"licenseNumber\":\"MCI-77001\"}}], Leena rows=1, index rows=5",
+      "status": "PASS"
+    },
+    {
+      "feature": "Console + network health",
+      "surface": "/preview/doctors + /preview/doctors-admin",
+      "action": "Collect console errors, page errors, failed requests and >=400 responses across every page above",
+      "expected": "No console errors, no failed requests, no error responses (the harness serves /api/* locally)",
+      "before": "—",
+      "after": "console=[], network=[]",
+      "status": "PASS"
+    }
+  ]
+}

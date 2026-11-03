@@ -5,6 +5,16 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+/*======================================================================
+  Sign-in form — printed fields, one signal button.
+====================================================================== */
+
+const fieldClass =
+  'mt-2 w-full border border-rule bg-sheet px-3.5 py-3 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-subtle focus:border-pine disabled:cursor-not-allowed disabled:opacity-60';
+
+const labelClass =
+  'font-mono text-[8px] uppercase tracking-[0.22em] text-ink-muted';
+
 export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -29,14 +39,14 @@ export function LoginForm() {
 
         if (authCode === 'email_not_verified') {
           setError(
-            'Please verify your email before signing in. Use the resend verification link below if needed.',
+            'Verify your email before signing in. Use the resend verification link below if needed.',
           );
         } else if (authCode === 'account_pending_approval') {
           setError(
-            'Your email is verified, but your account is awaiting admin approval.',
+            'Your email is verified, but your account is awaiting administrator approval.',
           );
         } else {
-          setError('Invalid email or password');
+          setError('Invalid email or password.');
         }
 
         return;
@@ -45,7 +55,7 @@ export function LoginForm() {
       router.push('/dashboard');
       router.refresh();
     } catch {
-      setError('Something went wrong. Please try again');
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -53,12 +63,18 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label
-          htmlFor="email"
-          className="text-foreground mb-2 block text-sm font-medium"
+      {error ? (
+        <p
+          role="alert"
+          className="border-danger bg-danger-soft text-danger border-l-2 px-3 py-2.5 text-[11px] leading-relaxed"
         >
-          Email
+          {error}
+        </p>
+      ) : null}
+
+      <div>
+        <label htmlFor="email" className={labelClass}>
+          Email address
         </label>
         <input
           id="email"
@@ -70,17 +86,22 @@ export function LoginForm() {
           placeholder="admin@medorch.local"
           required
           disabled={isLoading}
-          className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle hover:border-primary focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className={fieldClass}
         />
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="text-foreground mb-2 block text-sm font-medium"
-        >
-          Password
-        </label>
+        <div className="flex items-baseline justify-between">
+          <label htmlFor="password" className={labelClass}>
+            Password
+          </label>
+          <Link
+            href="/forgot-password"
+            className="link-draw font-mono text-[8px] tracking-[0.16em] text-ink-subtle uppercase hover:text-ink"
+          >
+            Forgot
+          </Link>
+        </div>
         <input
           id="password"
           name="password"
@@ -91,49 +112,34 @@ export function LoginForm() {
           placeholder="Enter your password"
           required
           disabled={isLoading}
-          className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle hover:border-primary focus-visible:border-primary focus-visible:ring-ring min-h-11 w-full rounded-[var(--radius-control)] border px-3.5 py-2.5 text-sm transition outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className={fieldClass}
         />
       </div>
-
-      {error && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border px-3.5 py-3 text-sm"
-        >
-          {error}
-        </div>
-      )}
 
       <button
         type="submit"
         disabled={isLoading}
-        className="bg-primary text-foreground-inverse hover:bg-primary-hover focus-visible:ring-ring active:bg-primary-active min-h-11 w-full rounded-[var(--radius-control)] px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        className="bg-pine text-chalk hover:bg-pine-deep group flex h-12 w-full items-center justify-between px-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? 'Signing in...' : 'Sign in'}
+        {isLoading ? 'Verifying…' : 'Sign in'}
+        <span
+          className="transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden="true"
+        >
+          →
+        </span>
       </button>
 
-      <div className="flex flex-col gap-3 pt-2 text-center text-sm">
-        <Link href="/forgot-password" className="text-primary hover:underline">
-          Forgot your password?
-        </Link>
-
+      <div className="text-ink-muted flex flex-wrap items-center justify-between gap-2 text-[11px]">
         <Link
           href="/resend-verification"
-          className="text-primary hover:underline"
+          className="link-draw hover:text-ink"
         >
-          Resend verification email
+          Resend verification
         </Link>
-
-        <p className="text-foreground-muted">
-          Don&apos;t have an account?{' '}
-          <Link
-            href="/register"
-            className="text-primary font-medium hover:underline"
-          >
-            Create an account
-          </Link>
-        </p>
+        <Link href="/register" className="link-draw hover:text-ink">
+          Request an account
+        </Link>
       </div>
     </form>
   );

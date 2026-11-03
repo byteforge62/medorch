@@ -62,7 +62,7 @@ function VerifyEmailContent() {
           <p
             role="status"
             aria-live="polite"
-            className={`mt-5 rounded-lg border p-3 text-sm leading-6 ${
+            className={`mt-5 border p-3 text-sm leading-6 ${
               state === 'success'
                 ? 'border-success/40 bg-success-soft text-success'
                 : 'border-danger-border bg-danger-soft text-danger'
