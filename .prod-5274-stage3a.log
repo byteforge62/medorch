@@ -1,0 +1,39 @@
+▲ Next.js 16.3.6
+- Local:         http://localhost:5274
+- Network:       http://10.252.211.158:5274
+✓ Ready in 779ms
+✓ Running next.config.ts took 86ms
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+[14833a14-f603-4408-9130-a5021dd51dfb] PATCH /api/alerts/[id]/read error: Error: FORBIDDEN_ALERT_ACCESS
+    at o (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1i0ovnk._.js:1:9291)
+    at async u (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1tm3_sy._.js:1:904)
+    at async Y (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1tm3_sy._.js:1:4480)
+    at async Q (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1tm3_sy._.js:1:5558)
+    at async Module._ [as handler] (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1tm3_sy._.js:1:7615)
+[ac57f9ba-484d-4fde-b856-c9cc1f58c371] DELETE /api/alerts/[id] error: Error: FORBIDDEN_ALERT_ACCESS
+    at m (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1i0ovnk._.js:1:9735)
+    at async p (C:\Users\patel\Desktop\medorch\.next\server\chunks\_1jxq_ok._.js:1:2225)
+    at async J (C:\Users\patel\Desktop\medorch\.next\server\chunks\_1jxq_ok._.js:1:5790)
+    at async W (C:\Users\patel\Desktop\medorch\.next\server\chunks\_1jxq_ok._.js:1:6868)
+    at async Module.C [as handler] (C:\Users\patel\Desktop\medorch\.next\server\chunks\_1jxq_ok._.js:1:8925)
+[6d38528a-4310-45e5-b6de-98cf2b043a17] PATCH /api/alerts/read-all error: Error: FORBIDDEN_ALERT_ACCESS
+    at p (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__1i0ovnk._.js:1:9519)
+    at u (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__135j0pf._.js:1:1155)
+    at async W (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__135j0pf._.js:1:4570)
+    at async Y (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__135j0pf._.js:1:5648)
+    at async Module.C [as handler] (C:\Users\patel\Desktop\medorch\.next\server\chunks\[root-of-the-server]__135j0pf._.js:1:7705)

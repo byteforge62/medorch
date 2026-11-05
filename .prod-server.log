@@ -1,0 +1,47 @@
+▲ Next.js 16.3.6
+- Local:         http://localhost:5274
+- Network:       http://192.168.0.106:5274
+✓ Ready in 925ms
+✓ Running next.config.ts took 116ms
+[31m[auth][error][0m CallbackRouteError: Read more at https://errors.authjs.dev#callbackrouteerror
+[31m[auth][cause][0m: AggregateError: 
+    at C:\Users\patel\Desktop\medorch\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async H.startTransaction (C:\Users\patel\Desktop\medorch\.next\server\chunks\_12d6o0a._.js:1:11916)
+    at async #i (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:11:92014)
+    at async gr.startTransaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:11:91065)
+    at async e.startTransaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:57:1037)
+    at async yr.transaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:58:1561)
+    at async Proxy._transactionWithCallback (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:99:4746)
+    at async Object.authorize (C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:95250)
+    at async of (C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:41323)
+[31m[auth][details][0m: {
+  "provider": "credentials"
+}
+[31m[auth][error][0m CallbackRouteError: Read more at https://errors.authjs.dev#callbackrouteerror
+[31m[auth][cause][0m: AggregateError: 
+    at C:\Users\patel\Desktop\medorch\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async H.startTransaction (C:\Users\patel\Desktop\medorch\.next\server\chunks\_12d6o0a._.js:1:11916)
+    at async #i (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:11:92014)
+    at async gr.startTransaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:11:91065)
+    at async e.startTransaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:57:1037)
+    at async yr.transaction (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:58:1561)
+    at async Proxy._transactionWithCallback (C:\Users\patel\Desktop\medorch\node_modules\@prisma\client\runtime\client.js:99:4746)
+    at async Object.authorize (C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:95250)
+    at async of (C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:41323)
+[31m[auth][details][0m: {
+  "provider": "credentials"
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '3548815816'
+}

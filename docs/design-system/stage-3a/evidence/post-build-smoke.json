@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-11-05T06:51:04.803Z",
+  "buildId": "j_HBmc_QkUtn6fZrYyg79",
+  "checks": [
+    {
+      "name": "Signed-out /alerts redirects to /login",
+      "pass": true,
+      "detail": "http://localhost:5274/login"
+    },
+    {
+      "name": "Signed-out /api/alerts is 401",
+      "pass": true,
+      "detail": "401"
+    },
+    {
+      "name": "Dashboard prefetches /alerts with 200",
+      "pass": true,
+      "detail": "[{\"status\":200,\"url\":\"http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS\"},{\"status\":200,\"url\":\"http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru\"}]"
+    },
+    {
+      "name": "Admin /alerts has four real rows",
+      "pass": true,
+      "detail": "4"
+    },
+    {
+      "name": "Admin meta reports three unread",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Error state does not invent counts",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Loading state is announced",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "No unexpected HTTP errors during final checks",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "alertResponses": [
+    {
+      "status": 200,
+      "url": "http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"
+    },
+    {
+      "status": 200,
+      "url": "http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru"
+    },
+    {
+      "status": 200,
+      "url": "http://localhost:5274/alerts?_rsc=aEOLnkTQApvJFxKe"
+    }
+  ],
+  "httpErrors": []
+}

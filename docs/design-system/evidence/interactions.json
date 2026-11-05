@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-11-03T08:59:09.082Z",
+  "results": [
+    {
+      "name": "Desktop navigation dropdown",
+      "action": "click Modules, then Escape",
+      "before": "expanded=false",
+      "after": "expanded=true, panel=true, afterEscape=false",
+      "status": "PASS"
+    },
+    {
+      "name": "Search input clears",
+      "action": "type \"cardio\", press Clear",
+      "before": "len 0",
+      "after": "typed=cardio, cleared=\"\"",
+      "status": "PASS"
+    },
+    {
+      "name": "Toggle switches",
+      "action": "click Email notifications switch",
+      "before": "aria-checked=true",
+      "after": "aria-checked=false",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile navigation",
+      "action": "open trigger, press Escape",
+      "before": "panel=false",
+      "after": "opened=true, panelsAfterEscape=0, focus=Open navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Section anchors",
+      "action": "click \"Data presentation\" in header nav",
+      "before": "hash=\"\"",
+      "after": "hash=#data, scrollY=1623",
+      "status": "PASS"
+    },
+    {
+      "name": "Loading and disabled states",
+      "action": "count aria-busy and disabled buttons",
+      "before": "0",
+      "after": "busy=2, disabled=6",
+      "status": "PASS"
+    },
+    {
+      "name": "Direction A hero CTA",
+      "action": "read Enter the platform href",
+      "before": "-",
+      "after": "href=/login, navLinks=3",
+      "status": "PASS"
+    },
+    {
+      "name": "Direction B nav CTA",
+      "action": "read Request access href",
+      "before": "-",
+      "after": "href=/register",
+      "status": "PASS"
+    },
+    {
+      "name": "Direction C dropdown",
+      "action": "click Surfaces",
+      "before": "closed",
+      "after": "open=true",
+      "status": "PASS"
+    },
+    {
+      "name": "Production landing page",
+      "action": "GET /",
+      "before": "-",
+      "after": "status=200, h1=\"The operating theatre,in a single fieldof view.\"",
+      "status": "PASS"
+    }
+  ]
+}

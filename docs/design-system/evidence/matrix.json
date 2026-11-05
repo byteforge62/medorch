@@ -1,0 +1,199 @@
+{
+  "generatedAt": "2026-11-03T08:59:44.232Z",
+  "baseUrl": "http://localhost:3100",
+  "matrix": [
+    {
+      "route": "/design-system",
+      "name": "playground",
+      "width": 1440,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "Component system, under review.",
+        "h2": 8,
+        "links": 35,
+        "buttons": 41,
+        "scrollHeight": 7421
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-a",
+      "name": "direction-a",
+      "width": 1440,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre day,read as one record.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 2,
+        "scrollHeight": 3665
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-b",
+      "name": "direction-b",
+      "width": 1440,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "One operational recordfor the theatre suite.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 1,
+        "scrollHeight": 4595
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-c",
+      "name": "direction-c",
+      "width": 1440,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre is arunning system.",
+        "h2": 5,
+        "links": 20,
+        "buttons": 2,
+        "scrollHeight": 4376
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system",
+      "name": "playground",
+      "width": 1024,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "Component system, under review.",
+        "h2": 8,
+        "links": 35,
+        "buttons": 41,
+        "scrollHeight": 7682
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-a",
+      "name": "direction-a",
+      "width": 1024,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre day,read as one record.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 2,
+        "scrollHeight": 3522
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-b",
+      "name": "direction-b",
+      "width": 1024,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "One operational recordfor the theatre suite.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 1,
+        "scrollHeight": 4336
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-c",
+      "name": "direction-c",
+      "width": 1024,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre is arunning system.",
+        "h2": 5,
+        "links": 20,
+        "buttons": 2,
+        "scrollHeight": 4260
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system",
+      "name": "playground",
+      "width": 390,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "Component system, under review.",
+        "h2": 8,
+        "links": 35,
+        "buttons": 41,
+        "scrollHeight": 13730
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-a",
+      "name": "direction-a",
+      "width": 390,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre day,read as one record.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 2,
+        "scrollHeight": 5831
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-b",
+      "name": "direction-b",
+      "width": 390,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "One operational recordfor the theatre suite.",
+        "h2": 4,
+        "links": 22,
+        "buttons": 1,
+        "scrollHeight": 6005
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    },
+    {
+      "route": "/design-system/direction-c",
+      "name": "direction-c",
+      "width": 390,
+      "status": 200,
+      "metrics": {
+        "overflow": 0,
+        "h1": "The theatre is arunning system.",
+        "h2": 5,
+        "links": 20,
+        "buttons": 2,
+        "scrollHeight": 6258
+      },
+      "consoleErrors": [],
+      "networkIssues": []
+    }
+  ],
+  "interactions": []
+}

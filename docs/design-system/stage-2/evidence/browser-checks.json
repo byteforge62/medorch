@@ -1,0 +1,933 @@
+{
+  "base": "http://localhost:5274",
+  "checks": [
+    {
+      "name": "Production landing returns 200",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "Production landing renders approved heading",
+      "pass": true,
+      "detail": "H1 present"
+    },
+    {
+      "name": "Preview-only direction note is absent in production",
+      "pass": true,
+      "detail": "direction note removed"
+    },
+    {
+      "name": "No horizontal overflow at 1440",
+      "pass": true,
+      "detail": "1440/1440"
+    },
+    {
+      "name": "Logo and account CTAs point to production routes",
+      "pass": true,
+      "detail": "{\"logo\":\"/\",\"signIn\":[\"/login\",\"/login\",\"/login\",\"/login\"],\"request\":[\"/register\",\"/register\",\"/register\",\"/register\"],\"designSystemLinks\":0}"
+    },
+    {
+      "name": "Design system links are absent from production landing",
+      "pass": true,
+      "detail": "0 found"
+    },
+    {
+      "name": "Desktop header navigation reaches Platform",
+      "pass": true,
+      "detail": "#platform"
+    },
+    {
+      "name": "Case selection rewrites the detail panel",
+      "pass": true,
+      "detail": "OT-03 knee selected"
+    },
+    {
+      "name": "Theatre day switches to Wednesday",
+      "pass": true,
+      "detail": "2 entries in OT-01, Wednesday cases rendered"
+    },
+    {
+      "name": "Module expands from the keyboard",
+      "pass": true,
+      "detail": "Schedules opened with Enter"
+    },
+    {
+      "name": "Role switch updates scope and audit highlighting",
+      "pass": true,
+      "detail": "Doctor scope"
+    },
+    {
+      "name": "Landing returns 200 at 1024",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "No horizontal overflow at 1024",
+      "pass": true,
+      "detail": "1024/1024"
+    },
+    {
+      "name": "Desktop navigation is available at 1024",
+      "pass": true,
+      "detail": "lg breakpoint header nav visible"
+    },
+    {
+      "name": "Landing returns 200 at 390",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "No horizontal overflow at 390",
+      "pass": true,
+      "detail": "390/390"
+    },
+    {
+      "name": "Mobile menu opens, closes on Escape and returns focus",
+      "pass": true,
+      "detail": "open=true closed=true focus=true"
+    },
+    {
+      "name": "Touch selects a case in the preview",
+      "pass": true,
+      "detail": "OT-03 knee selected by tap"
+    },
+    {
+      "name": "Touch switches the theatre day",
+      "pass": true,
+      "detail": "Wednesday cases rendered after tap"
+    },
+    {
+      "name": "Role scope works on touch",
+      "pass": true,
+      "detail": "OT staff selected by tap"
+    },
+    {
+      "name": "Signed-out dashboard redirects to login",
+      "pass": true,
+      "detail": "/login"
+    },
+    {
+      "name": "Signed-out API request is rejected",
+      "pass": true,
+      "detail": "GET /api/users 401"
+    },
+    {
+      "name": "Login form renders",
+      "pass": true,
+      "detail": "email and password fields present"
+    },
+    {
+      "name": "Seeded admin credentials create an ADMIN session",
+      "pass": true,
+      "detail": "admin@medorch.local / ADMIN"
+    },
+    {
+      "name": "Signed-in admin reaches the dashboard",
+      "pass": true,
+      "detail": "/dashboard"
+    },
+    {
+      "name": "Admin dashboard renders the operations view",
+      "pass": true,
+      "detail": "Hospital operations heading visible"
+    },
+    {
+      "name": "Admin can open /users",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "Admin API read is authorized",
+      "pass": true,
+      "detail": "GET /api/users 200"
+    },
+    {
+      "name": "Admin can open /audit",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "name": "Admin sign out clears the session",
+      "pass": true,
+      "detail": "cookie cleared=true, session=null"
+    },
+    {
+      "name": "Register form renders",
+      "pass": true,
+      "detail": "name and confirm password fields present"
+    },
+    {
+      "name": "Seeded doctor credentials create a DOCTOR session",
+      "pass": true,
+      "detail": "ananya.shah@demo.medorch.local / DOCTOR"
+    },
+    {
+      "name": "Doctor dashboard renders the day plan",
+      "pass": true,
+      "detail": "Day plan heading visible"
+    },
+    {
+      "name": "Doctor cannot open the ADMIN-only /users page",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "Doctor API read is forbidden",
+      "pass": true,
+      "detail": "GET /api/users 403"
+    },
+    {
+      "name": "Doctor can open role-permitted /schedules",
+      "pass": true,
+      "detail": "/schedules · Schedules heading visible"
+    },
+    {
+      "name": "Doctor sign out clears the session",
+      "pass": true,
+      "detail": "cookie cleared=true, session=null"
+    }
+  ],
+  "consoleEvents": [
+    {
+      "page": "auth",
+      "type": "console.error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "page": "auth",
+      "type": "console.error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "networkEvents": [
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=gfQ0cQjz9liQU9Cn",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "http-error",
+      "status": 404,
+      "url": "http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=39HvKGtREFWpXQW3",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=fD3TN4W_0Hhpbwaz",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=7b3sb9tPQsG9IX9A",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=CKzQGtdXyX1u0-Uv",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "http-error",
+      "status": 404,
+      "url": "http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/users?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/audit?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/7a04cd71-10f1-507d-a855-a99803b7b123?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/d1419fe0-78e8-537c-8775-9fd09b93f6cf?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/54577804-4af6-5e4e-83e8-b68578cf5021?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=Grh0GjJY9iGbiy4e",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/departments?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/949e6a9f-7eaf-55fe-af69-52e13f585f44?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/5f5e325f-8a39-526d-bd19-6cbaad604543?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/bc16f29f-5fce-5f11-aa4b-09ad5983978e?_rsc=IUALdpnvKMSh_GF7",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/949e6a9f-7eaf-55fe-af69-52e13f585f44?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/5f5e325f-8a39-526d-bd19-6cbaad604543?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/bc16f29f-5fce-5f11-aa4b-09ad5983978e?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/54577804-4af6-5e4e-83e8-b68578cf5021?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/12f86b29-68f0-5b58-8d7e-bd9153684320?_rsc=8_ojxWZ6t_zSXjgM",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients/appointments?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/dashboard?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients/appointments?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/54577804-4af6-5e4e-83e8-b68578cf5021?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/d1419fe0-78e8-537c-8775-9fd09b93f6cf?_rsc=j79Vj4yH5aoiafxS",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/54577804-4af6-5e4e-83e8-b68578cf5021?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/7a04cd71-10f1-507d-a855-a99803b7b123?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/schedules/d1419fe0-78e8-537c-8775-9fd09b93f6cf?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/patients?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/doctors?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/ot-rooms?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    },
+    {
+      "page": "auth-doctor",
+      "type": "requestfailed",
+      "url": "http://localhost:5274/equipment?_rsc=IOe_mmh6jQxP6_Ru",
+      "detail": "net::ERR_ABORTED"
+    }
+  ],
+  "knownNetwork": [
+    {
+      "page": "auth",
+      "type": "http-error",
+      "status": 404,
+      "url": "http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"
+    },
+    {
+      "page": "auth",
+      "type": "http-error",
+      "status": 404,
+      "url": "http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"
+    }
+  ],
+  "unexpectedNetwork": []
+}

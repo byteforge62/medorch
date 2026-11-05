@@ -1,0 +1,92 @@
+[
+  {
+    "name": "A1 room and case selection re-read the console",
+    "pass": true,
+    "detail": "OT-03 → knee case; OT-01 → hernia case"
+  },
+  {
+    "name": "A2 context tabs are arrow-key navigable",
+    "pass": true,
+    "detail": "ArrowRight → Sets; H-02 present"
+  },
+  {
+    "name": "A3 provisional hold can be placed and released",
+    "pass": true,
+    "detail": "hold drawn at 14:00 and removed"
+  },
+  {
+    "name": "A4 keyboard focus reaches the case list",
+    "pass": true,
+    "detail": "case row focusable"
+  },
+  {
+    "name": "A5 console has no console errors",
+    "pass": true,
+    "detail": "0 errors"
+  },
+  {
+    "name": "A6 touch selection and mobile overflow",
+    "pass": true,
+    "detail": "tap → OT-03; page 390/390"
+  },
+  {
+    "name": "B1 stage navigation jumps and marks the stage",
+    "pass": true,
+    "detail": "stage 05 active, #equipment"
+  },
+  {
+    "name": "B2 handover record discloses its audit entry",
+    "pass": true,
+    "detail": "audit detail revealed"
+  },
+  {
+    "name": "B3 scroll updates the active stage; rail is keyboard operable",
+    "pass": true,
+    "detail": "stage 07 then 03 after keyboard jump"
+  },
+  {
+    "name": "B4 desktop has no console errors",
+    "pass": true,
+    "detail": "0 errors"
+  },
+  {
+    "name": "B5 reduced motion keeps the journey usable",
+    "pass": true,
+    "detail": "stage 04 marked with reduced motion"
+  },
+  {
+    "name": "B6 touch stage chip and mobile overflow",
+    "pass": true,
+    "detail": "stage at 168px; page 390/390"
+  },
+  {
+    "name": "C1 plan region selection rewrites the record and draws the route",
+    "pass": true,
+    "detail": "OT-03 · Orthopaedics; route drawn"
+  },
+  {
+    "name": "C2 layer annotations and keyboard region selection",
+    "pass": true,
+    "detail": "equipment layer; Enter on OT-02 updated the record"
+  },
+  {
+    "name": "C3 manifest selection, stepping and scroll return",
+    "pass": true,
+    "detail": "sterile store; plan at 80px; next=Anaesthesia bay"
+  },
+  {
+    "name": "C4 desktop has no console errors",
+    "pass": true,
+    "detail": "0 errors"
+  },
+  {
+    "name": "C5 reduced motion disables the route animation",
+    "pass": true,
+    "detail": "animation suppressed"
+  },
+  {
+    "name": "C6 touch region selection and internal plan pan",
+    "pass": true,
+    "detail": "OT-02 by tap; page 390/390; plan pans internally"
+  }
+]

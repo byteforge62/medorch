@@ -1,0 +1,338 @@
+{
+  "generatedAt": "2026-11-03T16:18:05.338Z",
+  "results": [
+    {
+      "route": "a",
+      "view": "1440",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 4957,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#theatres",
+          "found": true,
+          "height": 860
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 611
+        },
+        {
+          "sel": "#interface",
+          "found": true,
+          "height": 703
+        },
+        {
+          "sel": "#platform",
+          "found": true,
+          "height": 743
+        },
+        {
+          "sel": "#method",
+          "found": true,
+          "height": 544
+        }
+      ]
+    },
+    {
+      "route": "a",
+      "view": "1024",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 4676,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#theatres",
+          "found": true,
+          "height": 768
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 565
+        },
+        {
+          "sel": "#interface",
+          "found": true,
+          "height": 652
+        },
+        {
+          "sel": "#platform",
+          "found": true,
+          "height": 733
+        },
+        {
+          "sel": "#method",
+          "found": true,
+          "height": 513
+        }
+      ]
+    },
+    {
+      "route": "a",
+      "view": "390",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 8457,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#theatres",
+          "found": true,
+          "height": 1349
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 1156
+        },
+        {
+          "sel": "#interface",
+          "found": true,
+          "height": 973
+        },
+        {
+          "sel": "#platform",
+          "found": true,
+          "height": 1424
+        },
+        {
+          "sel": "#method",
+          "found": true,
+          "height": 953
+        }
+      ]
+    },
+    {
+      "route": "b",
+      "view": "1440",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 5843,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 738
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 659
+        },
+        {
+          "sel": "#capabilities",
+          "found": true,
+          "height": 985
+        },
+        {
+          "sel": "#record",
+          "found": true,
+          "height": 521
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 571
+        }
+      ]
+    },
+    {
+      "route": "b",
+      "view": "1024",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 5647,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 836
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 624
+        },
+        {
+          "sel": "#capabilities",
+          "found": true,
+          "height": 933
+        },
+        {
+          "sel": "#record",
+          "found": true,
+          "height": 473
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 540
+        }
+      ]
+    },
+    {
+      "route": "b",
+      "view": "390",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 8310,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 1384
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 1044
+        },
+        {
+          "sel": "#capabilities",
+          "found": true,
+          "height": 1208
+        },
+        {
+          "sel": "#record",
+          "found": true,
+          "height": 665
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 997
+        }
+      ]
+    },
+    {
+      "route": "c",
+      "view": "1440",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 6046,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#live",
+          "found": true,
+          "height": 1045
+        },
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 826
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 844
+        },
+        {
+          "sel": "#states",
+          "found": true,
+          "height": 485
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 448
+        }
+      ]
+    },
+    {
+      "route": "c",
+      "view": "1024",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 5862,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#live",
+          "found": true,
+          "height": 953
+        },
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 771
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 831
+        },
+        {
+          "sel": "#states",
+          "found": true,
+          "height": 437
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 466
+        }
+      ]
+    },
+    {
+      "route": "c",
+      "view": "390",
+      "status": 200,
+      "overflow": 0,
+      "pageHeight": 8589,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "brokenImages": 0,
+      "anchors": [
+        {
+          "sel": "#live",
+          "found": true,
+          "height": 997
+        },
+        {
+          "sel": "#rooms",
+          "found": true,
+          "height": 1069
+        },
+        {
+          "sel": "#coordination",
+          "found": true,
+          "height": 1290
+        },
+        {
+          "sel": "#states",
+          "found": true,
+          "height": 888
+        },
+        {
+          "sel": "#lifecycle",
+          "found": true,
+          "height": 621
+        }
+      ]
+    }
+  ]
+}

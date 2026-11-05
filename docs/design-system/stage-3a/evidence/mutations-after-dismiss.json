@@ -1,0 +1,41 @@
+{
+  "label": "after-dismiss",
+  "generatedAt": "2026-11-05T08:06:06.069Z",
+  "testRows": [
+    {
+      "id": "5b29e0c5-c224-42f5-94ed-0c8614117ce3",
+      "userId": "b42c40c7-02f5-4fc2-a231-4210ec2ccb3d",
+      "title": "[Stage 3A mutation] Mark single read",
+      "type": "SCHEDULE",
+      "severity": "WARNING",
+      "isRead": true,
+      "readAt": "2026-11-05T08:02:34.033Z",
+      "createdAt": "2026-11-05T07:59:02.399Z"
+    },
+    {
+      "id": "3738a202-eed3-4f52-99ff-6b0265882d08",
+      "userId": "b42c40c7-02f5-4fc2-a231-4210ec2ccb3d",
+      "title": "[Stage 3A mutation] Mark all read B",
+      "type": "RESOURCE",
+      "severity": "INFO",
+      "isRead": true,
+      "readAt": "2026-11-05T08:04:16.519Z",
+      "createdAt": "2026-11-05T07:59:04.399Z"
+    },
+    {
+      "id": "c811b7ef-d561-4dc7-9108-0c08eb632d6a",
+      "userId": "b42c40c7-02f5-4fc2-a231-4210ec2ccb3d",
+      "title": "[Stage 3A mutation] Failure remains unread",
+      "type": "SYSTEM",
+      "severity": "CRITICAL",
+      "isRead": true,
+      "readAt": "2026-11-05T08:04:16.519Z",
+      "createdAt": "2026-11-05T07:59:05.399Z"
+    }
+  ],
+  "presentTestRows": 3,
+  "testUnread": 0,
+  "seededAlertCount": 4,
+  "seededHash": "ed89bb4aefd0d7b04dd2f4d29d8a7b1c459d6cebe7f6083c7c171d36bd456155",
+  "seededUnchanged": true
+}

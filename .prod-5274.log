@@ -1,0 +1,9 @@
+▲ Next.js 16.3.6
+- Local:         http://localhost:5274
+- Network:       http://192.168.0.106:5274
+✓ Ready in 723ms
+✓ Running next.config.ts took 80ms
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:5274/api/auth/session. Read more at https://errors.authjs.dev#untrustedhost
+    at C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:52160
+    at oA (C:\Users\patel\Desktop\medorch\.next\server\chunks\_0v-qvk_._.js:404:55103)
+    at async rV.do (C:\Users\patel\Desktop\medorch\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.prod.js:5:23405)

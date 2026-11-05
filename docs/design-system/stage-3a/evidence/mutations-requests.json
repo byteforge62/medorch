@@ -1,0 +1,177 @@
+{
+  "generatedAt": "2026-11-05T08:12:30.000Z",
+  "base": "http://localhost:5274",
+  "note": "Requests 1-5 are live requests against the running production server and PostgreSQL. Request 6 was deliberately intercepted in the browser test session to exercise the UI failure path; it is explicitly marked simulated and never reached the API.",
+  "requests": [
+    {
+      "step": "Mark one unread alert as read",
+      "actor": "disposable owner account (DOCTOR)",
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:5274/api/alerts/5b29e0c5-c224-42f5-94ed-0c8614117ce3/read",
+        "body": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "createdAt": "2026-11-05T07:59:02.399Z",
+            "id": "5b29e0c5-c224-42f5-94ed-0c8614117ce3",
+            "isRead": true,
+            "message": "Disposable verification record 1. Safe to delete.",
+            "readAt": "2026-11-05T08:02:34.033Z",
+            "scheduleId": null,
+            "severity": "WARNING",
+            "title": "[Stage 3A mutation] Mark single read",
+            "type": "SCHEDULE",
+            "userId": "b42c40c7-02f5-4fc2-a231-4210ec2ccb3d"
+          }
+        }
+      },
+      "observedUi": {
+        "before": "4 unread · 4 on file",
+        "after": "3 unread · 4 on file",
+        "row": "Unread marker and Mark read control removed; only Dismiss remains"
+      }
+    },
+    {
+      "step": "Mark all alerts as read",
+      "actor": "disposable owner account (DOCTOR)",
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:5274/api/alerts/read-all",
+        "body": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "count": 3
+          }
+        }
+      },
+      "followUpRead": {
+        "status": 200,
+        "allFourRowsReportedIsRead": true
+      },
+      "observedUi": {
+        "before": "3 unread · 4 on file",
+        "after": "0 unread · 4 on file",
+        "markReadControls": 0,
+        "markAllControl": "removed because unreadCount is zero"
+      }
+    },
+    {
+      "step": "Dismiss one alert",
+      "actor": "disposable owner account (DOCTOR)",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:5274/api/alerts/c24799dd-3483-4535-b205-12ed68ce5fa1",
+        "body": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "success": true
+          }
+        }
+      },
+      "observedUi": {
+        "before": "4 rows",
+        "after": "3 rows",
+        "registerCounts": "All 3 · Unread 0",
+        "dismissedTitlePresent": false
+      }
+    },
+    {
+      "step": "Cross-user mutation attempts",
+      "actor": "disposable intruder account (OT_STAFF) signed in separately",
+      "requests": [
+        {
+          "method": "PATCH",
+          "url": "/api/alerts/af52f341-6f1e-4b50-90e1-24ab6be4a033/read",
+          "responseStatus": 403,
+          "responseBody": {
+            "success": false,
+            "message": "You do not have permission to modify this alert.",
+            "requestId": "14833a14-f603-4408-9130-a5021dd51dfb"
+          }
+        },
+        {
+          "method": "DELETE",
+          "url": "/api/alerts/5b29e0c5-c224-42f5-94ed-0c8614117ce3",
+          "responseStatus": 403,
+          "responseBody": {
+            "success": false,
+            "message": "You do not have permission to delete this alert.",
+            "requestId": "ac57f9ba-484d-4fde-b856-c9cc1f58c371"
+          }
+        },
+        {
+          "method": "PATCH",
+          "url": "/api/alerts/read-all",
+          "requestBody": {
+            "userId": "b42c40c7-02f5-4fc2-a231-4210ec2ccb3d"
+          },
+          "responseStatus": 403,
+          "responseBody": {
+            "success": false,
+            "message": "You do not have permission to mark alerts as read for this user.",
+            "requestId": "6d38528a-4310-45e5-b6de-98cf2b043a17"
+          }
+        }
+      ],
+      "scopeCheck": {
+        "method": "GET",
+        "url": "/api/alerts",
+        "status": 200,
+        "dataLength": 0
+      },
+      "databaseCheck": "After all three rejected requests, owner alerts remained unchanged: one read row and one unread row. See mutations-after-auth.json."
+    },
+    {
+      "step": "Unauthenticated mutation attempt after sign-out",
+      "actor": "no session",
+      "request": {
+        "method": "PATCH",
+        "url": "/api/alerts/af52f341-6f1e-4b50-90e1-24ab6be4a033/read"
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "success": false,
+          "message": "Unauthorized",
+          "requestId": "cafa06cf-499e-4b77-9064-f8d14381209b"
+        }
+      }
+    },
+    {
+      "step": "Simulated failed mark-read",
+      "actor": "disposable owner account (DOCTOR)",
+      "simulated": true,
+      "simulationMethod": "The browser test session intercepted this one PATCH and returned an API-shaped 500 response. The request did not reach the API or database.",
+      "request": {
+        "method": "PATCH",
+        "url": "/api/alerts/af52f341-6f1e-4b50-90e1-24ab6be4a033/read"
+      },
+      "response": {
+        "status": 500,
+        "body": {
+          "success": false,
+          "message": "Unable to mark this alert as read. Please retry.",
+          "requestId": "stage3a-failure-simulation"
+        }
+      },
+      "observedUi": {
+        "actionError": "Unable to mark this alert as read. Please retry.",
+        "targetStillUnread": true,
+        "markReadControlPresent": true,
+        "filterCounts": "All 4 · Unread 1"
+      }
+    }
+  ]
+}

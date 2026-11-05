@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Day switch re-reads the theatre day",
+    "pass": true,
+    "detail": "Wed 5 -> 2 entries in OT-01"
+  },
+  {
+    "name": "Case selection rewrites the detail panel",
+    "pass": true,
+    "detail": "OT-03 knee selected; detail reads 09:00-10:35"
+  },
+  {
+    "name": "Modules expand from the keyboard",
+    "pass": true,
+    "detail": "Enter on Schedules expanded its detail"
+  },
+  {
+    "name": "Role switch updates scope and audit highlighting",
+    "pass": true,
+    "detail": "Doctor scope; 1 audit action highlighted"
+  },
+  {
+    "name": "No horizontal overflow at 1440 and 1024",
+    "pass": true,
+    "detail": "1440 1440/1440; 1024 1024/1024"
+  },
+  {
+    "name": "Mobile menu opens, Escape closes and returns focus",
+    "pass": true,
+    "detail": "Escape closed it and focus returned to the trigger"
+  },
+  {
+    "name": "Touch selects a case inside the panned day",
+    "pass": true,
+    "detail": "tapped the delayed OT-03 case"
+  },
+  {
+    "name": "Role scope and audit work on touch",
+    "pass": true,
+    "detail": "OT staff scope selected by tap"
+  },
+  {
+    "name": "Mobile page has no horizontal overflow",
+    "pass": true,
+    "detail": "390/390"
+  },
+  {
+    "name": "Reduced motion leaves the page intact",
+    "pass": true,
+    "detail": "no overflow, content intact"
+  },
+  {
+    "name": "No console errors on either viewport",
+    "pass": true,
+    "detail": "0 errors"
+  }
+]

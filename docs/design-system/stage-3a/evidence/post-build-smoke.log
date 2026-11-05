@@ -1,0 +1,9 @@
+Final build checks: 8/8 passed (build j_HBmc_QkUtn6fZrYyg79)
+PASS — Signed-out /alerts redirects to /login [http://localhost:5274/login]
+PASS — Signed-out /api/alerts is 401 [401]
+PASS — Dashboard prefetches /alerts with 200 [[{"status":200,"url":"http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"},{"status":200,"url":"http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru"}]]
+PASS — Admin /alerts has four real rows [4]
+PASS — Admin meta reports three unread
+PASS — Error state does not invent counts
+PASS — Loading state is announced
+PASS — No unexpected HTTP errors during final checks [[]]

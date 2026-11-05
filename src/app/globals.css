@@ -71,6 +71,8 @@
   --pine-bright: #2c5980;
   --pine-soft: #e5eef6;
   --primary-active: #0f2438;
+  /* Text colour that sits on the primary fill; inverts on a light-primary palette. */
+  --primary-ink: #ffffff;
 
   /* — Critical red, used only for harm ------------------------------ */
   --vermilion: #d95d5d;
@@ -116,6 +118,11 @@
   /* — Texture & apparatus -------------------------------------------- */
   --grain-dot: rgba(23, 50, 77, 0.04);
   --scroll-thumb: #c3d2de;
+
+  /* Text set on an inverted plate (--surface-inverse). */
+  --plate-ink: #ffffff;
+  --plate-ink-soft: rgba(255, 255, 255, 0.68);
+  --plate-line: rgba(255, 255, 255, 0.16);
 
   /* — Layout ---------------------------------------------------------- */
   --rail-closed: 4.25rem;
@@ -261,6 +268,7 @@
   --color-primary-hover: var(--pine-deep);
   --color-primary-active: var(--primary-active);
   --color-primary-soft: var(--pine-soft);
+  --color-primary-ink: var(--primary-ink);
 
   --color-secondary: var(--secondary);
   --color-secondary-hover: var(--secondary-hover);
@@ -800,4 +808,275 @@
     stroke-dasharray: none;
     animation: none;
   }
+}
+
+/*======================================================================
+  DESIGN SYSTEM v2 — tokens for the landing playground
+  ======================================================================
+  Additive only. Nothing above this block is altered, so every existing
+  screen keeps its current rendering.
+
+  Contracts
+  ---------
+  spacing   Tailwind's 4px scale (gap-1 = 4px … gap-24 = 96px). Layout
+            rhythm is expressed through three semantic tokens instead of
+            magic numbers repeated per section.
+  radius    --radius-control (controls), --radius-panel (surfaces),
+            --radius-xl (product previews), --radius-pill (chips, toggles).
+  motion    three durations, two easings. Everything is state-driven;
+            there is no ambient animation. The global reduced-motion block
+            above neutralises all of it.
+  state     one focus treatment (2px outline, 2px offset), a hover overlay
+            strength, and a single disabled opacity.
+  palettes  three scoped palettes for the landing directions. They override
+            the same semantic variables the rest of the product reads, so a
+            direction is a token scope, not a second component set.
+====================================================================== */
+
+:root {
+  /* Layout rhythm */
+  --ds-max: 84rem;
+  --ds-gutter: 1.25rem;
+  --ds-section-y: 4rem;
+  --ds-measure: 62ch;
+
+  /* Radius */
+  --radius-pill: 999px;
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-emphasis: cubic-bezier(0.22, 0.75, 0.2, 1);
+
+  /* Interaction states */
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --hover-overlay: 0.055;
+  --disabled-opacity: 0.5;
+
+  /* Elevation, one step above the product's softest panel */
+  --shadow-xl: 0 10px 24px rgba(23, 50, 77, 0.08),
+    0 40px 80px rgba(23, 50, 77, 0.12);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --ds-gutter: 2rem;
+    --ds-section-y: 5.5rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  :root {
+    --ds-gutter: 3rem;
+    --ds-section-y: 7rem;
+  }
+}
+
+/*----------------------------------------------------------------------
+  Palette B — Premium Enterprise.
+  Warm porcelain, near-black ink, bronze working colour. Deliberately not
+  blue: the enterprise register here is printed stationery, not a dashboard.
+---------------------------------------------------------------------- */
+
+[data-palette='enterprise'] {
+  --paper: #f7f4ef;
+  --paper-deep: #efe9e0;
+  --sheet: #fffdfa;
+  --sheet-raised: #fbf7f1;
+  --chalk: #ffffff;
+  --surface-subtle: #f1ece3;
+  --surface-muted: #e7e0d4;
+  --surface-inverse: #17130f;
+
+  --ink: #171310;
+  --ink-secondary: #5d554c;
+  --ink-muted: #6d6459;
+  --ink-subtle: #948a7d;
+
+  --rule: #e2dacd;
+  --rule-soft: #efe9e0;
+  --rule-strong: #cec3b1;
+  --border-line: #e2dacd;
+  --surface-border: #e6ded2;
+
+  --pine: #23291f;
+  --pine-deep: #141810;
+  --pine-bright: #3b4433;
+  --pine-soft: #eceee6;
+  --primary-active: #0c0f09;
+  --primary-ink: #ffffff;
+
+  --brass: #8a5a2b;
+  --brass-soft: #f3e7d8;
+
+  --secondary: #6f4a25;
+  --secondary-hover: #5c3c1d;
+  --secondary-active: #4a3018;
+
+  --success: #2f6b4f;
+  --success-soft: #e6f0e9;
+  --warning: #8a5a12;
+  --warning-soft: #f7ecd8;
+  --danger: #a33b2c;
+  --danger-soft: #f8e8e4;
+  --danger-border: #e6bdb5;
+  --info: #3c4a55;
+  --info-soft: #eceff2;
+
+  --rail: #17130f;
+  --rail-elevated: #241f19;
+  --rail-line: #3a322a;
+  --rail-muted: #a89c8d;
+
+  --shadow-xs: 0 1px 2px rgba(23, 19, 15, 0.06);
+  --shadow-sm: 0 1px 2px rgba(23, 19, 15, 0.05),
+    0 2px 8px rgba(23, 19, 15, 0.06);
+  --shadow-md: 0 2px 6px rgba(23, 19, 15, 0.05),
+    0 10px 26px rgba(23, 19, 15, 0.09);
+  --shadow-lg: 0 6px 14px rgba(23, 19, 15, 0.06),
+    0 24px 56px rgba(23, 19, 15, 0.13);
+  --shadow-xl: 0 10px 24px rgba(23, 19, 15, 0.08),
+    0 40px 80px rgba(23, 19, 15, 0.14);
+
+  --grain-dot: rgba(23, 19, 15, 0.045);
+  --scroll-thumb: #cec3b1;
+
+  --plate-ink: #ffffff;
+  --plate-ink-soft: rgba(255, 255, 255, 0.66);
+  --plate-line: rgba(255, 255, 255, 0.16);
+}
+
+/*----------------------------------------------------------------------
+  Palette C — Operational Intelligence.
+  Deep graphite ground, chalk type, mint signal. Built for reading live
+  state, so the working colour is the brightest thing on the surface.
+---------------------------------------------------------------------- */
+
+[data-palette='intelligence'] {
+  --paper: #0b1418;
+  --paper-deep: #071013;
+  --sheet: #102026;
+  --sheet-raised: #152a31;
+  --chalk: #f3f8f7;
+  --surface-subtle: #14262c;
+  --surface-muted: #1a323a;
+  --surface-inverse: #f2f7f6;
+
+  --ink: #e8f1ef;
+  --ink-secondary: #a7bdb8;
+  --ink-muted: #8ba5a0;
+  --ink-subtle: #6d8783;
+
+  --rule: #1f3b43;
+  --rule-soft: #172c33;
+  --rule-strong: #2d525c;
+  --border-line: #1f3b43;
+  --surface-border: #1b343b;
+
+  --pine: #7fe3c8;
+  --pine-deep: #9cf0d7;
+  --pine-bright: #b7f7e4;
+  --pine-soft: #10322c;
+  --primary-active: #d5fff2;
+  --primary-ink: #08231d;
+
+  --brass: #5fd6b4;
+  --brass-soft: #0d2f29;
+
+  --secondary: #6ee0c2;
+  --secondary-hover: #8beed4;
+  --secondary-active: #aaf7e2;
+
+  --success: #5fd6a6;
+  --success-soft: #0d2b22;
+  --warning: #e9c07a;
+  --warning-soft: #302612;
+  --danger: #ef8f83;
+  --danger-soft: #331b18;
+  --danger-border: #7a4038;
+  --info: #7fe3c8;
+  --info-soft: #0d2f29;
+
+  --rail: #071013;
+  --rail-elevated: #12242b;
+  --rail-line: #21414a;
+  --rail-muted: #90a8a4;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36),
+    0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.34),
+    0 10px 28px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.38),
+    0 24px 56px rgba(0, 0, 0, 0.46);
+  --shadow-xl: 0 10px 24px rgba(0, 0, 0, 0.4),
+    0 40px 80px rgba(0, 0, 0, 0.5);
+
+  --grain-dot: rgba(232, 241, 239, 0.03);
+  --scroll-thumb: #2a4b54;
+
+  /* The inverse plate is light in this palette, so its text turns dark. */
+  --plate-ink: #0d1f24;
+  --plate-ink-soft: #4d6b70;
+  --plate-line: rgba(13, 31, 36, 0.16);
+
+  color-scheme: dark;
+}
+
+/*----------------------------------------------------------------------
+  Playground + section primitives.
+  All motion collapses under the global reduced-motion block above.
+---------------------------------------------------------------------- */
+
+.ds-shell {
+  max-width: var(--ds-max);
+  margin-inline: auto;
+  padding-inline: var(--ds-gutter);
+}
+
+.ds-enter {
+  animation: reveal-rise var(--dur-slow) var(--ease-emphasis) both;
+  animation-delay: var(--ds-enter-delay, 0ms);
+}
+
+/* A hairline that separates stacked sections without drawing a box. */
+.ds-rule {
+  border-top: 1px solid var(--rule);
+}
+
+/* Grid paper for product plates; stays a texture, never a pattern. */
+.ds-grid-paper {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--rule) 45%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--rule) 45%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 32px 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-enter {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* An inverted surface flips the text tokens for its own subtree, so the
+   components inside it do not need a second set of colour props. */
+.inverse-surface {
+  --ink: var(--plate-ink);
+  --ink-secondary: var(--plate-ink-soft);
+  --ink-muted: var(--plate-ink-soft);
+  --rule: var(--plate-line);
+  --rule-soft: var(--plate-line);
+  --rule-strong: var(--plate-line);
 }

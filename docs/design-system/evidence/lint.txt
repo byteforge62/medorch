@@ -1,0 +1,35 @@
+
+> medorch@0.1.0 lint
+> eslint
+
+
+C:\Users\patel\Desktop\medorch\src\app\doctors\DoctorDirectory.tsx
+  65:10  warning  'formatStatus' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\patel\Desktop\medorch\src\app\patients\appointments\MyAppointments.tsx
+   80:18  warning  'setFilter' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  158:9   warning  'filterOptions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\patel\Desktop\medorch\src\components\departments\DepartmentManagement.tsx
+    7:10  warning  'Card' is defined but never used                          @typescript-eslint/no-unused-vars
+    9:10  warning  'EmptyState' is defined but never used                    @typescript-eslint/no-unused-vars
+   14:10  warning  'ScheduleStatusBadge' is defined but never used           @typescript-eslint/no-unused-vars
+   79:10  warning  'doctors' is assigned a value but never used              @typescript-eslint/no-unused-vars
+   86:10  warning  'showForm' is assigned a value but never used             @typescript-eslint/no-unused-vars
+   89:10  warning  'formError' is assigned a value but never used            @typescript-eslint/no-unused-vars
+   91:10  warning  'pendingActionId' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  147:9   warning  'filteredDepartments' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  166:9   warning  'counts' is assigned a value but never used               @typescript-eslint/no-unused-vars
+  184:12  warning  'openEditForm' is defined but never used                  @typescript-eslint/no-unused-vars
+  196:12  warning  'closeForm' is defined but never used                     @typescript-eslint/no-unused-vars
+  204:12  warning  'updateForm' is defined but never used                    @typescript-eslint/no-unused-vars
+  211:18  warning  'handleSubmit' is defined but never used                  @typescript-eslint/no-unused-vars
+  269:18  warning  'toggleDepartmentStatus' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\patel\Desktop\medorch\src\components\equipment\EquipmentManagement.tsx
+   71:18  warning  'setSearch' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   72:18  warning  'setStatus' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  228:9   warning  'statusOptionsJSX' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 20 problems (0 errors, 20 warnings)
+

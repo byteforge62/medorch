@@ -1,21 +1,36 @@
 import React from 'react';
 
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'icon'
+  | 'text';
+
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  /** `pill` for marketing surfaces, `control` for product surfaces. */
+  shape?: 'control' | 'pill';
   isLoading?: boolean;
+  /** Loading label announced to assistive technology, e.g. "Saving". */
+  loadingLabel?: string;
   children: React.ReactNode;
 }
 
 /*
- * Design system (docs/design-system/medorch/MASTER.md):
- * - every variant meets 4.5:1 for text-on-fill (or 3:1 control boundary)
- * - cursor-pointer, 150-250ms color transitions, visible focus (global outline)
- * - no layout-shifting transforms on hover
+ * Design system: every variant meets 4.5:1 for text-on-fill (or 3:1 for a
+ * control boundary). Icon and text variants carry their own padding so they
+ * are never a shrunken primary button; icon buttons require an aria-label,
+ * because the child is a glyph.
  */
-const variantStyles = {
+const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-white shadow-sm hover:bg-primary-hover active:bg-primary-active',
+    'bg-primary text-primary-ink shadow-sm hover:bg-primary-hover active:bg-primary-active',
   secondary:
     'bg-surface-muted text-foreground hover:bg-border active:bg-border-strong',
   outline:
@@ -23,20 +38,71 @@ const variantStyles = {
   ghost: 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
   danger:
     'bg-danger text-white shadow-sm hover:bg-danger-hover active:bg-danger-hover',
+  icon: 'border border-border bg-surface text-foreground-secondary shadow-xs hover:border-border-strong hover:text-foreground',
+  text: 'text-foreground-secondary hover:text-foreground underline decoration-border-strong decoration-1 underline-offset-[5px] hover:decoration-foreground',
 };
 
-const sizeStyles = {
-  sm: 'h-8 px-3 text-xs font-semibold rounded-[var(--radius-control)]',
-  md: 'h-10 px-4 text-sm font-semibold rounded-[var(--radius-control)]',
-  lg: 'h-11 px-5 text-[0.9375rem] font-semibold rounded-[var(--radius-control)]',
+const sizeStyles: Record<ButtonSize, string> = {
+  xs: 'h-7 px-2.5 text-[11px] font-semibold',
+  sm: 'h-8 px-3 text-xs font-semibold',
+  md: 'h-10 px-4 text-sm font-semibold',
+  lg: 'h-11 px-5 text-[0.9375rem] font-semibold',
 };
+
+/* Icon and text variants read as controls, not as filled buttons: their
+   type size follows the size prop but their box is set by the glyph. */
+const iconSizes: Record<ButtonSize, string> = {
+  xs: 'h-7 w-7',
+  sm: 'h-8 w-8',
+  md: 'h-10 w-10',
+  lg: 'h-11 w-11',
+};
+
+const textSizes: Record<ButtonSize, string> = {
+  xs: 'h-6 text-[11px]',
+  sm: 'h-7 text-xs',
+  md: 'h-8 text-sm',
+  lg: 'h-9 text-[0.9375rem]',
+};
+
+/* Shared class builder: lets a <Link> render as a button without nesting an
+   interactive element inside an anchor. */
+export function buttonClasses({
+  variant = 'primary',
+  size = 'md',
+  shape = 'control',
+  className = '',
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  shape?: 'control' | 'pill';
+  className?: string;
+}) {
+  const isIcon = variant === 'icon';
+  const isText = variant === 'text';
+  const box = isIcon
+    ? iconSizes[size]
+    : isText
+      ? `px-0 ${textSizes[size]}`
+      : sizeStyles[size];
+
+  return [
+    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200',
+    shape === 'pill' ? 'rounded-[var(--radius-pill)]' : 'rounded-[var(--radius-control)]',
+    variantStyles[variant],
+    box,
+    className,
+  ].join(' ');
+}
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
       variant = 'primary',
       size = 'md',
+      shape = 'control',
       isLoading = false,
+      loadingLabel,
       disabled,
       className = '',
       children,
@@ -44,11 +110,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) {
+
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        className={`inline-flex cursor-pointer items-center justify-center gap-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        aria-busy={isLoading || undefined}
+        className={`${buttonClasses({ variant, size, shape, className })} disabled:cursor-not-allowed disabled:opacity-50`}
         {...props}
       >
         {isLoading ? (
@@ -56,6 +124,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
             aria-hidden="true"
           />
+        ) : null}
+        {isLoading && loadingLabel ? (
+          <span className="sr-only">{loadingLabel}</span>
         ) : null}
         {children}
       </button>

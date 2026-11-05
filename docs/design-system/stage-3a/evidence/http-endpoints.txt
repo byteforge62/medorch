@@ -1,0 +1,19 @@
+Production server: http://localhost:5274 (next start, NODE_ENV=production)
+Build: j_HBmc_QkUtn6fZrYyg79
+
+GET /alerts (signed out)
+  HTTP 200 streaming shell
+  Body contains: NEXT_REDIRECT;replace;/login;307;
+  Browser resolves it to /login (verified).
+
+GET /api/alerts (signed out)
+  HTTP 401
+  Body: {"success":false,"message":"Unauthorized","requestId":"1b1b3a8a-f67d-4edd-9ce3-07f591974d68"}
+
+GET /login
+  HTTP 200
+
+GET /dashboard (signed out)
+  HTTP 200 streaming shell with redirect payload
+
+Signed-in /alerts responses are in evidence/browser-checks.json.

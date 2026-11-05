@@ -1,0 +1,13 @@
+Production server: http://localhost:5274 (next start, NODE_ENV=production)
+
+GET /                                      200
+GET /login                                 200
+GET /register                              200
+GET /design-system/clinical                200
+GET /api/auth/session                      200 (null body when signed out)
+GET /api/auth/csrf                         200
+
+GET /dashboard (signed out)                200 streaming shell
+  The body contains the Next.js redirect payload
+  `NEXT_REDIRECT;replace;/login;307;` and no dashboard content.
+  A real browser resolves this to /login (verified in the Playwright run).

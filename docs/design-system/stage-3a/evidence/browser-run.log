@@ -1,0 +1,58 @@
+Stage: admin sign-in
+Stage: doctor sign-in
+Stage: OT staff sign-in
+Stage: patient sign-in
+Checks: 48/48 passed
+PASS — Signed-out /alerts redirects to /login [http://localhost:5274/login]
+PASS — Signed-out GET /api/alerts is 401 [401]
+PASS — Admin sign-in reaches dashboard [http://localhost:5274/dashboard]
+PASS — Dashboard alert link produces no 404 prefetch [[{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"},{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru"}]]
+PASS — Dashboard exposes the All alerts link
+PASS — Dashboard All alerts link opens /alerts [http://localhost:5274/alerts]
+PASS — Admin GET /api/alerts is 200 [200]
+PASS — Admin API returns all four alerts [4]
+PASS — Admin alert fixture is available for authorization checks
+PASS — Admin page renders four alert rows [4]
+PASS — Admin sees all-recipient scope
+PASS — Admin sees admin alert title
+PASS — Admin sees doctor-owned alert title
+PASS — Admin sees OT-owned alert title
+PASS — Admin meta reports three unread
+PASS — Admin has mark-all control
+PASS — Admin sees three mark-read controls
+PASS — Admin sees four dismiss controls
+PASS — Unread filter shows three alerts [3]
+PASS — Unread filter is pressed
+PASS — No horizontal overflow at 1024 [{"documentWidth":1024,"documentClient":1024,"bodyWidth":1024}]
+PASS — No horizontal overflow at 390 [{"documentWidth":390,"documentClient":390,"bodyWidth":390}]
+PASS — Error state surfaces the failed request
+PASS — Loading state is announced
+PASS — Doctor GET /api/alerts is 200 [200]
+PASS — Doctor API returns no alerts [0]
+PASS — Doctor sees the real empty state
+PASS — Doctor page is scoped to the signed-in user
+PASS — Doctor page does not leak admin alerts
+PASS — No horizontal overflow on the empty state [{"documentWidth":1440,"documentClient":1440,"bodyWidth":1440}]
+PASS — OT staff GET /api/alerts is 200 [200]
+PASS — OT staff API returns one alert [1]
+PASS — OT staff sees the owned alert
+PASS — OT staff page is scoped to the signed-in user
+PASS — OT staff does not see admin alerts
+PASS — OT staff does not see doctor alerts
+PASS — OT staff has one mark-read control
+PASS — OT staff cannot mutate another user’s alert [403]
+PASS — Patient GET /api/alerts is 200 [200]
+PASS — Patient API returns no alerts [0]
+PASS — Patient sees the real empty state
+PASS — Patient page does not leak admin alerts
+PASS — Patient cannot mark another user’s alerts read [403]
+PASS — No page errors occurred [0]
+PASS — No unexpected HTTP errors occurred [[]]
+PASS — No unexpected console errors occurred [[]]
+PASS — Dashboard prefetches /alerts successfully [[{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"},{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru"},{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=aEOLnkTQApvJFxKe"}]]
+PASS — No unexpected network failures [0]
+Console errors: 2
+Page errors: 0
+Failed requests: 79
+Unexpected non-asset failures: 0
+/alerts RSC responses: [{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=j79Vj4yH5aoiafxS"},{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=IOe_mmh6jQxP6_Ru"},{"page":"admin","status":200,"rsc":true,"url":"http://localhost:5274/alerts?_rsc=aEOLnkTQApvJFxKe"}]

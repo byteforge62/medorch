@@ -1,0 +1,77 @@
+{
+  "generatedAt": "2026-11-03T16:03:55.946Z",
+  "results": [
+    {
+      "name": "A desktop dropdown",
+      "before": "expanded=false",
+      "after": "open=true, afterEscape=false",
+      "status": "PASS"
+    },
+    {
+      "name": "A room anchor",
+      "before": "hash=\"\"",
+      "after": "hash=#theatres",
+      "status": "PASS"
+    },
+    {
+      "name": "A hero CTA",
+      "before": "-",
+      "after": "href=/login",
+      "status": "PASS"
+    },
+    {
+      "name": "A mobile nav",
+      "before": "closed",
+      "after": "panels=1, opened=true, afterEscape=0, focus=Open navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "B desktop dropdown",
+      "before": "expanded=false",
+      "after": "open=true, afterEscape=false",
+      "status": "PASS"
+    },
+    {
+      "name": "B room anchor",
+      "before": "hash=\"\"",
+      "after": "hash=#rooms",
+      "status": "PASS"
+    },
+    {
+      "name": "B hero CTA",
+      "before": "-",
+      "after": "href=/login",
+      "status": "PASS"
+    },
+    {
+      "name": "B mobile nav",
+      "before": "closed",
+      "after": "panels=1, opened=true, afterEscape=0, focus=Open navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "C desktop dropdown",
+      "before": "expanded=false",
+      "after": "open=true, afterEscape=false",
+      "status": "PASS"
+    },
+    {
+      "name": "C room anchor",
+      "before": "hash=\"\"",
+      "after": "hash=#coordination",
+      "status": "PASS"
+    },
+    {
+      "name": "C hero CTA",
+      "before": "-",
+      "after": "href=/login",
+      "status": "PASS"
+    },
+    {
+      "name": "C mobile nav",
+      "before": "closed",
+      "after": "panels=1, opened=true, afterEscape=0, focus=Open navigation",
+      "status": "PASS"
+    }
+  ]
+}
