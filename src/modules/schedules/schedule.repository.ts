@@ -97,6 +97,133 @@ export async function findSchedulesForSurgeon(userId: string) {
   });
 }
 
+/*
+ * Stage 3D read projection for the theatre-day workspace. It is deliberately
+ * separate from findSchedules(): the public /api/schedules response shape is
+ * preserved, while the workspace can evaluate staff and equipment allocations
+ * without issuing one detail request per case.
+ */
+export async function findSchedulesForWorkspace(options?: {
+  assignedUserId?: string;
+  from?: Date;
+  to?: Date;
+}) {
+  const range =
+    options?.from && options?.to
+      ? {
+        startTime: { lt: options.to },
+        endTime: { gt: options.from },
+      }
+      : {};
+
+  return prisma.schedule.findMany({
+    where: {
+      ...(options?.assignedUserId
+        ? {
+          staff: {
+            some: {
+              userId: options.assignedUserId,
+            },
+          },
+        }
+        : {}),
+      ...range,
+    },
+    orderBy: [
+      { startTime: "asc" },
+      { id: "asc" },
+    ],
+    select: {
+      id: true,
+      patientId: true,
+      departmentId: true,
+      otRoomId: true,
+      surgeonId: true,
+      procedure: true,
+      scheduledDate: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      priority: true,
+      clinicalNotes: true,
+
+      patient: {
+        select: {
+          id: true,
+          patientCode: true,
+          name: true,
+        },
+      },
+
+      department: {
+        select: {
+          id: true,
+          name: true,
+          isActive: true,
+        },
+      },
+
+      otRoom: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          departmentId: true,
+          status: true,
+          isActive: true,
+        },
+      },
+
+      surgeon: {
+        select: {
+          id: true,
+          name: true,
+          status: true,
+        },
+      },
+
+      staff: {
+        orderBy: {
+          assignedAt: "asc",
+        },
+        select: {
+          id: true,
+          userId: true,
+          role: true,
+          assignedAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+
+      equipment: {
+        orderBy: {
+          assignedAt: "asc",
+        },
+        select: {
+          id: true,
+          equipmentId: true,
+          assignedAt: true,
+          releasedAt: true,
+          equipment: {
+            select: {
+              id: true,
+              name: true,
+              category: true,
+              serialNumber: true,
+              status: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function findScheduleById(id: string) {
   return prisma.schedule.findUnique({
     where: {
@@ -612,11 +739,11 @@ export async function createScheduleStaff(
     scheduleId: string;
     userId: string;
     role:
-      | "SURGEON"
-      | "NURSE"
-      | "ANESTHETIST"
-      | "TECHNICIAN"
-      | "OTHER";
+    | "SURGEON"
+    | "NURSE"
+    | "ANESTHETIST"
+    | "TECHNICIAN"
+    | "OTHER";
   },
   actorUserId?: string,
 ) {

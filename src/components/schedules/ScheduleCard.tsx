@@ -9,6 +9,12 @@ import {
   SchedulePriority,
 } from './ScheduleStatusBadge';
 import { ScheduleStatusActions } from './ScheduleStatusActions';
+import {
+  SCHEDULE_RAIL_TONE,
+  formatClock,
+  formatDateShort,
+  localDateKey,
+} from './schedule-workspace-format';
 
 export type ScheduleItem = {
   id: string;
@@ -30,64 +36,34 @@ export type ScheduleItem = {
     id: string;
     patientCode?: string;
     name: string;
-  };
+  } | null;
   department?: {
     id: string;
     name: string;
-  };
+  } | null;
   otRoom?: {
     id: string;
     name: string;
     code?: string;
     status?: string;
-  };
+  } | null;
   surgeon?: {
     id: string;
     name: string;
     email?: string;
-  };
+  } | null;
 };
 
-const railTone: Record<ScheduleStatus, string> = {
-  IN_PROGRESS: 'bg-danger',
-  DELAYED: 'bg-warning',
-  CONFIRMED: 'bg-primary',
-  SCHEDULED: 'bg-border-strong',
-  COMPLETED: 'bg-success',
-  CANCELLED: 'bg-border-strong/50',
+const railTone = SCHEDULE_RAIL_TONE;
+
+const formatDate = (value: string): string => {
+  if (!value) return 'Date unavailable';
+  const key = localDateKey(value);
+  return key ? formatDateShort(key) : 'Date unavailable';
 };
 
-const formatDate = (dateStr: string): string => {
-  if (!dateStr) return 'Date unavailable';
-
-  const date = new Date(dateStr);
-
-  if (Number.isNaN(date.getTime())) {
-    return dateStr;
-  }
-
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-};
-
-const formatTime = (timeStr: string): string => {
-  if (!timeStr) return 'Time unavailable';
-
-  const date = new Date(timeStr);
-
-  if (Number.isNaN(date.getTime())) {
-    return timeStr;
-  }
-
-  return date.toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-};
+const formatTime = (value: string): string =>
+  value ? formatClock(value) : 'Time unavailable';
 
 interface ScheduleCardProps {
   schedule: ScheduleItem;
@@ -174,7 +150,7 @@ export function ScheduleCard({
               View details
             </Link>
 
-            {canManageSchedules && onEdit ? (
+            {canManageSchedules && onEdit && !terminal ? (
               <Button
                 variant="outline"
                 size="sm"

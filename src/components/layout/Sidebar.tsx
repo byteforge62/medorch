@@ -169,21 +169,22 @@ export function Sidebar({
 
       <aside
         id={PRIMARY_NAVIGATION_ID}
+        data-app-sidebar
         aria-label="Primary navigation"
-        className={`group/rail bg-rail text-rail-text fixed top-0 bottom-0 left-0 z-50 flex w-[17rem] flex-col overflow-hidden border-r border-rail-line transition-[width,transform] duration-300 ease-[cubic-bezier(0.22,0.75,0.2,1)] lg:w-[var(--rail-closed)] lg:hover:w-[var(--rail-open)] lg:focus-within:w-[var(--rail-open)] ${
+        className={`group/rail bg-sheet text-ink border-rule fixed top-0 bottom-0 left-0 z-50 flex w-[17rem] flex-col overflow-hidden border-r transition-[width,transform] duration-300 ease-[cubic-bezier(0.22,0.75,0.2,1)] lg:w-[var(--rail-closed)] lg:focus-within:w-[var(--rail-open)] lg:hover:w-[var(--rail-open)] ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Masthead — the mark alone when collapsed */}
-        <div className="flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b border-rail-line px-6">
+        <div className="border-rule flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b px-6">
           <BrandMark className="text-brass h-6 w-6 shrink-0" />
           <span
             className={`flex min-w-0 flex-col transition-opacity duration-200 ${disclose}`}
           >
-            <span className="text-chalk text-[15px] leading-none font-semibold tracking-[-0.01em] whitespace-nowrap">
+            <span className="text-ink text-[15px] leading-none font-semibold tracking-[-0.01em] whitespace-nowrap">
               MedOrch
             </span>
-            <span className="text-rail-muted mt-1.5 text-[10px] leading-none font-medium whitespace-nowrap">
+            <span className="text-ink-muted mt-1.5 text-[10px] leading-none font-medium whitespace-nowrap">
               Theatre control
             </span>
           </span>
@@ -199,11 +200,11 @@ export function Sidebar({
               <div key={group} className="mb-7">
                 <div className="mb-2 flex items-center gap-2 px-6">
                   <span
-                    className={`h-px w-3 shrink-0 bg-rail-line transition-opacity duration-200 ${disclose}`}
+                    className={`bg-rule h-px w-3 shrink-0 transition-opacity duration-200 ${disclose}`}
                     aria-hidden="true"
                   />
                   <p
-                    className={`text-[10px] font-semibold tracking-[0.1em] whitespace-nowrap text-rail-muted uppercase transition-opacity duration-200 ${disclose}`}
+                    className={`text-ink-muted text-[10px] font-semibold tracking-[0.1em] whitespace-nowrap uppercase transition-opacity duration-200 ${disclose}`}
                   >
                     {groupLabels[group]}
                   </p>
@@ -223,7 +224,7 @@ export function Sidebar({
                           className={`relative mx-2.5 flex h-10 items-center gap-3 rounded-[var(--radius-control)] px-3 transition-colors duration-200 ${
                             active
                               ? 'bg-pine-soft text-pine'
-                              : 'text-rail-muted hover:bg-rail-elevated hover:text-chalk'
+                              : 'text-ink-muted hover:bg-surface-subtle hover:text-ink'
                           }`}
                         >
                           <span className="shrink-0" aria-hidden="true">
@@ -255,20 +256,20 @@ export function Sidebar({
         </nav>
 
         {/* Footer — status readout, clipped when collapsed */}
-        <div className="shrink-0 overflow-hidden border-t border-rail-line px-6 py-4">
+        <div className="border-rule shrink-0 overflow-hidden border-t px-6 py-4">
           <div className="flex items-center gap-2.5">
             <span
-              className="signal-dot h-1.5 w-1.5 shrink-0 bg-brass"
+              className="signal-dot bg-brass h-1.5 w-1.5 shrink-0"
               aria-hidden="true"
             />
             <span
-              className={`text-[10px] font-medium whitespace-nowrap text-rail-muted transition-opacity duration-200 ${disclose}`}
+              className={`text-ink-muted text-[10px] font-medium whitespace-nowrap transition-opacity duration-200 ${disclose}`}
             >
               System operational
             </span>
           </div>
           <p
-            className={`mt-2 font-mono text-[10px] whitespace-nowrap text-rail-muted/70 uppercase transition-opacity duration-200 ${disclose}`}
+            className={`text-ink-subtle mt-2 font-mono text-[10px] whitespace-nowrap uppercase transition-opacity duration-200 ${disclose}`}
           >
             v0.1.0 · {role}
           </p>

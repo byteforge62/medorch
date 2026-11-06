@@ -25,85 +25,83 @@
       technical values (codes, timestamps, quantities) instead of all labels
     - headings get a real size ladder (display / section / card / body / meta)
 
-  TWO ENVIRONMENTS, ONE COMPONENT SYSTEM
-  --------------------------------------
-  Every component reads semantic tokens only. Nothing in `src` names a colour
-  directly, so the two environments below are the same screens under different
-  light — no duplicated components, no per-page stylesheets.
+  ONE CLINICAL ENVIRONMENT
+  ------------------------
+  Every authenticated role reads the same semantic tokens. The approved
+  clinical palette is the single source of truth: paper ground, white working
+  surface, blue-grey recesses, clinical blue for primary action and restrained
+  teal for active state. Nothing in `src` needs a per-route colour override.
 
-    clinical    (default, :root)      warm white, ink type, teal working colour.
-                                      Records that are read and written.
-
-    operations  ([data-workspace])    deep clinical graphite, chalk type, mint
-                                      working colour. Live state that is watched.
-
-  The environment is chosen by workflow in `src/lib/design/workspace.ts` and
-  applied by the shell as `data-workspace` on the frame.
+  The shell applies `data-workspace="clinical"` explicitly so the environment
+  is declared at the boundary. Public landing, authentication and unauthorized
+  pages keep their own intentionally different visual language.
 ====================================================================== */
 
 :root {
+  color-scheme: light;
+
+  /* — Approved clinical palette ------------------------------------- */
   /* — Canvas & surfaces -------------------------------------------- */
-  --paper: #f4f7fa; /* clinical canvas */
-  --paper-deep: #eaf0f5; /* recessed bands, wells */
+  --paper: #f5f8fb; /* clinical canvas */
+  --paper-deep: #edf3f8; /* recessed bands, wells */
   --sheet: #ffffff; /* working surface */
-  --sheet-raised: #f8fbfd;
+  --sheet-raised: #f9fbfd;
   --chalk: #ffffff;
-  --surface-subtle: #eaf0f5;
-  --surface-muted: #e0e9f1;
-  --surface-inverse: #17324d;
+  --surface-subtle: #edf3f8;
+  --surface-muted: #e3eaf0;
+  --surface-inverse: #243447;
 
   /* — Type ---------------------------------------------------------- */
-  --ink: #172b3a;
-  --ink-secondary: #647586; /* 4.9:1 on white */
-  --ink-muted: #647586;
-  --ink-subtle: #8b9aa8; /* decorative metadata only */
+  --ink: #243447;
+  --ink-secondary: #718096;
+  --ink-muted: #718096;
+  --ink-subtle: #8795a6; /* decorative metadata only */
 
   /* — Structure ----------------------------------------------------- */
-  --rule: #dfe6ec;
-  --rule-soft: #eaf0f5;
-  --rule-strong: #c8d6e1;
-  --border-line: #dfe6ec;
-  --surface-border: #e6edf3;
+  --rule: #e3eaf0;
+  --rule-soft: #edf3f8;
+  --rule-strong: #cbd8e4;
+  --border-line: #e3eaf0;
+  --surface-border: #e3eaf0;
 
-  /* — Primary: clinical navy ---------------------------------------- */
-  --pine: #17324d;
-  --pine-deep: #22466a;
-  --pine-bright: #2c5980;
-  --pine-soft: #e5eef6;
-  --primary-active: #0f2438;
-  /* Text colour that sits on the primary fill; inverts on a light-primary palette. */
+  /* — Primary: clinical blue ---------------------------------------- */
+  --pine: #245b8f;
+  --pine-deep: #1d4b76;
+  --pine-bright: #2e6ea6;
+  --pine-soft: #e7eff7;
+  --primary-active: #173e63;
   --primary-ink: #ffffff;
 
   /* — Critical red, used only for harm ------------------------------ */
-  --vermilion: #d95d5d;
-  --vermilion-deep: #c24b4b;
-  --vermilion-soft: #fcecec;
+  --vermilion: #c74646;
+  --vermilion-deep: #a93a3a;
+  --vermilion-soft: #fbeaea;
 
   /* — Clinical teal: the active/working colour ---------------------- */
-  --brass: #087e8b;
-  --brass-soft: #e2f2f4;
+  --brass: #168c91;
+  --brass-soft: #e2f2f3;
 
   /* — Secondary ------------------------------------------------------ */
-  --secondary: #0d6f7c;
-  --secondary-hover: #0a5f6b;
-  --secondary-active: #084f5a;
+  --secondary: #11757a;
+  --secondary-hover: #0d6165;
+  --secondary-active: #0a5054;
 
   /* — Semantic ------------------------------------------------------- */
-  --success: #279b78;
-  --success-soft: #e3f4ed;
-  --warning: #a87318;
-  --warning-soft: #fbf1e1;
-  --danger: #d95d5d;
-  --danger-soft: #fcecec;
-  --danger-border: #f0b6b6;
-  --info: #087e8b;
-  --info-soft: #e2f2f4;
+  --success: #24845d;
+  --success-soft: #e6f3ee;
+  --warning: #b7791f;
+  --warning-soft: #fbf1e0;
+  --danger: #c74646;
+  --danger-soft: #fbeaea;
+  --danger-border: #e9b8b8;
+  --info: #168c91;
+  --info-soft: #e2f2f3;
 
-  /* — Navigation rail ------------------------------------------------ */
-  --rail: #0e2433;
-  --rail-elevated: #16334a;
-  --rail-line: #23445c;
-  --rail-muted: #9db3c4;
+  /* — Inverted plates used by the public/auth boundary ---------------- */
+  --rail: #243447;
+  --rail-elevated: #2d4055;
+  --rail-line: #3d5065;
+  --rail-muted: #a9b7c6;
 
   /* — Elevation: cool navy shadow ------------------------------------ */
   --shadow-xs: 0 1px 2px rgba(23, 50, 77, 0.06);
@@ -116,8 +114,8 @@
   --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   /* — Texture & apparatus -------------------------------------------- */
-  --grain-dot: rgba(23, 50, 77, 0.04);
-  --scroll-thumb: #c3d2de;
+  --grain-dot: rgba(36, 52, 71, 0.035);
+  --scroll-thumb: #c7d4e0;
 
   /* Text set on an inverted plate (--surface-inverse). */
   --plate-ink: #ffffff;
@@ -137,79 +135,6 @@
 }
 
 /*======================================================================
-  OPERATIONS ENVIRONMENT — graphite surfaces, chalk type, sage-mint.
-  ----------------------------------------------------------------------
-  Four distinguishable surface levels (ground → sheet → raised → rule), and
-  the working colour brightens rather than sinking, so important information
-  never becomes dim grey text on black.
-====================================================================== */
-
-[data-workspace='operations'] {
-  --paper: #0a1926;
-  --paper-deep: #071320;
-  --sheet: #102436;
-  --sheet-raised: #17334a;
-  --chalk: #f2f7fa;
-  --surface-subtle: #14293c;
-  --surface-muted: #18304a;
-  --surface-inverse: #f4f7fa;
-
-  --ink: #eaf2f8;
-  --ink-secondary: #a9bccb;
-  --ink-muted: #8598a7;
-  --ink-subtle: #6d8291;
-
-  --rule: #22455c;
-  --rule-soft: #1a3a50;
-  --rule-strong: #35586f;
-  --border-line: #22455c;
-  --surface-border: #1f3d53;
-
-  --pine: #7fb6da;
-  --pine-deep: #98c8e6;
-  --pine-bright: #b2d7ef;
-  --pine-soft: #14324a;
-  --primary-active: #cfe6f6;
-
-  --vermilion: #e88383;
-  --vermilion-deep: #f09c9c;
-  --vermilion-soft: #3a2022;
-
-  --brass: #4fc3cf;
-  --brass-soft: #10333b;
-
-  --secondary: #7fd4dd;
-  --secondary-hover: #96e0e8;
-  --secondary-active: #b0ebf1;
-
-  --success: #5fc7a3;
-  --success-soft: #10332a;
-  --warning: #e6b364;
-  --warning-soft: #33280f;
-  --danger: #e88383;
-  --danger-soft: #3a2022;
-  --danger-border: #7f3a3a;
-  --info: #4fc3cf;
-  --info-soft: #10333b;
-
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.34), 0 2px 8px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.32), 0 10px 28px rgba(0, 0, 0, 0.32);
-  --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.36), 0 24px 56px rgba(0, 0, 0, 0.44);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  --rail: #071320;
-  --rail-elevated: #132c40;
-  --rail-line: #22455c;
-  --rail-muted: #93a8b8;
-
-  --grain-dot: rgba(234, 242, 248, 0.03);
-  --scroll-thumb: #2b4a60;
-
-  color-scheme: dark;
-}
-
-/*======================================================================
   Theme bridge — semantic names + aliases so every existing screen
   inherits the identity without being rewritten.
 ====================================================================== */
@@ -217,8 +142,7 @@
 @theme inline {
   --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-jet), ui-monospace, SFMono-Regular,
-    monospace;
+  --font-mono: var(--font-mono-jet), ui-monospace, SFMono-Regular, monospace;
 
   /* New names */
   --color-paper: var(--paper);
@@ -356,11 +280,6 @@
     background-size: 4px 4px;
   }
 
-  /* The frame covers the viewport, so the body ground must follow it. */
-  body:has([data-workspace='operations']) {
-    background-color: #0a1926;
-  }
-
   ::selection {
     background: #087e8b;
     color: #ffffff;
@@ -389,14 +308,6 @@
   button {
     font: inherit;
     color: inherit;
-  }
-
-  /* Native controls (date pickers, selects) must not print a dark glyph on a
-     dark sheet. */
-  [data-workspace='operations'] input,
-  [data-workspace='operations'] select,
-  [data-workspace='operations'] textarea {
-    color-scheme: dark;
   }
 }
 
@@ -437,13 +348,11 @@
   color: var(--brass);
 }
 
-/* On a dark plate the forest accent all but disappears, so the italic resolves
-   to brass instead. These plates sit inside the clinical environment (the
-   sign-in frontispiece, inverted callouts), which is why the override is
-   stated here rather than left to the environment tokens. */
+/* On a dark plate the blue accent all but disappears, so the italic resolves
+   to teal instead. These plates sit inside the clinical environment (the
+   sign-in frontispiece, inverted callouts). */
 .bg-ink .display em,
-.bg-rail .display em,
-[data-workspace='operations'] .display em {
+.bg-rail .display em {
   color: var(--brass);
 }
 
@@ -857,8 +766,8 @@
   --disabled-opacity: 0.5;
 
   /* Elevation, one step above the product's softest panel */
-  --shadow-xl: 0 10px 24px rgba(23, 50, 77, 0.08),
-    0 40px 80px rgba(23, 50, 77, 0.12);
+  --shadow-xl:
+    0 10px 24px rgba(23, 50, 77, 0.08), 0 40px 80px rgba(23, 50, 77, 0.12);
 }
 
 @media (min-width: 48rem) {
@@ -932,14 +841,14 @@
   --rail-muted: #a89c8d;
 
   --shadow-xs: 0 1px 2px rgba(23, 19, 15, 0.06);
-  --shadow-sm: 0 1px 2px rgba(23, 19, 15, 0.05),
-    0 2px 8px rgba(23, 19, 15, 0.06);
-  --shadow-md: 0 2px 6px rgba(23, 19, 15, 0.05),
-    0 10px 26px rgba(23, 19, 15, 0.09);
-  --shadow-lg: 0 6px 14px rgba(23, 19, 15, 0.06),
-    0 24px 56px rgba(23, 19, 15, 0.13);
-  --shadow-xl: 0 10px 24px rgba(23, 19, 15, 0.08),
-    0 40px 80px rgba(23, 19, 15, 0.14);
+  --shadow-sm:
+    0 1px 2px rgba(23, 19, 15, 0.05), 0 2px 8px rgba(23, 19, 15, 0.06);
+  --shadow-md:
+    0 2px 6px rgba(23, 19, 15, 0.05), 0 10px 26px rgba(23, 19, 15, 0.09);
+  --shadow-lg:
+    0 6px 14px rgba(23, 19, 15, 0.06), 0 24px 56px rgba(23, 19, 15, 0.13);
+  --shadow-xl:
+    0 10px 24px rgba(23, 19, 15, 0.08), 0 40px 80px rgba(23, 19, 15, 0.14);
 
   --grain-dot: rgba(23, 19, 15, 0.045);
   --scroll-thumb: #cec3b1;
@@ -1006,14 +915,10 @@
   --rail-muted: #90a8a4;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36),
-    0 2px 8px rgba(0, 0, 0, 0.28);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.34),
-    0 10px 28px rgba(0, 0, 0, 0.34);
-  --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.38),
-    0 24px 56px rgba(0, 0, 0, 0.46);
-  --shadow-xl: 0 10px 24px rgba(0, 0, 0, 0.4),
-    0 40px 80px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36), 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.34), 0 10px 28px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.38), 0 24px 56px rgba(0, 0, 0, 0.46);
+  --shadow-xl: 0 10px 24px rgba(0, 0, 0, 0.4), 0 40px 80px rgba(0, 0, 0, 0.5);
 
   --grain-dot: rgba(232, 241, 239, 0.03);
   --scroll-thumb: #2a4b54;

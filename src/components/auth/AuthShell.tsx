@@ -34,7 +34,10 @@ export function AuthShell({
     <main className="bg-paper text-ink min-h-screen lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
       {/* ——— Frontispiece ——— */}
       <aside className="bg-ink text-chalk relative hidden flex-col justify-between overflow-hidden px-10 py-10 lg:flex xl:px-14 xl:py-12">
-        <div className="blueprint-ink absolute inset-0 opacity-50" aria-hidden="true" />
+        <div
+          className="blueprint-ink absolute inset-0 opacity-50"
+          aria-hidden="true"
+        />
 
         {/* Plan drawn behind the statement, cropped by the panel edge. */}
         <TheatrePlan
@@ -49,10 +52,10 @@ export function AuthShell({
 
         <div className="relative my-8 flex flex-1 items-center">
           <div className="max-w-[23ch]">
-            <p className="font-mono text-[9px] tracking-[0.26em] text-rail-muted uppercase">
+            <p className="font-mono text-[9px] tracking-[0.26em] text-white/60 uppercase">
               {plate}
             </p>
-            <p className="display mt-5 text-[clamp(2.1rem,3.5vw,3.25rem)] text-chalk">
+            <p className="display text-chalk mt-5 text-[clamp(2.1rem,3.5vw,3.25rem)]">
               One continuous record of the{' '}
               <em className="text-brass italic">theatre day</em>.
             </p>
@@ -63,7 +66,7 @@ export function AuthShell({
           </div>
         </div>
 
-        <div className="relative flex items-center justify-between border-t border-white/12 pt-4 font-mono text-[8px] tracking-[0.2em] text-rail-muted uppercase">
+        <div className="relative flex items-center justify-between border-t border-white/12 pt-4 font-mono text-[8px] tracking-[0.2em] text-white/60 uppercase">
           <span>MedOrch v0.1.0</span>
           <span>Authorised access</span>
         </div>
@@ -77,7 +80,7 @@ export function AuthShell({
           </div>
           <Link
             href="/"
-            className="link-draw font-mono text-[9px] tracking-[0.2em] text-ink-muted uppercase hover:text-ink"
+            className="link-draw text-ink-muted hover:text-ink font-mono text-[9px] tracking-[0.2em] uppercase"
           >
             ← Index
           </Link>
@@ -87,7 +90,9 @@ export function AuthShell({
           <div className="mx-auto w-full max-w-[26rem]">
             <div className="border-ink border-t-2 pt-5">
               <p className="eyebrow">{plate}</p>
-              <h1 className="display mt-3 text-[clamp(1.9rem,3.4vw,2.6rem)]">{title}</h1>
+              <h1 className="display mt-3 text-[clamp(1.9rem,3.4vw,2.6rem)]">
+                {title}
+              </h1>
               {description ? (
                 <p className="text-ink-secondary mt-3 max-w-[42ch] text-[13px] leading-[1.7]">
                   {description}

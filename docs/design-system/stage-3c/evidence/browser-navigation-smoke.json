@@ -1,0 +1,101 @@
+{
+  "checks": [
+    {
+      "name": "smoke nav /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "active": "/schedules"
+    },
+    {
+      "name": "smoke shell /schedules",
+      "pass": true,
+      "windowToken": null,
+      "shellToken": "smoke-3k2jborlk6s",
+      "sidebarToken": "smoke-3k2jborlk6s"
+    },
+    {
+      "name": "smoke nav /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "active": "/equipment"
+    },
+    {
+      "name": "smoke shell /equipment",
+      "pass": true,
+      "windowToken": null,
+      "shellToken": "smoke-3k2jborlk6s",
+      "sidebarToken": "smoke-3k2jborlk6s"
+    },
+    {
+      "name": "smoke nav /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "active": "/ot-rooms"
+    },
+    {
+      "name": "smoke shell /ot-rooms",
+      "pass": true,
+      "windowToken": null,
+      "shellToken": "smoke-3k2jborlk6s",
+      "sidebarToken": "smoke-3k2jborlk6s"
+    },
+    {
+      "name": "smoke nav /departments",
+      "pass": true,
+      "path": "/departments",
+      "active": "/departments"
+    },
+    {
+      "name": "smoke shell /departments",
+      "pass": true,
+      "windowToken": null,
+      "shellToken": "smoke-3k2jborlk6s",
+      "sidebarToken": "smoke-3k2jborlk6s"
+    },
+    {
+      "name": "smoke nav /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "active": "/doctors"
+    },
+    {
+      "name": "smoke shell /doctors",
+      "pass": true,
+      "windowToken": null,
+      "shellToken": "smoke-3k2jborlk6s",
+      "sidebarToken": "smoke-3k2jborlk6s"
+    },
+    {
+      "name": "schedule dialog light",
+      "pass": true,
+      "overlay": "oklab(0.319893 -0.0115881 -0.0384989 / 0.4)",
+      "panel": "rgb(255, 255, 255)",
+      "select": "rgb(255, 255, 255)",
+      "text": "rgb(36, 52, 71)"
+    },
+    {
+      "name": "equipment form light",
+      "pass": true,
+      "form": "rgba(0, 0, 0, 0)",
+      "panel": "rgb(255, 255, 255)",
+      "input": "rgb(255, 255, 255)",
+      "inputText": "rgb(36, 52, 71)"
+    }
+  ],
+  "dialogState": {
+    "overlay": "oklab(0.319893 -0.0115881 -0.0384989 / 0.4)",
+    "panel": "rgb(255, 255, 255)",
+    "select": "rgb(255, 255, 255)",
+    "text": "rgb(36, 52, 71)"
+  },
+  "formState": {
+    "form": "rgba(0, 0, 0, 0)",
+    "panel": "rgb(255, 255, 255)",
+    "input": "rgb(255, 255, 255)",
+    "inputText": "rgb(36, 52, 71)"
+  },
+  "frameNavigations": 2,
+  "withinDocumentNavigations": 7,
+  "consoleMessages": [],
+  "networkErrors": []
+}

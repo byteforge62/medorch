@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Button } from '@/components/ui/Button';
 import { ScheduleItem } from './ScheduleCard';
 import { SchedulePriority } from './ScheduleStatusBadge';
+import { formatClock, localDateKey } from './schedule-workspace-format';
 
 export interface PatientOption {
   id: string;
@@ -29,6 +30,7 @@ export interface OTRoomOption {
 export interface DoctorOption {
   id: string;
   userId: string;
+  name?: string;
   user?: {
     id: string;
     name: string;
@@ -38,6 +40,8 @@ export interface DoctorOption {
 
 interface ScheduleFormProps {
   initialSchedule?: ScheduleItem | null;
+  /** Local theatre day used when creating a new schedule. */
+  defaultDate?: string;
   patients: PatientOption[];
   departments: DepartmentOption[];
   otRooms: OTRoomOption[];
@@ -49,6 +53,7 @@ interface ScheduleFormProps {
 
 export function ScheduleForm({
   initialSchedule,
+  defaultDate,
   patients,
   departments,
   otRooms,
@@ -58,6 +63,7 @@ export function ScheduleForm({
   onSuccess,
 }: ScheduleFormProps) {
   const isEditing = Boolean(initialSchedule?.id);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const [patientId, setPatientId] = useState(() => initialSchedule?.patientId ?? '');
   const [departmentId, setDepartmentId] = useState(() => initialSchedule?.departmentId ?? '');
@@ -68,42 +74,80 @@ export function ScheduleForm({
   const [clinicalNotes, setClinicalNotes] = useState(() => initialSchedule?.clinicalNotes ?? '');
 
   const [scheduledDate, setScheduledDate] = useState(() => {
-    if (!initialSchedule?.scheduledDate) {
-      return new Date().toISOString().slice(0, 10);
+    if (initialSchedule?.scheduledDate) {
+      return localDateKey(initialSchedule.scheduledDate);
     }
-    try {
-      return new Date(initialSchedule.scheduledDate).toISOString().slice(0, 10);
-    } catch {
-      return '';
-    }
+
+    return defaultDate ?? localDateKey(new Date());
   });
 
-  const [startTime, setStartTime] = useState(() => {
-    if (!initialSchedule?.startTime) {
-      return '09:00';
-    }
-    try {
-      return new Date(initialSchedule.startTime).toTimeString().slice(0, 5);
-    } catch {
-      return '';
-    }
-  });
+  const [startTime, setStartTime] = useState(() =>
+    initialSchedule?.startTime
+      ? formatClock(initialSchedule.startTime)
+      : '09:00',
+  );
 
-  const [endTime, setEndTime] = useState(() => {
-    if (!initialSchedule?.endTime) {
-      return '10:00';
-    }
-    try {
-      return new Date(initialSchedule.endTime).toTimeString().slice(0, 5);
-    } catch {
-      return '';
-    }
-  });
+  const [endTime, setEndTime] = useState(() =>
+    initialSchedule?.endTime
+      ? formatClock(initialSchedule.endTime)
+      : '10:00',
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previous = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const timer = window.setTimeout(() => {
+      panelRef.current
+        ?.querySelector<HTMLInputElement>('input[name="procedure"]')
+        ?.focus();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+      document.body.style.overflow = previousOverflow;
+      previous?.focus();
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleDialogKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (event.key === 'Escape' && !isSubmitting) {
+      event.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (event.key !== 'Tab' || !panelRef.current) return;
+
+    const focusable = Array.from(
+      panelRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]',
+      ),
+    ).filter((element) => element.offsetParent !== null);
+
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   // Filter OT rooms by department if selected
   const availableOtRooms = departmentId
@@ -152,6 +196,14 @@ export function ScheduleForm({
     const startDateTime = new Date(`${scheduledDate}T${startTime}:00`);
     const endDateTime = new Date(`${scheduledDate}T${endTime}:00`);
 
+    if (
+      Number.isNaN(startDateTime.getTime()) ||
+      Number.isNaN(endDateTime.getTime())
+    ) {
+      setError('Enter a valid theatre date and time.');
+      return;
+    }
+
     if (endDateTime <= startDateTime) {
       setError('End time must be after start time.');
       return;
@@ -199,14 +251,38 @@ export function ScheduleForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-none border border-border-strong bg-surface p-6">
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">
+    <div
+      className="bg-foreground/45 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !isSubmitting) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="schedule-form-title"
+        aria-describedby="schedule-form-description"
+        onKeyDown={handleDialogKeyDown}
+        className="border-border-strong bg-surface max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
+      >
+        <div className="border-border flex items-start justify-between gap-4 border-b pb-4">
+          <div className="min-w-0">
+            <p className="eyebrow">
+              {isEditing ? 'Case record' : 'Theatre day'}
+            </p>
+            <h2
+              id="schedule-form-title"
+              className="text-foreground mt-1 text-lg font-semibold"
+            >
               {isEditing ? 'Edit schedule' : 'Create schedule'}
-            </h3>
-            <p className="mt-1 text-sm text-foreground-muted">
+            </h2>
+            <p
+              id="schedule-form-description"
+              className="text-foreground-muted mt-1 text-sm"
+            >
               {isEditing
                 ? 'Update the procedure, date, time, and assignments.'
                 : 'Schedule a new surgical procedure in an available theatre.'}
@@ -215,7 +291,8 @@ export function ScheduleForm({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground"
+            aria-label="Close schedule form"
+            className="border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             ✕
           </button>
@@ -223,7 +300,7 @@ export function ScheduleForm({
 
         {error && (
           <div
-            className="mt-4 border border-danger-border bg-danger-soft p-3 text-sm font-medium text-danger"
+            className="border-danger-border bg-danger-soft text-danger mt-4 rounded-[var(--radius-control)] border p-3 text-sm font-medium"
             role="alert"
           >
             {error}
@@ -237,11 +314,13 @@ export function ScheduleForm({
             </label>
             <input
               type="text"
+              name="procedure"
               required
+              maxLength={200}
               placeholder="e.g. Laparoscopic cholecystectomy"
               value={procedure}
               onChange={(e) => setProcedure(e.target.value)}
-              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground placeholder-foreground-muted px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="border-border-strong bg-surface text-foreground placeholder-foreground-muted focus-visible:border-primary focus-visible:outline-primary block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             />
           </div>
 
@@ -281,7 +360,7 @@ export function ScheduleForm({
                   const targetUserId = doc.user?.id ?? doc.userId;
                   return (
                     <option key={doc.id} value={targetUserId}>
-                      {doc.user?.name ?? 'Doctor'}
+                      {doc.user?.name ?? doc.name ?? 'Doctor'}
                     </option>
                   );
                 })}
@@ -321,12 +400,23 @@ export function ScheduleForm({
                 disabled={isSubmitting || availableOtRooms.length === 0}
               >
                 <option value="">Select OT room</option>
-                {availableOtRooms.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}{' '}
-                    {r.code ? `[${r.code}]` : ''}
-                  </option>
-                ))}
+                {availableOtRooms.map((r) => {
+                  const unavailable =
+                    r.isActive === false ||
+                    r.status === 'MAINTENANCE' ||
+                    r.status === 'DISABLED';
+
+                  return (
+                    <option
+                      key={r.id}
+                      value={r.id}
+                      disabled={unavailable}
+                    >
+                      {r.name} {r.code ? `[${r.code}]` : ''}
+                      {unavailable ? ` — ${r.status?.toLowerCase() ?? 'offline'}` : ''}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
@@ -334,7 +424,7 @@ export function ScheduleForm({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="block text-xs font-semibold text-foreground">
-                Scheduled date {isEditing ? 'update' : 'details'}
+                Theatre date {isEditing ? 'update' : 'details'}
               </label>
               <input
                 type="date"
@@ -393,12 +483,18 @@ export function ScheduleForm({
             </label>
             <textarea
               rows={3}
+              maxLength={5000}
               placeholder="Additional medical instructions, precautions, or procedure notes..."
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground placeholder-foreground-muted px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="border-border-strong bg-surface text-foreground placeholder-foreground-muted focus-visible:border-primary focus-visible:outline-primary block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             />
           </div>
+
+          <p className="text-ink-subtle text-[10px] leading-relaxed">
+            Dates and times are interpreted in local theatre time. Theatre,
+            surgeon and patient overlaps are rejected by the schedule API.
+          </p>
 
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
             <Button

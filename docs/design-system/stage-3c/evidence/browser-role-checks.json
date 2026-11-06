@@ -1,0 +1,1723 @@
+{
+  "mode": "after",
+  "role": "ADMIN",
+  "screenshots": [
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-dashboard-1440.png",
+      "width": 1440,
+      "height": 2863
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-schedules-1440.png",
+      "width": 1440,
+      "height": 1932
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-equipment-1440.png",
+      "width": 1440,
+      "height": 1260
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-ot-rooms-1440.png",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-doctors-1440.png",
+      "width": 1440,
+      "height": 1113
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-patients-1440.png",
+      "width": 1440,
+      "height": 1003
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-departments-1440.png",
+      "width": 1440,
+      "height": 1322
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-alerts-1440.png",
+      "width": 1440,
+      "height": 938
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-users-1440.png",
+      "width": 1440,
+      "height": 1635
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-audit-1440.png",
+      "width": 1440,
+      "height": 3662
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-schedules-1024.png",
+      "width": 1024,
+      "height": 2032
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-schedules-390.png",
+      "width": 390,
+      "height": 2212
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-equipment-1024.png",
+      "width": 1024,
+      "height": 1263
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-equipment-390.png",
+      "width": 390,
+      "height": 1416
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-theatres-1024.png",
+      "width": 1024,
+      "height": 1365
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/admin-theatres-390.png",
+      "width": 390,
+      "height": 2223
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/doctor-dashboard-1440.png",
+      "width": 1440,
+      "height": 1132
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/doctor-dashboard-1024.png",
+      "width": 1024,
+      "height": 1207
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/doctor-dashboard-390.png",
+      "width": 390,
+      "height": 1847
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/ot_staff-dashboard-1440.png",
+      "width": 1440,
+      "height": 1627
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/ot_staff-dashboard-1024.png",
+      "width": 1024,
+      "height": 1806
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/ot_staff-dashboard-390.png",
+      "width": 390,
+      "height": 2302
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/patient-dashboard-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/patient-dashboard-1024.png",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "path": "docs/design-system/stage-3c/screenshots/after/patient-dashboard-390.png",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "checks": [
+    {
+      "name": "unauthenticated workspace redirect",
+      "pass": true,
+      "path": "/login"
+    },
+    {
+      "name": "login ADMIN",
+      "pass": true,
+      "actualRole": "ADMIN"
+    },
+    {
+      "name": "theme ADMIN /dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /patients",
+      "pass": true,
+      "path": "/patients",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /departments",
+      "pass": true,
+      "path": "/departments",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /alerts",
+      "pass": true,
+      "path": "/alerts",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /users",
+      "pass": true,
+      "path": "/users",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme ADMIN /audit",
+      "pass": true,
+      "path": "/audit",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "nav ADMIN /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "active": "/schedules"
+    },
+    {
+      "name": "shell retained ADMIN /schedules",
+      "pass": true,
+      "windowToken": "ADMIN-di5awmn6m6l",
+      "shellToken": "ADMIN-di5awmn6m6l",
+      "sidebarToken": "ADMIN-di5awmn6m6l"
+    },
+    {
+      "name": "nav ADMIN /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "active": "/equipment"
+    },
+    {
+      "name": "shell retained ADMIN /equipment",
+      "pass": true,
+      "windowToken": "ADMIN-di5awmn6m6l",
+      "shellToken": "ADMIN-di5awmn6m6l",
+      "sidebarToken": "ADMIN-di5awmn6m6l"
+    },
+    {
+      "name": "nav ADMIN /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "active": "/ot-rooms"
+    },
+    {
+      "name": "shell retained ADMIN /ot-rooms",
+      "pass": true,
+      "windowToken": "ADMIN-di5awmn6m6l",
+      "shellToken": "ADMIN-di5awmn6m6l",
+      "sidebarToken": "ADMIN-di5awmn6m6l"
+    },
+    {
+      "name": "nav ADMIN /departments",
+      "pass": true,
+      "path": "/departments",
+      "active": "/departments"
+    },
+    {
+      "name": "shell retained ADMIN /departments",
+      "pass": true,
+      "windowToken": "ADMIN-di5awmn6m6l",
+      "shellToken": "ADMIN-di5awmn6m6l",
+      "sidebarToken": "ADMIN-di5awmn6m6l"
+    },
+    {
+      "name": "nav ADMIN /users",
+      "pass": true,
+      "path": "/users",
+      "active": "/users"
+    },
+    {
+      "name": "shell retained ADMIN /users",
+      "pass": true,
+      "windowToken": "ADMIN-di5awmn6m6l",
+      "shellToken": "ADMIN-di5awmn6m6l",
+      "sidebarToken": "ADMIN-di5awmn6m6l"
+    },
+    {
+      "name": "history back ADMIN",
+      "pass": true,
+      "path": "/departments",
+      "active": "/departments"
+    },
+    {
+      "name": "shell retained after back ADMIN",
+      "pass": true
+    },
+    {
+      "name": "history forward ADMIN",
+      "pass": true,
+      "path": "/users",
+      "active": "/users"
+    },
+    {
+      "name": "shell retained after forward ADMIN",
+      "pass": true
+    },
+    {
+      "name": "no document navigation ADMIN",
+      "pass": true,
+      "frameNavigations": 0
+    },
+    {
+      "name": "unauthorized ADMIN /patients/appointments",
+      "pass": true,
+      "path": "/unauthorized"
+    },
+    {
+      "name": "direct URL ADMIN",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "refresh ADMIN",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "login DOCTOR",
+      "pass": true,
+      "actualRole": "DOCTOR"
+    },
+    {
+      "name": "theme DOCTOR /dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /patients",
+      "pass": true,
+      "path": "/patients",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /departments",
+      "pass": true,
+      "path": "/departments",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme DOCTOR /alerts",
+      "pass": true,
+      "path": "/alerts",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "nav DOCTOR /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "active": "/schedules"
+    },
+    {
+      "name": "shell retained DOCTOR /schedules",
+      "pass": true,
+      "windowToken": "DOCTOR-h2du3mtwcqu",
+      "shellToken": "DOCTOR-h2du3mtwcqu",
+      "sidebarToken": "DOCTOR-h2du3mtwcqu"
+    },
+    {
+      "name": "nav DOCTOR /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "active": "/doctors"
+    },
+    {
+      "name": "shell retained DOCTOR /doctors",
+      "pass": true,
+      "windowToken": "DOCTOR-h2du3mtwcqu",
+      "shellToken": "DOCTOR-h2du3mtwcqu",
+      "sidebarToken": "DOCTOR-h2du3mtwcqu"
+    },
+    {
+      "name": "nav DOCTOR /patients",
+      "pass": true,
+      "path": "/patients",
+      "active": "/patients"
+    },
+    {
+      "name": "shell retained DOCTOR /patients",
+      "pass": true,
+      "windowToken": "DOCTOR-h2du3mtwcqu",
+      "shellToken": "DOCTOR-h2du3mtwcqu",
+      "sidebarToken": "DOCTOR-h2du3mtwcqu"
+    },
+    {
+      "name": "nav DOCTOR /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "active": "/equipment"
+    },
+    {
+      "name": "shell retained DOCTOR /equipment",
+      "pass": true,
+      "windowToken": "DOCTOR-h2du3mtwcqu",
+      "shellToken": "DOCTOR-h2du3mtwcqu",
+      "sidebarToken": "DOCTOR-h2du3mtwcqu"
+    },
+    {
+      "name": "history back DOCTOR",
+      "pass": true,
+      "path": "/patients",
+      "active": "/patients"
+    },
+    {
+      "name": "shell retained after back DOCTOR",
+      "pass": true
+    },
+    {
+      "name": "history forward DOCTOR",
+      "pass": true,
+      "path": "/equipment",
+      "active": "/equipment"
+    },
+    {
+      "name": "shell retained after forward DOCTOR",
+      "pass": true
+    },
+    {
+      "name": "no document navigation DOCTOR",
+      "pass": true,
+      "frameNavigations": 0
+    },
+    {
+      "name": "unauthorized DOCTOR /users",
+      "pass": true,
+      "path": "/unauthorized"
+    },
+    {
+      "name": "direct URL DOCTOR",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "refresh DOCTOR",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "login OT_STAFF",
+      "pass": true,
+      "actualRole": "OT_STAFF"
+    },
+    {
+      "name": "theme OT_STAFF /dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /equipment",
+      "pass": true,
+      "path": "/equipment",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /departments",
+      "pass": true,
+      "path": "/departments",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme OT_STAFF /alerts",
+      "pass": true,
+      "path": "/alerts",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "nav OT_STAFF /schedules",
+      "pass": true,
+      "path": "/schedules",
+      "active": "/schedules"
+    },
+    {
+      "name": "shell retained OT_STAFF /schedules",
+      "pass": true,
+      "windowToken": "OT_STAFF-qra0o1uilr9",
+      "shellToken": "OT_STAFF-qra0o1uilr9",
+      "sidebarToken": "OT_STAFF-qra0o1uilr9"
+    },
+    {
+      "name": "nav OT_STAFF /ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "active": "/ot-rooms"
+    },
+    {
+      "name": "shell retained OT_STAFF /ot-rooms",
+      "pass": true,
+      "windowToken": "OT_STAFF-qra0o1uilr9",
+      "shellToken": "OT_STAFF-qra0o1uilr9",
+      "sidebarToken": "OT_STAFF-qra0o1uilr9"
+    },
+    {
+      "name": "nav OT_STAFF /doctors",
+      "pass": true,
+      "path": "/doctors",
+      "active": "/doctors"
+    },
+    {
+      "name": "shell retained OT_STAFF /doctors",
+      "pass": true,
+      "windowToken": "OT_STAFF-qra0o1uilr9",
+      "shellToken": "OT_STAFF-qra0o1uilr9",
+      "sidebarToken": "OT_STAFF-qra0o1uilr9"
+    },
+    {
+      "name": "nav OT_STAFF /departments",
+      "pass": true,
+      "path": "/departments",
+      "active": "/departments"
+    },
+    {
+      "name": "shell retained OT_STAFF /departments",
+      "pass": true,
+      "windowToken": "OT_STAFF-qra0o1uilr9",
+      "shellToken": "OT_STAFF-qra0o1uilr9",
+      "sidebarToken": "OT_STAFF-qra0o1uilr9"
+    },
+    {
+      "name": "history back OT_STAFF",
+      "pass": true,
+      "path": "/doctors",
+      "active": "/doctors"
+    },
+    {
+      "name": "shell retained after back OT_STAFF",
+      "pass": true
+    },
+    {
+      "name": "history forward OT_STAFF",
+      "pass": true,
+      "path": "/departments",
+      "active": "/departments"
+    },
+    {
+      "name": "shell retained after forward OT_STAFF",
+      "pass": true
+    },
+    {
+      "name": "no document navigation OT_STAFF",
+      "pass": true,
+      "frameNavigations": 0
+    },
+    {
+      "name": "unauthorized OT_STAFF /patients",
+      "pass": true,
+      "path": "/unauthorized"
+    },
+    {
+      "name": "direct URL OT_STAFF",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "refresh OT_STAFF",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "login PATIENT",
+      "pass": true,
+      "actualRole": "PATIENT"
+    },
+    {
+      "name": "theme PATIENT /dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme PATIENT /patients/appointments",
+      "pass": true,
+      "path": "/patients/appointments",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "theme PATIENT /alerts",
+      "pass": true,
+      "path": "/alerts",
+      "bodyBg": "rgb(245, 248, 251)",
+      "sidebarBg": "rgb(255, 255, 255)",
+      "darkSurfaces": []
+    },
+    {
+      "name": "nav PATIENT /patients/appointments",
+      "pass": true,
+      "path": "/patients/appointments",
+      "active": "/patients/appointments"
+    },
+    {
+      "name": "shell retained PATIENT /patients/appointments",
+      "pass": true,
+      "windowToken": "PATIENT-bknmobp6zt8",
+      "shellToken": "PATIENT-bknmobp6zt8",
+      "sidebarToken": "PATIENT-bknmobp6zt8"
+    },
+    {
+      "name": "history back PATIENT",
+      "pass": true,
+      "path": "/dashboard",
+      "active": "/dashboard"
+    },
+    {
+      "name": "shell retained after back PATIENT",
+      "pass": true
+    },
+    {
+      "name": "history forward PATIENT",
+      "pass": true,
+      "path": "/patients/appointments",
+      "active": "/patients/appointments"
+    },
+    {
+      "name": "shell retained after forward PATIENT",
+      "pass": true
+    },
+    {
+      "name": "no document navigation PATIENT",
+      "pass": true,
+      "frameNavigations": 0
+    },
+    {
+      "name": "unauthorized PATIENT /doctors",
+      "pass": true,
+      "path": "/unauthorized"
+    },
+    {
+      "name": "direct URL PATIENT",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "refresh PATIENT",
+      "pass": true,
+      "path": "/dashboard"
+    },
+    {
+      "name": "sign out returns to login",
+      "pass": true,
+      "path": "/login"
+    },
+    {
+      "name": "private shell cleared after sign out",
+      "pass": true,
+      "shellPresent": false
+    },
+    {
+      "name": "private route after sign out",
+      "pass": true,
+      "path": "/login"
+    }
+  ],
+  "themeRows": [
+    {
+      "role": "ADMIN",
+      "route": "/dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/dashboard",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/schedules",
+      "pass": true,
+      "path": "/schedules",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/schedules",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/equipment",
+      "pass": true,
+      "path": "/equipment",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/equipment",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/ot-rooms",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/doctors",
+      "pass": true,
+      "path": "/doctors",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/doctors",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/patients",
+      "pass": true,
+      "path": "/patients",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/patients",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/departments",
+      "pass": true,
+      "path": "/departments",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/departments",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/alerts",
+      "pass": true,
+      "path": "/alerts",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": null,
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/users",
+      "pass": true,
+      "path": "/users",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/users",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "ADMIN",
+      "route": "/audit",
+      "pass": true,
+      "path": "/audit",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/audit",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/dashboard",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/schedules",
+      "pass": true,
+      "path": "/schedules",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/schedules",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/equipment",
+      "pass": true,
+      "path": "/equipment",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/equipment",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/ot-rooms",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/doctors",
+      "pass": true,
+      "path": "/doctors",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/doctors",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/patients",
+      "pass": true,
+      "path": "/patients",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/patients",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/departments",
+      "pass": true,
+      "path": "/departments",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/departments",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "DOCTOR",
+      "route": "/alerts",
+      "pass": true,
+      "path": "/alerts",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": null,
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/dashboard",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/schedules",
+      "pass": true,
+      "path": "/schedules",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/schedules",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/equipment",
+      "pass": true,
+      "path": "/equipment",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/equipment",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/ot-rooms",
+      "pass": true,
+      "path": "/ot-rooms",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/ot-rooms",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/doctors",
+      "pass": true,
+      "path": "/doctors",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/doctors",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/departments",
+      "pass": true,
+      "path": "/departments",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/departments",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "OT_STAFF",
+      "route": "/alerts",
+      "pass": true,
+      "path": "/alerts",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": null,
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "PATIENT",
+      "route": "/dashboard",
+      "pass": true,
+      "path": "/dashboard",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/dashboard",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "PATIENT",
+      "route": "/patients/appointments",
+      "pass": true,
+      "path": "/patients/appointments",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": "/patients/appointments",
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    },
+    {
+      "role": "PATIENT",
+      "route": "/alerts",
+      "pass": true,
+      "path": "/alerts",
+      "title": "MedOrch — Intelligent Hospital Operations",
+      "bodyBg": "rgb(245, 248, 251)",
+      "colorScheme": "light",
+      "shellPresent": true,
+      "shellToken": null,
+      "sidebarPresent": true,
+      "sidebarToken": null,
+      "sidebarBg": "rgb(255, 255, 255)",
+      "headerPresent": true,
+      "headerBg": "oklab(0.977701 -0.00188661 -0.0047304 / 0.85)",
+      "activeHref": null,
+      "darkSurfaces": [],
+      "windowToken": null,
+      "primary": "#245b8f",
+      "paper": "#f5f8fb",
+      "teal": "#168c91",
+      "text": "#243447",
+      "success": "#24845d",
+      "warning": "#b7791f",
+      "critical": "#c74646"
+    }
+  ],
+  "navigationRows": [
+    {
+      "role": "ADMIN",
+      "token": "ADMIN-di5awmn6m6l",
+      "links": [
+        "/dashboard",
+        "/schedules",
+        "/equipment",
+        "/ot-rooms",
+        "/departments",
+        "/users"
+      ],
+      "states": [
+        {
+          "href": "/schedules",
+          "path": "/schedules",
+          "active": "/schedules",
+          "windowToken": "ADMIN-di5awmn6m6l",
+          "shellToken": "ADMIN-di5awmn6m6l",
+          "sidebarToken": "ADMIN-di5awmn6m6l"
+        },
+        {
+          "href": "/equipment",
+          "path": "/equipment",
+          "active": "/equipment",
+          "windowToken": "ADMIN-di5awmn6m6l",
+          "shellToken": "ADMIN-di5awmn6m6l",
+          "sidebarToken": "ADMIN-di5awmn6m6l"
+        },
+        {
+          "href": "/ot-rooms",
+          "path": "/ot-rooms",
+          "active": "/ot-rooms",
+          "windowToken": "ADMIN-di5awmn6m6l",
+          "shellToken": "ADMIN-di5awmn6m6l",
+          "sidebarToken": "ADMIN-di5awmn6m6l"
+        },
+        {
+          "href": "/departments",
+          "path": "/departments",
+          "active": "/departments",
+          "windowToken": "ADMIN-di5awmn6m6l",
+          "shellToken": "ADMIN-di5awmn6m6l",
+          "sidebarToken": "ADMIN-di5awmn6m6l"
+        },
+        {
+          "href": "/users",
+          "path": "/users",
+          "active": "/users",
+          "windowToken": "ADMIN-di5awmn6m6l",
+          "shellToken": "ADMIN-di5awmn6m6l",
+          "sidebarToken": "ADMIN-di5awmn6m6l"
+        }
+      ],
+      "frameNavigations": 0,
+      "withinDocumentNavigations": 9,
+      "back": {
+        "path": "/departments",
+        "active": "/departments",
+        "token": "ADMIN-di5awmn6m6l"
+      },
+      "forward": {
+        "path": "/users",
+        "active": "/users",
+        "token": "ADMIN-di5awmn6m6l"
+      }
+    },
+    {
+      "role": "DOCTOR",
+      "token": "DOCTOR-h2du3mtwcqu",
+      "links": [
+        "/dashboard",
+        "/schedules",
+        "/doctors",
+        "/patients",
+        "/equipment"
+      ],
+      "states": [
+        {
+          "href": "/schedules",
+          "path": "/schedules",
+          "active": "/schedules",
+          "windowToken": "DOCTOR-h2du3mtwcqu",
+          "shellToken": "DOCTOR-h2du3mtwcqu",
+          "sidebarToken": "DOCTOR-h2du3mtwcqu"
+        },
+        {
+          "href": "/doctors",
+          "path": "/doctors",
+          "active": "/doctors",
+          "windowToken": "DOCTOR-h2du3mtwcqu",
+          "shellToken": "DOCTOR-h2du3mtwcqu",
+          "sidebarToken": "DOCTOR-h2du3mtwcqu"
+        },
+        {
+          "href": "/patients",
+          "path": "/patients",
+          "active": "/patients",
+          "windowToken": "DOCTOR-h2du3mtwcqu",
+          "shellToken": "DOCTOR-h2du3mtwcqu",
+          "sidebarToken": "DOCTOR-h2du3mtwcqu"
+        },
+        {
+          "href": "/equipment",
+          "path": "/equipment",
+          "active": "/equipment",
+          "windowToken": "DOCTOR-h2du3mtwcqu",
+          "shellToken": "DOCTOR-h2du3mtwcqu",
+          "sidebarToken": "DOCTOR-h2du3mtwcqu"
+        }
+      ],
+      "frameNavigations": 0,
+      "withinDocumentNavigations": 8,
+      "back": {
+        "path": "/patients",
+        "active": "/patients",
+        "token": "DOCTOR-h2du3mtwcqu"
+      },
+      "forward": {
+        "path": "/equipment",
+        "active": "/equipment",
+        "token": "DOCTOR-h2du3mtwcqu"
+      }
+    },
+    {
+      "role": "OT_STAFF",
+      "token": "OT_STAFF-qra0o1uilr9",
+      "links": [
+        "/dashboard",
+        "/schedules",
+        "/ot-rooms",
+        "/doctors",
+        "/departments"
+      ],
+      "states": [
+        {
+          "href": "/schedules",
+          "path": "/schedules",
+          "active": "/schedules",
+          "windowToken": "OT_STAFF-qra0o1uilr9",
+          "shellToken": "OT_STAFF-qra0o1uilr9",
+          "sidebarToken": "OT_STAFF-qra0o1uilr9"
+        },
+        {
+          "href": "/ot-rooms",
+          "path": "/ot-rooms",
+          "active": "/ot-rooms",
+          "windowToken": "OT_STAFF-qra0o1uilr9",
+          "shellToken": "OT_STAFF-qra0o1uilr9",
+          "sidebarToken": "OT_STAFF-qra0o1uilr9"
+        },
+        {
+          "href": "/doctors",
+          "path": "/doctors",
+          "active": "/doctors",
+          "windowToken": "OT_STAFF-qra0o1uilr9",
+          "shellToken": "OT_STAFF-qra0o1uilr9",
+          "sidebarToken": "OT_STAFF-qra0o1uilr9"
+        },
+        {
+          "href": "/departments",
+          "path": "/departments",
+          "active": "/departments",
+          "windowToken": "OT_STAFF-qra0o1uilr9",
+          "shellToken": "OT_STAFF-qra0o1uilr9",
+          "sidebarToken": "OT_STAFF-qra0o1uilr9"
+        }
+      ],
+      "frameNavigations": 0,
+      "withinDocumentNavigations": 8,
+      "back": {
+        "path": "/doctors",
+        "active": "/doctors",
+        "token": "OT_STAFF-qra0o1uilr9"
+      },
+      "forward": {
+        "path": "/departments",
+        "active": "/departments",
+        "token": "OT_STAFF-qra0o1uilr9"
+      }
+    },
+    {
+      "role": "PATIENT",
+      "token": "PATIENT-bknmobp6zt8",
+      "links": [
+        "/dashboard",
+        "/patients/appointments"
+      ],
+      "states": [
+        {
+          "href": "/patients/appointments",
+          "path": "/patients/appointments",
+          "active": "/patients/appointments",
+          "windowToken": "PATIENT-bknmobp6zt8",
+          "shellToken": "PATIENT-bknmobp6zt8",
+          "sidebarToken": "PATIENT-bknmobp6zt8"
+        }
+      ],
+      "frameNavigations": 0,
+      "withinDocumentNavigations": 5,
+      "back": {
+        "path": "/dashboard",
+        "active": "/dashboard",
+        "token": "PATIENT-bknmobp6zt8"
+      },
+      "forward": {
+        "path": "/patients/appointments",
+        "active": "/patients/appointments",
+        "token": "PATIENT-bknmobp6zt8"
+      }
+    }
+  ],
+  "eventCounts": {
+    "frameNavigations": 74,
+    "withinDocumentNavigations": 104,
+    "loadEvents": 73
+  },
+  "consoleMessages": [
+    {
+      "type": "exception",
+      "text": "Error: Minified React error #419; visit https://react.dev/errors/419 for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+    },
+    {
+      "type": "error",
+      "text": "ChunkLoadError: Failed to load chunk /_next/static/chunks/11ota86r2nkeb.js from module 64893\n    at http://localhost:5274/_next/static/chunks/turbopack-2veuhbqmaat8o.js:1:6259"
+    }
+  ],
+  "networkErrors": [
+    {
+      "errorText": "net::ERR_ABORTED",
+      "canceled": true,
+      "type": "Fetch"
+    },
+    {
+      "errorText": "net::ERR_ABORTED",
+      "canceled": true,
+      "type": "Fetch"
+    },
+    {
+      "errorText": "net::ERR_ABORTED",
+      "canceled": true,
+      "type": "Fetch"
+    },
+    {
+      "errorText": "net::ERR_ABORTED",
+      "canceled": true,
+      "type": "Fetch"
+    },
+    {
+      "errorText": "net::ERR_ABORTED",
+      "canceled": true,
+      "type": "Fetch"
+    }
+  ]
+}

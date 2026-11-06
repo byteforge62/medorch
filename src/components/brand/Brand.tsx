@@ -92,7 +92,7 @@ export function Wordmark({
         {subtitle ? (
           <span
             className={`mt-1 hidden font-mono text-[8px] tracking-[0.26em] uppercase sm:block ${
-              tone === 'chalk' ? 'text-rail-muted' : 'text-ink-subtle'
+              tone === 'chalk' ? 'text-white/60' : 'text-ink-subtle'
             }`}
           >
             {subtitle}

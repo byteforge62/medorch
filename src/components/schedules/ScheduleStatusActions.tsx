@@ -15,6 +15,8 @@ interface StatusAction {
   variant: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   requiresConfirmation?: boolean;
   confirmMessage?: string;
+  confirmLabel?: string;
+  confirmVariant?: 'primary' | 'danger';
 }
 
 export interface ScheduleStatusActionsProps {
@@ -27,30 +29,89 @@ export interface ScheduleStatusActionsProps {
 const STATUS_ACTIONS: Record<ScheduleStatus, StatusAction[]> = {
   SCHEDULED: [
     { targetStatus: 'CONFIRMED', label: 'Confirm', variant: 'primary' },
-    { targetStatus: 'CANCELLED', label: 'Cancel', variant: 'danger', requiresConfirmation: true },
+    {
+      targetStatus: 'CANCELLED',
+      label: 'Cancel',
+      variant: 'danger',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Cancel this theatre schedule? The case will be closed as cancelled.',
+      confirmLabel: 'Cancel schedule',
+      confirmVariant: 'danger',
+    },
   ],
   CONFIRMED: [
-    { targetStatus: 'IN_PROGRESS', label: 'Start Procedure', variant: 'primary' },
-    { targetStatus: 'DELAYED', label: 'Mark Delayed', variant: 'secondary', requiresConfirmation: true },
-    { targetStatus: 'CANCELLED', label: 'Cancel', variant: 'danger', requiresConfirmation: true },
+    {
+      targetStatus: 'IN_PROGRESS',
+      label: 'Start procedure',
+      variant: 'primary',
+    },
+    {
+      targetStatus: 'DELAYED',
+      label: 'Mark delayed',
+      variant: 'secondary',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Mark this procedure delayed? The theatre allocation stays recorded.',
+      confirmLabel: 'Mark delayed',
+    },
+    {
+      targetStatus: 'CANCELLED',
+      label: 'Cancel',
+      variant: 'danger',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Cancel this theatre schedule? The case will be closed as cancelled.',
+      confirmLabel: 'Cancel schedule',
+      confirmVariant: 'danger',
+    },
   ],
   IN_PROGRESS: [
-    { targetStatus: 'COMPLETED', label: 'Mark complete', variant: 'primary', requiresConfirmation: true },
+    {
+      targetStatus: 'DELAYED',
+      label: 'Mark delayed',
+      variant: 'secondary',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Mark this running procedure delayed? The theatre allocation stays recorded.',
+      confirmLabel: 'Mark delayed',
+    },
+    {
+      targetStatus: 'COMPLETED',
+      label: 'Mark complete',
+      variant: 'primary',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Mark this procedure complete? This closes the case and cannot be reversed.',
+      confirmLabel: 'Mark complete',
+    },
   ],
   DELAYED: [
-    { targetStatus: 'IN_PROGRESS', label: 'Resume', variant: 'primary' },
-    { targetStatus: 'COMPLETED', label: 'Mark complete', variant: 'primary' },
-    { targetStatus: 'CANCELLED', label: 'Cancel', variant: 'danger', requiresConfirmation: true },
+    {
+      targetStatus: 'CONFIRMED',
+      label: 'Reconfirm',
+      variant: 'secondary',
+    },
+    {
+      targetStatus: 'IN_PROGRESS',
+      label: 'Resume',
+      variant: 'primary',
+    },
+    {
+      targetStatus: 'CANCELLED',
+      label: 'Cancel',
+      variant: 'danger',
+      requiresConfirmation: true,
+      confirmMessage:
+        'Cancel this delayed theatre schedule? The case will be closed as cancelled.',
+      confirmLabel: 'Cancel schedule',
+      confirmVariant: 'danger',
+    },
   ],
   COMPLETED: [],
   CANCELLED: [],
 };
 
-/**
- * Screen-reader name for a status action button. Confirmation and
- * cancellation operate on the schedule itself, so those names name the
- * schedule; the remaining transitions act on the procedure.
- */
 function statusActionAriaLabel(
   action: StatusAction,
   scheduleLabel?: string,
@@ -67,32 +128,64 @@ function statusActionAriaLabel(
 
 function ConfirmDialog({
   message,
+  title,
+  confirmLabel,
+  confirmVariant,
   onConfirm,
   onCancel,
 }: {
   message: string;
+  title: string;
+  confirmLabel: string;
+  confirmVariant: 'primary' | 'danger';
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const id = React.useId();
+  const cancelRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    cancelRef.current?.focus();
+  }, []);
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="status-confirm-title"
+      className="bg-foreground/45 fixed inset-0 z-50 flex items-center justify-center p-4"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onCancel();
+        }
+      }}
     >
-      <div className="w-full max-w-sm border border-border-strong bg-surface p-6">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${id}-title`}
+        aria-describedby={`${id}-message`}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            onCancel();
+          }
+        }}
+        className="border-border-strong bg-surface w-full max-w-sm rounded-[var(--radius-panel)] border p-5 shadow-xl"
+      >
+        <p className="eyebrow">Case status</p>
         <h3
-          id="status-confirm-title"
-          className="mt-1 text-center text-sm font-semibold text-foreground"
+          id={`${id}-title`}
+          className="text-foreground mt-1.5 text-sm font-semibold"
         >
-          Confirm procedure status change
+          {title}
         </h3>
-        <p className="mt-2 text-center text-sm text-foreground-muted">
+        <p
+          id={`${id}-message`}
+          className="text-foreground-muted mt-2 text-[12px] leading-relaxed"
+        >
           {message}
         </p>
-        <div className="mt-5 flex flex-col-reverse items-center gap-3 sm:flex-row justify-end">
+        <div className="mt-5 flex flex-col-reverse justify-end gap-2 sm:flex-row">
           <Button
+            ref={cancelRef}
             type="button"
             variant="secondary"
             size="sm"
@@ -102,88 +195,125 @@ function ConfirmDialog({
           </Button>
           <Button
             type="button"
-            variant="danger"
+            variant={confirmVariant}
             size="sm"
             onClick={onConfirm}
           >
-            Confirm
+            {confirmLabel}
           </Button>
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
-export function ScheduleStatusActions({ scheduleId, currentStatus, onStatusUpdated, scheduleLabel }: ScheduleStatusActionsProps) {
-  const [pendingAction, setPendingAction] = React.useState<StatusAction | null>(null);
+export function ScheduleStatusActions({
+  scheduleId,
+  currentStatus,
+  onStatusUpdated,
+  scheduleLabel,
+}: ScheduleStatusActionsProps) {
+  const [pendingAction, setPendingAction] =
+    React.useState<StatusAction | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const actions = STATUS_ACTIONS[currentStatus] ?? [];
 
   if (actions.length === 0) return null;
 
-  const activateAction = (action: StatusAction) => {
+  const submitAction = async (action: StatusAction) => {
     setError(null);
-    if (action.requiresConfirmation) {
-      setPendingAction(action);
-    } else {
-      setIsSubmitting(true);
-      fetch(`/api/schedules/${scheduleId}/status`, {
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`/api/schedules/${scheduleId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: action.targetStatus }),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            return res.json().then((data: unknown) => {
-              const message =
-                data && typeof data === 'object' && 'error' in data
-                  ? (data.error as string)
-                  : 'Unable to update the procedure status.';
-              throw new Error(message);
-            });
+      });
+
+      if (!response.ok) {
+        let message = 'Unable to update the procedure status.';
+
+        try {
+          const data: unknown = await response.json();
+          if (
+            data &&
+            typeof data === 'object' &&
+            'error' in data &&
+            typeof data.error === 'string'
+          ) {
+            message = data.error;
           }
+        } catch {
+          // Keep the generic message when the server did not return JSON.
+        }
 
-          return res.json();
-        })
-        .then(() => onStatusUpdated(scheduleId, action.targetStatus))
-        .catch((caught: unknown) =>
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : 'An unexpected error occurred.',
-          ),
-        )
-        .finally(() => setIsSubmitting(false));
+        throw new Error(message);
+      }
 
+      onStatusUpdated(scheduleId, action.targetStatus);
+    } catch (caught: unknown) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : 'An unexpected error occurred.',
+      );
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const activateAction = (
+    action: StatusAction,
+    trigger: HTMLButtonElement,
+  ) => {
+    setError(null);
+    triggerRef.current = trigger;
+
+    if (action.requiresConfirmation) {
+      setPendingAction(action);
+      return;
+    }
+
+    void submitAction(action);
   };
 
   if (pendingAction) {
     return (
       <ConfirmDialog
-        message={pendingAction.confirmMessage ?? 'Are you sure you want to proceed?'}
+        title={`${pendingAction.label}?`}
+        message={
+          pendingAction.confirmMessage ??
+          'Are you sure you want to change this case?'
+        }
+        confirmLabel={pendingAction.confirmLabel ?? 'Confirm'}
+        confirmVariant={pendingAction.confirmVariant ?? 'primary'}
         onConfirm={() => {
-          activateAction(pendingAction);
+          const action = pendingAction;
           setPendingAction(null);
+          void submitAction(action);
         }}
-        onCancel={() => setPendingAction(null)}
+        onCancel={() => {
+          setPendingAction(null);
+          window.setTimeout(() => triggerRef.current?.focus(), 0);
+        }}
       />
     );
   }
 
   return (
-    <fieldset className="space-y-3 border border-border border-l-4 border-l-primary rounded-md bg-surface-muted p-4">
+    <fieldset className="border-rule/80 bg-surface/70 rounded-[var(--radius-control)] border p-2.5">
       <legend className="sr-only">Change procedure status</legend>
-      {error && (
+      {error ? (
         <div
           role="alert"
-          className="rounded-md border border-danger-border bg-danger-soft p-3 text-sm font-medium text-danger"
+          className="border-danger-border bg-danger-soft text-danger mb-2 rounded-[var(--radius-control)] border p-2 text-[10.5px] font-medium"
         >
           {error}
         </div>
-      )}
+      ) : null}
       <div className="flex flex-wrap gap-2">
         {actions.map((action) => (
           <Button
@@ -193,7 +323,7 @@ export function ScheduleStatusActions({ scheduleId, currentStatus, onStatusUpdat
             size="sm"
             isLoading={isSubmitting}
             aria-label={statusActionAriaLabel(action, scheduleLabel)}
-            onClick={() => activateAction(action)}
+            onClick={(event) => activateAction(action, event.currentTarget)}
           >
             {action.label}
           </Button>

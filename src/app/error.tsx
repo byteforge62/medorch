@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function Error({
   reset,
 }: {
@@ -9,15 +11,15 @@ export default function Error({
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
       <div className="max-w-md text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-foreground-subtle">
+        <p className="text-foreground-subtle text-xs font-semibold tracking-widest uppercase">
           Something went wrong
         </p>
 
-        <h1 className="mt-4 text-3xl font-bold text-foreground">
+        <h1 className="text-foreground mt-4 text-3xl font-bold">
           We hit a temporary problem
         </h1>
 
-        <p className="mt-3 text-foreground-secondary">
+        <p className="text-foreground-secondary mt-3">
           The application could not finish this request. This is usually
           temporary, and your work is safe.
         </p>
@@ -26,17 +28,17 @@ export default function Error({
           <button
             type="button"
             onClick={() => reset()}
-            className="inline-flex items-center justify-center rounded-[var(--radius-xl)] bg-primary px-5 py-2.5 text-sm font-semibold text-foreground-inverse transition-colors hover:bg-primary-hover focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+            className="bg-primary text-foreground-inverse hover:bg-primary-hover focus:outline-primary inline-flex items-center justify-center rounded-[var(--radius-xl)] px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-2 focus:outline-offset-2"
           >
             Try again
           </button>
 
-          <a
+          <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center rounded-[var(--radius-xl)] border border-border-strong px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+            className="border-border-strong text-foreground-secondary hover:bg-surface focus:outline-primary inline-flex items-center justify-center rounded-[var(--radius-xl)] border px-5 py-2.5 text-sm font-medium transition-colors focus:outline-2 focus:outline-offset-2"
           >
             Return to dashboard
-          </a>
+          </Link>
         </div>
       </div>
     </main>

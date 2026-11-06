@@ -1,0 +1,17 @@
+role start ADMIN
+role complete ADMIN
+role start DOCTOR
+role complete DOCTOR
+role start OT_STAFF
+role complete OT_STAFF
+role start PATIENT
+role complete PATIENT
+{
+  "mode": "after",
+  "role": "ADMIN",
+  "screenshots": 25,
+  "checks": 96,
+  "failedChecks": [],
+  "consoleMessages": 2,
+  "networkErrors": 5
+}

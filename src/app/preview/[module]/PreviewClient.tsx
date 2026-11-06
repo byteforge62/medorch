@@ -23,10 +23,10 @@ import type { UserRole } from '@/generated/prisma/client';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/ui/PageHeader';
 
-import { PatientRegistry } from '@/app/patients/PatientRegistry';
-import { DoctorDirectory } from '@/app/doctors/DoctorDirectory';
-import { OTRoomManagement } from '@/app/ot-rooms/OtRoomManagement';
-import { EquipmentManagement } from '@/app/equipment/EquipmentManagement';
+import { PatientRegistry } from '@/app/(workspace)/patients/PatientRegistry';
+import { DoctorDirectory } from '@/app/(workspace)/doctors/DoctorDirectory';
+import { OTRoomManagement } from '@/app/(workspace)/ot-rooms/OtRoomManagement';
+import { EquipmentManagement } from '@/app/(workspace)/equipment/EquipmentManagement';
 import { SchedulePage } from '@/components/schedules/SchedulePage';
 import { AuditLogViewer } from '@/components/audit/AuditLogViewer';
 import { UserList } from '@/components/users/UserList';
@@ -35,7 +35,6 @@ import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 import { AdminDashboard } from '@/components/dashboard/admin/AdminDashboard';
-import type { Workspace } from '@/lib/design/workspace';
 
 const PREVIEW_USER = {
   name: 'Preview Operator',
@@ -51,12 +50,11 @@ function AdminControlRoom() {
 
 const MODULES: Record<
   string,
-  { label: string; role: UserRole; workspace?: Workspace; render: () => React.ReactNode }
+  { label: string; role: UserRole; render: () => React.ReactNode }
 > = {
   admin: {
     label: 'Admin dashboard',
     role: 'ADMIN',
-    workspace: 'clinical',
     render: () => <AdminControlRoom />,
   },
   doctor: {
@@ -74,12 +72,36 @@ const MODULES: Record<
     role: 'PATIENT',
     render: () => <PatientDashboard userName="Ira Devan" />,
   },
-  patients: { label: 'Patient Registry', role: 'ADMIN', render: () => <PatientRegistry /> },
-  doctors: { label: 'Doctor Directory', role: 'ADMIN', render: () => <DoctorDirectory /> },
-  'ot-rooms': { label: 'OT Rooms', role: 'ADMIN', render: () => <OTRoomManagement /> },
-  equipment: { label: 'Equipment', role: 'ADMIN', render: () => <EquipmentManagement /> },
-  schedules: { label: 'Schedules', role: 'ADMIN', render: () => <SchedulePage /> },
-  audit: { label: 'Audit Logs', role: 'ADMIN', render: () => <AuditLogViewer /> },
+  patients: {
+    label: 'Patient Registry',
+    role: 'ADMIN',
+    render: () => <PatientRegistry />,
+  },
+  doctors: {
+    label: 'Doctor Directory',
+    role: 'ADMIN',
+    render: () => <DoctorDirectory />,
+  },
+  'ot-rooms': {
+    label: 'OT Rooms',
+    role: 'ADMIN',
+    render: () => <OTRoomManagement />,
+  },
+  equipment: {
+    label: 'Equipment',
+    role: 'ADMIN',
+    render: () => <EquipmentManagement />,
+  },
+  schedules: {
+    label: 'Schedules',
+    role: 'ADMIN',
+    render: () => <SchedulePage />,
+  },
+  audit: {
+    label: 'Audit Logs',
+    role: 'ADMIN',
+    render: () => <AuditLogViewer />,
+  },
   users: {
     label: 'User Management',
     role: 'ADMIN',
@@ -120,11 +142,7 @@ export function PreviewClient({ module }: { module: string }) {
   }
 
   return (
-    <AppShell
-      role={entry.role}
-      user={{ ...PREVIEW_USER, role: entry.role }}
-      workspace={entry.workspace}
-    >
+    <AppShell role={entry.role} user={{ ...PREVIEW_USER, role: entry.role }}>
       <div className="border-danger/35 bg-danger-soft/50 text-danger mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold">
         Preview · synthetic fixture data — not a clinical record
       </div>

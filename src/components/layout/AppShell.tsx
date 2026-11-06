@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { UserRole } from '@/generated/prisma/client';
-import { workspaceForRoute, type Workspace } from '@/lib/design/workspace';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
@@ -16,15 +15,16 @@ import { Sidebar } from './Sidebar';
   render their own `<main>` landmark, so this frame never introduces a second
   one.
 
-  Environment: the frame carries `data-workspace`, which every token in
-  globals.css is scoped against. The value comes from the workflow itself
-  (see lib/design/workspace) rather than from a switcher, so a theatre board
-  is graphite because it is watched, and a patient index is paper because it is
-  read. Callers may override it only for previews and tests.
+  The shell is mounted by the authenticated `(workspace)` layout, not by an
+  individual page. It therefore survives client-side navigation: the rail,
+  command bar and session consumers keep their DOM and state while only the
+  working sheet changes. Every navigation re-keys the sheet, which runs the
+  page-enter animation. That is the page transition system: a 450ms rise, no
+  route spinner, no curtain that delays the content.
 
-  Every navigation re-keys the sheet, which runs the page-enter animation.
-  That is the page transition system: a 500ms rise, no route spinner, no
-  curtain that delays the content.
+  Every authenticated role uses the approved light clinical environment. The
+  previous graphite operations scope has been removed rather than left as a
+  hidden route switch.
 
   `role` and `user` are optional overrides used by visual previews and tests;
   at runtime both read the authenticated session.
@@ -34,20 +34,18 @@ export function AppShell({
   children,
   role,
   user,
-  workspace,
 }: {
   children: React.ReactNode;
   role?: UserRole;
   user?: { name?: string | null; email?: string | null; role?: string } | null;
-  workspace?: Workspace;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const activeWorkspace = workspace ?? workspaceForRoute(pathname, role);
 
   return (
     <div
-      data-workspace={activeWorkspace}
+      data-workspace="clinical"
+      data-app-shell="clinical"
       className="bg-paper text-ink relative min-h-screen"
     >
       <Sidebar
@@ -66,6 +64,7 @@ export function AppShell({
         <div className="relative">
           <div
             key={pathname}
+            data-page-content
             className="page-enter mx-auto w-full max-w-[var(--sheet-max)] px-4 pt-8 pb-24 sm:px-6 lg:px-9"
           >
             {children}

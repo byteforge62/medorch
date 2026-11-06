@@ -87,12 +87,17 @@ export function Header({
     .join('');
 
   return (
-    <header className="border-rule-soft bg-paper/85 sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-md sm:px-6 lg:px-8">
+    <header
+      data-app-header
+      className="border-rule-soft bg-paper/85 sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-md sm:px-6 lg:px-8"
+    >
       <div className="flex min-w-0 items-center gap-3">
         <button
           onClick={onToggleSidebar}
           className="border-rule text-ink hover:bg-surface flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-control)] border transition-colors lg:hidden"
-          aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-label={
+            sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'
+          }
           aria-expanded={sidebarOpen}
           aria-controls={PRIMARY_NAVIGATION_ID}
         >
@@ -121,9 +126,7 @@ export function Header({
                     ) : null}
                     <span
                       className={`truncate capitalize ${
-                        isLast
-                          ? 'text-ink font-semibold'
-                          : 'text-ink-muted'
+                        isLast ? 'text-ink font-semibold' : 'text-ink-muted'
                       }`}
                       aria-current={isLast ? 'page' : undefined}
                     >
