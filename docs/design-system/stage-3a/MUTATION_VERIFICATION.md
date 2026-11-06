@@ -32,6 +32,21 @@ node --env-file=.env --import tsx .tmp-stage3a-mutations/harness.ts verify-clean
 
 The harness was removed after verification. Its JSON output is retained in `evidence/`.
 
+| Command | Result |
+| --- | --- |
+| `setup` | Created two disposable users and four unread alerts; seeded count 4, hash recorded |
+| `snapshot before` | 4 test rows, 4 unread, seeded unchanged |
+| `snapshot after-single-read` | 4 test rows, 3 unread, targeted row read |
+| `snapshot after-mark-all` | 4 test rows, 0 unread, all read |
+| `snapshot after-dismiss` | 3 test rows, 0 unread, dismissed row absent |
+| `dismissed-state` | Direct lookup returned `null` for the dismissed ID |
+| `create-failure` | Created the fifth test alert, unread |
+| `snapshot before-failure` | 4 present test rows, 1 unread, seeded unchanged |
+| `snapshot after-failure` | Failure row still unread; seeded unchanged |
+| `snapshot after-auth` | Owner rows unchanged after three 403 responses |
+| `cleanup` | Deleted 7 audit rows, 4 alerts and 2 users; seeded unchanged |
+| `verify-clean` | 0 test users, 0 test alerts; seeded hash matches baseline |
+
 ## 1. Mark one unread alert as read
 
 **Action:** Signed in as the disposable owner, opened `/alerts`, and pressed **Mark read** on `[Stage 3A mutation] Mark single read`.

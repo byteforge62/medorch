@@ -1,0 +1,23 @@
+PASS Admin dashboard access — Admin session reached /dashboard with the operations control heading.
+PASS Real operational panels rendered — All seven requested operational areas are present in the live DOM.
+PASS Live API data rendered — {"rooms":7,"schedules":10,"equipment":10,"alerts":4,"doctors":5,"users":14,"auditTotal":170}
+PASS Theatre selection — Selecting DEMO-GEN-02 updated the detail panel with its room and scheduled case.
+PASS Schedule filter — All open — The All open scope exposed the cases beyond the seven-day window.
+PASS Schedule selection — Selecting a scheduled case revealed its status, surgeon and record link.
+PASS Equipment filter — Attention filter reduced the register to equipment requiring intervention.
+PASS Navigation destinations — Rendered links include /schedules, /equipment, /ot-rooms, /users, /alerts.
+PASS Alert navigation — The linked alert resolves to the schedule record /schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45.
+PASS Desktop overflow — 1440×900 layout: document scroll width 1440px against 1440px viewport; rail 68px.
+PASS Loading state — The dashboard rendered its aria-busy skeleton while API responses were delayed.
+PASS Partial-data state — A failed equipment feed produced an explicit partial-picture warning and panel error without inventing values.
+PASS Empty state — Empty collections produced explicit empty states for theatres, schedule, equipment and attention.
+PASS Keyboard focus visibility — 8 of 8 Tab stops exposed a focus-visible outline or ring. First: {"tag":"A","text":"Dashboard","focusVisible":true,"outline":"solid 2px rgb(23, 50, 77)","boxShadow":"none"}.
+PASS Responsive 1440×900 — innerWidth=1440, scrollWidth=1440, main=1300px, no horizontal overflow=true.
+PASS Responsive 1024×768 — innerWidth=1024, scrollWidth=1024, main=884px, no horizontal overflow=true.
+PASS Responsive 390×844 — innerWidth=390, scrollWidth=390, main=358px, no horizontal overflow=true.
+PASS Alert target available — Unread alert 59ebe4b7-3d6e-5925-8e39-3d925bc0427a (Upcoming procedure).
+PASS Alert mark read — PATCH /api/alerts/59ebe4b7-3d6e-5925-8e39-3d925bc0427a/read persisted isRead=true and removed the alert from the review queue.
+PASS Responsive measurement set — [{"viewport":{"width":1440,"height":900,"name":"1440"},"innerWidth":1440,"scrollWidth":1440,"mainWidth":1300,"order":["operational-attention","theatre-operations","alert-queue","surgical-schedule","clinical-workforce","equipment-readiness","operational-activity"]},{"viewport":{"width":1024,"height":768,"name":"1024"},"innerWidth":1024,"scrollWidth":1024,"mainWidth":884,"order":["operational-attention","theatre-operations","alert-queue","surgical-schedule","clinical-workforce","equipment-readiness","operational-activity"]},{"viewport":{"width":390,"height":844,"name":"390"},"innerWidth":390,"scrollWidth":390,"mainWidth":358,"order":["operational-attention","theatre-operations","alert-queue","surgical-schedule","clinical-workforce","equipment-readiness","operational-activity"]}]
+PASS Responsive priority recomposition — Desktop theatre top=621 vs alerts top=621; mobile alerts top=967 vs theatre top=1526.
+PASS Doctor cannot access administrator data — Doctor dashboard rendered its own workspace; API statuses {"/api/users":403,"/api/audit":403,"/api/ot-rooms":200,"/api/schedules":200}.
+PASS Doctor blocked from /users — Server redirect reached /unauthorized; page title/text begins: ACCESS DENIED  You cannot view this page  Your account does not have permission to access this resource. If you were loo.

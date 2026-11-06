@@ -1,0 +1,42 @@
+# Stage 3B final database state
+Captured: 2026-11-05T23:02:37+05:30
+
+ rooms | schedules | equipment | alerts | doctors | users | departments | audit_logs 
+-------+-----------+-----------+--------+---------+-------+-------------+------------
+     7 |        10 |        10 |      4 |       5 |    14 |           4 |        169
+(1 row)
+
+                  id                  |           title           | severity | isRead |       readAt        
+--------------------------------------+---------------------------+----------+--------+---------------------
+ 59ebe4b7-3d6e-5925-8e39-3d925bc0427a | Upcoming procedure        | INFO     | f      | 
+ 8597d9c7-5f68-5ca0-b82a-7156f53ccb2b | Schedule delay            | WARNING  | t      | 2026-11-05 00:00:00
+ 35fc19e2-407b-57c3-aebb-a719a27b3492 | Resource coordination     | INFO     | f      | 
+ 8961a342-ec8e-54da-98f6-32692d117287 | Equipment maintenance due | WARNING  | f      | 
+(4 rows)
+
+   status    | count 
+-------------+-------
+ AVAILABLE   |     4
+ OCCUPIED    |     1
+ MAINTENANCE |     1
+ DISABLED    |     1
+(4 rows)
+
+   status    | count 
+-------------+-------
+ SCHEDULED   |     2
+ CONFIRMED   |     1
+ IN_PROGRESS |     1
+ COMPLETED   |     4
+ CANCELLED   |     1
+ DELAYED     |     1
+(6 rows)
+
+   status    | count 
+-------------+-------
+ AVAILABLE   |     3
+ IN_USE      |     5
+ MAINTENANCE |     1
+ RETIRED     |     1
+(4 rows)
+

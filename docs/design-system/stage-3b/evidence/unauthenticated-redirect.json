@@ -1,0 +1,8 @@
+{
+  "performedAt": "2026-11-05T17:39:21.518Z",
+  "method": "Headless Chrome incognito tab navigation",
+  "requested": "http://localhost:5274/dashboard",
+  "finalUrl": "http://localhost:5274/login",
+  "pass": true,
+  "note": "The page guard redirected an unauthenticated request to /login."
+}

@@ -34,7 +34,8 @@ import { UserList } from '@/components/users/UserList';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
-import { HospitalIntelligence } from '@/components/dashboard/HospitalIntelligence';
+import { AdminDashboard } from '@/components/dashboard/admin/AdminDashboard';
+import type { Workspace } from '@/lib/design/workspace';
 
 const PREVIEW_USER = {
   name: 'Preview Operator',
@@ -45,14 +46,19 @@ const PREVIEW_USER = {
 function AdminControlRoom() {
   // The real admin branch renders the operations console on its own; the preview
   // mounts the same thing rather than reintroducing a page header.
-  return <HospitalIntelligence />;
+  return <AdminDashboard />;
 }
 
 const MODULES: Record<
   string,
-  { label: string; role: UserRole; render: () => React.ReactNode }
+  { label: string; role: UserRole; workspace?: Workspace; render: () => React.ReactNode }
 > = {
-  admin: { label: 'Admin dashboard', role: 'ADMIN', render: () => <AdminControlRoom /> },
+  admin: {
+    label: 'Admin dashboard',
+    role: 'ADMIN',
+    workspace: 'clinical',
+    render: () => <AdminControlRoom />,
+  },
   doctor: {
     label: 'Doctor dashboard',
     role: 'DOCTOR',
@@ -117,6 +123,7 @@ export function PreviewClient({ module }: { module: string }) {
     <AppShell
       role={entry.role}
       user={{ ...PREVIEW_USER, role: entry.role }}
+      workspace={entry.workspace}
     >
       <div className="border-danger/35 bg-danger-soft/50 text-danger mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold">
         Preview · synthetic fixture data — not a clinical record

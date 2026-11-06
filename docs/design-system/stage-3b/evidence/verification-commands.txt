@@ -1,0 +1,48 @@
+Stage 3B — verification command log
+Date: 2026-11-05 (IST)
+Production server: http://localhost:5274
+
+1) TypeScript
+$ npx tsc --noEmit
+exit=0
+(no diagnostics; evidence/typecheck.log is empty because the command emitted nothing)
+
+2) Scoped ESLint
+$ npx eslint src/app/dashboard/page.tsx "src/app/preview/[module]/PreviewClient.tsx" src/components/dashboard/admin --max-warnings=0
+exit=0
+(no findings; evidence/eslint.log is empty because the command emitted nothing)
+
+3) Production build
+$ npm run build
+exit=0
+Next.js 16.3.6 (Turbopack)
+Compiled successfully; TypeScript finished; 49/49 static pages generated.
+Full output: evidence/production-build.log
+
+4) Production server
+$ npm start -- -p 5274
+Next.js ready at http://localhost:5274
+
+5) Browser harness (production build, installed Chrome 156)
+$ node .tmp-stage3b-browser.mjs
+exit=0
+23/23 PASS
+Full output: evidence/browser-run.log
+Structured results: evidence/browser-checks.json
+Harness was a temporary local file and was removed after capture.
+
+6) Unauthenticated page guard
+Method: incognito Chrome tab navigated to http://localhost:5274/dashboard
+Final URL: http://localhost:5274/login
+Result: PASS
+Evidence: evidence/unauthenticated-redirect.json
+
+7) Database restoration / final state
+$ docker compose exec -T postgres psql -U medorch -d medorch ...
+Final: 7 rooms, 10 schedules, 10 equipment, 4 alerts (3 unread), 5 doctors, 14 users, 4 departments, 169 audit rows.
+Target alert: isRead=false, readAt=NULL.
+Full output: evidence/database-state.txt
+
+8) Screenshots
+Production Chrome captures at 1440×900, 1024×768 and 390×844.
+See docs/design-system/stage-3b/screenshots/.

@@ -1,0 +1,294 @@
+{
+  "generatedAt": "2026-11-05T17:28:38.021Z",
+  "baseUrl": "http://localhost:5274",
+  "browser": "Chrome/156.0.8078.80",
+  "viewport": "1440×900, 1024×768, 390×844",
+  "counts": {
+    "rooms": 7,
+    "schedules": 10,
+    "equipment": 10,
+    "alerts": 4,
+    "doctors": 5,
+    "users": 14,
+    "auditTotal": 170
+  },
+  "responsive": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "name": "1440"
+      },
+      "innerWidth": 1440,
+      "scrollWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "horizontalOverflow": false,
+      "mainWidth": 1300,
+      "order": [
+        "operational-attention",
+        "theatre-operations",
+        "alert-queue",
+        "surgical-schedule",
+        "clinical-workforce",
+        "equipment-readiness",
+        "operational-activity"
+      ],
+      "positions": {
+        "operational-attention": 334,
+        "theatre-operations": 621,
+        "alert-queue": 621,
+        "surgical-schedule": 1236,
+        "clinical-workforce": 1236,
+        "equipment-readiness": 1903,
+        "operational-activity": 1903
+      }
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768,
+        "name": "1024"
+      },
+      "innerWidth": 1024,
+      "scrollWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "horizontalOverflow": false,
+      "mainWidth": 884,
+      "order": [
+        "operational-attention",
+        "theatre-operations",
+        "alert-queue",
+        "surgical-schedule",
+        "clinical-workforce",
+        "equipment-readiness",
+        "operational-activity"
+      ],
+      "positions": {
+        "operational-attention": 327,
+        "theatre-operations": 1125,
+        "alert-queue": 615,
+        "surgical-schedule": 1848,
+        "clinical-workforce": 2480,
+        "equipment-readiness": 3100,
+        "operational-activity": 3944
+      }
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "name": "390"
+      },
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "horizontalOverflow": false,
+      "mainWidth": 358,
+      "order": [
+        "operational-attention",
+        "theatre-operations",
+        "alert-queue",
+        "surgical-schedule",
+        "clinical-workforce",
+        "equipment-readiness",
+        "operational-activity"
+      ],
+      "positions": {
+        "operational-attention": 444,
+        "theatre-operations": 1526,
+        "alert-queue": 967,
+        "surgical-schedule": 2700,
+        "clinical-workforce": 3598,
+        "equipment-readiness": 4265,
+        "operational-activity": 5209
+      }
+    }
+  ],
+  "focusChecks": [
+    {
+      "tag": "A",
+      "text": "Dashboard",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(23, 50, 77)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Schedules",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(34, 60, 86)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Departments",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(41, 68, 93)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Patients",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(34, 60, 86)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Doctors",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(41, 68, 93)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Equipment",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(34, 60, 86)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Theatres",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(41, 68, 93)",
+      "boxShadow": "none"
+    },
+    {
+      "tag": "A",
+      "text": "Accounts",
+      "focusVisible": true,
+      "outline": "solid 2px rgb(41, 68, 93)",
+      "boxShadow": "none"
+    }
+  ],
+  "results": [
+    {
+      "name": "Admin dashboard access",
+      "pass": true,
+      "detail": "Admin session reached /dashboard with the operations control heading."
+    },
+    {
+      "name": "Real operational panels rendered",
+      "pass": true,
+      "detail": "All seven requested operational areas are present in the live DOM."
+    },
+    {
+      "name": "Live API data rendered",
+      "pass": true,
+      "detail": "{\"rooms\":7,\"schedules\":10,\"equipment\":10,\"alerts\":4,\"doctors\":5,\"users\":14,\"auditTotal\":170}"
+    },
+    {
+      "name": "Theatre selection",
+      "pass": true,
+      "detail": "Selecting DEMO-GEN-02 updated the detail panel with its room and scheduled case."
+    },
+    {
+      "name": "Schedule filter — All open",
+      "pass": true,
+      "detail": "The All open scope exposed the cases beyond the seven-day window."
+    },
+    {
+      "name": "Schedule selection",
+      "pass": true,
+      "detail": "Selecting a scheduled case revealed its status, surgeon and record link."
+    },
+    {
+      "name": "Equipment filter",
+      "pass": true,
+      "detail": "Attention filter reduced the register to equipment requiring intervention."
+    },
+    {
+      "name": "Navigation destinations",
+      "pass": true,
+      "detail": "Rendered links include /schedules, /equipment, /ot-rooms, /users, /alerts."
+    },
+    {
+      "name": "Alert navigation",
+      "pass": true,
+      "detail": "The linked alert resolves to the schedule record /schedules/c50a625a-a0d6-50cc-a4e8-0e6ed6d52c45."
+    },
+    {
+      "name": "Desktop overflow",
+      "pass": true,
+      "detail": "1440×900 layout: document scroll width 1440px against 1440px viewport; rail 68px."
+    },
+    {
+      "name": "Loading state",
+      "pass": true,
+      "detail": "The dashboard rendered its aria-busy skeleton while API responses were delayed."
+    },
+    {
+      "name": "Partial-data state",
+      "pass": true,
+      "detail": "A failed equipment feed produced an explicit partial-picture warning and panel error without inventing values."
+    },
+    {
+      "name": "Empty state",
+      "pass": true,
+      "detail": "Empty collections produced explicit empty states for theatres, schedule, equipment and attention."
+    },
+    {
+      "name": "Keyboard focus visibility",
+      "pass": true,
+      "detail": "8 of 8 Tab stops exposed a focus-visible outline or ring. First: {\"tag\":\"A\",\"text\":\"Dashboard\",\"focusVisible\":true,\"outline\":\"solid 2px rgb(23, 50, 77)\",\"boxShadow\":\"none\"}."
+    },
+    {
+      "name": "Responsive 1440×900",
+      "pass": true,
+      "detail": "innerWidth=1440, scrollWidth=1440, main=1300px, no horizontal overflow=true."
+    },
+    {
+      "name": "Responsive 1024×768",
+      "pass": true,
+      "detail": "innerWidth=1024, scrollWidth=1024, main=884px, no horizontal overflow=true."
+    },
+    {
+      "name": "Responsive 390×844",
+      "pass": true,
+      "detail": "innerWidth=390, scrollWidth=390, main=358px, no horizontal overflow=true."
+    },
+    {
+      "name": "Alert target available",
+      "pass": true,
+      "detail": "Unread alert 59ebe4b7-3d6e-5925-8e39-3d925bc0427a (Upcoming procedure)."
+    },
+    {
+      "name": "Alert mark read",
+      "pass": true,
+      "detail": "PATCH /api/alerts/59ebe4b7-3d6e-5925-8e39-3d925bc0427a/read persisted isRead=true and removed the alert from the review queue."
+    },
+    {
+      "name": "Responsive measurement set",
+      "pass": true,
+      "detail": "[{\"viewport\":{\"width\":1440,\"height\":900,\"name\":\"1440\"},\"innerWidth\":1440,\"scrollWidth\":1440,\"mainWidth\":1300,\"order\":[\"operational-attention\",\"theatre-operations\",\"alert-queue\",\"surgical-schedule\",\"clinical-workforce\",\"equipment-readiness\",\"operational-activity\"]},{\"viewport\":{\"width\":1024,\"height\":768,\"name\":\"1024\"},\"innerWidth\":1024,\"scrollWidth\":1024,\"mainWidth\":884,\"order\":[\"operational-attention\",\"theatre-operations\",\"alert-queue\",\"surgical-schedule\",\"clinical-workforce\",\"equipment-readiness\",\"operational-activity\"]},{\"viewport\":{\"width\":390,\"height\":844,\"name\":\"390\"},\"innerWidth\":390,\"scrollWidth\":390,\"mainWidth\":358,\"order\":[\"operational-attention\",\"theatre-operations\",\"alert-queue\",\"surgical-schedule\",\"clinical-workforce\",\"equipment-readiness\",\"operational-activity\"]}]"
+    },
+    {
+      "name": "Responsive priority recomposition",
+      "pass": true,
+      "detail": "Desktop theatre top=621 vs alerts top=621; mobile alerts top=967 vs theatre top=1526."
+    },
+    {
+      "name": "Doctor cannot access administrator data",
+      "pass": true,
+      "detail": "Doctor dashboard rendered its own workspace; API statuses {\"/api/users\":403,\"/api/audit\":403,\"/api/ot-rooms\":200,\"/api/schedules\":200}."
+    },
+    {
+      "name": "Doctor blocked from /users",
+      "pass": true,
+      "detail": "Server redirect reached /unauthorized; page title/text begins: ACCESS DENIED  You cannot view this page  Your account does not have permission to access this resource. If you were loo."
+    }
+  ],
+  "alertMutated": {
+    "id": "59ebe4b7-3d6e-5925-8e39-3d925bc0427a",
+    "title": "Upcoming procedure",
+    "restoreIsRead": false
+  },
+  "cleanup": {
+    "performedAt": "2026-11-05T17:30:50.845Z",
+    "note": "The test alert was restored to isRead=false, readAt=null; audit rows generated by the verification sessions were removed, restoring the seeded audit count to 169.",
+    "alertId": "59ebe4b7-3d6e-5925-8e39-3d925bc0427a",
+    "alertIsReadAfterCleanup": false,
+    "auditTotalAfterCleanup": 169
+  }
+}

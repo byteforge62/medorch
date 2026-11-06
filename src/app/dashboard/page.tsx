@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation';
 import { requireAuth } from '@/lib/auth/authorization';
 import { AppShell } from '@/components/layout/AppShell';
-import { HospitalIntelligence } from '@/components/dashboard/HospitalIntelligence';
+import { AdminDashboard } from '@/components/dashboard/admin/AdminDashboard';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
 
-/* Each role gets its own composed workspace. The ADMIN branch no longer wraps
-   the console in a page header or a stack of summary widgets — the command bar
-   and the operations floor carry that responsibility themselves. */
+/* Each role gets its own composed workspace. The ADMIN branch is a light
+   clinical operations surface; clinicians and patients keep their clinical
+   reading of the dashboard. */
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -44,8 +44,8 @@ export default async function DashboardPage() {
   }
 
   return (
-    <AppShell>
-      <HospitalIntelligence />
+    <AppShell workspace="clinical">
+      <AdminDashboard />
     </AppShell>
   );
 }

@@ -1,6 +1,6 @@
 # Stage 3A — Change Manifest
 
-No commit, push, reset, stash, clean or discard was performed. The working tree remains uncommitted.
+No commit, push, reset, stash, clean or discard was performed by this verification run. An external commit (`2fdfbc8`, 13:49) captured the Stage 3A files and mutation evidence during the run; the added command table in `MUTATION_VERIFICATION.md` remains uncommitted.
 
 ## Source changes
 
@@ -117,6 +117,6 @@ Local runtime log `.prod-5274-stage3a.log` remains while the production server i
 
 ## Working tree
 
-The repository already contained uncommitted Stage 1, Stage 2 and design-system work before this stage. Those changes were retained. This stage adds only `src/app/alerts/` and `docs/design-system/stage-3a/`.
+The implementation adds only `src/app/alerts/` and `docs/design-system/stage-3a/`. Mutation verification added `MUTATION_VERIFICATION.md`, five screenshots and eleven evidence files without changing source. At the end of the run, the only uncommitted change is the command table in `MUTATION_VERIFICATION.md`.
 
 No Stage 3B dashboard redesign was started.
