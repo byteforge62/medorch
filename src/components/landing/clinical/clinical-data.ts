@@ -404,37 +404,37 @@ export const statusStyle: Record<
   { bar: string; dot: string; text: string }
 > = {
   'In progress': {
-    bar: 'bg-[#E7EFF7] border-[#245B8F] text-[#1D4A76]',
-    dot: 'bg-[#245B8F]',
-    text: 'text-[#245B8F]',
+    bar: 'bg-[var(--pine-soft)] border-[var(--primary)] text-[var(--primary-deep)]',
+    dot: 'bg-[var(--primary)]',
+    text: 'text-[var(--primary)]',
   },
   Confirmed: {
-    bar: 'bg-[#E6F4F4] border-[#168C91] text-[#106F73]',
-    dot: 'bg-[#168C91]',
-    text: 'text-[#10777B]',
+    bar: 'bg-[var(--success-soft)] border-[var(--success)] text-[var(--success)]',
+    dot: 'bg-[var(--success)]',
+    text: 'text-[var(--success)]',
   },
   Delayed: {
-    bar: 'bg-[#FBF3E4] border-[#B7791F] text-[#8A5A14]',
-    dot: 'bg-[#B7791F]',
-    text: 'text-[#8A5A14]',
+    bar: 'bg-[var(--warning-soft)] border-[var(--warning)] text-[var(--warning)]',
+    dot: 'bg-[var(--warning)]',
+    text: 'text-[var(--warning)]',
   },
   Scheduled: {
-    bar: 'bg-[#F7FAFC] border-[#C7D5E2] text-[#4A5D70]',
-    dot: 'bg-[#9AAABB]',
-    text: 'text-[#5A7186]',
+    bar: 'bg-[var(--surface-subtle)] border-[var(--rule-strong)] text-[var(--ink-secondary)]',
+    dot: 'bg-[var(--ink-subtle)]',
+    text: 'text-[var(--ink-muted)]',
   },
   Completed: {
-    bar: 'bg-[#E9F4EF] border-[#A9D3C1] text-[#1E6B4C]',
-    dot: 'bg-[#24845D]',
-    text: 'text-[#1E6B4C]',
+    bar: 'bg-[var(--success-soft)] border-[var(--success)] text-[var(--success)]',
+    dot: 'bg-[var(--success)]',
+    text: 'text-[var(--success)]',
   },
 };
 
 export const roomStateStyle: Record<RoomState, { dot: string; text: string }> = {
-  'In use': { dot: 'bg-[#245B8F]', text: 'text-[#1D4A76]' },
-  Ready: { dot: 'bg-[#24845D]', text: 'text-[#1E6B4C]' },
-  Turnover: { dot: 'bg-[#B7791F]', text: 'text-[#8A5A14]' },
-  Maintenance: { dot: 'bg-[#C74646]', text: 'text-[#9E3535]' },
+  'In use': { dot: 'bg-[var(--primary)]', text: 'text-[var(--primary-deep)]' },
+  Ready: { dot: 'bg-[var(--success)]', text: 'text-[var(--success)]' },
+  Turnover: { dot: 'bg-[var(--warning)]', text: 'text-[var(--warning)]' },
+  Maintenance: { dot: 'bg-[var(--vermilion)]', text: 'text-[var(--vermilion-deep)]' },
 };
 
 /* Modules: ten domains, each with its own responsibility. */

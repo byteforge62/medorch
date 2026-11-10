@@ -2,12 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 
 /*======================================================================
-  MedOrch brand mark — "the aperture"
+  MedOrch brand mark — the clinical orbit
   ======================================================================
-  A surgical targeting reticle: a thin instrument ring, a solid pupil, and
-  four hairlines crossing beyond the bezel. It reads at 16px in a rail and
-  at 120px on a plate, and it is drawn from the same geometry as the
-  theatre plans used across the product, so the identity stays coherent.
+  A soft square carrying the medical cross, with a small orbital arc that
+  keeps the mark from reading as a generic first-aid symbol. It is drawn
+  from the same lavender geometry as the product shell.
 ====================================================================== */
 
 export function BrandMark({
@@ -26,27 +25,21 @@ export function BrandMark({
       aria-hidden={title ? undefined : true}
     >
       {title ? <title>{title}</title> : null}
-      <circle
-        cx="16"
-        cy="16"
-        r="12.4"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        vectorEffect="non-scaling-stroke"
-      />
-      <circle cx="16" cy="16" r="3.5" fill="currentColor" />
+      <rect width="32" height="32" rx="10" fill="currentColor" />
       <path
-        d="M16 0.9V9.1M16 22.9V31.1M0.9 16H9.1M22.9 16H31.1"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        vectorEffect="non-scaling-stroke"
+        d="M16 8.3v15.4M8.3 16h15.4"
+        stroke="white"
+        strokeWidth="2.8"
+        strokeLinecap="round"
       />
       <path
-        d="M22.8 6.4a12.4 12.4 0 0 1 2.9 4.6"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        opacity="0.55"
+        d="M23.6 7.3a12 12 0 0 1 2.3 3.4"
+        stroke="white"
+        strokeOpacity="0.5"
+        strokeWidth="1.4"
+        strokeLinecap="round"
       />
+      <circle cx="25.6" cy="23.3" r="1.7" fill="white" fillOpacity="0.42" />
     </svg>
   );
 }
@@ -70,10 +63,10 @@ export function Wordmark({
 }) {
   const wordSize =
     size === 'sm'
-      ? 'text-[11px] tracking-[0.3em]'
+      ? 'text-[14px] tracking-[-0.02em]'
       : size === 'lg'
-        ? 'text-[15px] tracking-[0.42em]'
-        : 'text-[12px] tracking-[0.34em]';
+        ? 'text-[19px] tracking-[-0.03em]'
+        : 'text-[16px] tracking-[-0.025em]';
 
   const markSize =
     size === 'sm' ? 'h-5 w-5' : size === 'lg' ? 'h-8 w-8' : 'h-6 w-6';
@@ -83,7 +76,7 @@ export function Wordmark({
       <BrandMark className={markSize} />
       <span className="flex flex-col">
         <span
-          className={`font-mono font-medium uppercase ${wordSize} ${
+          className={`font-display font-semibold ${wordSize} ${
             tone === 'chalk' ? 'text-chalk' : 'text-ink'
           }`}
         >
@@ -91,7 +84,7 @@ export function Wordmark({
         </span>
         {subtitle ? (
           <span
-            className={`mt-1 hidden font-mono text-[8px] tracking-[0.26em] uppercase sm:block ${
+            className={`mt-1 hidden text-[8px] font-semibold tracking-[0.2em] uppercase sm:block ${
               tone === 'chalk' ? 'text-white/60' : 'text-ink-subtle'
             }`}
           >

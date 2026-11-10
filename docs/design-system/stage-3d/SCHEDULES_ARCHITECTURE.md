@@ -28,11 +28,9 @@ Schedules
 │   ├── assigned staff and equipment
 │   ├── selected-case conflicts
 │   └── actions (status; edit; open full record)
-└── Alternate case list
-    └── retained ruled list for scanning/filtering without the timeline
 ```
 
-The timeline is the default. A compact `Theatre day / Case list` toggle preserves the existing list workflow as a secondary reading of the same data. The list is not the primary visual deliverable.
+The timeline and day agenda are the primary views. The previous month calendar and ruled list remain available only on the internal `/preview/schedules` design preview; they are not duplicated inside the production Schedules route. Staff, equipment and notes management continue through the existing `/schedules/[id]` case file.
 
 ## 3. Component structure
 
@@ -48,12 +46,12 @@ The timeline is the default. A compact `Theatre day / Case list` toggle preserve
 | `ScheduleInspector.tsx` | Selected case record and permitted actions |
 | `schedule-conflicts.ts` | Pure conflict/warning detector, testable without a database |
 | `schedule-workspace-format.ts` | One local-time formatting/duration/axis contract |
-| `ScheduleFilters.tsx` | Existing filter strip, extended with theatre/status controls |
+| `ScheduleToolbar.tsx` | Search, theatre, department, status and priority filters over the loaded day |
 | `ScheduleForm.tsx` | Existing create/edit workflow; improved dialog semantics and default date |
 | `ScheduleStatusActions.tsx` | Existing status workflow; confirmation executor corrected |
 | `ScheduleStatusBadge.tsx` | Existing status/priority labels retained |
-| `ScheduleList.tsx` / `ScheduleCard.tsx` | Existing alternate list, reused |
-| `ScheduleCalendar.tsx` | Removed from the module's primary route; no fabricated month data added |
+| `ScheduleList.tsx` / `ScheduleCard.tsx` | Retained for internal preview; terminal cases hide Edit |
+| `ScheduleCalendar.tsx` | Retained for internal preview only; no fabricated month data added |
 
 ## 4. Server data boundary
 
@@ -109,7 +107,7 @@ The page gate is `requireRole(['ADMIN','DOCTOR','OT_STAFF'])`, the same set alre
 - `scheduledDate` is retained as stored, but day grouping is derived from `startTime` in local time. This removes the previous UTC/local split.
 - Overnight cases are included in both days they overlap and their visual block is clamped to the selected day's bounds.
 - Duration is always `endTime - startTime`; no arbitrary block lengths.
-- Axis default is 07:00–20:00 and expands to include recorded cases, rounded to the hour and clamped to 00:00–24:00.
+- Axis default is 07:00–20:00. On a booked day it fits the recorded cases with one hour of padding (minimum four hours). On today it also expands to include the current time, clamped to 00:00–24:00.
 - The current-time marker appears only when the selected local date is today and the current minute falls within the axis.
 
 ## 7. Conflict model
@@ -144,8 +142,8 @@ The client offers only transitions the server accepts:
 |---|---|
 | SCHEDULED | Confirm, Cancel |
 | CONFIRMED | Start procedure, Mark delayed, Cancel |
-| IN_PROGRESS | Mark complete |
-| DELAYED | Resume, Confirm, Cancel |
+| IN_PROGRESS | Mark complete, Mark delayed |
+| DELAYED | Reconfirm, Resume, Cancel |
 | COMPLETED | none |
 | CANCELLED | none |
 
@@ -159,19 +157,19 @@ Terminal cases hide Edit; the server remains the authority and returns `409` if 
 
 - **1440 × 900:** full time axis with all theatre lanes, inspector in a right column.
 - **1024 × 768:** full timeline with internal horizontal scrolling if required; inspector stacks below.
-- **390 × 844:** compact day header, horizontally scrollable week strip, full-width lane minimaps with exact block positions, chronological agenda, inspector stacked below. No page-level horizontal overflow.
+- **390 × 844:** compact day header, hidden week strip (date controls remain), two-column filters, full-width lane minimaps with exact block positions, chronological agenda, inspector stacked below. No page-level horizontal overflow.
 - Timeline itself may scroll horizontally at narrow widths; that scroll is contained and labelled.
 
 ## 10. Accessibility and motion
 
 - Native buttons, inputs and selects for all controls.
-- `aria-pressed` on timeline blocks and view toggles.
+- `aria-pressed` on timeline blocks and agenda rows.
 - `aria-current="date"` on the selected week-strip day.
 - Accessible names include procedure, time range, theatre and status.
 - Status is conveyed by text plus colour; conflicts are labelled "Confirmed" or "Warning", not by red alone.
 - Visible focus rings on all interactive surfaces.
-- Form dialog has `role="dialog"`, `aria-modal`, `aria-labelledby`, labelled fields and an E2E-tested Escape close.
-- Confirmation dialog has `role="dialog"`, an accessible name, Escape support and visible text.
+- Form dialog has `role="dialog"`, `aria-modal`, `aria-labelledby`, labelled fields, initial focus, a Tab trap and Escape close.
+- Confirmation dialog has `role="dialog"`, an accessible name, initial focus on the safe action, a Tab trap, Escape support, body scroll lock and visible text.
 - All transitions are state-driven; the existing global `prefers-reduced-motion` rules disable them.
 
 ## 11. Loading, empty and error states
@@ -181,10 +179,9 @@ Terminal cases hide Edit; the server remains the authority and returns `409` if 
 | Route loading | `schedules/loading.tsx` mirrors the masthead and timeline geometry, within the persistent shell |
 | Empty day | Timeline and agenda remain usable; explicit "No procedures on this date" message; date controls stay available |
 | No filter matches | Explicit filtered-empty message and clear-filters action |
-| Loader failure | `schedules/error.tsx` with the actual message and a reset action inside the workspace shell |
-| Form validation | Field-level required/time-range message with `role="alert"` and focusable summary |
+| Loader failure | `schedules/error.tsx` with a safe generic message, optional digest reference and a reset action inside the workspace shell |
+| Form validation | Form-level time-range message with `role="alert"`; native required fields stay in place |
 | API conflict | Existing 409 message displayed without discarding entered form values |
-| Background refresh failure | Inline warning; existing data remains usable |
 
 ## 12. Non-goals
 

@@ -1,0 +1,186 @@
+
+> medorch@0.1.0 test:database
+> node --conditions=react-server --import tsx --test tests/schedule-constraints.test.ts tests/schedule-status-concurrency.test.ts tests/schedule-audit-atomicity.test.ts tests/schedule-repository-audit.test.ts tests/schedule-related-repository-audit.test.ts tests/alerts-repository-audit.test.ts tests/privacy-boundary.test.ts
+
+TAP version 13
+# Subtest: alert repository mutations and audit records commit or roll back together
+not ok 1 - alert repository mutations and audit records commit or roll back together
+  ---
+  duration_ms: 7.3063
+  location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\alerts-repository-audit.test.ts:2:1157'
+  failureType: 'testCodeFailure'
+  error: 'Alert repository audit tests require a disposable local medorch_alerts_test_* database.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\alerts-repository-audit.test.ts:21:10)
+    Test.runInAsyncScope (node:async_hooks:211:14)
+    Test.run (node:internal/test_runner/test:931:25)
+    Test.start (node:internal/test_runner/test:829:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: staff and patient schedule reads are scoped and return limited fields
+ok 2 - staff and patient schedule reads are scoped and return limited fields
+  ---
+  duration_ms: 1138.9304
+  ...
+# Subtest: schedule mutation and audit record commit or roll back together
+ok 3 - schedule mutation and audit record commit or roll back together
+  ---
+  duration_ms: 376.8356
+  ...
+# Subtest: PostgreSQL schedule overlap constraints
+    # Subtest: rejects an overlapping room booking
+    ok 1 - rejects an overlapping room booking
+      ---
+      duration_ms: 14.4592
+      ...
+    # Subtest: rejects an overlapping surgeon booking
+    ok 2 - rejects an overlapping surgeon booking
+      ---
+      duration_ms: 13.7692
+      ...
+    # Subtest: rejects an overlapping patient booking
+    ok 3 - rejects an overlapping patient booking
+      ---
+      duration_ms: 11.3442
+      ...
+    # Subtest: allows adjacent bookings
+    ok 4 - allows adjacent bookings
+      ---
+      duration_ms: 5.9477
+      ...
+    # Subtest: allows overlapping cancelled schedules
+    ok 5 - allows overlapping cancelled schedules
+      ---
+      duration_ms: 3.7309
+      ...
+    # Subtest: allows overlapping completed schedules
+    ok 6 - allows overlapping completed schedules
+      ---
+      duration_ms: 5.5586
+      ...
+    1..6
+ok 4 - PostgreSQL schedule overlap constraints
+  ---
+  duration_ms: 378.8612
+  ...
+# Subtest: concurrent overlapping inserts cannot double-book an OT room
+ok 5 - concurrent overlapping inserts cannot double-book an OT room
+  ---
+  duration_ms: 406.249
+  ...
+# Subtest: schedule staff, equipment, and note repositories audit atomically
+    # Subtest: staff assignment writes an audit record
+    ok 1 - staff assignment writes an audit record
+      ---
+      duration_ms: 960.9932
+      ...
+    # Subtest: failed staff-assignment audit rolls back the assignment
+    ok 2 - failed staff-assignment audit rolls back the assignment
+      ---
+      duration_ms: 142.3436
+      ...
+    # Subtest: failed staff-removal audit preserves the assignment
+    ok 3 - failed staff-removal audit preserves the assignment
+      ---
+      duration_ms: 65.6143
+      ...
+    # Subtest: successful staff removal writes an audit record
+    ok 4 - successful staff removal writes an audit record
+      ---
+      duration_ms: 318.9198
+      ...
+    # Subtest: equipment assignment writes an audit record and claims equipment
+    ok 5 - equipment assignment writes an audit record and claims equipment
+      ---
+      duration_ms: 81.2779
+      ...
+    # Subtest: failed equipment-assignment audit rolls back assignment and equipment claim
+    ok 6 - failed equipment-assignment audit rolls back assignment and equipment claim
+      ---
+      duration_ms: 234.5084
+      ...
+    # Subtest: failed equipment-release audit rolls back release and availability change
+    ok 7 - failed equipment-release audit rolls back release and availability change
+      ---
+      duration_ms: 53.731
+      ...
+    # Subtest: successful equipment release writes an audit record and frees equipment
+    ok 8 - successful equipment release writes an audit record and frees equipment
+      ---
+      duration_ms: 43.5471
+      ...
+    # Subtest: schedule-note creation writes an audit record
+    ok 9 - schedule-note creation writes an audit record
+      ---
+      duration_ms: 65.4919
+      ...
+    # Subtest: failed schedule-note update audit preserves the original content
+    ok 10 - failed schedule-note update audit preserves the original content
+      ---
+      duration_ms: 26.0663
+      ...
+    # Subtest: successful schedule-note update writes an audit record
+    ok 11 - successful schedule-note update writes an audit record
+      ---
+      duration_ms: 20.3659
+      ...
+    # Subtest: failed schedule-note deletion audit preserves the note
+    ok 12 - failed schedule-note deletion audit preserves the note
+      ---
+      duration_ms: 23.0298
+      ...
+    # Subtest: successful schedule-note deletion writes an audit record
+    ok 13 - successful schedule-note deletion writes an audit record
+      ---
+      duration_ms: 18.1776
+      ...
+    1..13
+ok 6 - schedule staff, equipment, and note repositories audit atomically
+  ---
+  duration_ms: 2470.4056
+  ...
+# Subtest: schedule repository writes audit logs atomically
+    # Subtest: successful schedule update writes an audit record
+    ok 1 - successful schedule update writes an audit record
+      ---
+      duration_ms: 864.9693
+      ...
+    # Subtest: failed audit insert rolls back schedule update
+    ok 2 - failed audit insert rolls back schedule update
+      ---
+      duration_ms: 207.5234
+      ...
+    # Subtest: successful status transition writes an audit record
+    ok 3 - successful status transition writes an audit record
+      ---
+      duration_ms: 85.8607
+      ...
+    # Subtest: failed status audit insert rolls back status transition
+    ok 4 - failed status audit insert rolls back status transition
+      ---
+      duration_ms: 83.5716
+      ...
+    1..4
+ok 7 - schedule repository writes audit logs atomically
+  ---
+  duration_ms: 1561.2855
+  ...
+# Subtest: concurrent status updates from the same initial state allow only one winner
+ok 8 - concurrent status updates from the same initial state allow only one winner
+  ---
+  duration_ms: 1165.1975
+  ...
+1..8
+# tests 31
+# suites 0
+# pass 30
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14306.0723

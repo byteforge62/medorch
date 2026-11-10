@@ -30,15 +30,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-primary-ink shadow-sm hover:bg-primary-hover active:bg-primary-active',
+    'bg-primary text-primary-ink shadow-[0_6px_16px_rgba(101,80,181,0.18)] hover:bg-primary-hover active:bg-primary-active',
   secondary:
-    'bg-surface-muted text-foreground hover:bg-border active:bg-border-strong',
+    'bg-primary-soft text-primary hover:bg-[#DED3F4] active:bg-[#D5C8EF]',
   outline:
-    'border border-border bg-surface text-foreground-secondary shadow-xs hover:border-border-strong hover:text-foreground',
-  ghost: 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
+    'border border-border bg-sheet text-foreground-secondary shadow-xs hover:border-border-strong hover:bg-surface-subtle hover:text-foreground',
+  ghost: 'text-foreground-muted hover:bg-primary-soft hover:text-primary',
   danger:
     'bg-danger text-white shadow-sm hover:bg-danger-hover active:bg-danger-hover',
-  icon: 'border border-border bg-surface text-foreground-secondary shadow-xs hover:border-border-strong hover:text-foreground',
+  icon: 'border border-border bg-sheet text-foreground-secondary shadow-xs hover:border-border-strong hover:bg-surface-subtle hover:text-primary',
   text: 'text-foreground-secondary hover:text-foreground underline decoration-border-strong decoration-1 underline-offset-[5px] hover:decoration-foreground',
 };
 

@@ -1,0 +1,41 @@
+TAP version 13
+# Subtest: schedule status transitions allow valid next states and reject skipped states
+ok 1 - schedule status transitions allow valid next states and reject skipped states
+  ---
+  duration_ms: 4.0916
+  ...
+# Subtest: only assigned OT staff can read an individual schedule
+ok 2 - only assigned OT staff can read an individual schedule
+  ---
+  duration_ms: 0.3881
+  ...
+# Subtest: schedule list redaction preserves its response shape
+ok 3 - schedule list redaction preserves its response shape
+  ---
+  duration_ms: 1.2905
+  ...
+# Subtest: schedule detail redaction removes clinical and patient-specific fields
+ok 4 - schedule detail redaction removes clinical and patient-specific fields
+  ---
+  duration_ms: 0.4467
+  ...
+# Subtest: schedule detail redaction is null-safe for missing patient or notes data
+ok 5 - schedule detail redaction is null-safe for missing patient or notes data
+  ---
+  duration_ms: 0.5841
+  ...
+# Subtest: OT detail redaction nulls every patient demographic the detail query selects
+ok 6 - OT detail redaction nulls every patient demographic the detail query selects
+  ---
+  duration_ms: 1.0494
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1231.7549
+access_exit=0

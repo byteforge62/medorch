@@ -1,0 +1,20 @@
+TAP version 13
+# Subtest: the schedule loading boundary exposes an accessible busy state
+ok 1 - the schedule loading boundary exposes an accessible busy state
+  ---
+  duration_ms: 13.0809
+  ...
+# Subtest: the schedule error boundary offers retry and a safe exit
+ok 2 - the schedule error boundary offers retry and a safe exit
+  ---
+  duration_ms: 1.9298
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 792.2161

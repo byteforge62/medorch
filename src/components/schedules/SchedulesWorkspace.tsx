@@ -77,6 +77,7 @@ function briefFor(
 
   const brief: DayBrief = {
     procedures: active.length,
+    cancelled: daySchedules.length - active.length,
     bookedTheatres: bookedRoomIds.size,
     freeTheatres,
     inUseTheatres,
@@ -200,9 +201,15 @@ export function SchedulesWorkspace({
   initialDateWasExplicit: boolean;
 }) {
   const router = useRouter();
-  const [schedules, setSchedules] = useState(data.schedules);
-  const [selectedDateKey, setSelectedDateKey] = useState(initialDateKey);
-  const [todayKey, setTodayKey] = useState(data.todayKey);
+  const [now, setNow] = useState<Date | null>(null);
+  const [weekState, setWeekState] = useState({
+    source: data.schedules,
+    items: data.schedules,
+  });
+  const [dateState, setDateState] = useState({
+    source: initialDateKey,
+    value: initialDateKey,
+  });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filters, setFilters] = useState<ScheduleWorkspaceFilters>(
     EMPTY_SCHEDULE_FILTERS,
@@ -210,45 +217,49 @@ export function SchedulesWorkspace({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] =
     useState<WorkspaceSchedule | null>(null);
-  const [now, setNow] = useState<Date | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [isRefreshing, startRefresh] = useTransition();
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    setSchedules(data.schedules);
-  }, [data.schedules]);
+  /* Server props are the source of truth after a refresh or week navigation. */
+  if (weekState.source !== data.schedules) {
+    setWeekState({ source: data.schedules, items: data.schedules });
+  }
 
-  useEffect(() => {
-    setSelectedDateKey(initialDateKey);
+  if (dateState.source !== initialDateKey) {
+    setDateState({ source: initialDateKey, value: initialDateKey });
     setSelectedId(null);
-  }, [initialDateKey]);
+  }
+
+  const schedules = weekState.items;
 
   /*
    * The server cannot know the browser's timezone. The visible day and the
    * "today" marker therefore come from the client clock. Only a request that
    * omitted `?date=` is corrected; an explicit URL date is respected.
    */
-  useEffect(() => {
-    const clientToday = localDateKey(new Date());
-    setTodayKey(clientToday);
+  const todayKey = now ? localDateKey(now) : data.todayKey;
+  const selectedDateKey =
+    !initialDateWasExplicit && dateState.value === initialDateKey
+      ? todayKey
+      : dateState.value;
 
-    if (initialDateWasExplicit || clientToday === initialDateKey) {
+  useEffect(() => {
+    if (initialDateWasExplicit || todayKey === initialDateKey) {
       return;
     }
 
-    if (weekDatesFor(clientToday)[0] === weekDatesFor(initialDateKey)[0]) {
-      setSelectedDateKey(clientToday);
+    if (weekDatesFor(todayKey)[0] === weekDatesFor(initialDateKey)[0]) {
       const url = new URL(window.location.href);
-      url.searchParams.set('date', clientToday);
+      url.searchParams.set('date', todayKey);
       window.history.replaceState(null, '', url);
       return;
     }
 
     startRefresh(() => {
-      router.replace(`/schedules?date=${clientToday}`);
+      router.replace(`/schedules?date=${todayKey}`);
     });
-  }, [initialDateKey, initialDateWasExplicit, router, startRefresh]);
+  }, [initialDateKey, initialDateWasExplicit, router, startRefresh, todayKey]);
 
   useEffect(() => {
     const update = () => setNow(new Date());
@@ -341,17 +352,33 @@ export function SchedulesWorkspace({
     [data.rooms, filters.departmentId, filters.theatreId],
   );
 
+  const roomsInView = useMemo(
+    () =>
+      filters.theatreId
+        ? visibleRooms
+        : visibleRooms.filter(
+            (room) =>
+              room.isActive ||
+              daySchedules.some((schedule) => schedule.otRoomId === room.id),
+          ),
+    [daySchedules, filters.theatreId, visibleRooms],
+  );
+
   const weekCounts = useMemo(() => {
     const counts: Record<string, number> = {};
 
-    for (const schedule of schedules) {
-      if (schedule.status === 'CANCELLED') continue;
-      const key = localDateKey(schedule.startTime);
-      counts[key] = (counts[key] ?? 0) + 1;
+    for (const key of weekDatesFor(selectedDateKey)) {
+      counts[key] = schedules.filter((schedule) =>
+        scheduleIntersectsDate(
+          schedule.startTime,
+          schedule.endTime,
+          key,
+        ),
+      ).length;
     }
 
     return counts;
-  }, [schedules]);
+  }, [schedules, selectedDateKey]);
 
   const selectedSchedule = selectedId
     ? schedules.find((schedule) => schedule.id === selectedId) ?? null
@@ -404,7 +431,7 @@ export function SchedulesWorkspace({
       const nextWeek = weekDatesFor(nextKey);
 
       if (currentWeek[0] === nextWeek[0]) {
-        setSelectedDateKey(nextKey);
+        setDateState((current) => ({ ...current, value: nextKey }));
         setSelectedId(null);
         const url = new URL(window.location.href);
         url.searchParams.set('date', nextKey);
@@ -430,11 +457,12 @@ export function SchedulesWorkspace({
 
   const handleStatusUpdated = useCallback(
     (scheduleId: string, status: WorkspaceSchedule['status']) => {
-      setSchedules((current) =>
-        current.map((schedule) =>
+      setWeekState((current) => ({
+        ...current,
+        items: current.items.map((schedule) =>
           schedule.id === scheduleId ? { ...schedule, status } : schedule,
         ),
-      );
+      }));
       const schedule = schedules.find((item) => item.id === scheduleId);
       announce(
         `${schedule?.procedure ?? 'Case'} is now ${SCHEDULE_STATUS_LABEL[
@@ -521,7 +549,7 @@ export function SchedulesWorkspace({
           <ScheduleTimeline
             schedules={filteredSchedules}
             allDaySchedules={daySchedules}
-            rooms={visibleRooms}
+            rooms={roomsInView}
             dateKey={selectedDateKey}
             todayKey={todayKey}
             now={now}
@@ -539,7 +567,7 @@ export function SchedulesWorkspace({
 
         <div className="min-w-0">
           {selectedSchedule ? (
-            <div className="scroll-mt-4 xl:sticky xl:top-4">
+            <div className="scroll-mt-20 xl:sticky xl:top-20">
               <ScheduleInspector
                 schedule={selectedSchedule}
                 conflicts={selectedConflicts}
@@ -556,7 +584,7 @@ export function SchedulesWorkspace({
           ) : (
             <EmptyInspector
               dayCount={activeDaySchedules.length}
-              roomCount={visibleRooms.length}
+              roomCount={roomsInView.length}
               pending={brief.pending}
               canCreate={data.capabilities.canCreate}
               onNewSchedule={openCreateForm}
@@ -574,7 +602,7 @@ export function SchedulesWorkspace({
         </p>
         <p className="font-mono tabular-nums">
           Prisma read {formatClock(data.generatedAt)} · {schedules.length}{' '}
-          cases loaded this week
+          cases loaded in range
         </p>
       </footer>
 

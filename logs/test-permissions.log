@@ -1,0 +1,39 @@
+
+> medorch@0.1.0 test:permissions
+> node --import tsx --test tests/permissions.test.ts
+
+TAP version 13
+# Subtest: ADMIN permissions
+ok 1 - ADMIN permissions
+  ---
+  duration_ms: 1.1552
+  ...
+# Subtest: DOCTOR permissions
+ok 2 - DOCTOR permissions
+  ---
+  duration_ms: 0.3942
+  ...
+# Subtest: OT_STAFF cannot manage clinical notes or equipment assignments
+ok 3 - OT_STAFF cannot manage clinical notes or equipment assignments
+  ---
+  duration_ms: 0.1737
+  ...
+# Subtest: PATIENT is restricted to own schedule access
+ok 4 - PATIENT is restricted to own schedule access
+  ---
+  duration_ms: 0.1425
+  ...
+# Subtest: schedule mutation permissions are role-restricted
+ok 5 - schedule mutation permissions are role-restricted
+  ---
+  duration_ms: 0.17
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 514.115

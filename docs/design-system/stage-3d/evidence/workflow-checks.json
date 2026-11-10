@@ -1,0 +1,243 @@
+{
+  "startedAt": "2026-11-07T14:28:20.680Z",
+  "marker": "Stage 3D verification case",
+  "checks": [
+    {
+      "name": "Invalid end time is rejected in the form without writing a record",
+      "pass": true,
+      "detail": {
+        "message": "End time must be after start time.",
+        "count": 10,
+        "stillOpen": true
+      }
+    },
+    {
+      "name": "ADMIN created a schedule through the existing form/API",
+      "pass": true,
+      "detail": {
+        "id": "51efb9ee-2e65-4895-b859-2fe05e750a8e",
+        "status": "SCHEDULED",
+        "startTime": "2026-11-08T14:30:00.000Z",
+        "endTime": "2026-11-08T15:00:00.000Z",
+        "patient": {
+          "name": "Aarav Mehta"
+        },
+        "surgeon": {
+          "name": "Dr. Ananya Shah"
+        },
+        "otRoom": {
+          "code": "DEMO-GEN-01"
+        }
+      }
+    },
+    {
+      "name": "Created case appears in the timeline with its selected resources",
+      "pass": true,
+      "detail": {
+        "hasMarker": true
+      }
+    },
+    {
+      "name": "ADMIN edited the disposable schedule through the existing form/API",
+      "pass": true,
+      "detail": {
+        "procedure": "Stage 3D verification case edited"
+      }
+    },
+    {
+      "name": "DOCTOR updated the disposable case status through the inspector",
+      "pass": true,
+      "detail": {
+        "status": "CONFIRMED"
+      }
+    },
+    {
+      "name": "ADMIN cancelled the case and terminal controls are hidden",
+      "pass": true,
+      "detail": {
+        "status": "CANCELLED",
+        "closed": true,
+        "noEdit": true,
+        "noStatus": true
+      }
+    },
+    {
+      "name": "Disposable records were removed and seeded schedule state restored",
+      "pass": true,
+      "detail": {
+        "removedScheduleIds": [
+          "51efb9ee-2e65-4895-b859-2fe05e750a8e"
+        ],
+        "scheduleCountBefore": 10,
+        "scheduleCountAfter": 10,
+        "statusesBefore": [
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "IN_PROGRESS"
+          },
+          {
+            "_count": {
+              "_all": 2
+            },
+            "status": "SCHEDULED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "CONFIRMED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "CANCELLED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "DELAYED"
+          },
+          {
+            "_count": {
+              "_all": 4
+            },
+            "status": "COMPLETED"
+          }
+        ],
+        "statusesAfter": [
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "IN_PROGRESS"
+          },
+          {
+            "_count": {
+              "_all": 2
+            },
+            "status": "SCHEDULED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "CONFIRMED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "CANCELLED"
+          },
+          {
+            "_count": {
+              "_all": 1
+            },
+            "status": "DELAYED"
+          },
+          {
+            "_count": {
+              "_all": 4
+            },
+            "status": "COMPLETED"
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": [
+    "admin-schedule-create-filled-1440.png",
+    "admin-created-case-1440.png",
+    "doctor-confirmed-case-1440.png",
+    "admin-cancelled-case-1440.png"
+  ],
+  "cleanup": {
+    "removedScheduleIds": [
+      "51efb9ee-2e65-4895-b859-2fe05e750a8e"
+    ],
+    "scheduleCountBefore": 10,
+    "scheduleCountAfter": 10,
+    "statusesBefore": [
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "IN_PROGRESS"
+      },
+      {
+        "_count": {
+          "_all": 2
+        },
+        "status": "SCHEDULED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "CONFIRMED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "CANCELLED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "DELAYED"
+      },
+      {
+        "_count": {
+          "_all": 4
+        },
+        "status": "COMPLETED"
+      }
+    ],
+    "statusesAfter": [
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "IN_PROGRESS"
+      },
+      {
+        "_count": {
+          "_all": 2
+        },
+        "status": "SCHEDULED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "CONFIRMED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "CANCELLED"
+      },
+      {
+        "_count": {
+          "_all": 1
+        },
+        "status": "DELAYED"
+      },
+      {
+        "_count": {
+          "_all": 4
+        },
+        "status": "COMPLETED"
+      }
+    ]
+  },
+  "finishedAt": "2026-11-07T14:28:58.406Z",
+  "pass": true
+}

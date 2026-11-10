@@ -31,7 +31,7 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] leading-none font-semibold whitespace-nowrap ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] leading-none font-semibold whitespace-nowrap ring-1 ring-black/5 ring-inset ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

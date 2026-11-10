@@ -8,7 +8,7 @@ import { LoginForm } from '@/components/auth/LoginForm';
 export default function LoginPage() {
   return (
     <AuthShell
-      plate="Access · Plate 01"
+      plate="Access · 01"
       title={
         <>
           Enter the <em className="text-pine italic">theatre</em>.

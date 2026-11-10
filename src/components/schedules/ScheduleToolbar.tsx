@@ -78,7 +78,8 @@ export function ScheduleToolbar({
         <div className="flex min-w-0 items-center gap-2">
           <p className="eyebrow">Lens</p>
           <span className="text-ink-subtle font-mono text-[10px] tabular-nums">
-            {resultCount} of {totalCount} procedures
+            {resultCount} of {totalCount}{' '}
+            {totalCount === 1 ? 'procedure' : 'procedures'}
           </span>
         </div>
 
@@ -98,8 +99,8 @@ export function ScheduleToolbar({
         )}
       </div>
 
-      <div className="grid gap-2.5 px-4 pb-3.5 sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))]">
-        <label className="relative block min-w-0">
+      <div className="grid grid-cols-1 gap-2.5 px-4 pb-3.5 sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))]">
+        <label className="relative block min-w-0 sm:col-span-2 xl:col-span-1">
           <span className="sr-only">Search procedures</span>
           <MagnifyingGlass
             size={14}
@@ -110,7 +111,7 @@ export function ScheduleToolbar({
             type="search"
             value={filters.search}
             onChange={(event) => update('search', event.target.value)}
-            placeholder="Procedure, patient, surgeon, theatre"
+            placeholder="Procedure, patient, surgeon"
             className={`${controlClass} pl-8`}
           />
         </label>

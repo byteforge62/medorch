@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { PencilSimple } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -10,6 +11,13 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { Button } from '@/components/ui/Button';
 import { ScheduleStatusBadge, SchedulePriorityBadge } from '@/components/schedules/ScheduleStatusBadge';
 import { ScheduleStatusActions } from '@/components/schedules/ScheduleStatusActions';
+import {
+  ScheduleForm,
+  type DepartmentOption as ScheduleDepartmentOption,
+  type DoctorOption as ScheduleDoctorOption,
+  type OTRoomOption as ScheduleRoomOption,
+  type PatientOption as SchedulePatientOption,
+} from '@/components/schedules/ScheduleForm';
 
 type ScheduleStatus =
   | 'SCHEDULED'
@@ -63,6 +71,10 @@ interface ScheduleNote {
 
 interface Schedule {
   id: string;
+  patientId: string;
+  departmentId: string;
+  otRoomId: string;
+  surgeonId: string;
   procedure: string;
   scheduledDate: string;
   startTime: string;
@@ -162,6 +174,15 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
   const [editingNote, setEditingNote] = useState<ScheduleNote | null>(null);
   const [editingNoteContent, setEditingNoteContent] = useState('');
 
+  const [editOpen, setEditOpen] = useState(false);
+  const [editOptionsLoaded, setEditOptionsLoaded] = useState(false);
+  const [editOptionsLoading, setEditOptionsLoading] = useState(false);
+  const [editOptionsError, setEditOptionsError] = useState('');
+  const [patients, setPatients] = useState<SchedulePatientOption[]>([]);
+  const [departments, setDepartments] = useState<ScheduleDepartmentOption[]>([]);
+  const [otRooms, setOtRooms] = useState<ScheduleRoomOption[]>([]);
+  const [doctors, setDoctors] = useState<ScheduleDoctorOption[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
@@ -256,6 +277,41 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
       ),
     [equipmentOptions, schedule?.equipment],
   );
+
+  const openEditSchedule = async () => {
+    if (editOptionsLoaded) {
+      setEditOpen(true);
+      return;
+    }
+
+    setEditOptionsLoading(true);
+    setEditOptionsError('');
+
+    try {
+      const [patientData, departmentData, roomData, doctorData] =
+        await Promise.all([
+          apiClient.get<SchedulePatientOption[]>('/api/patients'),
+          apiClient.get<ScheduleDepartmentOption[]>('/api/departments'),
+          apiClient.get<ScheduleRoomOption[]>('/api/ot-rooms'),
+          apiClient.get<ScheduleDoctorOption[]>('/api/doctors'),
+        ]);
+
+      setPatients(patientData ?? []);
+      setDepartments(departmentData ?? []);
+      setOtRooms(roomData ?? []);
+      setDoctors(doctorData ?? []);
+      setEditOptionsLoaded(true);
+      setEditOpen(true);
+    } catch (optionsError) {
+      setEditOptionsError(
+        optionsError instanceof ApiClientError
+          ? optionsError.message
+          : 'Could not load the schedule options.',
+      );
+    } finally {
+      setEditOptionsLoading(false);
+    }
+  };
 
   const handleAssignStaff = async () => {
     if (!selectedUserId) {
@@ -514,16 +570,39 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           </div>
 
           {canManageSchedules ? (
-            <div className="shrink-0 lg:max-w-md">
+            <div className="shrink-0 space-y-2 lg:max-w-md">
+              {schedule.status !== 'COMPLETED' &&
+              schedule.status !== 'CANCELLED' ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  isLoading={editOptionsLoading}
+                  loadingLabel="Loading schedule options"
+                  onClick={() => void openEditSchedule()}
+                  className="w-full"
+                >
+                  <PencilSimple size={13} aria-hidden="true" />
+                  Edit schedule
+                </Button>
+              ) : null}
+
+              {editOptionsError ? (
+                <p role="alert" className="text-danger text-[12px]">
+                  {editOptionsError}
+                </p>
+              ) : null}
+
               <ScheduleStatusActions
                 scheduleId={schedule.id}
                 scheduleLabel={schedule.procedure}
                 currentStatus={schedule.status}
-                onStatusUpdated={(_scheduleId, status) =>
+                onStatusUpdated={(_scheduleId, status) => {
                   setSchedule((current) =>
                     current ? { ...current, status } : current,
-                  )
-                }
+                  );
+                  void refreshAfterMutation();
+                }}
               />
             </div>
           ) : null}
@@ -591,7 +670,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <Card>
+        <Card className="min-w-0">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="eyebrow">Theatre team</p>
@@ -640,7 +719,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               <select
                 value={selectedUserId}
                 onChange={(event) => setSelectedUserId(event.target.value)}
-                className="border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                className="min-w-0 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
               >
                 <option value="">Select staff</option>
 
@@ -656,7 +735,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 onChange={(event) =>
                   setSelectedStaffRole(event.target.value as StaffRole)
                 }
-                className="border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
+                className="min-w-0 w-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm"
               >
                 {STAFF_ROLES.map((role) => (
                   <option key={role} value={role}>
@@ -672,7 +751,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           ) : null}
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <div>
             <p className="eyebrow">Equipment</p>
             <h2 className="text-foreground mt-1.5 text-base font-semibold tracking-tight">Assigned equipment</h2>
@@ -858,6 +937,21 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           </div>
         )}
       </Card>
+
+      <ScheduleForm
+        initialSchedule={schedule}
+        defaultDate={schedule.scheduledDate.slice(0, 10)}
+        patients={patients}
+        departments={departments}
+        otRooms={otRooms}
+        doctors={doctors}
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSuccess={() => {
+          setEditOpen(false);
+          void refreshAfterMutation();
+        }}
+      />
     </main>
   );
 }

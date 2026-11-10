@@ -17,8 +17,8 @@ const baseControl =
 function controlClasses(invalid?: boolean, extra = '') {
   return `${baseControl} ${
     invalid
-      ? 'border-danger focus-visible:border-danger'
-      : 'border-border focus-visible:border-primary'
+      ? 'border-danger focus-visible:border-danger focus-visible:shadow-[0_0_0_3px_rgba(197,58,93,0.10)]'
+      : 'border-border focus-visible:border-primary focus-visible:shadow-[0_0_0_3px_rgba(101,80,181,0.11)]'
   } ${extra}`;
 }
 

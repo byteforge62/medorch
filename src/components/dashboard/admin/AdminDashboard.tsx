@@ -2,9 +2,17 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import {
+  BellRinging,
+  CalendarCheck,
+  DoorOpen,
+  FirstAidKit,
+} from '@phosphor-icons/react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Button, buttonClasses } from '@/components/ui/Button';
+import { MedicalOrbit } from '@/components/visual/MedicalOrbit';
 
 import { DashboardSkeleton, Panel, PanelError } from './DashboardPrimitives';
 import { OperationalAttention } from './OperationalAttention';
@@ -96,7 +104,19 @@ async function fetchDetails(schedules: Schedule[]) {
   return { details, failed };
 }
 
+function greetingName(name?: string | null) {
+  const parts = (name || 'there')
+    .replace(/^(Dr\.?|Mr\.?|Ms\.?|Mrs\.?)\s+/i, '')
+    .split(' ')
+    .filter(Boolean);
+
+  if (parts.length === 0) return 'there';
+  return parts[0].toLowerCase() === 'medorch' ? parts[parts.length - 1] : parts[0];
+}
+
 export function AdminDashboard() {
+  const { data: session } = useSession();
+  const firstName = greetingName(session?.user?.name);
   const [data, setData] = useState<DashboardData>(EMPTY_DATA);
   const [errors, setErrors] = useState<DashboardErrors>({});
   const [loading, setLoading] = useState(true);
@@ -264,85 +284,128 @@ export function AdminDashboard() {
 
   return (
     <main className="space-y-4">
-      <header className="border-rule flex flex-col gap-5 border-b pb-5">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-              <p className="eyebrow">Clinical operations</p>
-              <span className="bg-rule h-3 w-px" aria-hidden="true" />
-              <p className="text-ink-subtle text-[11px]">{dateLabel}</p>
-            </div>
-            <h1 className="text-ink mt-2 text-[clamp(1.65rem,2.9vw,2.25rem)] leading-[1.02] font-semibold tracking-[-0.035em]">
-              Operations control
-            </h1>
-            <p className="text-ink-muted mt-2 max-w-[68ch] text-[12.5px] leading-relaxed">
-              The current theatre picture, open cases, resource readiness and decisions that need
-              an administrator now.
-            </p>
+      <header className="space-y-4">
+        <div className="border-rule relative overflow-hidden rounded-[22px] border bg-[linear-gradient(120deg,#EFEAF9_0%,#E8E1F7_60%,#DED4F2_100%)] px-5 py-5 sm:px-6 sm:py-6">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+          >
+            <div className="absolute -top-24 -left-16 h-64 w-64 rounded-full border border-primary/10" />
+            <div className="absolute top-1/2 -left-10 h-40 w-40 rounded-full bg-sheet/35 blur-2xl" />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-ink-subtle mr-1 text-[10.5px]">Updated {timeLabel}</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              isLoading={refreshing}
-              loadingLabel="Refreshing operations data"
-              onClick={refresh}
-            >
-              {refreshing ? 'Refreshing…' : 'Refresh'}
-            </Button>
-            <Link href="/schedules" className={buttonClasses({ size: 'sm' })}>
-              Open schedules
-            </Link>
+          <div className="relative z-10 max-w-[68%] min-[400px]:max-w-[62%] lg:max-w-[58%]">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+              <p className="text-[10px] font-semibold tracking-[0.1em] text-primary uppercase">
+                Operations control
+              </p>
+              <span className="bg-primary/20 h-3 w-px" aria-hidden="true" />
+              <p className="text-ink-muted text-[10.5px]">{dateLabel}</p>
+            </div>
+            <h1 className="text-ink mt-2 text-[clamp(1.55rem,3.1vw,2.15rem)] leading-[1.04] font-semibold tracking-[-0.038em]">
+              Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}.
+            </h1>
+            <p className="text-ink-secondary mt-2 max-w-[54ch] text-[12px] leading-[1.65]">
+              The current theatre picture, open cases, resource readiness and the decisions that
+              need you now.
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-ink-subtle mr-1 text-[10px]">Updated {timeLabel}</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                isLoading={refreshing}
+                loadingLabel="Refreshing operations data"
+                onClick={refresh}
+                className="bg-sheet/80"
+              >
+                {refreshing ? 'Refreshing…' : 'Refresh'}
+              </Button>
+              <Link href="/schedules" className={buttonClasses({ size: 'sm' })}>
+                Open schedules
+              </Link>
+            </div>
           </div>
+
+          <MedicalOrbit
+            className="pointer-events-none absolute top-1/2 -right-2 hidden w-[270px] -translate-y-[46%] drop-shadow-[0_18px_32px_rgba(101,80,181,0.10)] lg:block"
+          />
         </div>
 
-        <dl className="divide-rule-soft grid grid-cols-2 divide-x rounded-[var(--radius-panel)] border border-rule bg-sheet shadow-xs sm:grid-cols-4">
-          <div className="px-4 py-3">
-            <dt className="text-ink-muted text-[10px] font-medium">Open cases</dt>
-            <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.55rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-              {errors.schedules ? '—' : stats.open}
-              {!errors.schedules ? (
-                <span className="text-ink-subtle text-[10px] font-medium tracking-normal">
-                  {stats.today} today
-                </span>
-              ) : null}
-            </dd>
+        <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+            <span className="bg-primary-soft text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
+              <CalendarCheck size={18} weight="duotone" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
+                Open cases
+              </dt>
+              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+                {errors.schedules ? '—' : stats.open}
+                {!errors.schedules ? (
+                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
+                    {stats.today} today
+                  </span>
+                ) : null}
+              </dd>
+            </div>
           </div>
-          <div className="px-4 py-3">
-            <dt className="text-ink-muted text-[10px] font-medium">Theatres ready</dt>
-            <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.55rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-              {errors.rooms ? '—' : `${stats.readyRooms}/${stats.activeRooms}`}
-              {!errors.rooms ? (
-                <span className="text-ink-subtle text-[10px] font-medium tracking-normal">
-                  active
-                </span>
-              ) : null}
-            </dd>
+          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+            <span className="bg-success-soft text-success flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
+              <DoorOpen size={18} weight="duotone" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
+                Theatres ready
+              </dt>
+              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+                {errors.rooms ? '—' : `${stats.readyRooms}/${stats.activeRooms}`}
+                {!errors.rooms ? (
+                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
+                    active
+                  </span>
+                ) : null}
+              </dd>
+            </div>
           </div>
-          <div className="px-4 py-3">
-            <dt className="text-ink-muted text-[10px] font-medium">Unread alerts</dt>
-            <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.55rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-              {errors.alerts ? '—' : stats.unread}
-              {!errors.alerts ? (
-                <span className="text-ink-subtle text-[10px] font-medium tracking-normal">
-                  on file
-                </span>
-              ) : null}
-            </dd>
+          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+            <span className="bg-warning-soft text-warning flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
+              <BellRinging size={18} weight="duotone" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
+                Unread alerts
+              </dt>
+              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+                {errors.alerts ? '—' : stats.unread}
+                {!errors.alerts ? (
+                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
+                    on file
+                  </span>
+                ) : null}
+              </dd>
+            </div>
           </div>
-          <div className="px-4 py-3">
-            <dt className="text-ink-muted text-[10px] font-medium">Equipment available</dt>
-            <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.55rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-              {errors.equipment ? '—' : `${stats.availableEquipment}/${stats.equipment}`}
-              {!errors.equipment ? (
-                <span className="text-ink-subtle text-[10px] font-medium tracking-normal">
-                  tracked
-                </span>
-              ) : null}
-            </dd>
+          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+            <span className="bg-vermilion-soft text-vermilion flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
+              <FirstAidKit size={18} weight="duotone" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
+                Equipment
+              </dt>
+              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
+                {errors.equipment ? '—' : `${stats.availableEquipment}/${stats.equipment}`}
+                {!errors.equipment ? (
+                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
+                    available
+                  </span>
+                ) : null}
+              </dd>
+            </div>
           </div>
         </dl>
       </header>

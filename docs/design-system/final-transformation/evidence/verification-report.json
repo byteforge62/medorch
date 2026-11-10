@@ -1,0 +1,292 @@
+{
+  "startedAt": "2026-11-07T16:09:26.729Z",
+  "base": "http://localhost:3004",
+  "screenshots": [
+    "landing-1440.png",
+    "landing-1024.png",
+    "landing-390.png",
+    "login-1440.png",
+    "login-390.png",
+    "register-1440.png",
+    "forgot-password-1440.png",
+    "admin-dashboard-1440.png",
+    "admin-dashboard-1024.png",
+    "admin-dashboard-390.png",
+    "admin-schedules-1440.png",
+    "admin-schedule-detail-1440.png",
+    "admin-equipment-1440.png",
+    "admin-theatres-1440.png",
+    "admin-alerts-1440.png",
+    "admin-doctors-1440.png",
+    "admin-doctor-detail-1440.png",
+    "admin-patients-1440.png",
+    "admin-patient-detail-1440.png",
+    "admin-departments-1440.png",
+    "admin-departments-1024.png",
+    "admin-departments-390.png",
+    "admin-users-1440.png",
+    "admin-users-1024.png",
+    "admin-users-390.png",
+    "admin-audit-1440.png",
+    "admin-audit-event-1440.png",
+    "admin-audit-1024.png",
+    "admin-audit-390.png",
+    "unauthorized-1440.png",
+    "doctor-dashboard-1440.png",
+    "doctor-schedules-1440.png",
+    "doctor-departments-1024.png",
+    "ot-dashboard-1440.png",
+    "ot-theatres-1024.png",
+    "ot-schedules-1440.png",
+    "patient-dashboard-1440.png",
+    "patient-appointments-1440.png",
+    "patient-appointment-detail-1440.png",
+    "patient-appointments-390.png"
+  ],
+  "checks": [
+    {
+      "name": "Landing renders at 1440",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Landing renders at 1024",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Landing renders at 390",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Landing has no page-level horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "Login form renders",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Login has no mobile horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "Admin dashboard renders",
+      "pass": true,
+      "detail": "Operations control"
+    },
+    {
+      "name": "Admin dashboard has no mobile horizontal overflow",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Schedule detail renders",
+      "pass": true,
+      "detail": "Urgent Abdominal Procedure"
+    },
+    {
+      "name": "Doctor detail renders",
+      "pass": true,
+      "detail": "Dr. Ananya Shah"
+    },
+    {
+      "name": "Patient detail renders",
+      "pass": true,
+      "detail": "Aarav Mehta"
+    },
+    {
+      "name": "Departments workspace renders",
+      "pass": true,
+      "detail": "Clinical divisions"
+    },
+    {
+      "name": "Department list includes resource counts",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Department search filters the directory",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Department create form opens without submitting",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Departments has no mobile horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "Users workspace renders",
+      "pass": true,
+      "detail": "Who can enter MedOrch"
+    },
+    {
+      "name": "Account search filters the roster",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Account create form opens without submitting",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Users has no mobile horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "Audit ledger renders",
+      "pass": true,
+      "detail": "Audit ledger"
+    },
+    {
+      "name": "Audit filters apply to the server-backed ledger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Audit event inspection opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Audit has no mobile horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "Access boundary page renders",
+      "pass": true,
+      "detail": "This record is outside your access."
+    },
+    {
+      "name": "ADMIN reaches /users",
+      "pass": true,
+      "detail": "/users"
+    },
+    {
+      "name": "ADMIN reaches /audit",
+      "pass": true,
+      "detail": "/audit"
+    },
+    {
+      "name": "ADMIN reaches /departments",
+      "pass": true,
+      "detail": "/departments"
+    },
+    {
+      "name": "ADMIN reaches /patients",
+      "pass": true,
+      "detail": "/patients"
+    },
+    {
+      "name": "Doctor dashboard renders",
+      "pass": true,
+      "detail": "Day plan"
+    },
+    {
+      "name": "Doctor reaches schedules",
+      "pass": true,
+      "detail": "/schedules"
+    },
+    {
+      "name": "DOCTOR is blocked from users",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "DOCTOR is blocked from audit",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "OT dashboard renders",
+      "pass": true,
+      "detail": "Theatre command"
+    },
+    {
+      "name": "OT staff reaches theatres",
+      "pass": true,
+      "detail": "/ot-rooms"
+    },
+    {
+      "name": "OT_STAFF is blocked from patient registry",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "OT_STAFF is blocked from users",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "Patient dashboard renders",
+      "pass": true,
+      "detail": "Hello, Aarav"
+    },
+    {
+      "name": "Patient visit book renders",
+      "pass": true,
+      "detail": "Your theatre visits"
+    },
+    {
+      "name": "Patient visits separate upcoming and past",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Patient appointment detail renders",
+      "pass": true,
+      "detail": "Laparoscopic Cholecystectomy"
+    },
+    {
+      "name": "Patient appointments has no mobile horizontal overflow",
+      "pass": true,
+      "detail": "390px"
+    },
+    {
+      "name": "PATIENT is blocked from schedules",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "PATIENT is blocked from patient registry",
+      "pass": true,
+      "detail": "/unauthorized"
+    },
+    {
+      "name": "Mobile navigation toggle opens the drawer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Reduced-motion preference neutralises page animation",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "Search control accepts keyboard focus and exposes a focus-within state",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "routes": {
+    "admin": {},
+    "doctor": {},
+    "ot": {},
+    "patient": {}
+  },
+  "finishedAt": "2026-11-07T16:10:57.084Z",
+  "passed": 47,
+  "failed": 0
+}

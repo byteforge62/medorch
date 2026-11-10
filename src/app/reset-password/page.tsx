@@ -3,6 +3,14 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
+import { AuthShell } from '@/components/auth/AuthShell';
+import {
+  authButtonClass,
+  authFieldClass,
+  authLabelClass,
+  authLinkClass,
+  authNoticeClass,
+} from '@/components/auth/auth-styles';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -70,127 +78,108 @@ function ResetPasswordForm() {
   }
 
   return (
-    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
-      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
-        <Link
-          href="/login"
-          className="text-primary text-sm transition hover:underline"
-        >
-          ← Back to login
-        </Link>
-
-        <div className="mt-8">
-          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
-            MedOrch
-          </p>
-
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-            Reset password
-          </h1>
-
-          <p className="text-foreground-muted mt-3 text-sm leading-6">
-            Choose a new password for your MedOrch account.
-          </p>
-        </div>
-
-        {!token && (
-          <p
-            role="alert"
-            className="border-danger-border bg-danger-soft text-danger mt-6 rounded-[var(--radius-control)] border p-3 text-sm"
-          >
-            No reset token was found in this link. Open the latest reset email
-            or request another link.
-          </p>
-        )}
-
-        {!completed && (
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div>
-              <label
-                htmlFor="password"
-                className="text-foreground mb-2 block text-sm font-medium"
-              >
-                New password
-              </label>
-
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={12}
-                maxLength={128}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                disabled={loading || !token}
-                placeholder="Enter your new password"
-                className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
-              />
-              <p className="text-foreground-subtle mt-2 text-xs">
-                Use between 12 and 128 characters.
-              </p>
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="text-foreground mb-2 block text-sm font-medium"
-              >
-                Confirm new password
-              </label>
-
-              <input
-                id="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                maxLength={128}
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                disabled={loading || !token}
-                placeholder="Re-enter your new password"
-                className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
-              />
-            </div>
-
-            {error && (
-              <p
-                role="alert"
-                className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-              >
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !token}
-              className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? 'Resetting password...' : 'Reset password'}
-            </button>
-          </form>
-        )}
-
-        {message && (
-          <p
-            role="status"
-            className="border-success/40 bg-success-soft text-success mt-6 rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-          >
-            {message}
-          </p>
-        )}
-
-        {completed && (
-          <Link
-            href="/login"
-            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-5 block w-full rounded-[var(--radius-control)] px-4 py-3 text-center text-sm font-semibold transition-colors"
-          >
-            Return to login
+    <AuthShell
+      plate="Credential recovery · 02"
+      title={
+        <>
+          Set a new <em className="text-pine italic">password</em>.
+        </>
+      }
+      description="Choose a password between 12 and 128 characters. Completing this step replaces the previous credential immediately."
+      asideNote="A reset link is single-use and expires. The new credential is verified on the next request and never shown again."
+      footer={
+        <>
+          Need a fresh link?{' '}
+          <Link href="/forgot-password" className={authLinkClass}>
+            Request another
           </Link>
-        )}
-      </section>
-    </main>
+          .
+        </>
+      }
+    >
+      {!token ? (
+        <p
+          role="alert"
+          className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger mb-5`}
+        >
+          No reset token was found in this link. Open the latest reset email or
+          request another link.
+        </p>
+      ) : null}
+
+      {!completed ? (
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="password" className={authLabelClass}>
+              New password
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={12}
+              maxLength={128}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={loading || !token}
+              placeholder="12 characters minimum"
+              className={authFieldClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className={authLabelClass}>
+              Confirm new password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              maxLength={128}
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              disabled={loading || !token}
+              placeholder="Re-enter your new password"
+              className={authFieldClass}
+            />
+          </div>
+
+          {error ? (
+            <p
+              role="alert"
+              className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger`}
+            >
+              {error}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={loading || !token}
+            className={authButtonClass}
+          >
+            {loading ? 'Updating credential…' : 'Reset password'}
+          </button>
+        </form>
+      ) : null}
+
+      {message ? (
+        <p
+          role="status"
+          className={`${authNoticeClass} border-success/25 bg-success-soft text-success ${completed ? '' : 'mt-5'}`}
+        >
+          {message}
+        </p>
+      ) : null}
+
+      {completed ? (
+        <Link href="/login" className={`${authButtonClass} mt-5`}>
+          Continue to sign in
+        </Link>
+      ) : null}
+    </AuthShell>
   );
 }
 
@@ -198,8 +187,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <main className="bg-background text-foreground-muted flex min-h-screen items-center justify-center text-sm">
-          Loading password reset...
+        <main className="bg-paper text-ink-muted flex min-h-screen items-center justify-center text-sm">
+          Loading password reset…
         </main>
       }
     >

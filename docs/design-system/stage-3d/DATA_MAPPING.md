@@ -52,7 +52,7 @@ Contact fields, date of birth, gender and medical history are **not selected** b
 | Assign/remove staff | `/api/schedules/[id]/staff…` | `schedules:staff:manage` (ADMIN) | Existing full case record |
 | Assign/release equipment | `/api/schedules/[id]/equipment…` | `schedules:equipment:manage` (ADMIN) | Existing full case record |
 | Notes | `/api/schedules/[id]/notes…` | `schedules:notes:manage` (ADMIN/DOCTOR) | Existing full case record |
-| Alternate list | Same server projection | same | Timeline/Case list toggle |
+| Alternate list | Same server projection | same | Internal `/preview/schedules` only; production route has no list toggle |
 
 The workspace intentionally links to `/schedules/[id]` for staff/equipment/notes management rather than duplicating those write surfaces. This keeps one implementation of the existing contracts and prevents privilege drift.
 
@@ -87,10 +87,10 @@ The form sends exactly the existing fields:
 | Derived field | Formula | Never |
 |---|---|---|
 | Duration | `max(0, endTime - startTime)` | Uses `scheduledDate` or a guessed duration |
-| Axis start/end | min/max of local minutes of visible cases, default 07:00–20:00, padded/rounded | Fixed arbitrary positions |
+| Axis start/end | Default 07:00–20:00; booked days fit case minutes with one-hour padding; today includes current time | Fixed arbitrary positions |
 | Block left/width | `(clampedStart - axisStart) / axisSpan` and `(clampedEnd - clampedStart) / axisSpan` | Uses array order or priority |
 | Day membership | Local start/end intersects the local selected day | UTC `toISOString().slice(0,10)` grouping |
-| Week count | Non-cancelled schedules intersecting each local date | Counts of hidden/filtered items |
+| Week count | All schedules intersecting each local date | Counts of hidden/filtered items |
 | Now line | Current local minute when selected date is today | Shows on other dates |
 | Free theatres | Active theatres with no non-terminal case on selected date | Invents availability |
 | In use | Theatres with `IN_PROGRESS` case intersecting current time (today) | Trusts a stale `OTRoom.status` alone |
@@ -174,8 +174,8 @@ The Schedules workspace becomes the deeper operational surface; the dashboard re
 
 ## 10. Scale and limitation notes
 
-- The API returns all accessible schedules; there is no pagination or date range filter. The development dataset has 10 rows; this is recorded as a scale limitation.
-- Staff and equipment conflicts are calculated client-side from the loaded day. A future server-side range endpoint would be needed for large datasets.
+- `/api/schedules` still returns all accessible schedules; there is no API pagination or date-range parameter. The workspace itself reads the selected day plus one padded week for the week strip, so the page does not request unrelated months. The development dataset has 10 rows; the API-wide scale risk is recorded as a limitation.
+- Staff and equipment conflicts are calculated from the loaded week on the server and narrowed to the selected day for display. A future date-range API would be needed for large hospitals.
 - No timezone field exists. The workspace labels local theatre time and does not change stored values.
 - Theatre register status is not automatically synchronized with schedule lifecycle. The workspace surfaces actual case times and labels register disagreement as a warning.
 - `ScheduleEquipment` claims inventory globally at assignment time, not for the scheduled range. The timeline shows the recorded allocation without redefining it.

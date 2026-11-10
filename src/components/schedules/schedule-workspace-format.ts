@@ -205,20 +205,45 @@ export function scheduleIntersectsDate(
 export function buildTimeAxis(
   schedules: Array<{ startTime: string; endTime: string }>,
   dateKey: string,
+  now?: Date | null,
 ) {
   const bounds = schedules
     .map((schedule) => scheduleDayBounds(schedule.startTime, schedule.endTime, dateKey))
     .filter((value): value is { startMinute: number; endMinute: number } => Boolean(value));
+  const nowMinute =
+    now && localDateKey(now) === dateKey ? minutesOfLocalDay(now) : null;
 
-  const earliest = bounds.length
-    ? Math.min(...bounds.map((value) => value.startMinute))
-    : 7 * 60;
-  const latest = bounds.length
-    ? Math.max(...bounds.map((value) => value.endMinute))
-    : 20 * 60;
+  if (
+    bounds.length === 0 &&
+    (nowMinute === null || (nowMinute >= 7 * 60 && nowMinute <= 20 * 60))
+  ) {
+    return {
+      startHour: 7,
+      endHour: 20,
+      span: 13 * 60,
+      pct(minutes: number) {
+        return ((minutes - 7 * 60) / (13 * 60)) * 100;
+      },
+    };
+  }
 
-  const startHour = Math.max(0, Math.min(7, Math.floor(earliest / 60)));
-  const endHour = Math.min(24, Math.max(20, Math.ceil(latest / 60)));
+  const points = [
+    ...bounds.flatMap((value) => [value.startMinute, value.endMinute]),
+    ...(nowMinute !== null ? [nowMinute] : []),
+  ];
+  const earliest = Math.min(...points);
+  const latest = Math.max(...points);
+
+  /*
+   * Fit the axis to the booked day with an hour of breathing room on each
+   * side, never shorter than four hours. This keeps short cases readable
+   * without inventing a duration or hiding the surrounding theatre day.
+   */
+  const startHour = Math.max(0, Math.min(23, Math.floor(earliest / 60) - 1));
+  const endHour = Math.min(
+    24,
+    Math.max(startHour + 4, Math.ceil(latest / 60) + 1),
+  );
   const safeEndHour = Math.max(startHour + 1, endHour);
   const span = (safeEndHour - startHour) * 60;
 

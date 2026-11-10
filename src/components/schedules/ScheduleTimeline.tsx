@@ -94,6 +94,15 @@ function laneState(
     };
   }
 
+  if (!isToday && cases.length > 0) {
+    return {
+      label: 'Scheduled',
+      tone: 'text-primary',
+      dot: 'bg-primary',
+      unavailable: false,
+    };
+  }
+
   return {
     label: 'Available',
     tone: 'text-success',
@@ -218,8 +227,8 @@ export function ScheduleTimeline({
   }, [allDaySchedules, isToday, now, rooms, schedules]);
 
   const axis = useMemo(
-    () => buildTimeAxis(schedules, dateKey),
-    [dateKey, schedules],
+    () => buildTimeAxis(allDaySchedules, dateKey, isToday ? now : null),
+    [allDaySchedules, dateKey, isToday, now],
   );
 
   const ticks = hourTicks(axis.startHour, axis.endHour);
@@ -248,7 +257,11 @@ export function ScheduleTimeline({
               Theatre day
             </h2>
             <span className="text-ink-subtle font-mono text-[9.5px] uppercase">
-              {lanes.length} theatres · {schedules.length} procedures
+              {lanes.length} theatres ·{' '}
+              {schedules.length === allDaySchedules.length
+                ? schedules.length
+                : `${schedules.length} of ${allDaySchedules.length}`}{' '}
+              {schedules.length === 1 ? 'procedure' : 'procedures'}
             </span>
           </div>
           <p className="text-ink-muted mt-1 flex items-center gap-1.5 text-[10.5px]">
@@ -293,10 +306,14 @@ export function ScheduleTimeline({
             <div className="relative h-8">
               {ticks.map((hour) => {
                 const pct = axis.pct(hour * 60);
+                const nearNow =
+                  nowMinute !== null &&
+                  Math.abs(hour * 60 - nowMinute) < 45;
                 const showLabel =
-                  hour === axis.startHour ||
-                  hour === axis.endHour ||
-                  hour % 2 === 0;
+                  !nearNow &&
+                  (hour === axis.startHour ||
+                    hour === axis.endHour ||
+                    (hour - axis.startHour) % 2 === 0);
 
                 return (
                   <React.Fragment key={hour}>
@@ -333,7 +350,7 @@ export function ScheduleTimeline({
             </div>
           </div>
 
-          {lanes.map(({ room, cases, state }) => (
+          {lanes.map(({ room, cases, allCases, state }) => (
             <div
               key={room.id}
               className="border-rule grid grid-cols-[10.5rem_minmax(0,1fr)] border-b last:border-b-0"
@@ -361,7 +378,7 @@ export function ScheduleTimeline({
                     {state.label}
                   </span>
                   <span className="text-ink-subtle text-[9px]">
-                    {cases.length} case{cases.length === 1 ? '' : 's'}
+                    {allCases.length} case{allCases.length === 1 ? '' : 's'}
                   </span>
                 </div>
               </div>
@@ -394,7 +411,9 @@ export function ScheduleTimeline({
                   <p className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[9.5px]">
                     {state.unavailable
                       ? 'Theatre unavailable'
-                      : 'No procedures booked'}
+                      : allCases.length > 0
+                        ? 'No cases match the lens'
+                        : 'No procedures booked'}
                   </p>
                 ) : null}
 
@@ -461,10 +480,10 @@ export function ScheduleTimeline({
                         aria-hidden="true"
                       />
                       <span className="min-w-0 pl-2.5 pr-1.5 py-1">
-                        <span className="block truncate text-[10.5px] leading-tight font-semibold">
+                        <span className="block truncate text-[10px] leading-tight font-semibold">
                           {schedule.procedure}
                         </span>
-                        <span className="mt-1 block truncate font-mono text-[9px] leading-tight tabular-nums opacity-80">
+                        <span className="mt-1 block truncate font-mono text-[8.5px] leading-tight tabular-nums opacity-80">
                           {formatTimeRange(
                             schedule.startTime,
                             schedule.endTime,
@@ -502,7 +521,7 @@ export function ScheduleTimeline({
       {/* Mobile: exact-position lane minimaps + readable agenda. */}
       <div className="md:hidden" data-schedule-mobile>
         <div className="border-rule divide-rule border-t">
-          {lanes.map(({ room, cases, state }) => (
+          {lanes.map(({ room, cases, allCases, state }) => (
             <div key={room.id} className="px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -570,7 +589,9 @@ export function ScheduleTimeline({
                 <p className="text-ink-subtle mt-1 text-[9.5px]">
                   {state.unavailable
                     ? 'Theatre unavailable'
-                    : 'No procedures booked'}
+                    : allCases.length > 0
+                      ? 'No cases match the lens'
+                      : 'No procedures booked'}
                 </p>
               ) : null}
             </div>

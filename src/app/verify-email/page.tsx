@@ -1,7 +1,14 @@
 'use client';
 
+import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { AuthShell } from '@/components/auth/AuthShell';
+import {
+  authButtonClass,
+  authLinkClass,
+  authNoticeClass,
+} from '@/components/auth/auth-styles';
 
 type VerificationState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -48,55 +55,63 @@ function VerifyEmailContent() {
   }
 
   return (
-    <main className="bg-background flex min-h-screen items-center justify-center px-4 py-12">
-      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-          Verify your email
-        </h1>
-
-        <p className="text-foreground-muted mt-3 text-sm leading-6">
-          Confirm your email address to continue with your MedOrch registration.
+    <AuthShell
+      plate="Account verification · 04"
+      title={
+        <>
+          Confirm your <em className="text-pine italic">email</em>.
+        </>
+      }
+      description="This step confirms that the address belongs to you. It does not grant a clinical role; an administrator still approves the account."
+      asideNote="Identity is established in two stages: the address is verified, then access is approved and scoped to a role."
+      footer={
+        <>
+          Need a different link?{' '}
+          <Link href="/resend-verification" className={authLinkClass}>
+            Resend verification
+          </Link>
+          .
+        </>
+      }
+    >
+      {message ? (
+        <p
+          role="status"
+          aria-live="polite"
+          className={`${authNoticeClass} ${
+            state === 'success'
+              ? 'border-success/25 bg-success-soft text-success'
+              : 'border-danger-border bg-danger-soft text-danger'
+          }`}
+        >
+          {message}
         </p>
+      ) : (
+        <p className="text-ink-secondary text-[13px] leading-relaxed">
+          Verify now to confirm this address. The link is checked against the
+          token attached to your account.
+        </p>
+      )}
 
-        {message && (
-          <p
-            role="status"
-            aria-live="polite"
-            className={`mt-5 border p-3 text-sm leading-6 ${
-              state === 'success'
-                ? 'border-success/40 bg-success-soft text-success'
-                : 'border-danger-border bg-danger-soft text-danger'
-            }`}
-          >
-            {message}
-          </p>
-        )}
-
-        {state !== 'success' && (
-          <button
-            type="button"
-            onClick={handleVerify}
-            disabled={state === 'loading'}
-            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-6 w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {state === 'loading'
-              ? 'Verifying...'
-              : state === 'error'
-                ? 'Try again'
-                : 'Verify email'}
-          </button>
-        )}
-
-        {state === 'success' && (
-          <a
-            href="/login"
-            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active mt-6 block w-full rounded-[var(--radius-control)] px-4 py-3 text-center text-sm font-semibold transition-colors"
-          >
-            Continue to login
-          </a>
-        )}
-      </section>
-    </main>
+      {state !== 'success' ? (
+        <button
+          type="button"
+          onClick={handleVerify}
+          disabled={state === 'loading'}
+          className={`${authButtonClass} mt-6`}
+        >
+          {state === 'loading'
+            ? 'Verifying email…'
+            : state === 'error'
+              ? 'Try verification again'
+              : 'Verify email'}
+        </button>
+      ) : (
+        <Link href="/login" className={`${authButtonClass} mt-6`}>
+          Continue to sign in
+        </Link>
+      )}
+    </AuthShell>
   );
 }
 
@@ -104,10 +119,8 @@ export default function VerifyEmailPage() {
   return (
     <Suspense
       fallback={
-        <main className="bg-background flex min-h-screen items-center justify-center">
-          <p className="text-foreground-muted text-sm">
-            Loading verification page...
-          </p>
+        <main className="bg-paper flex min-h-screen items-center justify-center">
+          <p className="text-ink-muted text-sm">Loading verification…</p>
         </main>
       }
     >

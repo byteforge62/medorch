@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { X } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Button } from '@/components/ui/Button';
-import { ScheduleItem } from './ScheduleCard';
 import { SchedulePriority } from './ScheduleStatusBadge';
 import { formatClock, localDateKey } from './schedule-workspace-format';
 
@@ -38,8 +38,22 @@ export interface DoctorOption {
   };
 }
 
+export interface ScheduleFormInitial {
+  id: string;
+  patientId: string;
+  departmentId: string;
+  otRoomId: string;
+  surgeonId: string;
+  procedure: string;
+  scheduledDate: string;
+  startTime: string;
+  endTime: string;
+  priority: SchedulePriority;
+  clinicalNotes?: string | null;
+}
+
 interface ScheduleFormProps {
-  initialSchedule?: ScheduleItem | null;
+  initialSchedule?: ScheduleFormInitial | null;
   /** Local theatre day used when creating a new schedule. */
   defaultDate?: string;
   patients: PatientOption[];
@@ -225,7 +239,9 @@ export function ScheduleForm({
         startTime: startDateTime.toISOString(),
         endTime: endDateTime.toISOString(),
         priority,
-        clinicalNotes: clinicalNotes.trim() ? clinicalNotes.trim() : undefined,
+        clinicalNotes: isEditing
+          ? clinicalNotes.trim() || null
+          : clinicalNotes.trim() || undefined,
       };
 
       if (isEditing && initialSchedule) {
@@ -292,9 +308,9 @@ export function ScheduleForm({
             type="button"
             onClick={onClose}
             aria-label="Close schedule form"
-            className="border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground focus-visible:outline-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            ✕
+            <X size={15} weight="bold" aria-hidden="true" />
           </button>
         </div>
 

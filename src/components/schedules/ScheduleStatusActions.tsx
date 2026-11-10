@@ -142,10 +142,17 @@ function ConfirmDialog({
   onCancel: () => void;
 }) {
   const id = React.useId();
+  const cardRef = React.useRef<HTMLDivElement>(null);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     cancelRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, []);
 
   return (
@@ -158,6 +165,7 @@ function ConfirmDialog({
       }}
     >
       <div
+        ref={cardRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${id}-title`}
@@ -165,7 +173,29 @@ function ConfirmDialog({
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
+            event.stopPropagation();
             onCancel();
+            return;
+          }
+
+          if (event.key !== 'Tab' || !cardRef.current) return;
+
+          const focusable = Array.from(
+            cardRef.current.querySelectorAll<HTMLElement>(
+              'button:not([disabled]), a[href]',
+            ),
+          ).filter((element) => element.offsetParent !== null);
+
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
           }
         }}
         className="border-border-strong bg-surface w-full max-w-sm rounded-[var(--radius-panel)] border p-5 shadow-xl"

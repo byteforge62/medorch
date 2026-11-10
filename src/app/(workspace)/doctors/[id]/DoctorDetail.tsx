@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ArrowLeft } from '@phosphor-icons/react';
 
 import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
+import {
+  SchedulePriorityBadge,
+  ScheduleStatusBadge,
+  type SchedulePriority,
+  type ScheduleStatus,
+} from '@/components/schedules/ScheduleStatusBadge';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 
 interface DoctorSchedule {
@@ -51,12 +57,12 @@ interface DoctorDetailRecord {
   schedules: DoctorSchedule[];
 }
 
-function formatDate(value: string) {
+function formatDate(value: string | null) {
+  if (!value) return '—';
+
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return '—';
-  }
+  if (Number.isNaN(date.getTime())) return '—';
 
   return new Intl.DateTimeFormat('en-IN', {
     dateStyle: 'medium',
@@ -66,9 +72,7 @@ function formatDate(value: string) {
 function formatTime(value: string) {
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return '—';
-  }
+  if (Number.isNaN(date.getTime())) return '—';
 
   return new Intl.DateTimeFormat('en-IN', {
     hour: '2-digit',
@@ -76,8 +80,52 @@ function formatTime(value: string) {
   }).format(date);
 }
 
-function formatStatus(value: string) {
-  return value.replaceAll('_', ' ');
+function datePlate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return { day: '—', month: '', year: '' };
+  }
+
+  return {
+    day: new Intl.DateTimeFormat('en-IN', { day: '2-digit' }).format(date),
+    month: new Intl.DateTimeFormat('en-IN', { month: 'short' }).format(date),
+    year: new Intl.DateTimeFormat('en-IN', { year: 'numeric' }).format(date),
+  };
+}
+
+function initials(name: string | null) {
+  return (
+    (name ?? '')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || 'DR'
+  );
+}
+
+function Detail({
+  label,
+  value,
+  mono = false,
+}: {
+  label: string;
+  value: string | null | undefined;
+  mono?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-ink-muted text-[12px] font-medium">{label}</dt>
+      <dd
+        className={`text-ink mt-1 text-[13px] font-medium break-words ${
+          mono ? 'font-mono text-[12px]' : ''
+        }`}
+      >
+        {value || '—'}
+      </dd>
+    </div>
+  );
 }
 
 export function DoctorDetail({ doctorId }: { doctorId: string }) {
@@ -94,9 +142,7 @@ export function DoctorDetail({ doctorId }: { doctorId: string }) {
           `/api/doctors/${doctorId}`,
         );
 
-        if (!cancelled) {
-          setDoctor(response);
-        }
+        if (!cancelled) setDoctor(response);
       } catch (fetchError) {
         if (!cancelled) {
           setError(
@@ -106,9 +152,7 @@ export function DoctorDetail({ doctorId }: { doctorId: string }) {
           );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -119,202 +163,202 @@ export function DoctorDetail({ doctorId }: { doctorId: string }) {
     };
   }, [doctorId]);
 
-  if (loading) {
-    return <LoadingState />;
+  if (loading) return <LoadingState message="Loading clinician record…" />;
+
+  if (error || !doctor) {
+    return (
+      <main className="space-y-4">
+        <Link
+          href="/doctors"
+          className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-medium"
+        >
+          <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+          Doctor directory
+        </Link>
+        <ErrorState message={error || 'Doctor record was not found.'} />
+      </main>
+    );
   }
 
-  if (error) {
-    return <ErrorState message={error} />;
-  }
+  const upcomingish = doctor.schedules.filter(
+    (schedule) => schedule.status !== 'CANCELLED',
+  ).length;
 
-  if (!doctor) {
-    return <ErrorState message="Doctor record was not found." />;
-  }
+  const clinicalContext = Array.from(
+    new Set(
+      [doctor.specialization, doctor.department?.name].filter(
+        (value): value is string => Boolean(value),
+      ),
+    ),
+  );
 
   return (
     <main className="space-y-6">
-      <div>
-        <Link
-          href="/doctors"
-          className="text-sm font-medium text-[var(--color-primary)] hover:underline"
-        >
-          ← Back to Doctor Directory
+      <Link
+        href="/doctors"
+        className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-medium"
+      >
+        <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+        Doctor directory
         </Link>
 
-        <div className="mt-4">
-          <p className="text-sm font-medium text-[var(--color-primary)]">
-            Clinical Operations
-          </p>
-
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            {doctor.user.name || 'Unnamed doctor'}
-          </h1>
-
-          <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-            Doctor profile and scheduled operating-theatre procedures.
-          </p>
-        </div>
-      </div>
-
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Account status
-          </p>
-          <div className="mt-2">
-            <Badge>{formatStatus(doctor.user.status)}</Badge>
-          </div>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">Department</p>
-          <p className="mt-2 font-semibold">
-            {doctor.department?.name || 'Unassigned'}
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Specialization
-          </p>
-          <p className="mt-2 font-semibold">
-            {doctor.specialization || 'Not specified'}
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Scheduled procedures
-          </p>
-          <p className="mt-2 text-2xl font-semibold">
-            {doctor.schedules.length}
-          </p>
-        </Card>
-      </section>
-
-      <Card>
-        <h2 className="font-semibold">Account and profile information</h2>
-
-        <dl className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <dt className="text-sm text-[var(--color-text-muted)]">
-              Email address
-            </dt>
-            <dd className="mt-1 text-sm font-medium break-all">
-              {doctor.user.email}
-            </dd>
-          </div>
-
-          <div>
-            <dt className="text-sm text-[var(--color-text-muted)]">
-              Phone number
-            </dt>
-            <dd className="mt-1 text-sm font-medium">
-              {doctor.user.phone || 'Not provided'}
-            </dd>
-          </div>
-
-          <div>
-            <dt className="text-sm text-[var(--color-text-muted)]">
-              License number
-            </dt>
-            <dd className="mt-1 text-sm font-medium">
-              {doctor.licenseNumber || 'Not provided'}
-            </dd>
-          </div>
-
-          <div>
-            <dt className="text-sm text-[var(--color-text-muted)]">
-              Profile created
-            </dt>
-            <dd className="mt-1 text-sm font-medium">
-              {formatDate(doctor.createdAt)}
-            </dd>
-          </div>
-
-          <div>
-            <dt className="text-sm text-[var(--color-text-muted)]">
-              Last profile update
-            </dt>
-            <dd className="mt-1 text-sm font-medium">
-              {formatDate(doctor.updatedAt)}
-            </dd>
-          </div>
-        </dl>
-      </Card>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold">Schedule history</h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Operating-theatre procedures assigned to this surgeon.
-          </p>
-        </div>
-
-        {doctor.schedules.length === 0 ? (
-          <EmptyState
-            title="No scheduled procedures"
-            description="Procedures assigned to this doctor will appear here."
-          />
-        ) : (
-          <Card>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="border-b border-[var(--color-border)] text-[var(--color-text-muted)]">
-                  <tr>
-                    <th className="px-3 py-3 font-medium">Procedure</th>
-                    <th className="px-3 py-3 font-medium">Scheduled date</th>
-                    <th className="px-3 py-3 font-medium">Time</th>
-                    <th className="px-3 py-3 font-medium">Department</th>
-                    <th className="px-3 py-3 font-medium">Operating theatre</th>
-                    <th className="px-3 py-3 font-medium">Status</th>
-                    <th className="px-3 py-3 font-medium">Priority</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {doctor.schedules.map((schedule) => (
-                    <tr
-                      key={schedule.id}
-                      className="border-b border-[var(--color-border)] last:border-0"
-                    >
-                      <td className="px-3 py-4 font-medium">
-                        {schedule.procedure}
-                      </td>
-
-                      <td className="px-3 py-4 whitespace-nowrap">
-                        {formatDate(schedule.scheduledDate)}
-                      </td>
-
-                      <td className="px-3 py-4 whitespace-nowrap">
-                        {formatTime(schedule.startTime)} –{' '}
-                        {formatTime(schedule.endTime)}
-                      </td>
-
-                      <td className="px-3 py-4">{schedule.department.name}</td>
-
-                      <td className="px-3 py-4">
-                        <p>{schedule.otRoom.name}</p>
-                        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                          {schedule.otRoom.code}
-                        </p>
-                      </td>
-
-                      <td className="px-3 py-4">
-                        <Badge>{formatStatus(schedule.status)}</Badge>
-                      </td>
-
-                      <td className="px-3 py-4">
-                        {formatStatus(schedule.priority)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <header className="pb-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <span
+              className="bg-primary-soft text-primary flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold"
+              aria-hidden="true"
+            >
+              {initials(doctor.user.name)}
+            </span>
+            <div className="min-w-0">
+              <p className="text-pine text-[11px] font-semibold">
+                Clinician record
+              </p>
+              <h1 className="display mt-1 text-[clamp(1.9rem,4vw,2.6rem)]">
+                {doctor.user.name || 'Unnamed doctor'}
+              </h1>
+              <p className="text-ink-secondary mt-1.5 text-[13px]">
+                {clinicalContext.length > 0
+                  ? clinicalContext.join(' · ')
+                  : 'Specialty not recorded'}
+              </p>
             </div>
-          </Card>
-        )}
-      </section>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>{doctor.user.status.replaceAll('_', ' ')}</Badge>
+            <span className="text-ink-secondary border-rule bg-sheet inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold">
+              {doctor.schedules.length} case
+              {doctor.schedules.length === 1 ? '' : 's'} on record
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(16rem,0.68fr)_minmax(0,1.55fr)]">
+        <section
+          className="panel overflow-hidden"
+          aria-labelledby="credentials-title"
+        >
+          <div className="border-rule-soft border-b px-5 py-3.5">
+            <h2
+              id="credentials-title"
+              className="text-ink text-[13px] font-semibold"
+            >
+              Credentials and contact
+            </h2>
+            <p className="text-ink-muted mt-0.5 text-[11px]">
+              The professional identity held on file.
+            </p>
+          </div>
+
+          <dl className="space-y-4 px-5 py-4">
+            <Detail label="Specialty" value={doctor.specialization} />
+            <Detail label="Department" value={doctor.department?.name} />
+            <Detail label="Medical licence" value={doctor.licenseNumber} mono />
+            <Detail label="Email" value={doctor.user.email} />
+            <Detail label="Phone" value={doctor.user.phone} />
+          </dl>
+
+          <dl className="border-rule-soft grid grid-cols-2 gap-3 border-t px-5 py-4">
+            <Detail
+              label="Profile created"
+              value={formatDate(doctor.createdAt)}
+            />
+            <Detail label="Last updated" value={formatDate(doctor.updatedAt)} />
+          </dl>
+
+          <div className="border-rule-soft bg-surface-subtle border-t px-5 py-3">
+            <p className="text-ink-subtle font-mono text-[9.5px] break-all">
+              PROFILE {doctor.id}
+            </p>
+          </div>
+        </section>
+
+        <section
+          className="panel-flush overflow-hidden"
+          aria-labelledby="operating-list-title"
+        >
+          <div className="border-rule-soft flex flex-wrap items-end justify-between gap-2 border-b px-4 py-3.5">
+            <div>
+              <h2
+                id="operating-list-title"
+                className="text-ink text-[13px] font-semibold"
+              >
+                Operating list
+              </h2>
+              <p className="text-ink-muted mt-0.5 text-[11px]">
+                Theatre procedures assigned to this clinician.
+              </p>
+            </div>
+            <p className="text-ink-subtle font-mono text-[10px]">
+              {upcomingish} active · {doctor.schedules.length} total
+            </p>
+          </div>
+
+          {doctor.schedules.length === 0 ? (
+            <div className="p-5">
+              <EmptyState
+                title="No scheduled procedures"
+                description="Procedures assigned to this doctor will appear here."
+              />
+            </div>
+          ) : (
+            <ol className="divide-rule-soft divide-y">
+              {doctor.schedules.map((schedule) => {
+                const date = datePlate(schedule.scheduledDate);
+
+                return (
+                  <li key={schedule.id}>
+                    <Link
+                      href={`/schedules/${schedule.id}`}
+                      className="group hover:bg-surface-subtle grid grid-cols-[3.6rem_minmax(0,1fr)] gap-3 px-4 py-3.5 transition-colors sm:grid-cols-[4.2rem_minmax(0,1fr)_auto]"
+                    >
+                      <div className="border-rule-soft border-r pr-3">
+                        <p className="text-ink font-mono text-[18px] leading-none">
+                          {date.day}
+                        </p>
+                        <p className="text-ink-subtle mt-1 text-[9.5px] font-semibold tracking-[0.05em] uppercase">
+                          {date.month} {date.year}
+                        </p>
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-ink text-[13px] font-semibold">
+                            {schedule.procedure}
+                          </h3>
+                          <SchedulePriorityBadge
+                            priority={schedule.priority as SchedulePriority}
+                          />
+                        </div>
+                        <p className="text-ink-muted mt-1 text-[11.5px]">
+                          {formatTime(schedule.startTime)} –{' '}
+                          {formatTime(schedule.endTime)} ·{' '}
+                          {schedule.otRoom.name} ({schedule.otRoom.code})
+                        </p>
+                        <p className="text-ink-subtle mt-0.5 text-[10.5px]">
+                          {schedule.department.name}
+                        </p>
+                      </div>
+
+                      <div className="col-span-2 flex items-center justify-between gap-2 sm:col-span-1 sm:flex-col sm:items-end sm:justify-center">
+                        <ScheduleStatusBadge
+                          status={schedule.status as ScheduleStatus}
+                        />
+                        <span className="text-ink-subtle text-[9.5px] font-medium opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                          Open case
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

@@ -1,0 +1,80 @@
+
+> medorch@0.1.0 test:me-read-handlers
+> node --import tsx --test tests/me-read-handlers.test.ts
+
+TAP version 13
+# [test-staff-error] GET /api/me/staff-schedules error: Error: synthetic database failure
+#     at getData (C:\\Users\\patel\\Desktop\\medorch\\tests\\me-read-handlers.test.ts:145:13)
+#     at handleStaffSchedules (C:\\Users\\patel\\Desktop\\medorch\\src\\lib\\api\\me-read-handlers.ts:34:24)
+#     at TestContext.<anonymous> (C:\\Users\\patel\\Desktop\\medorch\\tests\\me-read-handlers.test.ts:141:26)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+#     at Test.run (node:internal/test_runner/test:970:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+# [test-patient-error] GET /api/me/appointments error: Error: synthetic database failure
+#     at getData (C:\\Users\\patel\\Desktop\\medorch\\tests\\me-read-handlers.test.ts:164:13)
+#     at handlePatientAppointments (C:\\Users\\patel\\Desktop\\medorch\\src\\lib\\api\\me-read-handlers.ts:64:27)
+#     at TestContext.<anonymous> (C:\\Users\\patel\\Desktop\\medorch\\tests\\me-read-handlers.test.ts:160:26)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+#     at Test.run (node:internal/test_runner/test:970:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+# Subtest: staff schedules: unauthenticated request returns 401
+ok 1 - staff schedules: unauthenticated request returns 401
+  ---
+  duration_ms: 6.0028
+  ...
+# Subtest: staff schedules: non-OT staff role returns 403
+ok 2 - staff schedules: non-OT staff role returns 403
+  ---
+  duration_ms: 0.9045
+  ...
+# Subtest: staff schedules: passes the authenticated user's ID to the service
+ok 3 - staff schedules: passes the authenticated user's ID to the service
+  ---
+  duration_ms: 5.8447
+  ...
+# Subtest: patient appointments: unauthenticated request returns 401
+ok 4 - patient appointments: unauthenticated request returns 401
+  ---
+  duration_ms: 1.0839
+  ...
+# Subtest: patient appointments: non-patient role returns 403
+ok 5 - patient appointments: non-patient role returns 403
+  ---
+  duration_ms: 2.2325
+  ...
+# Subtest: patient appointments: passes the authenticated user's ID to the service
+ok 6 - patient appointments: passes the authenticated user's ID to the service
+  ---
+  duration_ms: 1.6008
+  ...
+# Subtest: patient appointments: missing patient record returns 404
+ok 7 - patient appointments: missing patient record returns 404
+  ---
+  duration_ms: 1.1153
+  ...
+# Subtest: staff schedules: service failure returns 500 without leaking the error
+ok 8 - staff schedules: service failure returns 500 without leaking the error
+  ---
+  duration_ms: 8.7791
+  ...
+# Subtest: patient appointments: service failure returns 500 without leaking the error
+ok 9 - patient appointments: service failure returns 500 without leaking the error
+  ---
+  duration_ms: 2.9354
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1531.1858
+me_exit=0

@@ -1,0 +1,74 @@
+{
+  "startedAt": "2026-11-07T14:24:59.182Z",
+  "marker": "Stage 3D conflict fixture",
+  "checks": [
+    {
+      "name": "Live coordination panel shows both overlapping allocations",
+      "pass": true,
+      "detail": {
+        "blocks": 2,
+        "staff": true,
+        "equipment": true,
+        "confirmedCount": true,
+        "warnings": true
+      }
+    },
+    {
+      "name": "Confirmed conflict opens the affected case brief",
+      "pass": true,
+      "detail": {
+        "hasFixture": true,
+        "hasConflict": true
+      }
+    },
+    {
+      "name": "Conflict fixtures removed and schedule count restored",
+      "pass": true,
+      "detail": {
+        "removedScheduleIds": [
+          "b6f9baf4-75c6-49af-a689-243d57390200",
+          "5c936243-8f43-4fd1-98db-874af45ff343"
+        ],
+        "scheduleCountBefore": 10,
+        "scheduleCountAfter": 10
+      }
+    }
+  ],
+  "screenshots": [
+    "admin-schedules-conflicts-1440.png"
+  ],
+  "fixture": {
+    "schedules": [
+      {
+        "id": "b6f9baf4-75c6-49af-a689-243d57390200"
+      },
+      {
+        "id": "5c936243-8f43-4fd1-98db-874af45ff343"
+      }
+    ],
+    "rooms": [
+      "DEMO-GEN-01",
+      "DEMO-GEN-02"
+    ],
+    "surgeons": [
+      "Dr. Ananya Shah",
+      "Dr. Rohan Patel"
+    ],
+    "patients": [
+      "Aarav Mehta",
+      "Diya Shah"
+    ],
+    "staff": "Kavya Shah",
+    "equipment": "Anaesthesia Workstation"
+  },
+  "cleanup": {
+    "removedScheduleIds": [
+      "b6f9baf4-75c6-49af-a689-243d57390200",
+      "5c936243-8f43-4fd1-98db-874af45ff343"
+    ],
+    "scheduleCountBefore": 10,
+    "scheduleCountAfter": 10
+  },
+  "finishedAt": "2026-11-07T14:25:14.272Z",
+  "pass": true
+}

@@ -15,10 +15,10 @@ interface PageHeaderProps {
 /**
  * PageHeader — the masthead of every screen.
  *
- * A teal signal dot and a tracked kicker, then the display title at a size
+ * A violet signal dot and a tracked kicker, then the display title at a size
  * that actually commands the page, then one line of orientation. The action
  * slot sits on the right and drops below the title on narrow screens rather
- * than crushing it. No heavy rules: the header floats on the page, and the
+ * than crushing it. No heavy rules: the header floats on the sheet, and the
  * panels beneath it carry the structure.
  */
 export function PageHeader({
@@ -29,7 +29,7 @@ export function PageHeader({
   actions,
 }: PageHeaderProps) {
   return (
-    <header className="pb-7">
+    <header className="pb-6 sm:pb-7">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -48,7 +48,7 @@ export function PageHeader({
             ) : null}
           </div>
 
-          <h1 className="display text-foreground mt-3 text-[clamp(2rem,4.2vw,3rem)]">
+          <h1 className="display text-foreground mt-3 text-[clamp(2rem,3.8vw,2.8rem)] text-balance">
             {title}
           </h1>
 

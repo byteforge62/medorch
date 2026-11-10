@@ -4,16 +4,17 @@ import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import {
+  authButtonClass,
+  authFieldClass,
+  authLabelClass,
+  authLinkClass,
+  authNoticeClass,
+} from './auth-styles';
 
 /*======================================================================
   Sign-in form — printed fields, one signal button.
 ====================================================================== */
-
-const fieldClass =
-  'mt-2 w-full border border-rule bg-sheet px-3.5 py-3 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-subtle focus:border-pine disabled:cursor-not-allowed disabled:opacity-60';
-
-const labelClass =
-  'font-mono text-[8px] uppercase tracking-[0.22em] text-ink-muted';
 
 export function LoginForm() {
   const router = useRouter();
@@ -66,14 +67,14 @@ export function LoginForm() {
       {error ? (
         <p
           role="alert"
-          className="border-danger bg-danger-soft text-danger border-l-2 px-3 py-2.5 text-[11px] leading-relaxed"
+          className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger`}
         >
           {error}
         </p>
       ) : null}
 
       <div>
-        <label htmlFor="email" className={labelClass}>
+        <label htmlFor="email" className={authLabelClass}>
           Email address
         </label>
         <input
@@ -86,20 +87,20 @@ export function LoginForm() {
           placeholder="admin@medorch.local"
           required
           disabled={isLoading}
-          className={fieldClass}
+          className={authFieldClass}
         />
       </div>
 
       <div>
         <div className="flex items-baseline justify-between">
-          <label htmlFor="password" className={labelClass}>
+          <label htmlFor="password" className={authLabelClass}>
             Password
           </label>
           <Link
             href="/forgot-password"
-            className="link-draw font-mono text-[8px] tracking-[0.16em] text-ink-subtle uppercase hover:text-ink"
+            className="text-ink-muted hover:text-ink text-[12px] font-medium"
           >
-            Forgot
+            Forgot password
           </Link>
         </div>
         <input
@@ -112,32 +113,19 @@ export function LoginForm() {
           placeholder="Enter your password"
           required
           disabled={isLoading}
-          className={fieldClass}
+          className={authFieldClass}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="bg-pine text-chalk hover:bg-pine-deep group flex h-12 w-full items-center justify-between px-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isLoading ? 'Verifying…' : 'Sign in'}
-        <span
-          className="transition-transform duration-300 group-hover:translate-x-1"
-          aria-hidden="true"
-        >
-          →
-        </span>
+      <button type="submit" disabled={isLoading} className={authButtonClass}>
+        {isLoading ? 'Verifying access…' : 'Sign in'}
       </button>
 
       <div className="text-ink-muted flex flex-wrap items-center justify-between gap-2 text-[11px]">
-        <Link
-          href="/resend-verification"
-          className="link-draw hover:text-ink"
-        >
+        <Link href="/resend-verification" className={authLinkClass}>
           Resend verification
         </Link>
-        <Link href="/register" className="link-draw hover:text-ink">
+        <Link href="/register" className={authLinkClass}>
           Request an account
         </Link>
       </div>

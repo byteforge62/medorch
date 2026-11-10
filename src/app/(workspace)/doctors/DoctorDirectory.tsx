@@ -497,7 +497,7 @@ export function DoctorDirectory() {
     SUSPENDED: {
       label: 'Suspended',
       short: 'Suspended',
-      dot: 'bg-[#5b93b8]',
+      dot: 'bg-info',
       chip: 'bg-primary-soft text-primary',
       action: 'Suspend',
     },

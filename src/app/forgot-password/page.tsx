@@ -2,6 +2,14 @@
 
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
+import { AuthShell } from '@/components/auth/AuthShell';
+import {
+  authButtonClass,
+  authFieldClass,
+  authLabelClass,
+  authLinkClass,
+  authNoticeClass,
+} from '@/components/auth/auth-styles';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -55,86 +63,75 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
-      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
-        <Link
-          href="/login"
-          className="text-primary text-sm transition hover:underline"
-        >
-          ← Back to login
-        </Link>
-
-        <div className="mt-8">
-          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
-            MedOrch
-          </p>
-
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-            Forgot password?
-          </h1>
-
-          <p className="text-foreground-muted mt-3 text-sm leading-6">
-            Enter your registered email address. If an account exists,
-            we&apos;ll send instructions to reset your password.
-          </p>
+    <AuthShell
+      plate="Credential recovery · 01"
+      title={
+        <>
+          Recover your <em className="text-pine italic">access</em>.
+        </>
+      }
+      description="Enter the email registered to your MedOrch account. If it is eligible, a reset link will be sent to that address."
+      asideNote="Recovery is deliberately quiet: the response does not reveal whether an account exists, and the reset link carries a single-use token."
+      footer={
+        <>
+          Remembered your password?{' '}
+          <Link href="/login" className={authLinkClass}>
+            Return to sign in
+          </Link>
+          .
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label htmlFor="email" className={authLabelClass}>
+            Email address
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            maxLength={254}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            disabled={loading}
+            className={authFieldClass}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="email"
-              className="text-foreground mb-2 block text-sm font-medium"
-            >
-              Email address
-            </label>
-
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              maxLength={254}
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              disabled={loading}
-              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2 disabled:opacity-60"
-            />
-          </div>
-
-          {message && (
-            <p
-              role="status"
-              className="border-success/40 bg-success-soft text-success rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-            >
-              {message}
-            </p>
-          )}
-
-          {error && (
-            <p
-              role="alert"
-              className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-            >
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading || !email.trim()}
-            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        {message ? (
+          <p
+            role="status"
+            className={`${authNoticeClass} border-success/25 bg-success-soft text-success`}
           >
-            {loading ? 'Sending request...' : 'Send reset link'}
-          </button>
-        </form>
+            {message}
+          </p>
+        ) : null}
 
-        <p className="text-foreground-muted mt-6 text-center text-xs leading-5">
-          For your security, this page does not reveal whether an account
-          exists.
-        </p>
-      </section>
-    </main>
+        {error ? (
+          <p
+            role="alert"
+            className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger`}
+          >
+            {error}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={loading || !email.trim()}
+          className={authButtonClass}
+        >
+          {loading ? 'Sending reset link…' : 'Send reset link'}
+        </button>
+      </form>
+
+      <p className="text-ink-subtle mt-5 text-center text-[11.5px] leading-relaxed">
+        For your security, this page does not reveal whether an account exists.
+      </p>
+    </AuthShell>
   );
 }

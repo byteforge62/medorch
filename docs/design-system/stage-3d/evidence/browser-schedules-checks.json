@@ -1,0 +1,146 @@
+{
+  "startedAt": "2026-11-07T14:36:49.981Z",
+  "base": "http://localhost:3000",
+  "screenshots": [
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedule-detail-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedule-detail-resources-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedule-create-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-1024.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-1024-board.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-390-top.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-390.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-empty-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\admin-schedules-today-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\doctor-schedules-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\ot-staff-schedules-1440.png",
+    "C:\\Users\\patel\\Desktop\\medorch\\docs\\design-system\\stage-3d\\screenshots\\patient-unauthorized-1440.png"
+  ],
+  "checks": [
+    {
+      "name": "ADMIN loads theatre lanes and positioned cases",
+      "pass": true,
+      "detail": {
+        "lanes": 6,
+        "blocks": 2,
+        "newSchedule": true,
+        "hasCoordination": true
+      }
+    },
+    {
+      "name": "ADMIN sees create action",
+      "pass": true,
+      "detail": {
+        "lanes": 6,
+        "blocks": 2,
+        "newSchedule": true,
+        "hasCoordination": true
+      }
+    },
+    {
+      "name": "Date navigation moves to the next theatre day",
+      "pass": true,
+      "detail": {
+        "from": "2026-11-06",
+        "to": "2026-11-07"
+      }
+    },
+    {
+      "name": "Theatre selection narrows the board to the chosen room",
+      "pass": true,
+      "detail": {
+        "blocks": 1,
+        "lens": true
+      }
+    },
+    {
+      "name": "ADMIN case brief exposes case resources and permitted actions",
+      "pass": true,
+      "detail": {
+        "hasPatient": true,
+        "hasSurgeon": true,
+        "hasTheatre": true,
+        "hasTeam": true,
+        "hasEquipment": true,
+        "hasStatus": true,
+        "hasEdit": true
+      }
+    },
+    {
+      "name": "ADMIN create dialog opens with required fields",
+      "pass": true,
+      "detail": {
+        "title": true,
+        "hasDate": true,
+        "hasPatient": true,
+        "hasProcedure": true
+      }
+    },
+    {
+      "name": "ADMIN tablet uses the time-positioned board without page overflow",
+      "pass": true,
+      "detail": {
+        "timeline": true,
+        "agenda": true,
+        "bodyWidth": 1024,
+        "viewport": 1024
+      }
+    },
+    {
+      "name": "ADMIN mobile uses the agenda without page overflow",
+      "pass": true,
+      "detail": {
+        "agenda": true,
+        "desktopHidden": true,
+        "bodyWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "name": "Empty day keeps theatre availability visible",
+      "pass": true,
+      "detail": {
+        "hasEmptyMessage": true,
+        "lanes": 6
+      }
+    },
+    {
+      "name": "Current-time indicator is visible on today with an outlying case",
+      "pass": true,
+      "detail": {
+        "label": true,
+        "date": "2026-11-07"
+      }
+    },
+    {
+      "name": "DOCTOR can read cases and edit/update status but cannot create",
+      "pass": true,
+      "detail": {
+        "newSchedule": false,
+        "blocks": 2,
+        "hasEdit": true,
+        "hasStatus": true
+      }
+    },
+    {
+      "name": "OT_STAFF is scoped to assigned cases with no management controls",
+      "pass": true,
+      "detail": {
+        "blocks": 2,
+        "newSchedule": false,
+        "assignedScope": true,
+        "edit": false,
+        "clinicalRestricted": true
+      }
+    },
+    {
+      "name": "PATIENT is redirected away from the scheduling workspace",
+      "pass": true,
+      "detail": {
+        "path": "/unauthorized"
+      }
+    }
+  ],
+  "finishedAt": "2026-11-07T14:37:22.275Z",
+  "pass": true
+}

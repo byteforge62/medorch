@@ -1,0 +1,290 @@
+[harness] disposable database: medorch_runtime_test_12e922aebecd
+[harness] applying committed migrations...
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+Datasource "db": PostgreSQL database "medorch_runtime_test_12e922aebecd", schema "public" at "localhost:5432"
+
+9 migrations found in prisma/migrations
+
+Applying migration `20260926140643_init`
+Applying migration `20260926144114_add_audit_logging`
+Applying migration `20261010224215_schedule_overlap_constraints`
+Applying migration `20261014065831_add_email_verification_tokens`
+Applying migration `20261014071134_add_user_email_verified_at`
+Applying migration `20261014195231_add_verification_email_rate_limit`
+Applying migration `20261015154412_add_password_reset_tokens`
+Applying migration `20261015165347_add_verification_rate_limit_purpose`
+Applying migration `20261016055322_add_user_session_version`
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.0 -> 8.0.0-rc.33                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260926140643_init/
+    └─ migration.sql
+  └─ 20260926144114_add_audit_logging/
+    └─ migration.sql
+  └─ 20261010224215_schedule_overlap_constraints/
+    └─ migration.sql
+  └─ 20261014065831_add_email_verification_tokens/
+    └─ migration.sql
+  └─ 20261014071134_add_user_email_verified_at/
+    └─ migration.sql
+  └─ 20261014195231_add_verification_email_rate_limit/
+    └─ migration.sql
+  └─ 20261015154412_add_password_reset_tokens/
+    └─ migration.sql
+  └─ 20261015165347_add_verification_rate_limit_purpose/
+    └─ migration.sql
+  └─ 20261016055322_add_user_session_version/
+    └─ migration.sql
+
+All migrations have been successfully applied.
+[harness] seeding demo data (SEED_VERIFIED_PATIENTS=1)...
+MedOrch demo data seeded successfully.
+{
+  departments: 4,
+  users: 12,
+  doctorProfiles: 5,
+  patients: 10,
+  operatingRooms: 7,
+  equipment: 10,
+  schedules: 10,
+  alerts: 4,
+  auditExamples: 3,
+  adminEmail: 'admin@medorch.local'
+}
+[harness] starting next start on http://127.0.0.1:5784...
+[server] ▲ Next.js 16.3.6
+[server] - Local:         http://localhost:5784
+- Network:       http://192.168.0.106:5784
+[server] ✓ Ready in 1012ms
+[server] ✓ Running next.config.ts took 253ms
+[harness] server ready.
+TAP version 13
+# Subtest: runtime authorization
+    # Subtest: returns 401 for unauthenticated requests on protected endpoints
+    ok 1 - returns 401 for unauthenticated requests on protected endpoints
+      ---
+      duration_ms: 213.5342
+      ...
+    # Subtest: ADMIN can read protected collections and the audit trail
+    not ok 2 - ADMIN can read protected collections and the audit trail
+      ---
+      duration_ms: 184.3764
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:5874'
+      failureType: 'testCodeFailure'
+      error: 'expected value to be instance of function Array() { [native code] }'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: true
+      actual: false
+      operator: '=='
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:60:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBeInstanceOf (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:95:38)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:356:29)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: ADMIN department lifecycle is mutable and visible to OT_STAFF
+    not ok 3 - ADMIN department lifecycle is mutable and visible to OT_STAFF
+      ---
+      duration_ms: 24.4258
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:6882'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected "actual" to be strictly unequal to:
+        
+        undefined
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      operator: 'notStrictEqual'
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:46:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBeDefined (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:92:24)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:371:24)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: DOCTOR can read permitted resources but cannot mutate admin-only ones
+    not ok 4 - DOCTOR can read permitted resources but cannot mutate admin-only ones
+      ---
+      duration_ms: 117.2047
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:8130'
+      failureType: 'testCodeFailure'
+      error: 'Request with GET/HEAD method cannot have body.'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        node:internal/deps/undici/undici:13502:13
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:437:19)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: DOCTOR schedule transitions follow the documented status rules
+    not ok 5 - DOCTOR schedule transitions follow the documented status rules
+      ---
+      duration_ms: 21.5709
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:8914'
+      failureType: 'testCodeFailure'
+      error: 'schedules.find is not a function'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:456:17)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: OT_STAFF sees only assignment-derived schedules and redacted detail
+    not ok 6 - OT_STAFF sees only assignment-derived schedules and redacted detail
+      ---
+      duration_ms: 25.2968
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:10058'
+      failureType: 'testCodeFailure'
+      error: 'expected 0 to be greater than 0'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: true
+      actual: false
+      operator: '=='
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:66:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBeGreaterThan (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:96:33)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:503:30)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: OT_STAFF cannot mutate schedules, notes, staff, or equipment
+    not ok 7 - OT_STAFF cannot mutate schedules, notes, staff, or equipment
+      ---
+      duration_ms: 75.4091
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:11751'
+      failureType: 'testCodeFailure'
+      error: 'Request with GET/HEAD method cannot have body.'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        node:internal/deps/undici/undici:13502:13
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:580:19)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: PATIENT can read their own appointments and alerts, not others
+    not ok 8 - PATIENT can read their own appointments and alerts, not others
+      ---
+      duration_ms: 22.1367
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:12559'
+      failureType: 'testCodeFailure'
+      error: 'expected undefined to be greater than 0'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: true
+      actual: false
+      operator: '=='
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:66:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBeGreaterThan (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:96:33)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:598:29)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: PATIENT cannot reach schedules, users, audit, or me/schedules
+    ok 9 - PATIENT cannot reach schedules, users, audit, or me/schedules
+      ---
+      duration_ms: 65.7486
+      ...
+    # Subtest: unknown and malformed resource ids are handled without leaking data
+    not ok 10 - unknown and malformed resource ids are handled without leaking data
+      ---
+      duration_ms: 12.3345
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:14881'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        400 !== 404
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 404
+      actual: 400
+      operator: 'strictEqual'
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:37:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBe (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:89:25)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:697:31)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    # Subtest: schedule status mutations reject invalid transitions and unknown ids
+    not ok 11 - schedule status mutations reject invalid transitions and unknown ids
+      ---
+      duration_ms: 11.8063
+      location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:15334'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        400 !== 404
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 404
+      actual: 400
+      operator: 'strictEqual'
+      stack: |-
+        evaluate (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:37:14)
+        run (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:77:7)
+        Object.toBe (C:\Users\patel\Desktop\medorch\tests\helpers\expect.ts:89:25)
+        TestContext.<anonymous> (C:\Users\patel\Desktop\medorch\tests\runtime-authorization.test.ts:717:31)
+        process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+        async Test.run (node:internal/test_runner/test:932:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:629:7)
+      ...
+    1..11
+not ok 1 - runtime authorization
+  ---
+  duration_ms: 3384.8984
+  type: 'suite'
+  location: 'C:\\Users\\patel\\Desktop\\medorch\\tests\\runtime-authorization.test.ts:2:3896'
+  failureType: 'subtestsFailed'
+  error: '9 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 11
+# suites 1
+# pass 2
+# fail 9
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4308.2173
+[harness] stopping server...
+[harness] dropping disposable database...
+[harness] done (exit 1).
+runtime-harness exit 1

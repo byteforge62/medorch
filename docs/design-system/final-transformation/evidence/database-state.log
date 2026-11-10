@@ -1,0 +1,16 @@
+{
+  "counts": {
+    "users": 14,
+    "departments": 4,
+    "patients": 12,
+    "schedules": 10,
+    "alerts": 4,
+    "audit": 285
+  },
+  "latestUser": "2026-10-15T05:40:11.050Z",
+  "latestPatient": "2026-10-15T05:40:11.050Z",
+  "latestAudit": {
+    "createdAt": "2026-11-07T16:10:53.275Z",
+    "action": "LOGIN"
+  }
+}

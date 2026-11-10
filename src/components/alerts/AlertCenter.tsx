@@ -139,12 +139,12 @@ export function AlertCenter() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="border-border-strong bg-surface text-foreground-muted hover:bg-surface-muted hover:text-foreground relative flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border transition-colors"
+        className="border-rule-soft bg-surface-subtle text-ink-secondary hover:bg-pine-soft hover:text-primary relative flex h-10 w-10 items-center justify-center rounded-[13px] border transition-colors"
         aria-label="Alerts"
       >
         <Bell size={18} weight="regular" aria-hidden="true" />
         {unreadCount > 0 ? (
-          <span className="bg-danger text-foreground-inverse absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-none px-0.5 text-[10px] font-bold">
+          <span className="bg-danger absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white ring-2 ring-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         ) : null}
@@ -156,7 +156,7 @@ export function AlertCenter() {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="border-border bg-surface fixed top-16 right-3 left-3 z-50 border sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:mt-2 sm:w-96">
+          <div className="border-rule bg-sheet fixed top-[5.5rem] right-3 left-3 z-50 overflow-hidden rounded-[20px] border shadow-[0_24px_60px_rgba(66,48,112,0.18)] sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:mt-2 sm:w-96">
             <div className="border-border flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center space-x-2">
                 <h4 className="text-foreground text-sm font-semibold">

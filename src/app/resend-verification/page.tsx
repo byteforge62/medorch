@@ -1,6 +1,15 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useState } from 'react';
+import { AuthShell } from '@/components/auth/AuthShell';
+import {
+  authButtonClass,
+  authFieldClass,
+  authLabelClass,
+  authLinkClass,
+  authNoticeClass,
+} from '@/components/auth/auth-styles';
 
 export default function ResendVerificationPage() {
   const [email, setEmail] = useState('');
@@ -55,85 +64,75 @@ export default function ResendVerificationPage() {
   }
 
   return (
-    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-12">
-      <section className="border-border bg-surface w-full max-w-md rounded-[var(--radius-card)] border p-8 shadow-xs">
-        <a
-          href="/login"
-          className="text-primary text-sm transition hover:underline"
-        >
-          ← Back to login
-        </a>
-
-        <div className="mt-8">
-          <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
-            MedOrch
-          </p>
-
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-            Resend verification
-          </h1>
-
-          <p className="text-foreground-muted mt-3 text-sm leading-6">
-            Enter the email address you registered with. If your account
-            requires verification, we’ll send you a new verification link.
-          </p>
+    <AuthShell
+      plate="Account verification · 03"
+      title={
+        <>
+          Resend the <em className="text-pine italic">verification</em>.
+        </>
+      }
+      description="Enter the address you registered with. If the account still needs verification, a fresh link will be sent."
+      asideNote="Verification protects the first step of access. An account remains unable to sign in until its email has been confirmed and a role approved."
+      footer={
+        <>
+          Already verified?{' '}
+          <Link href="/login" className={authLinkClass}>
+            Return to sign in
+          </Link>
+          .
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label htmlFor="email" className={authLabelClass}>
+            Email address
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            maxLength={254}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            className={authFieldClass}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="email"
-              className="text-foreground mb-2 block text-sm font-medium"
-            >
-              Email address
-            </label>
-
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              maxLength={254}
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus-visible:ring-ring w-full rounded-[var(--radius-control)] border px-4 py-3 text-sm transition-colors outline-none focus-visible:ring-2"
-            />
-          </div>
-
-          {message && (
-            <p
-              role="status"
-              className="border-success/40 bg-success-soft text-success rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-            >
-              {message}
-            </p>
-          )}
-
-          {error && (
-            <p
-              role="alert"
-              className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border p-3 text-sm leading-6"
-            >
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading || !email.trim()}
-            className="bg-primary text-foreground-inverse hover:bg-primary-hover active:bg-primary-active w-full rounded-[var(--radius-control)] px-4 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        {message ? (
+          <p
+            role="status"
+            className={`${authNoticeClass} border-success/25 bg-success-soft text-success`}
           >
-            {loading ? 'Sending request...' : 'Send verification link'}
-          </button>
-        </form>
+            {message}
+          </p>
+        ) : null}
 
-        <p className="text-foreground-muted mt-6 text-center text-xs leading-5">
-          For your security, the response won’t reveal whether an account exists
-          or is eligible for verification.
-        </p>
-      </section>
-    </main>
+        {error ? (
+          <p
+            role="alert"
+            className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger`}
+          >
+            {error}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={loading || !email.trim()}
+          className={authButtonClass}
+        >
+          {loading ? 'Sending verification…' : 'Send verification link'}
+        </button>
+      </form>
+
+      <p className="text-ink-subtle mt-5 text-center text-[11.5px] leading-relaxed">
+        For your security, the response will not reveal whether an account
+        exists or is eligible for verification.
+      </p>
+    </AuthShell>
   );
 }

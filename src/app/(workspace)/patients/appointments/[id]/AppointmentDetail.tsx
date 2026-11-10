@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ArrowLeft } from '@phosphor-icons/react';
 
 import { ScheduleStatusBadge } from '@/components/schedules/ScheduleStatusBadge';
-import { Ledger, LedgerRow } from '@/components/ui/Ledger';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -46,21 +46,15 @@ interface PatientAppointmentsResponse {
 function formatDate(value: string) {
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return 'Date unavailable';
-  }
+  if (Number.isNaN(date.getTime())) return 'Date unavailable';
 
-  return new Intl.DateTimeFormat('en-IN', {
-    dateStyle: 'full',
-  }).format(date);
+  return new Intl.DateTimeFormat('en-IN', { dateStyle: 'full' }).format(date);
 }
 
 function formatTime(value: string) {
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return 'Time unavailable';
-  }
+  if (Number.isNaN(date.getTime())) return 'Time unavailable';
 
   return new Intl.DateTimeFormat('en-IN', {
     hour: '2-digit',
@@ -68,8 +62,46 @@ function formatTime(value: string) {
   }).format(date);
 }
 
+function datePlate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return { day: '—', month: '', year: '', weekday: '' };
+  }
+
+  return {
+    day: new Intl.DateTimeFormat('en-IN', { day: '2-digit' }).format(date),
+    month: new Intl.DateTimeFormat('en-IN', { month: 'long' }).format(date),
+    year: new Intl.DateTimeFormat('en-IN', { year: 'numeric' }).format(date),
+    weekday: new Intl.DateTimeFormat('en-IN', { weekday: 'long' }).format(date),
+  };
+}
+
 function formatLabel(value: string) {
   return value.replaceAll('_', ' ');
+}
+
+function Fact({
+  label,
+  value,
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-ink-muted text-[10.5px] font-medium">{label}</dt>
+      <dd
+        className={`text-ink mt-1 text-[13px] font-medium break-words ${
+          mono ? 'font-mono text-[11.5px]' : ''
+        }`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
 }
 
 export function AppointmentDetail({
@@ -78,6 +110,7 @@ export function AppointmentDetail({
   appointmentId: string;
 }) {
   const [appointment, setAppointment] = useState<Appointment | null>(null);
+  const [patientName, setPatientName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -96,6 +129,7 @@ export function AppointmentDetail({
 
         if (!cancelled) {
           setAppointment(ownAppointment ?? null);
+          setPatientName(patient.name);
         }
       } catch (caught: unknown) {
         if (!cancelled) {
@@ -106,9 +140,7 @@ export function AppointmentDetail({
           );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -119,9 +151,7 @@ export function AppointmentDetail({
     };
   }, [appointmentId]);
 
-  if (loading) {
-    return <LoadingState message="Loading appointment details..." />;
-  }
+  if (loading) return <LoadingState message="Loading visit record…" />;
 
   if (error) {
     return (
@@ -129,9 +159,10 @@ export function AppointmentDetail({
         <ErrorState message={error} />
         <Link
           href="/patients/appointments"
-          className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+          className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-semibold"
         >
-          ← Back to My Appointments
+          <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+          My appointments
         </Link>
       </div>
     );
@@ -146,94 +177,161 @@ export function AppointmentDetail({
         />
         <Link
           href="/patients/appointments"
-          className="text-sm font-semibold text-[var(--color-primary)] hover:underline"
+          className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-semibold"
         >
-          ← Back to My Appointments
+          <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+          My appointments
         </Link>
       </div>
     );
   }
 
-  const details = [
-    {
-      label: 'Scheduled date',
-      value: formatDate(appointment.scheduledDate),
-    },
-    {
-      label: 'Start time',
-      value: formatTime(appointment.startTime),
-    },
-    {
-      label: 'End time',
-      value: formatTime(appointment.endTime),
-    },
-    {
-      label: 'Department',
-      value: appointment.department.name,
-    },
-    {
-      label: 'Operating theatre',
-      value: appointment.otRoom.name,
-    },
-    {
-      label: 'Room code',
-      value: appointment.otRoom.code,
-    },
-    {
-      label: 'Priority',
-      value: formatLabel(appointment.priority),
-    },
-  ];
+  const date = datePlate(appointment.scheduledDate);
 
   return (
     <main className="space-y-6">
       <Link
         href="/patients/appointments"
-        className="inline-flex text-sm font-semibold text-[var(--color-primary)] hover:underline"
+        className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-medium"
       >
-        ← Back to My Appointments
+        <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+        My appointments
       </Link>
 
-      <section>
-        <p className="text-sm font-medium text-[var(--color-primary)]">
-          Patient Portal
-        </p>
-
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Appointment Details
-          </h1>
-
+      <header className="border-rule border-b pb-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-primary text-[10.5px] font-semibold tracking-[0.08em] uppercase">
+              Visit record
+            </p>
+            <h1 className="display mt-2 text-[clamp(1.9rem,4vw,2.6rem)]">
+              {appointment.procedure}
+            </h1>
+            <p className="text-ink-secondary mt-2 text-[13px]">
+              {formatDate(appointment.scheduledDate)}
+            </p>
+          </div>
           <ScheduleStatusBadge status={appointment.status} />
         </div>
+      </header>
 
-        <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          Review the details and current status of your appointment.
-        </p>
-      </section>
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(15rem,0.7fr)]">
+        <section
+          className="panel overflow-hidden"
+          aria-labelledby="visit-sheet-title"
+        >
+          <div className="grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <div className="relative flex flex-col justify-between overflow-hidden bg-[linear-gradient(150deg,#7C67C7_0%,#6550B5_48%,#4E3A94_100%)] px-5 py-5 text-white">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full border border-white/15"
+              />
+              <p className="relative font-mono text-[9.5px] tracking-[0.14em] text-white/55 uppercase">
+                Scheduled
+              </p>
+              <div className="relative mt-4 sm:mt-0">
+                <p className="font-mono text-[42px] leading-none">{date.day}</p>
+                <p className="mt-1 text-[13px] font-semibold text-white/90">
+                  {date.month}
+                </p>
+                <p className="mt-0.5 text-[10.5px] text-white/55">
+                  {date.year} · {date.weekday}
+                </p>
+              </div>
+            </div>
 
-      <section className="border-border bg-surface border">
-        <header className="border-border-strong bg-surface-muted border-b px-4 py-4 sm:px-6">
-          <p className="text-foreground-subtle font-mono text-[11px] tracking-[0.16em] uppercase">
-            Appointment record
-          </p>
-          <h2 className="text-foreground mt-1 text-lg font-semibold">
-            {appointment.procedure}
-          </h2>
-        </header>
-        <Ledger className="border-0 border-b-0 sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-          {details.map((detail) => (
-            <LedgerRow key={detail.label} className="px-4 py-3 sm:px-6">
-              <p className="text-foreground-muted font-mono text-[10px] tracking-[0.12em] uppercase">
-                {detail.label}
+            <div className="px-5 py-5">
+              <h2
+                id="visit-sheet-title"
+                className="text-ink text-[17px] font-semibold"
+              >
+                {appointment.procedure}
+              </h2>
+              <p className="text-ink-muted mt-1 text-[12px]">
+                {formatTime(appointment.startTime)} –{' '}
+                {formatTime(appointment.endTime)} ·{' '}
+                {appointment.department.name}
               </p>
-              <p className="text-foreground mt-1 text-sm font-medium">
-                {detail.value}
-              </p>
-            </LedgerRow>
-          ))}
-        </Ledger>
-      </section>
+
+              <dl className="border-rule-soft mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t pt-4">
+                <Fact
+                  label="Scheduled date"
+                  value={formatDate(appointment.scheduledDate)}
+                />
+                <Fact
+                  label="Visit window"
+                  value={`${formatTime(appointment.startTime)} – ${formatTime(
+                    appointment.endTime,
+                  )}`}
+                />
+                <Fact label="Department" value={appointment.department.name} />
+                <Fact
+                  label="Operating theatre"
+                  value={`${appointment.otRoom.name} (${appointment.otRoom.code})`}
+                />
+                <Fact
+                  label="Planning priority"
+                  value={formatLabel(appointment.priority)}
+                />
+                <Fact label="Status" value={formatLabel(appointment.status)} />
+              </dl>
+            </div>
+          </div>
+
+          <div className="border-rule-soft bg-surface-subtle border-t px-5 py-3">
+            <p className="text-ink-subtle font-mono text-[9.5px] break-all">
+              VISIT {appointment.id}
+            </p>
+          </div>
+        </section>
+
+        <aside
+          className="panel overflow-hidden"
+          aria-labelledby="visit-notes-title"
+        >
+          <div className="border-rule-soft border-b px-5 py-3.5">
+            <h2
+              id="visit-notes-title"
+              className="text-ink text-[13px] font-semibold"
+            >
+              About this record
+            </h2>
+          </div>
+
+          <div className="space-y-4 px-5 py-4">
+            <p className="text-ink-secondary text-[12px] leading-[1.75]">
+              This is the theatre coordination record for your visit. The status
+              above is updated by hospital staff as the schedule changes.
+            </p>
+
+            <dl className="space-y-3">
+              <div>
+                <dt className="text-ink-subtle text-[10px]">Patient</dt>
+                <dd className="text-ink mt-0.5 text-[12px] font-medium">
+                  {patientName || 'Your linked patient record'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-ink-subtle text-[10px]">Where to go</dt>
+                <dd className="text-ink mt-0.5 text-[12px] font-medium">
+                  {appointment.otRoom.name} · {appointment.otRoom.code}
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="border-rule-soft bg-pine-soft border-t px-5 py-4">
+            <p className="text-pine text-[11.5px] leading-relaxed">
+              If these details look wrong, contact the hospital&apos;s theatre
+              coordination desk and quote visit reference{' '}
+              <span className="font-mono text-[10.5px]">
+                {appointment.id.slice(0, 8)}
+              </span>
+              .
+            </p>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

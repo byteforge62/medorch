@@ -15,6 +15,8 @@ import {
   Stethoscope,
   UserList,
   Users,
+  X,
+  type IconProps,
 } from '@phosphor-icons/react';
 import type { UserRole } from '@/generated/prisma/client';
 import { BrandMark } from '@/components/brand/Brand';
@@ -23,93 +25,82 @@ import { BrandMark } from '@/components/brand/Brand';
 export const PRIMARY_NAVIGATION_ID = 'primary-navigation';
 
 interface NavItem {
-  code: string;
   name: string;
   href: string;
   roles: UserRole[];
-  icon: React.ReactNode;
+  icon: React.ComponentType<IconProps>;
   group: 'work' | 'control';
 }
 
 const navItems: NavItem[] = [
   {
-    code: '01',
     name: 'Dashboard',
     href: '/dashboard',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF', 'PATIENT'],
-    icon: <SquaresFour size={16} weight="regular" />,
+    icon: SquaresFour,
     group: 'work',
   },
   {
-    code: '02',
     name: 'Schedules',
     href: '/schedules',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: <CalendarBlank size={16} weight="regular" />,
+    icon: CalendarBlank,
     group: 'work',
   },
   {
-    code: '03',
     name: 'Departments',
     href: '/departments',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: <Buildings size={16} weight="regular" />,
+    icon: Buildings,
     group: 'work',
   },
   {
-    code: '04',
     name: 'Patients',
     href: '/patients',
     roles: ['ADMIN', 'DOCTOR'],
-    icon: <Users size={16} weight="regular" />,
+    icon: Users,
     group: 'work',
   },
   {
-    code: '05',
     name: 'Doctors',
     href: '/doctors',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: <Stethoscope size={16} weight="regular" />,
+    icon: Stethoscope,
     group: 'work',
   },
   {
-    code: '06',
     name: 'Equipment',
     href: '/equipment',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: <FirstAidKit size={16} weight="regular" />,
+    icon: FirstAidKit,
     group: 'work',
   },
   {
-    code: '07',
     name: 'Theatres',
     href: '/ot-rooms',
     roles: ['ADMIN', 'DOCTOR', 'OT_STAFF'],
-    icon: <DoorOpen size={16} weight="regular" />,
+    icon: DoorOpen,
     group: 'work',
   },
   {
-    code: '08',
     name: 'My appointments',
     href: '/patients/appointments',
     roles: ['PATIENT'],
-    icon: <CalendarCheck size={16} weight="regular" />,
+    icon: CalendarCheck,
     group: 'work',
   },
   {
-    code: '09',
     name: 'Accounts',
     href: '/users',
     roles: ['ADMIN'],
-    icon: <UserList size={16} weight="regular" />,
+    icon: UserList,
     group: 'control',
   },
   {
-    code: '10',
     name: 'Audit trail',
     href: '/audit',
     roles: ['ADMIN'],
-    icon: <ClipboardText size={16} weight="regular" />,
+    icon: ClipboardText,
     group: 'control',
   },
 ];
@@ -119,16 +110,22 @@ const groupLabels: Record<NavItem['group'], string> = {
   control: 'Administration',
 };
 
-/*======================================================================
-  Instrument rail
-  ======================================================================
-  A narrow spine (84px) that widens to 256px on hover or keyboard focus.
-  Everything that is not part of the collapsed glyph set — wordmark, group
-  names, destination labels, status text — is clipped and faded out, so the
-  collapsed rail reads as a numbered index and never leaks into the sheet.
+function initialsOf(name?: string | null) {
+  return (name || 'User')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+}
 
-  The active destination is a printed tab pulled out of the dark spine: paper
-  fill, ink type, a vermilion signal tick and a 2px edge mark.
+/*======================================================================
+  Lavender navigation panel
+  ======================================================================
+  A persistent white panel floating inside the lavender field. Icons sit
+  in soft lavender tiles; the active destination turns its tile violet
+  and its row lavender. Labels remain visible at every desktop width so
+  the navigation reads as a place, not a hover secret.
 ====================================================================== */
 
 export function Sidebar({
@@ -151,17 +148,11 @@ export function Sidebar({
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
-  /* On the mobile drawer the labels must always be visible; in the desktop
-     rail they appear only while the rail is open. */
-  const disclose = isOpen
-    ? 'opacity-100'
-    : 'opacity-0 lg:group-hover/rail:opacity-100';
-
   return (
     <>
       {isOpen ? (
         <div
-          className="bg-ink/55 fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-[#25213b]/40 backdrop-blur-[2px] lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -171,48 +162,52 @@ export function Sidebar({
         id={PRIMARY_NAVIGATION_ID}
         data-app-sidebar
         aria-label="Primary navigation"
-        className={`group/rail bg-sheet text-ink border-rule fixed top-0 bottom-0 left-0 z-50 flex w-[17rem] flex-col overflow-hidden border-r transition-[width,transform] duration-300 ease-[cubic-bezier(0.22,0.75,0.2,1)] lg:w-[var(--rail-closed)] lg:focus-within:w-[var(--rail-open)] lg:hover:w-[var(--rail-open)] ${
+        className={`bg-sheet border-rule fixed top-0 bottom-0 left-0 z-50 flex w-[17rem] flex-col overflow-hidden border-r shadow-[0_18px_60px_rgba(66,48,112,0.10)] transition-transform duration-300 ease-[cubic-bezier(0.22,0.75,0.2,1)] lg:top-4 lg:bottom-4 lg:left-4 lg:z-30 lg:w-[16rem] lg:rounded-[28px] lg:border ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Masthead — the mark alone when collapsed */}
-        <div className="border-rule flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b px-6">
-          <BrandMark className="text-brass h-6 w-6 shrink-0" />
-          <span
-            className={`flex min-w-0 flex-col transition-opacity duration-200 ${disclose}`}
+        <div className="flex h-[5.25rem] shrink-0 items-center justify-between px-5">
+          <Link
+            href="/dashboard"
+            className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            aria-label="MedOrch dashboard"
           >
-            <span className="text-ink text-[15px] leading-none font-semibold tracking-[-0.01em] whitespace-nowrap">
-              MedOrch
+            <BrandMark className="h-9 w-9 shrink-0 text-primary" />
+            <span className="flex min-w-0 flex-col">
+              <span className="font-display text-ink truncate text-[18px] leading-none font-semibold tracking-[-0.03em]">
+                MedOrch
+              </span>
+              <span className="text-ink-muted mt-1.5 truncate text-[10px] font-medium tracking-[0.02em]">
+                Theatre operations
+              </span>
             </span>
-            <span className="text-ink-muted mt-1.5 text-[10px] leading-none font-medium whitespace-nowrap">
-              Theatre control
-            </span>
-          </span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+            className="text-ink-muted hover:bg-surface-subtle hover:text-ink flex h-9 w-9 items-center justify-center rounded-xl transition-colors lg:hidden"
+          >
+            <X size={18} weight="bold" aria-hidden="true" />
+          </button>
         </div>
 
-        {/* Index */}
-        <nav className="thin-scroll flex-1 overflow-x-hidden overflow-y-auto py-5">
+        <nav className="thin-scroll flex-1 overflow-y-auto px-3 pb-3">
           {groups.map((group) => {
             const items = allowed.filter((item) => item.group === group);
             if (items.length === 0) return null;
 
             return (
-              <div key={group} className="mb-7">
-                <div className="mb-2 flex items-center gap-2 px-6">
-                  <span
-                    className={`bg-rule h-px w-3 shrink-0 transition-opacity duration-200 ${disclose}`}
-                    aria-hidden="true"
-                  />
-                  <p
-                    className={`text-ink-muted text-[10px] font-semibold tracking-[0.1em] whitespace-nowrap uppercase transition-opacity duration-200 ${disclose}`}
-                  >
-                    {groupLabels[group]}
-                  </p>
-                </div>
+              <div key={group} className="mb-5">
+                <p className="text-ink-subtle mb-2 px-3 text-[9.5px] font-semibold tracking-[0.13em] uppercase">
+                  {groupLabels[group]}
+                </p>
 
-                <ul>
+                <ul className="space-y-1">
                   {items.map((item) => {
                     const active = isActive(item.href);
+                    const IconComponent = item.icon;
 
                     return (
                       <li key={item.href}>
@@ -221,18 +216,28 @@ export function Sidebar({
                           onClick={onClose}
                           aria-current={active ? 'page' : undefined}
                           title={item.name}
-                          className={`relative mx-2.5 flex h-10 items-center gap-3 rounded-[var(--radius-control)] px-3 transition-colors duration-200 ${
+                          className={`group flex h-11 items-center gap-3 rounded-[14px] px-2.5 transition-colors duration-200 ${
                             active
-                              ? 'bg-pine-soft text-pine'
-                              : 'text-ink-muted hover:bg-surface-subtle hover:text-ink'
+                              ? 'bg-primary-soft text-primary'
+                              : 'text-ink-secondary hover:bg-surface-subtle hover:text-ink'
                           }`}
                         >
-                          <span className="shrink-0" aria-hidden="true">
-                            {item.icon}
+                          <span
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] transition-colors duration-200 ${
+                              active
+                                ? 'bg-primary text-white shadow-[0_5px_14px_rgba(101,80,181,0.22)]'
+                                : 'bg-surface-subtle text-ink-muted group-hover:bg-pine-soft group-hover:text-primary'
+                            }`}
+                            aria-hidden="true"
+                          >
+                            <IconComponent
+                              size={17}
+                              weight={active ? 'fill' : 'regular'}
+                            />
                           </span>
 
                           <span
-                            className={`truncate text-[13px] whitespace-nowrap transition-opacity duration-200 ${disclose} ${
+                            className={`min-w-0 flex-1 truncate text-[13px] ${
                               active ? 'font-semibold' : 'font-medium'
                             }`}
                           >
@@ -241,7 +246,7 @@ export function Sidebar({
 
                           {active ? (
                             <span
-                              className="bg-pine ml-auto h-1.5 w-1.5 shrink-0 rounded-full"
+                              className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
                               aria-hidden="true"
                             />
                           ) : null}
@@ -255,24 +260,35 @@ export function Sidebar({
           })}
         </nav>
 
-        {/* Footer — status readout, clipped when collapsed */}
-        <div className="border-rule shrink-0 overflow-hidden border-t px-6 py-4">
-          <div className="flex items-center gap-2.5">
-            <span
-              className="signal-dot bg-brass h-1.5 w-1.5 shrink-0"
-              aria-hidden="true"
-            />
-            <span
-              className={`text-ink-muted text-[10px] font-medium whitespace-nowrap transition-opacity duration-200 ${disclose}`}
-            >
-              System operational
-            </span>
+        <div className="shrink-0 px-3 pb-3">
+          <div className="bg-surface-subtle border-rule-soft rounded-[18px] border p-3.5">
+            <div className="flex items-center gap-2">
+              <span
+                className="bg-success h-2 w-2 shrink-0 rounded-full shadow-[0_0_0_3px_rgba(32,138,104,0.12)]"
+                aria-hidden="true"
+              />
+              <p className="text-ink-secondary text-[10.5px] font-semibold">
+                Systems operational
+              </p>
+            </div>
+
+            <div className="border-rule-soft mt-3 flex items-center gap-2.5 border-t pt-3">
+              <span
+                className="bg-primary-soft text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+                aria-hidden="true"
+              >
+                {initialsOf(session?.user?.name)}
+              </span>
+              <span className="min-w-0">
+                <span className="text-ink block truncate text-[11.5px] font-semibold">
+                  {session?.user?.name ?? 'Signed in'}
+                </span>
+                <span className="text-ink-muted mt-0.5 block truncate text-[9.5px] font-medium tracking-[0.04em] uppercase">
+                  {role.replaceAll('_', ' ')}
+                </span>
+              </span>
+            </div>
           </div>
-          <p
-            className={`text-ink-subtle mt-2 font-mono text-[10px] whitespace-nowrap uppercase transition-opacity duration-200 ${disclose}`}
-          >
-            v0.1.0 · {role}
-          </p>
         </div>
       </aside>
     </>

@@ -18,6 +18,7 @@ import {
 
 export interface DayBrief {
   procedures: number;
+  cancelled: number;
   bookedTheatres: number;
   freeTheatres: number;
   inUseTheatres: number;
@@ -190,10 +191,15 @@ export function ScheduleDayHeader({
           </div>
         </div>
 
-        <dl className="grid grid-cols-2 gap-x-5 gap-y-3 border-rule pt-3 sm:grid-cols-3 xl:grid-cols-5 xl:border-l xl:pt-0 xl:pl-6">
+        <dl className="border-rule grid grid-cols-3 gap-x-4 gap-y-3 pt-3 sm:gap-x-5 xl:grid-cols-5 xl:border-l xl:pt-0 xl:pl-6">
           <BriefMetric
             label="Procedures"
             value={`${brief.procedures}`}
+            note={
+              brief.cancelled > 0
+                ? `${brief.cancelled} cancelled`
+                : undefined
+            }
           />
           <BriefMetric
             label="Theatres"

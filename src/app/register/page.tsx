@@ -3,6 +3,13 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { AuthShell } from '@/components/auth/AuthShell';
+import {
+  authButtonClass,
+  authFieldClass,
+  authLabelClass,
+  authLinkClass,
+  authNoticeClass,
+} from '@/components/auth/auth-styles';
 
 type RegistrationResponse = {
   message?: string;
@@ -11,12 +18,6 @@ type RegistrationResponse = {
     message: string;
   }>;
 };
-
-const fieldClass =
-  'mt-2 w-full border border-rule bg-sheet px-3.5 py-3 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-subtle focus:border-pine disabled:cursor-not-allowed disabled:opacity-60';
-
-const labelClass =
-  'font-mono text-[8px] uppercase tracking-[0.22em] text-ink-muted';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -93,7 +94,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell
-      plate="Enrolment · Plate 02"
+      plate="Enrolment · 02"
       title={
         <>
           Request patient <em className="text-pine italic">access</em>.
@@ -104,7 +105,7 @@ export default function RegisterPage() {
       footer={
         <>
           Already registered?{' '}
-          <Link href="/login" className="link-draw text-ink">
+          <Link href="/login" className={authLinkClass}>
             Sign in
           </Link>
           . Staff accounts are issued by an administrator.
@@ -114,7 +115,7 @@ export default function RegisterPage() {
       {error ? (
         <p
           role="alert"
-          className="border-danger bg-danger-soft text-danger mb-5 border-l-2 px-3 py-2.5 text-[11px] leading-relaxed"
+          className={`${authNoticeClass} border-danger-border bg-danger-soft text-danger mb-5`}
         >
           {error}
         </p>
@@ -124,9 +125,9 @@ export default function RegisterPage() {
         <div
           role="status"
           aria-live="polite"
-          className="border-success bg-success-soft text-success border-l-2 px-3 py-3 text-[11px] leading-relaxed"
+          className={`${authNoticeClass} border-success/25 bg-success-soft text-success`}
         >
-          <p className="mb-1 font-mono text-[8px] tracking-[0.22em] uppercase">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.04em]">
             Registration received
           </p>
           {success}
@@ -136,7 +137,7 @@ export default function RegisterPage() {
       {!success ? (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className={labelClass}>
+            <label htmlFor="name" className={authLabelClass}>
               Full name
             </label>
             <input
@@ -149,12 +150,12 @@ export default function RegisterPage() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Enter your full name"
-              className={fieldClass}
+              className={authFieldClass}
             />
           </div>
 
           <div>
-            <label htmlFor="email" className={labelClass}>
+            <label htmlFor="email" className={authLabelClass}>
               Email address
             </label>
             <input
@@ -167,12 +168,12 @@ export default function RegisterPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className={fieldClass}
+              className={authFieldClass}
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className={labelClass}>
+            <label htmlFor="phone" className={authLabelClass}>
               Phone <span className="normal-case">(optional)</span>
             </label>
             <input
@@ -185,13 +186,13 @@ export default function RegisterPage() {
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               placeholder="Enter your phone number"
-              className={fieldClass}
+              className={authFieldClass}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="password" className={labelClass}>
+              <label htmlFor="password" className={authLabelClass}>
                 Password
               </label>
               <input
@@ -205,12 +206,12 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="12 characters minimum"
-                className={fieldClass}
+                className={authFieldClass}
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className={labelClass}>
+              <label htmlFor="confirmPassword" className={authLabelClass}>
                 Confirm
               </label>
               <input
@@ -224,7 +225,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Re-enter password"
-                className={fieldClass}
+                className={authFieldClass}
               />
             </div>
           </div>
@@ -232,15 +233,9 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-pine text-chalk hover:bg-pine-deep group mt-2 flex h-12 w-full items-center justify-between px-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className={`${authButtonClass} mt-2`}
           >
-            {loading ? 'Submitting…' : 'Request access'}
-            <span
-              className="transition-transform duration-300 group-hover:translate-x-1"
-              aria-hidden="true"
-            >
-              →
-            </span>
+            {loading ? 'Submitting request…' : 'Request access'}
           </button>
         </form>
       ) : null}

@@ -1,0 +1,61 @@
+TAP version 13
+# Subtest: the schedule loading boundary exposes an accessible busy state
+ok 1 - the schedule loading boundary exposes an accessible busy state
+  ---
+  duration_ms: 31.6078
+  ...
+# Subtest: the schedule error boundary offers retry and a safe exit
+ok 2 - the schedule error boundary offers retry and a safe exit
+  ---
+  duration_ms: 7.7302
+  ...
+# Subtest: half-open schedule ranges touch without overlapping
+ok 3 - half-open schedule ranges touch without overlapping
+  ---
+  duration_ms: 3.3801
+  ...
+# Subtest: theatre, surgeon and patient double-bookings are confirmed conflicts
+ok 4 - theatre, surgeon and patient double-bookings are confirmed conflicts
+  ---
+  duration_ms: 41.7177
+  ...
+# Subtest: staff and unreleased equipment double-allocations are reported
+ok 5 - staff and unreleased equipment double-allocations are reported
+  ---
+  duration_ms: 2.1736
+  ...
+# Subtest: released equipment is excluded from allocation conflicts
+ok 6 - released equipment is excluded from allocation conflicts
+  ---
+  duration_ms: 0.7075
+  ...
+# Subtest: cancelled and completed cases do not raise active allocation conflicts
+ok 7 - cancelled and completed cases do not raise active allocation conflicts
+  ---
+  duration_ms: 0.9617
+  ...
+# Subtest: unavailable theatres, inactive surgeons and unassigned staff are warnings
+ok 8 - unavailable theatres, inactive surgeons and unassigned staff are warnings
+  ---
+  duration_ms: 0.6519
+  ...
+# Subtest: the time axis fits the booked day and keeps an empty day full
+ok 9 - the time axis fits the booked day and keeps an empty day full
+  ---
+  duration_ms: 1.3709
+  ...
+# Subtest: invalid time ranges are confirmed data errors
+ok 10 - invalid time ranges are confirmed data errors
+  ---
+  duration_ms: 0.9824
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1738.76
+workspace_exit=0

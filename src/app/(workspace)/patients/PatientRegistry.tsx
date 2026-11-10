@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { MagnifyingGlass, UserPlus } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -37,6 +38,7 @@ interface Patient {
   phone?: string | null;
   dateOfBirth?: string | null;
   gender?: string | null;
+  medicalHistory?: string | null;
 }
 
 type PatientFormData = {
@@ -257,7 +259,7 @@ export function PatientRegistry() {
         ? new Date(patient.dateOfBirth).toISOString().slice(0, 10)
         : '',
       gender: patient.gender ?? '',
-      medicalHistory: '',
+      medicalHistory: patient.medicalHistory ?? '',
     });
   }
 
@@ -275,6 +277,7 @@ export function PatientRegistry() {
       phone: form.phone.trim() || null,
       dateOfBirth: form.dateOfBirth || null,
       gender: form.gender.trim() || null,
+      medicalHistory: form.medicalHistory.trim() || null,
     };
 
     try {
@@ -339,6 +342,7 @@ export function PatientRegistry() {
               setFormError('');
             }}
           >
+            <UserPlus size={15} weight="bold" aria-hidden="true" />
             Register patient
           </Button>
         ) : null}
@@ -370,7 +374,11 @@ export function PatientRegistry() {
               </label>
 
               <div className="well mt-2 flex items-center gap-2 px-2.5 py-1.5">
-                <span className="text-ink-subtle text-[13px]" aria-hidden="true">⌕</span>
+                <MagnifyingGlass
+                  size={14}
+                  className="text-ink-subtle shrink-0"
+                  aria-hidden="true"
+                />
                 <input
                   id="patient-search"
                   type="search"
@@ -585,23 +593,26 @@ export function PatientRegistry() {
                     />
                   </Field>
 
-                  {!editingPatient ? (
-                    <Field
+                  <Field
+                    id="patient-history"
+                    label="Medical history"
+                    className="sm:col-span-2"
+                  >
+                    <textarea
                       id="patient-history"
-                      label="Medical history"
-                      className="sm:col-span-2"
-                    >
-                      <textarea
-                        id="patient-history"
-                        rows={3}
-                        value={form.medicalHistory}
-                        onChange={(e) =>
-                          updateForm('medicalHistory', e.target.value)
-                        }
-                        className={INPUT}
-                      />
-                    </Field>
-                  ) : null}
+                      rows={3}
+                      value={form.medicalHistory}
+                      onChange={(e) =>
+                        updateForm('medicalHistory', e.target.value)
+                      }
+                      className={INPUT}
+                      placeholder={
+                        editingPatient
+                          ? 'Authorised clinical context held against this patient.'
+                          : undefined
+                      }
+                    />
+                  </Field>
                 </div>
 
                 <div className="border-rule-soft flex justify-end gap-2 border-t pt-4">

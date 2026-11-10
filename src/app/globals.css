@@ -4,118 +4,103 @@
 @source '../../src';
 
 /*======================================================================
-  MEDORCH — "CLINICAL INTELLIGENCE"
+  MEDORCH — LAVENDER THEATRE
   ======================================================================
-  Identity: a hospital operating system with the calm of a well-made
-  instrument and the warmth of a good clinic.
+  Identity: a calm, contemporary hospital operations product. Soft lavender
+  canvas, white working sheets, one violet working colour and a small family
+  of clinical status colours.
 
-  WHAT CHANGED FROM THE PREVIOUS PASS
-  -----------------------------------
-  The earlier foundation was geometrically austere: 0px panels, 2px controls,
-  no elevation, and mono type at 8-10px on every metadata line. Correct, but
-  it read as a terminal rather than as premium software. This pass keeps the
-  two-environment model and the semantic token contract (so no screen breaks)
-  while rebuilding the *material*:
+  The semantic token contract is unchanged, so every existing screen inherits
+  the new visual language without rewriting its behaviour. Controls are
+  rounded, panels float on violet-tinted shadows, and mono type is reserved
+  for genuinely technical values (codes, timestamps, quantities).
 
-    - panels are rounded and float on a soft shadow instead of sitting as
-      hairlines on paper
-    - controls have real radius, real padding and a hover lift
-    - the working colour is surgical teal, not near-black pine
-    - metadata is set at readable sizes; mono is now reserved for genuinely
-      technical values (codes, timestamps, quantities) instead of all labels
-    - headings get a real size ladder (display / section / card / body / meta)
-
-  ONE CLINICAL ENVIRONMENT
-  ------------------------
-  Every authenticated role reads the same semantic tokens. The approved
-  clinical palette is the single source of truth: paper ground, white working
-  surface, blue-grey recesses, clinical blue for primary action and restrained
-  teal for active state. Nothing in `src` needs a per-route colour override.
-
-  The shell applies `data-workspace="clinical"` explicitly so the environment
-  is declared at the boundary. Public landing, authentication and unauthorized
-  pages keep their own intentionally different visual language.
+  ONE PRODUCT ENVIRONMENT
+  -----------------------
+  Authenticated and public surfaces read the same palette. The app shell
+  declares `data-workspace="lavender"`; the landing page and auth front desk
+  share the same tokens and illustration language.
 ====================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* — Approved clinical palette ------------------------------------- */
+  /* — Lavender clinical palette ------------------------------------- */
   /* — Canvas & surfaces -------------------------------------------- */
-  --paper: #f5f8fb; /* clinical canvas */
-  --paper-deep: #edf3f8; /* recessed bands, wells */
+  --paper: #f0ecfa; /* lavender canvas */
+  --paper-deep: #e8e1f7; /* recessed lavender bands */
   --sheet: #ffffff; /* working surface */
-  --sheet-raised: #f9fbfd;
+  --sheet-raised: #fbf9ff;
   --chalk: #ffffff;
-  --surface-subtle: #edf3f8;
-  --surface-muted: #e3eaf0;
-  --surface-inverse: #243447;
+  --surface-subtle: #f5f1fc;
+  --surface-muted: #ece5f8;
+  --surface-inverse: #34295c;
 
   /* — Type ---------------------------------------------------------- */
-  --ink: #243447;
-  --ink-secondary: #718096;
-  --ink-muted: #718096;
-  --ink-subtle: #8795a6; /* decorative metadata only */
+  --ink: #25213b;
+  --ink-secondary: #5f5878;
+  --ink-muted: #6b6483;
+  --ink-subtle: #8a829e; /* decorative metadata only */
 
   /* — Structure ----------------------------------------------------- */
-  --rule: #e3eaf0;
-  --rule-soft: #edf3f8;
-  --rule-strong: #cbd8e4;
-  --border-line: #e3eaf0;
-  --surface-border: #e3eaf0;
+  --rule: #e8e2f2;
+  --rule-soft: #f1ecf9;
+  --rule-strong: #d7cdea;
+  --border-line: #e8e2f2;
+  --surface-border: #e8e2f2;
 
-  /* — Primary: clinical blue ---------------------------------------- */
-  --pine: #245b8f;
-  --pine-deep: #1d4b76;
-  --pine-bright: #2e6ea6;
-  --pine-soft: #e7eff7;
-  --primary-active: #173e63;
+  /* — Primary: lavender violet -------------------------------------- */
+  --pine: #6550b5;
+  --pine-deep: #5541a1;
+  --pine-bright: #7b67ce;
+  --pine-soft: #e7e0f8;
+  --primary-active: #463687;
   --primary-ink: #ffffff;
 
-  /* — Critical red, used only for harm ------------------------------ */
-  --vermilion: #c74646;
-  --vermilion-deep: #a93a3a;
-  --vermilion-soft: #fbeaea;
+  /* — Critical rose, used only for harm ----------------------------- */
+  --vermilion: #c53a5d;
+  --vermilion-deep: #a82f4e;
+  --vermilion-soft: #fce9ee;
 
-  /* — Clinical teal: the active/working colour ---------------------- */
-  --brass: #168c91;
-  --brass-soft: #e2f2f3;
+  /* — Secondary violet: the accent/working colour ------------------- */
+  --brass: #7c67c7;
+  --brass-soft: #efeafb;
 
   /* — Secondary ------------------------------------------------------ */
-  --secondary: #11757a;
-  --secondary-hover: #0d6165;
-  --secondary-active: #0a5054;
+  --secondary: #6e5abf;
+  --secondary-hover: #5d49ab;
+  --secondary-active: #4e3c94;
 
   /* — Semantic ------------------------------------------------------- */
-  --success: #24845d;
-  --success-soft: #e6f3ee;
-  --warning: #b7791f;
-  --warning-soft: #fbf1e0;
-  --danger: #c74646;
-  --danger-soft: #fbeaea;
-  --danger-border: #e9b8b8;
-  --info: #168c91;
-  --info-soft: #e2f2f3;
+  --success: #208a68;
+  --success-soft: #e8f6f1;
+  --warning: #a66c18;
+  --warning-soft: #fbf1de;
+  --danger: #c53a5d;
+  --danger-soft: #fce9ee;
+  --danger-border: #f0c3cf;
+  --info: #6b57be;
+  --info-soft: #eee9fb;
 
   /* — Inverted plates used by the public/auth boundary ---------------- */
-  --rail: #243447;
-  --rail-elevated: #2d4055;
-  --rail-line: #3d5065;
-  --rail-muted: #a9b7c6;
+  --rail: #3a2e5f;
+  --rail-elevated: #4a3b75;
+  --rail-line: #5a4a88;
+  --rail-muted: #cfc5e9;
 
-  /* — Elevation: cool navy shadow ------------------------------------ */
-  --shadow-xs: 0 1px 2px rgba(23, 50, 77, 0.06);
+  /* — Elevation: violet-tinted shadow -------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(66, 48, 112, 0.05);
   --shadow-sm:
-    0 1px 2px rgba(23, 50, 77, 0.05), 0 2px 8px rgba(23, 50, 77, 0.06);
+    0 1px 2px rgba(66, 48, 112, 0.04), 0 5px 16px rgba(66, 48, 112, 0.06);
   --shadow-md:
-    0 2px 6px rgba(23, 50, 77, 0.05), 0 10px 26px rgba(23, 50, 77, 0.09);
+    0 2px 6px rgba(66, 48, 112, 0.05), 0 14px 34px rgba(66, 48, 112, 0.1);
   --shadow-lg:
-    0 6px 14px rgba(23, 50, 77, 0.06), 0 24px 56px rgba(23, 50, 77, 0.14);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 8px 18px rgba(66, 48, 112, 0.07), 0 28px 64px rgba(66, 48, 112, 0.16);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 
   /* — Texture & apparatus -------------------------------------------- */
-  --grain-dot: rgba(36, 52, 71, 0.035);
-  --scroll-thumb: #c7d4e0;
+  --grain-dot: rgba(101, 80, 181, 0.04);
+  --scroll-thumb: #c9bbe4;
 
   /* Text set on an inverted plate (--surface-inverse). */
   --plate-ink: #ffffff;
@@ -124,7 +109,7 @@
 
   /* — Layout ---------------------------------------------------------- */
   --rail-closed: 4.25rem;
-  --rail-open: 15.5rem;
+  --rail-open: 16rem;
   --gutter: 1.5rem;
   --sheet-max: 104rem;
 
@@ -225,14 +210,14 @@
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
 
-  /* Real geometry. Panels are rounded and float; controls are rounded more,
-     because they are the things a hand lands on. */
-  --radius-control: 8px;
-  --radius-panel: 10px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Real geometry. Soft, generous lavender surfaces; controls remain crisp
+     enough for dense scheduling work. */
+  --radius-control: 11px;
+  --radius-panel: 18px;
+  --radius-sm: 8px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
 }
 
 /*======================================================================
@@ -252,6 +237,23 @@
 
   body {
     background-color: var(--paper);
+    background-image:
+      radial-gradient(
+        ellipse 46% 38% at 5% 3%,
+        rgba(141, 122, 208, 0.22),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 38% 32% at 98% 22%,
+        rgba(101, 80, 181, 0.13),
+        transparent 74%
+      ),
+      radial-gradient(
+        ellipse 58% 46% at 58% 108%,
+        rgba(232, 225, 247, 0.95),
+        transparent 76%
+      );
+    background-attachment: fixed;
     color: var(--ink);
     font-size: 15px;
     line-height: 1.55;
@@ -261,28 +263,51 @@
       'liga' 1,
       'ss01' 1;
     text-rendering: optimizeLegibility;
+    isolation: isolate;
   }
 
-  /* Paper grain: a barely-there printed texture, no imagery required. The
-     dot inverts with the environment so it stays a texture, not dust. */
+  /* Layered lavender geometry. Fixed, negative-stacked and pointer-inert so
+     it can never sit over a schedule, table cell or control. */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: -1;
     pointer-events: none;
-    opacity: 0.3;
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      var(--grain-dot) 1px,
-      transparent 0
-    );
-    background-size: 4px 4px;
+    background:
+      radial-gradient(
+        circle at 12% 16%,
+        transparent 0 12.4rem,
+        rgba(101, 80, 181, 0.055) 12.45rem 12.52rem,
+        transparent 12.58rem
+      ),
+      radial-gradient(
+        circle at 91% 76%,
+        transparent 0 19rem,
+        rgba(101, 80, 181, 0.045) 19.05rem 19.13rem,
+        transparent 19.2rem
+      );
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    z-index: -1;
+    top: -15rem;
+    right: -13rem;
+    width: 36rem;
+    height: 36rem;
+    pointer-events: none;
+    border: 1px solid rgba(101, 80, 181, 0.08);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 5.5rem rgba(141, 122, 208, 0.035),
+      0 0 0 11rem rgba(141, 122, 208, 0.022);
   }
 
   ::selection {
-    background: #087e8b;
-    color: #ffffff;
+    background: var(--pine-soft);
+    color: var(--ink);
   }
 
   h1,
@@ -291,12 +316,12 @@
   h4 {
     font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-    letter-spacing: -0.022em;
+    letter-spacing: -0.026em;
     line-height: 1.15;
   }
 
-  /* Focus: a printed square aperture, never a glow. Follows the working
-     colour, so it reaches 6:1+ on graphite as well as paper. */
+  /* Focus: a crisp violet ring with a clean offset, visible on lavender and
+     white surfaces. */
   :focus-visible {
     outline: 2px solid var(--pine);
     outline-offset: 2px;
@@ -333,12 +358,14 @@
   color: var(--ink-secondary);
 }
 
-/* Display serif, set tight and large. */
+/* Display face, set tight and large. Headings balance across lines rather
+   than leaving an orphan on the last row. */
 .display {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+  letter-spacing: -0.032em;
+  line-height: 1.04;
+  text-wrap: balance;
 }
 
 /* No italic serif emphasis: the second clause of a title simply takes the
@@ -348,9 +375,7 @@
   color: var(--brass);
 }
 
-/* On a dark plate the blue accent all but disappears, so the italic resolves
-   to teal instead. These plates sit inside the clinical environment (the
-   sign-in frontispiece, inverted callouts). */
+/* Inverted plates use the same accent, lifted for contrast. */
 .bg-ink .display em,
 .bg-rail .display em {
   color: var(--brass);
@@ -359,24 +384,33 @@
 /* Section heading — the workhorse for module titles. */
 .section-title {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.1875rem;
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.022em;
+  line-height: 1.25;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
 }
 
 /* Supporting copy under a title. */
 .lede {
   font-size: 0.9375rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--ink-muted);
-  max-width: 62ch;
+  max-width: 66ch;
+  text-wrap: pretty;
 }
 
-/* Tabular figures for every number in the product. */
-.tnum {
+/* Tabular figures for every number in the product. Mono is always set on
+   the same fixed-width grid so times, IDs and counts line up in columns. */
+.tnum,
+.font-mono {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
+}
+
+::selection {
+  background: var(--pine-soft);
+  color: var(--ink);
 }
 
 /* Technical value: codes, serials, timestamps. The only place mono belongs. */
@@ -409,6 +443,14 @@
   overflow: hidden;
 }
 
+/* A tinted panel for patient-facing or summary surfaces. */
+.panel-lavender {
+  background: color-mix(in srgb, var(--sheet) 48%, var(--pine-soft));
+  border: 1px solid color-mix(in srgb, var(--pine) 14%, var(--rule));
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-sm);
+}
+
 /* Interactive surface — lifts on hover. */
 .panel-hover {
   transition:
@@ -419,7 +461,7 @@
 .panel-hover:hover {
   box-shadow: var(--shadow-md);
   border-color: color-mix(in srgb, var(--pine) 32%, var(--rule));
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 /* A tinted inset well for grouping inside a panel. */
@@ -442,6 +484,13 @@
 .control:focus-visible {
   border-color: var(--pine);
 }
+
+/* A control container (search shell, select, field) carries the same visible
+   focus signal even when the focused input has its own outline removed. */
+.control:focus-within {
+    border-color: var(--pine);
+    box-shadow: 0 0 0 3px rgba(101, 80, 181, 0.12);
+  }
 
 /* Blueprint grid, light and dark variants. */
 .blueprint {
@@ -618,9 +667,11 @@
   animation-delay: var(--reveal-delay, 0ms);
 }
 
-/* Page transition, applied per navigation in the shell. */
+/* Page transition, applied per navigation in the shell.
+   Opacity only: a persistent transform would create a containing block
+   and de-centre fixed dialogs such as the schedule form. */
 .page-enter {
-  animation: reveal-rise 0.45s var(--ease-out-quint) both;
+  animation: reveal-fade 0.4s var(--ease-out-quint) both;
 }
 
 /* Staggered entrance for lists / plates. */
@@ -767,7 +818,7 @@
 
   /* Elevation, one step above the product's softest panel */
   --shadow-xl:
-    0 10px 24px rgba(23, 50, 77, 0.08), 0 40px 80px rgba(23, 50, 77, 0.12);
+    0 10px 24px rgba(66, 48, 112, 0.08), 0 40px 80px rgba(66, 48, 112, 0.12);
 }
 
 @media (min-width: 48rem) {

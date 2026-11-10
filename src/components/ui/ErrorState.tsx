@@ -18,9 +18,9 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="border-danger-border bg-danger-soft rounded-[var(--radius-card)] border p-6 text-center"
+      className="border-danger-border bg-danger-soft rounded-[18px] border p-6 text-center"
     >
-      <div className="bg-danger text-foreground-inverse mx-auto flex h-10 w-10 items-center justify-center rounded-none">
+      <div className="bg-danger mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-white">
         <Warning size={20} weight="bold" aria-hidden="true" />
       </div>
       <h4 className="text-danger mt-3 text-sm font-semibold">{title}</h4>

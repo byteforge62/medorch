@@ -15,7 +15,7 @@ export function AccessPanel() {
       <div
         role="group"
         aria-label="Role scope"
-        className="flex flex-wrap gap-1.5 border-b border-[#D9E3EC] pb-4"
+        className="border-rule flex flex-wrap gap-1.5 border-b pb-4"
       >
         {roleScopes.map((item) => {
           const selected = item.role === role.role;
@@ -25,16 +25,16 @@ export function AccessPanel() {
               type="button"
               onClick={() => setRoleName(item.role)}
               aria-pressed={selected}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245B8F] sm:min-h-9 ${
+              className={`inline-flex min-h-11 items-center gap-2 rounded-[10px] border px-3 text-[12.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] sm:min-h-9 ${
                 selected
-                  ? 'border-[#245B8F] bg-[#245B8F] text-white'
-                  : 'border-[#D9E3EC] bg-white text-[#47586B] hover:border-[#B9CADB]'
+                  ? 'border-primary bg-primary text-white shadow-[0_4px_12px_rgba(101,80,181,0.18)]'
+                  : 'border-rule bg-surface-subtle text-ink-secondary hover:border-rule-strong hover:text-ink'
               }`}
             >
               {item.role}
               <span
                 className={`font-mono text-[10.5px] ${
-                  selected ? 'text-white/75' : 'text-[#718096]'
+                  selected ? 'text-white/75' : 'text-[var(--ink-muted)]'
                 }`}
               >
                 {item.count}
@@ -46,26 +46,26 @@ export function AccessPanel() {
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
         <div aria-live="polite">
-          <h3 className="text-[15px] font-semibold text-[#243447]">{role.role}</h3>
-          <p className="mt-1 max-w-[46ch] text-[13.5px] leading-[1.6] text-[#526478]">
+          <h3 className="text-[15px] font-semibold text-[var(--ink)]">{role.role}</h3>
+          <p className="mt-1 max-w-[46ch] text-[13.5px] leading-[1.6] text-[var(--ink-secondary)]">
             {role.summary}
           </p>
 
-          <h4 className="mt-5 text-[11.5px] font-medium text-[#718096]">Can</h4>
+          <h4 className="mt-5 text-[11.5px] font-medium text-[var(--ink-muted)]">Can</h4>
           <ul className="mt-1.5 space-y-1.5">
             {role.can.map((item) => (
-              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[#243447]">
-                <span className="mt-[8px] h-[5px] w-[5px] shrink-0 rounded-full bg-[#24845D]" aria-hidden="true" />
+              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[var(--ink)]">
+                <span className="mt-[8px] h-[5px] w-[5px] shrink-0 rounded-full bg-[var(--success)]" aria-hidden="true" />
                 {item}
               </li>
             ))}
           </ul>
 
-          <h4 className="mt-5 text-[11.5px] font-medium text-[#718096]">Cannot</h4>
+          <h4 className="mt-5 text-[11.5px] font-medium text-[var(--ink-muted)]">Cannot</h4>
           <ul className="mt-1.5 space-y-1.5">
             {role.cannot.map((item) => (
-              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[#526478]">
-                <span className="mt-[7px] h-[5px] w-[5px] shrink-0 rounded-[1px] bg-[#A7B5C4]" aria-hidden="true" />
+              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[var(--ink-secondary)]">
+                <span className="mt-[7px] h-[5px] w-[5px] shrink-0 rounded-[1px] bg-[var(--ink-subtle)]" aria-hidden="true" />
                 {item}
               </li>
             ))}
@@ -74,30 +74,30 @@ export function AccessPanel() {
 
         <div>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-[13.5px] font-semibold text-[#243447]">Sample audit extract</h3>
-            <p className="text-[11.5px] text-[#718096]">
+            <h3 className="text-[13.5px] font-semibold text-[var(--ink)]">Sample audit extract</h3>
+            <p className="text-[11.5px] text-[var(--ink-muted)]">
               {highlighted > 0
                 ? `Highlighting ${highlighted} action${highlighted === 1 ? '' : 's'} by ${role.role}`
                 : `No ${role.role.toLowerCase()}-attributed actions in this extract`}
             </p>
           </div>
 
-          <ul className="mt-2 border-t border-[#D9E3EC]">
+          <ul className="border-rule bg-sheet mt-2 overflow-hidden rounded-[14px] border">
             {auditSample.map((entry) => {
               const match = entry.role === role.role;
               return (
                 <li
                   key={`${entry.time}-${entry.action}`}
-                  className={`grid grid-cols-[62px_minmax(0,1fr)] gap-x-3 border-b border-[#E6EDF4] py-2 transition-colors ${
-                    match ? 'bg-[#F2F7FC]' : ''
+                  className={`border-rule-soft grid grid-cols-[62px_minmax(0,1fr)] gap-x-3 border-b px-3 py-2.5 transition-colors last:border-b-0 ${
+                    match ? 'bg-pine-soft/65' : 'bg-sheet'
                   }`}
                 >
-                  <span className="font-mono text-[10.5px] text-[#718096]">{entry.time}</span>
+                  <span className="font-mono text-[10.5px] text-[var(--ink-muted)]">{entry.time}</span>
                   <span className="min-w-0">
-                    <span className={`block text-[12.5px] leading-[1.4] ${match ? 'font-medium text-[#243447]' : 'text-[#526478]'}`}>
+                    <span className={`block text-[12.5px] leading-[1.4] ${match ? 'font-medium text-[var(--ink)]' : 'text-[var(--ink-secondary)]'}`}>
                       {entry.action}
                     </span>
-                    <span className="mt-0.5 block text-[11px] text-[#718096]">
+                    <span className="mt-0.5 block text-[11px] text-[var(--ink-muted)]">
                       {entry.actor} · {entry.role} · {entry.entity}
                     </span>
                   </span>
@@ -105,7 +105,7 @@ export function AccessPanel() {
               );
             })}
           </ul>
-          <p className="mt-2 text-[11px] leading-[1.5] text-[#718096]">
+          <p className="mt-2 text-[11px] leading-[1.5] text-[var(--ink-muted)]">
             Synthetic extract. In the application the trail is filterable by actor, action and
             date, and requires the audit permission.
           </p>

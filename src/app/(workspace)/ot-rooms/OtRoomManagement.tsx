@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
+import { Plus } from '@phosphor-icons/react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -304,7 +305,7 @@ export function OTRoomManagement() {
     AVAILABLE: 'bg-success',
     OCCUPIED: 'bg-primary',
     MAINTENANCE: 'bg-warning',
-    DISABLED: 'bg-[#94a3b1]',
+    DISABLED: 'bg-ink-subtle',
   };
 
   const statusSoft: Record<OTRoomStatus, string> = {
@@ -390,6 +391,7 @@ export function OTRoomManagement() {
 
         {isAdmin ? (
           <Button type="button" onClick={openCreateForm}>
+            <Plus size={15} weight="bold" aria-hidden="true" />
             Add operating theatre
           </Button>
         ) : null}

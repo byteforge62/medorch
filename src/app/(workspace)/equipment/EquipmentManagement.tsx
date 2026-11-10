@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
+import { Plus } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -324,6 +325,7 @@ export function EquipmentManagement() {
         actions={
           isAdmin ? (
             <Button type="button" onClick={openCreateForm}>
+              <Plus size={15} weight="bold" aria-hidden="true" />
               Add equipment
             </Button>
           ) : null
@@ -445,14 +447,14 @@ export function EquipmentManagement() {
       {error && (
         <div
           role="alert"
-          className="border border-[var(--color-danger-border)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]"
+          className="border-danger-border bg-danger-soft text-danger rounded-[14px] border px-4 py-3 text-sm"
         >
           {error}
         </div>
       )}
 
 
-      <div className="border-border bg-surface flex flex-col gap-2 border px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4">
+      <div className="border-rule bg-sheet flex flex-col gap-2 rounded-[15px] border px-4 py-2.5 shadow-xs sm:flex-row sm:items-center sm:gap-4">
         <label htmlFor="equipment-search" className="eyebrow shrink-0">
           Find item
         </label>
@@ -493,8 +495,8 @@ export function EquipmentManagement() {
           description="Try changing the search or status filter."
         />
       ) : (
-        <section className="border-border border">
-          <header className="border-border flex flex-wrap items-baseline justify-between gap-2 border-b px-4 py-2.5">
+        <section className="panel-flush">
+          <header className="border-rule bg-surface-subtle/60 flex flex-wrap items-baseline justify-between gap-2 border-b px-4 py-2.5">
             <h2 className="eyebrow">Inventory register</h2>
 
             <p className="text-foreground-muted font-mono text-[11px] tabular-nums">

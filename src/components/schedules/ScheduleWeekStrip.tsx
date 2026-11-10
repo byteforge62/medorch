@@ -23,7 +23,7 @@ export function ScheduleWeekStrip({
   const last = dates[dates.length - 1];
 
   return (
-    <section aria-label="Week at a glance" className="pb-5">
+    <section aria-label="Week at a glance" className="hidden pb-5 sm:block">
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.1em] uppercase">
           Week at a glance
@@ -82,8 +82,8 @@ export function ScheduleWeekStrip({
               </span>
               {today ? (
                 <span
-                  className={`bg-brass absolute right-1.5 bottom-1.5 h-1.5 w-1.5 rounded-full ${
-                    selected ? 'bg-primary' : ''
+                  className={`absolute bottom-1 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full ${
+                    selected ? 'bg-primary' : 'bg-brass'
                   }`}
                   title="Today"
                 />

@@ -2,17 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import { MagnifyingGlass, UserPlus } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { UserStatusBadge } from './UserStatusBadge';
-import { UserFilters } from './UserFilters';
 
 type UserRole = 'ADMIN' | 'DOCTOR' | 'OT_STAFF' | 'PATIENT';
-
 type UserStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'REJECTED';
 
 interface User {
@@ -53,28 +51,70 @@ const STATUS_OPTIONS: UserStatus[] = [
   'REJECTED',
 ];
 
-const inputClass =
-  'w-full border border-border-strong bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20   ';
+const ROLE_META: Record<
+  UserRole,
+  { label: string; scope: string; tone: string; dot: string }
+> = {
+  ADMIN: {
+    label: 'Administrator',
+    scope:
+      'Full operational record: accounts, schedules, theatres, equipment, departments, audit history and approvals.',
+    tone: 'bg-pine-soft text-pine',
+    dot: 'bg-pine',
+  },
+  DOCTOR: {
+    label: 'Doctor',
+    scope:
+      'Clinical schedules, the doctor directory, patient records, theatres and equipment. No account administration.',
+    tone: 'bg-info-soft text-info',
+    dot: 'bg-info',
+  },
+  OT_STAFF: {
+    label: 'Theatre staff',
+    scope:
+      'Assigned cases, theatre status and operating resources. No patient registry, schedule editing or account administration.',
+    tone: 'bg-warning-soft text-warning',
+    dot: 'bg-warning',
+  },
+  PATIENT: {
+    label: 'Patient',
+    scope:
+      'Own appointment record only. Operational schedules, patient directories and audit history are out of scope.',
+    tone: 'bg-vermilion-soft text-vermilion',
+    dot: 'bg-vermilion',
+  },
+};
+
+const INPUT =
+  'control mt-1.5 h-10 w-full px-3 text-[13px] text-ink outline-none placeholder:text-ink-subtle';
 
 function formatDate(value: string | null) {
-  if (!value) {
-    return '—';
-  }
+  if (!value) return 'Not recorded';
 
-  return new Date(value).toLocaleDateString();
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return 'Not recorded';
+
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
 }
 
 function formatRole(role: UserRole) {
-  switch (role) {
-    case 'ADMIN':
-      return 'Admin';
-    case 'DOCTOR':
-      return 'Doctor';
-    case 'OT_STAFF':
-      return 'OT Staff';
-    case 'PATIENT':
-      return 'Patient';
-  }
+  return ROLE_META[role].label;
+}
+
+function initials(name: string) {
+  return (
+    name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || '—'
+  );
 }
 
 export function UserList() {
@@ -85,6 +125,7 @@ export function UserList() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState<UserRole | 'ALL'>('ALL');
   const [status, setStatus] = useState<UserStatus | 'ALL'>('ALL');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -98,52 +139,40 @@ export function UserList() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
-
       const data = await apiClient.get<User[]>('/api/users');
-
       setUsers(data);
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        setError(err.message);
-      } else {
-        setError('Failed to load users.');
-      }
-    } finally {
-      setLoading(false);
+      setError(
+        err instanceof ApiClientError ? err.message : 'Failed to load users.',
+      );
+      throw err;
     }
   }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadUsers() {
+    async function load() {
       try {
         setLoading(true);
         setError(null);
-
         const data = await apiClient.get<User[]>('/api/users');
-
-        if (!cancelled) {
-          setUsers(data);
-        }
+        if (!cancelled) setUsers(data);
       } catch (err) {
         if (!cancelled) {
-          if (err instanceof ApiClientError) {
-            setError(err.message);
-          } else {
-            setError('Failed to load users.');
-          }
+          setError(
+            err instanceof ApiClientError
+              ? err.message
+              : 'Failed to load users.',
+          );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
-    loadUsers();
+    void load();
 
     return () => {
       cancelled = true;
@@ -151,21 +180,53 @@ export function UserList() {
   }, []);
 
   const filteredUsers = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const query = search.trim().toLowerCase();
 
-    return users.filter((user) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        user.name.toLowerCase().includes(normalizedSearch) ||
-        user.email.toLowerCase().includes(normalizedSearch);
+    return users
+      .filter((user) => {
+        const matchesSearch =
+          !query ||
+          user.name.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query) ||
+          (user.phone ?? '').toLowerCase().includes(query);
+        const matchesRole = role === 'ALL' || user.role === role;
+        const matchesStatus = status === 'ALL' || user.status === status;
 
-      const matchesRole = role === 'ALL' || user.role === role;
-
-      const matchesStatus = status === 'ALL' || user.status === status;
-
-      return matchesSearch && matchesRole && matchesStatus;
-    });
+        return matchesSearch && matchesRole && matchesStatus;
+      })
+      .sort((a, b) => {
+        const pendingDelta =
+          Number(b.status === 'PENDING') - Number(a.status === 'PENDING');
+        if (pendingDelta !== 0) return pendingDelta;
+        return a.name.localeCompare(b.name);
+      });
   }, [users, search, role, status]);
+
+  const selected =
+    filteredUsers.find((user) => user.id === selectedId) ??
+    filteredUsers[0] ??
+    null;
+
+  const counts = useMemo(
+    () => ({
+      total: users.length,
+      active: users.filter((user) => user.status === 'ACTIVE').length,
+      pending: users.filter((user) => user.status === 'PENDING').length,
+      restricted: users.filter(
+        (user) => user.status === 'SUSPENDED' || user.status === 'REJECTED',
+      ).length,
+    }),
+    [users],
+  );
+
+  const roleCounts = useMemo(
+    () =>
+      ROLE_OPTIONS.map((item) => ({
+        role: item,
+        count: users.filter((user) => user.role === item).length,
+      })),
+    [users],
+  );
 
   function updateCreateForm(field: keyof CreateUserForm, value: string) {
     setCreateForm((current) => ({ ...current, [field]: value }));
@@ -200,9 +261,10 @@ export function UserList() {
 
     setCreating(true);
     setCreateError(null);
+    setActionSuccess(null);
 
     try {
-      await apiClient.post<User>('/api/users', {
+      const created = await apiClient.post<User>('/api/users', {
         name,
         email,
         password: createForm.password,
@@ -211,27 +273,28 @@ export function UserList() {
         ...(createForm.status ? { status: createForm.status } : {}),
       });
 
-      setActionSuccess(`${name} was created successfully.`);
+      setActionSuccess(`${name} was created.`);
+      setSelectedId(created.id);
       setCreateForm(EMPTY_CREATE_FORM);
       setCreateOpen(false);
       await fetchUsers();
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        setCreateError(err.message);
-      } else {
-        setCreateError('Failed to create user.');
-      }
+      setCreateError(
+        err instanceof ApiClientError ? err.message : 'Failed to create user.',
+      );
     } finally {
       setCreating(false);
     }
   }
 
-  const handleApprove = async (user: User) => {
-    const confirmed = window.confirm(
-      `Approve patient ${user.name}? They will be able to sign in once their account becomes active.`,
-    );
-
-    if (!confirmed) return;
+  async function handleApprove(user: User) {
+    if (
+      !window.confirm(
+        `Approve ${user.name}? They will be able to sign in once the account becomes active.`,
+      )
+    ) {
+      return;
+    }
 
     setApprovingUserId(user.id);
     setActionError(null);
@@ -239,357 +302,564 @@ export function UserList() {
 
     try {
       await apiClient.post(`/api/users/${user.id}/approve`, {});
-
-      setActionSuccess(`${user.name} was approved successfully.`);
+      setActionSuccess(`${user.name} was approved.`);
       await fetchUsers();
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        setActionError(err.message);
-      } else {
-        setActionError('Failed to approve patient.');
-      }
+      setActionError(
+        err instanceof ApiClientError
+          ? err.message
+          : 'Failed to approve patient.',
+      );
     } finally {
       setApprovingUserId(null);
     }
-  };
+  }
+
+  if (loading) {
+    return <LoadingState message="Loading the access register…" />;
+  }
+
+  if (error && users.length === 0) {
+    return (
+      <ErrorState
+        title="The access register could not be loaded"
+        message={error}
+        onRetry={() => {
+          setLoading(true);
+          void fetchUsers().finally(() => setLoading(false));
+        }}
+      />
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <div>
-          <CardTitle>All accounts</CardTitle>
+    <main className="space-y-6">
+      <header className="border-rule border-b pb-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-primary inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase">
+              <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
+              Access & identity
+            </p>
+            <h1 className="display mt-3 text-[clamp(2rem,4vw,2.85rem)]">
+              Who can enter MedOrch
+            </h1>
+            <p className="lede mt-3 text-[14px]">
+              Every account, its role and its approval state. Access is granted
+              by role on the server; this register is the administrative record.
+            </p>
+          </div>
 
-          <p className="text-foreground-subtle mt-1 text-xs">
-            {filteredUsers.length} of {users.length} users
-          </p>
+          <Button
+            type="button"
+            onClick={() => {
+              setCreateOpen((current) => !current);
+              setCreateError(null);
+            }}
+          >
+            <UserPlus size={15} weight="bold" aria-hidden="true" />
+            {createOpen ? 'Close new account' : 'Create account'}
+          </Button>
         </div>
 
-        <Button
-          type="button"
-          onClick={() => {
-            setCreateOpen((current) => !current);
-            setCreateError(null);
-          }}
-        >
-          {createOpen ? 'Close form' : '+ Create user'}
-        </Button>
-      </CardHeader>
+        <div className="border-rule-soft mt-6 grid gap-5 border-t pt-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-center">
+          <dl className="grid grid-cols-2 gap-x-7 gap-y-3 sm:grid-cols-4">
+            {[
+              { term: 'Accounts', value: counts.total },
+              { term: 'Active', value: counts.active },
+              { term: 'Awaiting approval', value: counts.pending },
+              { term: 'Restricted', value: counts.restricted },
+            ].map((item) => (
+              <div key={item.term}>
+                <dt className="text-ink-muted text-[10.5px] font-medium">
+                  {item.term}
+                </dt>
+                <dd className="text-ink mt-1 font-mono text-[21px] leading-none tabular-nums">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
 
-      {createOpen && (
-        <form
-          onSubmit={handleCreateUser}
-          className="border-border mb-6 space-y-4 border p-4"
-        >
           <div>
-            <h3 className="text-foreground text-sm font-semibold">
-              Create user account
-            </h3>
-            <p className="text-foreground-subtle mt-1 text-xs">
-              Provision an account directly. Patient accounts created here
-              should still be verified and approved through the normal lifecycle
-              where required.
-            </p>
-          </div>
-
-          {createError && (
-            <p
-              role="alert"
-              className="border-danger/30 bg-danger/10 text-danger border p-3 text-sm"
-            >
-              {createError}
-            </p>
-          )}
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <label
-                htmlFor="create-user-name"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Full name *
-              </label>
-              <input
-                id="create-user-name"
-                required
-                minLength={2}
-                maxLength={100}
-                value={createForm.name}
-                onChange={(event) =>
-                  updateCreateForm('name', event.target.value)
-                }
-                className={inputClass}
-              />
+            <div className="bg-surface-muted flex h-2 overflow-hidden rounded-[2px]">
+              {roleCounts.map((entry) => (
+                <span
+                  key={entry.role}
+                  className={ROLE_META[entry.role].dot}
+                  style={{
+                    width: `${(entry.count / Math.max(1, users.length)) * 100}%`,
+                  }}
+                  title={`${formatRole(entry.role)}: ${entry.count}`}
+                />
+              ))}
             </div>
-
-            <div>
-              <label
-                htmlFor="create-user-email"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Email *
-              </label>
-              <input
-                id="create-user-email"
-                type="email"
-                required
-                maxLength={254}
-                value={createForm.email}
-                onChange={(event) =>
-                  updateCreateForm('email', event.target.value)
-                }
-                className={inputClass}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="create-user-password"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Temporary password *
-              </label>
-              <input
-                id="create-user-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={12}
-                maxLength={128}
-                value={createForm.password}
-                onChange={(event) =>
-                  updateCreateForm('password', event.target.value)
-                }
-                className={inputClass}
-              />
-              <p className="text-foreground-subtle mt-1 text-xs">
-                12–128 characters.
-              </p>
-            </div>
-
-            <div>
-              <label
-                htmlFor="create-user-phone"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Phone
-              </label>
-              <input
-                id="create-user-phone"
-                type="tel"
-                minLength={7}
-                maxLength={20}
-                value={createForm.phone}
-                onChange={(event) =>
-                  updateCreateForm('phone', event.target.value)
-                }
-                className={inputClass}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="create-user-role"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Role *
-              </label>
-              <select
-                id="create-user-role"
-                required
-                value={createForm.role}
-                onChange={(event) =>
-                  updateCreateForm('role', event.target.value)
-                }
-                className={inputClass}
-              >
-                <option value="">Select a role</option>
-                {ROLE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {formatRole(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="create-user-status"
-                className="text-foreground-muted mb-1.5 block text-xs font-medium"
-              >
-                Initial status
-              </label>
-              <select
-                id="create-user-status"
-                value={createForm.status}
-                onChange={(event) =>
-                  updateCreateForm('status', event.target.value)
-                }
-                className={inputClass}
-              >
-                <option value="">Default (server decides)</option>
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+            <div className="text-ink-subtle mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
+              {roleCounts.map((entry) => (
+                <span
+                  key={entry.role}
+                  className="inline-flex items-center gap-1"
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${ROLE_META[entry.role].dot}`}
+                    aria-hidden="true"
+                  />
+                  {entry.role} {entry.count}
+                </span>
+              ))}
             </div>
           </div>
+        </div>
+      </header>
 
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              disabled={creating}
-              onClick={() => {
-                setCreateOpen(false);
-                setCreateForm(EMPTY_CREATE_FORM);
-                setCreateError(null);
-              }}
-              className="border-border text-foreground-muted hover:bg-surface-muted border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-
-            <Button type="submit" disabled={creating}>
-              {creating ? 'Creating...' : 'Create user'}
-            </Button>
-          </div>
-        </form>
-      )}
-
-      <div className="mb-5">
-        <UserFilters
-          search={search}
-          role={role}
-          status={status}
-          onSearchChange={setSearch}
-          onRoleChange={setRole}
-          onStatusChange={setStatus}
-        />
-      </div>
-
-      {actionError && (
-        <p
-          role="alert"
-          className="border-danger/30 bg-danger/10 text-danger mb-4 border p-3 text-sm"
-        >
-          {actionError}
-        </p>
-      )}
-
-      {actionSuccess && (
+      {actionSuccess ? (
         <p
           role="status"
-          className="border-success/30 bg-success/10 text-success mb-4 border p-3 text-sm"
+          className="border-success/25 bg-success-soft text-success rounded-[var(--radius-control)] border px-4 py-2.5 text-[12.5px]"
         >
           {actionSuccess}
         </p>
-      )}
+      ) : null}
 
-      {loading ? (
-        <LoadingState message="Loading users..." />
-      ) : error ? (
-        <ErrorState message={error} onRetry={fetchUsers} />
-      ) : filteredUsers.length === 0 ? (
-        <EmptyState
-          title="No users found"
-          description={
-            users.length === 0
-              ? 'There are no users to display.'
-              : 'No users match the selected filters.'
-          }
-        />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-border border-b">
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  User
-                </th>
+      {actionError ? (
+        <p
+          role="alert"
+          className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border px-4 py-2.5 text-[12.5px]"
+        >
+          {actionError}
+        </p>
+      ) : null}
 
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
+      {createOpen ? (
+        <section
+          className="panel overflow-hidden"
+          aria-labelledby="create-account-title"
+        >
+          <div className="border-rule-soft bg-surface-subtle flex items-start justify-between gap-3 border-b px-5 py-3">
+            <div>
+              <p className="text-ink-subtle text-[10px] font-medium tracking-[0.08em] uppercase">
+                Provision account
+              </p>
+              <h2
+                id="create-account-title"
+                className="text-ink mt-0.5 text-[15px] font-semibold"
+              >
+                Create a MedOrch identity
+              </h2>
+            </div>
+            <p className="text-ink-muted max-w-[42ch] text-[11.5px] leading-relaxed">
+              Patient accounts still follow verification and approval. Staff
+              accounts are granted by role at creation.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreateUser} className="space-y-4 p-5">
+            {createError ? (
+              <p
+                role="alert"
+                className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border px-3 py-2 text-[12.5px]"
+              >
+                {createError}
+              </p>
+            ) : null}
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
+                  Full name <span className="text-danger">*</span>
+                </span>
+                <input
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  value={createForm.name}
+                  onChange={(event) =>
+                    updateCreateForm('name', event.target.value)
+                  }
+                  className={INPUT}
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
+                  Email <span className="text-danger">*</span>
+                </span>
+                <input
+                  type="email"
+                  required
+                  maxLength={254}
+                  value={createForm.email}
+                  onChange={(event) =>
+                    updateCreateForm('email', event.target.value)
+                  }
+                  className={INPUT}
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
+                  Temporary password <span className="text-danger">*</span>
+                </span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={12}
+                  maxLength={128}
+                  value={createForm.password}
+                  onChange={(event) =>
+                    updateCreateForm('password', event.target.value)
+                  }
+                  className={INPUT}
+                />
+                <span className="text-ink-subtle mt-1 block text-[10.5px]">
+                  12–128 characters.
+                </span>
+              </label>
+
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
                   Phone
-                </th>
+                </span>
+                <input
+                  type="tel"
+                  minLength={7}
+                  maxLength={20}
+                  value={createForm.phone}
+                  onChange={(event) =>
+                    updateCreateForm('phone', event.target.value)
+                  }
+                  className={INPUT}
+                />
+              </label>
 
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  Role
-                </th>
-
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  Status
-                </th>
-
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  Approved
-                </th>
-
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  Created
-                </th>
-
-                <th className="text-foreground-subtle px-3 py-3 font-medium">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-border border-b last:border-0"
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
+                  Role <span className="text-danger">*</span>
+                </span>
+                <select
+                  required
+                  value={createForm.role}
+                  onChange={(event) =>
+                    updateCreateForm('role', event.target.value)
+                  }
+                  className={INPUT}
                 >
-                  <td className="px-3 py-4">
-                    <div className="text-foreground font-medium">
-                      {user.name}
-                    </div>
+                  <option value="">Select a role</option>
+                  {ROLE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {formatRole(option)}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-                    <div className="text-foreground-subtle mt-0.5 text-xs">
-                      {user.email}
-                    </div>
-                  </td>
+              <label className="block">
+                <span className="text-ink-secondary text-[12px] font-medium">
+                  Initial status
+                </span>
+                <select
+                  value={createForm.status}
+                  onChange={(event) =>
+                    updateCreateForm('status', event.target.value)
+                  }
+                  className={INPUT}
+                >
+                  <option value="">Server default</option>
+                  {STATUS_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-                  <td className="text-foreground-muted px-3 py-4">
-                    {user.phone || '—'}
-                  </td>
+            <div className="border-rule-soft flex justify-end gap-2 border-t pt-4">
+              <button
+                type="button"
+                disabled={creating}
+                onClick={() => {
+                  setCreateOpen(false);
+                  setCreateForm(EMPTY_CREATE_FORM);
+                  setCreateError(null);
+                }}
+                className="control text-ink-secondary hover:bg-surface-subtle h-9 px-3.5 text-[12.5px] font-semibold disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <Button type="submit" size="sm" isLoading={creating}>
+                Create account
+              </Button>
+            </div>
+          </form>
+        </section>
+      ) : null}
 
-                  <td className="text-foreground-muted px-3 py-4">
-                    {formatRole(user.role)}
-                  </td>
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(18rem,0.88fr)_minmax(0,1.25fr)]">
+        <section aria-label="Account roster" className="panel-flush">
+          <div className="border-rule-soft space-y-2.5 border-b p-4">
+            <label htmlFor="user-search" className="sr-only">
+              Search accounts
+            </label>
+            <div className="control flex h-10 items-center gap-2 px-3">
+              <MagnifyingGlass
+                size={14}
+                className="text-ink-subtle shrink-0"
+                aria-hidden="true"
+              />
+              <input
+                id="user-search"
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Name, email or phone"
+                className="text-ink placeholder:text-ink-subtle w-full min-w-0 border-0 bg-transparent text-[13px] outline-none"
+              />
+            </div>
 
-                  <td className="px-3 py-4">
-                    <UserStatusBadge status={user.status} />
-                  </td>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="sr-only">Role</span>
+                <select
+                  value={role}
+                  onChange={(event) =>
+                    setRole(event.target.value as UserRole | 'ALL')
+                  }
+                  className="control text-ink-secondary h-9 w-full px-2 text-[11.5px] outline-none"
+                >
+                  <option value="ALL">All roles</option>
+                  {ROLE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {formatRole(option)}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-                  <td className="text-foreground-muted px-3 py-4">
-                    {formatDate(user.approvedAt)}
-                  </td>
+              <label className="block">
+                <span className="sr-only">Status</span>
+                <select
+                  value={status}
+                  onChange={(event) =>
+                    setStatus(event.target.value as UserStatus | 'ALL')
+                  }
+                  className="control text-ink-secondary h-9 w-full px-2 text-[11.5px] outline-none"
+                >
+                  <option value="ALL">All statuses</option>
+                  {STATUS_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
 
-                  <td className="text-foreground-muted px-3 py-4">
-                    {formatDate(user.createdAt)}
-                  </td>
+          {filteredUsers.length === 0 ? (
+            <div className="p-4">
+              <EmptyState
+                title="No matching accounts"
+                description="Change the search, role or status filter."
+              />
+            </div>
+          ) : (
+            <ul className="divide-rule-soft max-h-[40rem] divide-y overflow-y-auto">
+              {filteredUsers.map((user) => {
+                const active = selected?.id === user.id;
+                const meta = ROLE_META[user.role];
 
-                  <td className="px-3 py-4">
-                    {user.role === 'PATIENT' && user.status === 'PENDING' && (
-                      <button
-                        type="button"
-                        onClick={() => handleApprove(user)}
-                        disabled={approvingUserId !== null}
-                        className="bg-primary text-foreground-inverse rounded-lg px-3 py-2 text-xs font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                return (
+                  <li key={user.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(user.id)}
+                      aria-pressed={active}
+                      className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors ${
+                        active ? 'bg-pine-soft' : 'hover:bg-surface-subtle'
+                      }`}
+                    >
+                      <span
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
+                          active
+                            ? 'bg-pine text-white'
+                            : 'bg-surface-muted text-ink-secondary'
+                        }`}
+                        aria-hidden="true"
                       >
-                        {approvingUserId === user.id
-                          ? 'Approving...'
-                          : 'Approve'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Card>
+                        {initials(user.name)}
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="text-ink truncate text-[13px] font-semibold">
+                            {user.name}
+                          </span>
+                          <span
+                            className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`}
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <span className="text-ink-muted mt-0.5 block truncate text-[11.5px]">
+                          {user.email}
+                        </span>
+                        <span className="mt-1 flex items-center gap-2">
+                          <span
+                            className={`rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold ${meta.tone}`}
+                          >
+                            {formatRole(user.role)}
+                          </span>
+                          <UserStatusBadge status={user.status} />
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <div className="border-rule-soft text-ink-subtle flex items-center justify-between border-t px-4 py-2.5 text-[10.5px]">
+            <span>
+              {filteredUsers.length} of {users.length} accounts
+            </span>
+            <span>Pending first</span>
+          </div>
+        </section>
+
+        {selected ? (
+          <article
+            className="panel overflow-hidden"
+            aria-labelledby="account-title"
+          >
+            <div className="border-rule-soft border-b px-5 py-4 sm:px-6">
+              <div className="flex items-start gap-4">
+                <span
+                  className="bg-pine flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white"
+                  aria-hidden="true"
+                >
+                  {initials(selected.name)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-ink-subtle text-[10px] font-medium tracking-[0.08em] uppercase">
+                        Account identity
+                      </p>
+                      <h2
+                        id="account-title"
+                        className="text-ink mt-0.5 truncate text-[19px] leading-tight font-semibold"
+                      >
+                        {selected.name}
+                      </h2>
+                    </div>
+                    <UserStatusBadge status={selected.status} />
+                  </div>
+                  <p className="text-ink-muted mt-1 text-[12.5px] break-all">
+                    {selected.email}
+                  </p>
+                  <p className="text-ink-subtle mt-1.5 font-mono text-[10.5px]">
+                    ID {selected.id.slice(0, 8)} · joined{' '}
+                    {formatDate(selected.createdAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-rule-soft bg-rule grid gap-px border-b sm:grid-cols-2">
+              <div className="bg-sheet px-5 py-4">
+                <p className="text-ink-subtle text-[10.5px] font-medium">
+                  Role and access
+                </p>
+                <span
+                  className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${ROLE_META[selected.role].tone}`}
+                >
+                  {formatRole(selected.role)}
+                </span>
+                <p className="text-ink-secondary mt-2 text-[12px] leading-relaxed">
+                  {ROLE_META[selected.role].scope}
+                </p>
+              </div>
+
+              <div className="bg-sheet px-5 py-4">
+                <p className="text-ink-subtle text-[10.5px] font-medium">
+                  Contact
+                </p>
+                <dl className="mt-2 space-y-2">
+                  <div>
+                    <dt className="text-ink-subtle text-[10.5px]">Phone</dt>
+                    <dd className="text-ink mt-0.5 text-[12.5px]">
+                      {selected.phone || 'Not recorded'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-subtle text-[10.5px]">
+                      Email verification / approval
+                    </dt>
+                    <dd className="text-ink mt-0.5 text-[12.5px]">
+                      {selected.approvedAt
+                        ? `Approved ${formatDate(selected.approvedAt)}`
+                        : 'Not yet approved'}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <div className="px-5 py-4 sm:px-6">
+              <h3 className="text-ink text-[13px] font-semibold">
+                Approval and record state
+              </h3>
+
+              {selected.role === 'PATIENT' && selected.status === 'PENDING' ? (
+                <div className="border-warning/25 bg-warning-soft mt-3 rounded-[var(--radius-control)] border px-4 py-3">
+                  <p className="text-ink text-[12.5px] font-semibold">
+                    Approval required
+                  </p>
+                  <p className="text-ink-secondary mt-1 text-[11.5px] leading-relaxed">
+                    This patient has registered but cannot reach their
+                    appointment record until an administrator approves the
+                    account.
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="mt-3"
+                    disabled={approvingUserId !== null}
+                    isLoading={approvingUserId === selected.id}
+                    onClick={() => void handleApprove(selected)}
+                  >
+                    Approve patient account
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-rule-soft mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+                  <p className="text-ink-muted text-[12px]">
+                    {selected.status === 'ACTIVE'
+                      ? 'Account is active and can sign in.'
+                      : selected.status === 'PENDING'
+                        ? 'Account is waiting on a lifecycle step.'
+                        : selected.status === 'SUSPENDED'
+                          ? 'Account is suspended and outside the active access set.'
+                          : 'Account was rejected and has no active access.'}
+                  </p>
+                  <span className="text-ink-subtle font-mono text-[10.5px]">
+                    Updated {formatDate(selected.updatedAt)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </article>
+        ) : (
+          <section className="panel p-6">
+            <EmptyState
+              title="No account selected"
+              description="Choose an identity from the roster to inspect its access grant."
+            />
+          </section>
+        )}
+      </div>
+    </main>
   );
 }

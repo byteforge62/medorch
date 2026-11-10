@@ -1,0 +1,26 @@
+{
+  "count": 10,
+  "statuses": {
+    "CANCELLED": 1,
+    "COMPLETED": 4,
+    "CONFIRMED": 1,
+    "IN_PROGRESS": 1,
+    "DELAYED": 1,
+    "SCHEDULED": 2
+  },
+  "fixtures": [],
+  "seededToday": [
+    {
+      "procedure": "Appendectomy",
+      "status": "CONFIRMED",
+      "start": "2026-11-06T09:00:00.000Z",
+      "end": "2026-11-06T10:30:00.000Z"
+    },
+    {
+      "procedure": "Fracture Fixation",
+      "status": "IN_PROGRESS",
+      "start": "2026-11-06T13:00:00.000Z",
+      "end": "2026-11-06T15:00:00.000Z"
+    }
+  ]
+}
