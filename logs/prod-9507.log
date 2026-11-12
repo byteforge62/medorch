@@ -1,9 +1,0 @@
-
-> medorch@0.1.0 start
-> next start -p 9507
-
-▲ Next.js 16.3.6
-- Local:         http://localhost:9507
-- Network:       http://192.168.1.106:9507
-✓ Ready in 888ms
-✓ Running next.config.ts took 113ms
