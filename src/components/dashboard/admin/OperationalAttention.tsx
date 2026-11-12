@@ -9,7 +9,6 @@ import {
   Panel,
   PanelEmpty,
   PanelError,
-  PanelHeader,
 } from './DashboardPrimitives';
 import { formatClock, formatDay, formatTimeRange } from './format';
 import type {
@@ -185,25 +184,31 @@ export function OperationalAttention({
   const hasCritical = items.some((item) => item.tone === 'critical');
 
   return (
-    <Panel labelledBy="operational-attention">
-      <PanelHeader
-        id="operational-attention"
-        title="Operational attention"
-        caption="Unresolved conditions that can affect the theatre day. Each item opens its source record."
-        aside={
-          <div className="flex items-center gap-2">
-            <CountTag tone={hasCritical ? 'critical' : items.length ? 'warning' : 'positive'}>
-              {items.length ? `${items.length} open` : 'Clear'}
-            </CountTag>
-            <Link
-              href="/alerts"
-              className="text-ink-muted hover:text-primary hidden text-[11px] font-semibold sm:inline"
-            >
-              Alert register
-            </Link>
-          </div>
-        }
-      />
+    <Panel labelledBy="operational-attention" tone="warning">
+      <div className="dashboard-panel-header flex flex-wrap items-center justify-between gap-2 border-b border-rule-soft px-4 py-2.5 sm:px-5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <h2 id="operational-attention" className="text-ink text-[13px] leading-tight font-semibold">
+            Operational attention
+          </h2>
+          <CountTag tone={hasCritical ? 'critical' : items.length ? 'warning' : 'positive'}>
+            {items.length ? `${items.length} open` : 'Clear'}
+          </CountTag>
+          <span className="text-ink-muted hidden text-[10.5px] xl:inline">
+            Unresolved conditions that can affect the theatre day.
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-ink-subtle hidden font-mono text-[9px] sm:inline">
+            REVIEW {formatClock(now)}
+          </span>
+          <Link
+            href="/alerts"
+            className="text-ink-muted hover:text-primary text-[10.5px] font-semibold"
+          >
+            Alert register →
+          </Link>
+        </div>
+      </div>
 
       {unavailable.length ? (
         <div
@@ -236,7 +241,7 @@ export function OperationalAttention({
       ) : items.length === 0 ? (
         <PanelError message="No usable operational feed was available, so no urgency conclusion can be drawn." />
       ) : (
-        <ul className="bg-rule-soft grid gap-px sm:grid-cols-2">
+        <ul className="bg-rule-soft grid grid-cols-2 gap-px lg:grid-cols-4">
           {items.map((item) => {
             const tone = toneStyles[item.tone];
 
@@ -244,20 +249,20 @@ export function OperationalAttention({
               <li key={item.id} className="bg-sheet min-w-0">
                 <Link
                   href={item.href}
-                  className="group hover:bg-surface-subtle relative flex h-full items-start gap-3 px-4 py-3.5 transition-colors sm:px-5"
+                  className="group hover:bg-surface-subtle relative flex h-full items-start gap-2 px-3.5 py-2.5 transition-colors sm:px-4"
                 >
                   <span
                     className={`${tone.rail} absolute top-0 bottom-0 left-0 w-[3px]`}
                     aria-hidden="true"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className={`${tone.label} text-[10px] font-semibold tracking-[0.08em] uppercase`}>
+                    <p className={`${tone.label} text-[9px] font-semibold tracking-[0.08em] uppercase`}>
                       {item.source}
                     </p>
-                    <p className="text-ink mt-1 text-[12.5px] leading-snug font-semibold">
+                    <p className="text-ink mt-0.5 line-clamp-2 text-[11.5px] leading-snug font-semibold">
                       {item.title}
                     </p>
-                    <p className="text-ink-muted mt-0.5 line-clamp-2 text-[11px] leading-relaxed">
+                    <p className="text-ink-muted mt-0.5 line-clamp-1 hidden text-[10px] leading-relaxed lg:block">
                       {item.detail}
                     </p>
                   </div>
@@ -274,11 +279,7 @@ export function OperationalAttention({
         </ul>
       )}
 
-      {items.length > 0 ? (
-        <p className="border-rule-soft text-ink-subtle border-t px-4 py-2 text-[10.5px] sm:px-5">
-          Review time {formatClock(now)} · warnings remain visible until the source record changes.
-        </p>
-      ) : null}
+
     </Panel>
   );
 }

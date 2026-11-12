@@ -1,115 +1,182 @@
-'use client';
+import { Check, Minus } from '@phosphor-icons/react/dist/ssr';
 
-import { useState } from 'react';
-import { auditSample, roleScopes } from './clinical-data';
+import { roleScopes } from './clinical-data';
+
+type AccessCell = {
+  label: string;
+  allowed: boolean;
+};
+
+const rows: Array<{
+  area: string;
+  note: string;
+  cells: [AccessCell, AccessCell, AccessCell, AccessCell];
+}> = [
+  {
+    area: 'Schedules',
+    note: 'Create, edit, status and notes',
+    cells: [
+      { label: 'Manage', allowed: true },
+      { label: 'Manage', allowed: true },
+      { label: 'Assigned', allowed: true },
+      { label: 'Own', allowed: true },
+    ],
+  },
+  {
+    area: 'Theatres',
+    note: 'Room state and availability',
+    cells: [
+      { label: 'Manage', allowed: true },
+      { label: 'Read', allowed: true },
+      { label: 'Read', allowed: true },
+      { label: 'None', allowed: false },
+    ],
+  },
+  {
+    area: 'Patients',
+    note: 'Registry and clinical detail',
+    cells: [
+      { label: 'Manage', allowed: true },
+      { label: 'Clinical', allowed: true },
+      { label: 'None', allowed: false },
+      { label: 'Own visits', allowed: true },
+    ],
+  },
+  {
+    area: 'Resources',
+    note: 'Staff and equipment assignment',
+    cells: [
+      { label: 'Assign', allowed: true },
+      { label: 'Read', allowed: true },
+      { label: 'Read', allowed: true },
+      { label: 'None', allowed: false },
+    ],
+  },
+  {
+    area: 'Accounts',
+    note: 'Approval, roles and status',
+    cells: [
+      { label: 'Manage', allowed: true },
+      { label: 'None', allowed: false },
+      { label: 'None', allowed: false },
+      { label: 'None', allowed: false },
+    ],
+  },
+  {
+    area: 'Audit',
+    note: 'Attributed change history',
+    cells: [
+      { label: 'Read', allowed: true },
+      { label: 'None', allowed: false },
+      { label: 'None', allowed: false },
+      { label: 'None', allowed: false },
+    ],
+  },
+];
+
+const roles = ['Administrator', 'Doctor', 'OT staff', 'Patient'];
 
 export function AccessPanel() {
-  const [roleName, setRoleName] = useState<(typeof roleScopes)[number]['role']>(
-    roleScopes[0].role,
-  );
-  const role = roleScopes.find((item) => item.role === roleName) ?? roleScopes[0];
-  const highlighted = auditSample.filter((entry) => entry.role === role.role).length;
-
   return (
     <div>
-      <div
-        role="group"
-        aria-label="Role scope"
-        className="border-rule flex flex-wrap gap-1.5 border-b pb-4"
-      >
-        {roleScopes.map((item) => {
-          const selected = item.role === role.role;
-          return (
-            <button
-              key={item.role}
-              type="button"
-              onClick={() => setRoleName(item.role)}
-              aria-pressed={selected}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-[10px] border px-3 text-[12.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] sm:min-h-9 ${
-                selected
-                  ? 'border-primary bg-primary text-white shadow-[0_4px_12px_rgba(101,80,181,0.18)]'
-                  : 'border-rule bg-surface-subtle text-ink-secondary hover:border-rule-strong hover:text-ink'
-              }`}
-            >
-              {item.role}
-              <span
-                className={`font-mono text-[10.5px] ${
-                  selected ? 'text-white/75' : 'text-[var(--ink-muted)]'
-                }`}
-              >
-                {item.count}
+      {/* On a narrow screen a four-column matrix hides three of the four
+          roles. The same permission data is presented as role records. */}
+      <div className="grid gap-2 md:hidden">
+        {roleScopes.map((role) => (
+          <article
+            key={role.role}
+            className="rounded-[14px] border border-[#E4DCF0] bg-white/82 p-3.5"
+          >
+            <div className="flex items-baseline justify-between gap-3 border-b border-[#EFEAF7] pb-2">
+              <h3 className="text-[12px] font-semibold text-[#28233D]">{role.role}</h3>
+              <span className="font-mono text-[8.5px] tracking-[0.06em] text-[#8A829E]">
+                {role.count} permissions
               </span>
-            </button>
-          );
-        })}
+            </div>
+            <p className="mt-2 text-[10px] leading-[1.55] text-[#77718F]">{role.summary}</p>
+            <ul className="mt-2 grid gap-1.5">
+              {role.can.map((permission) => (
+                <li key={permission} className="flex items-start gap-1.5 text-[10px] leading-[1.45] text-[#4E4768]">
+                  <Check size={10} weight="bold" className="mt-0.5 shrink-0 text-[#7055BE]" aria-hidden="true" />
+                  {permission}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
       </div>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
-        <div aria-live="polite">
-          <h3 className="text-[15px] font-semibold text-[var(--ink)]">{role.role}</h3>
-          <p className="mt-1 max-w-[46ch] text-[13.5px] leading-[1.6] text-[var(--ink-secondary)]">
-            {role.summary}
-          </p>
-
-          <h4 className="mt-5 text-[11.5px] font-medium text-[var(--ink-muted)]">Can</h4>
-          <ul className="mt-1.5 space-y-1.5">
-            {role.can.map((item) => (
-              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[var(--ink)]">
-                <span className="mt-[8px] h-[5px] w-[5px] shrink-0 rounded-full bg-[var(--success)]" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <h4 className="mt-5 text-[11.5px] font-medium text-[var(--ink-muted)]">Cannot</h4>
-          <ul className="mt-1.5 space-y-1.5">
-            {role.cannot.map((item) => (
-              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.5] text-[var(--ink-secondary)]">
-                <span className="mt-[7px] h-[5px] w-[5px] shrink-0 rounded-[1px] bg-[var(--ink-subtle)]" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-[13.5px] font-semibold text-[var(--ink)]">Sample audit extract</h3>
-            <p className="text-[11.5px] text-[var(--ink-muted)]">
-              {highlighted > 0
-                ? `Highlighting ${highlighted} action${highlighted === 1 ? '' : 's'} by ${role.role}`
-                : `No ${role.role.toLowerCase()}-attributed actions in this extract`}
-            </p>
-          </div>
-
-          <ul className="border-rule bg-sheet mt-2 overflow-hidden rounded-[14px] border">
-            {auditSample.map((entry) => {
-              const match = entry.role === role.role;
-              return (
-                <li
-                  key={`${entry.time}-${entry.action}`}
-                  className={`border-rule-soft grid grid-cols-[62px_minmax(0,1fr)] gap-x-3 border-b px-3 py-2.5 transition-colors last:border-b-0 ${
-                    match ? 'bg-pine-soft/65' : 'bg-sheet'
-                  }`}
+      <div className="hidden overflow-x-auto pb-2 md:block">
+        <table className="w-full min-w-[620px] border-separate border-spacing-0 text-left">
+          <caption className="sr-only">
+            Server-enforced access by role. The counts are the number of
+            permissions held by each role.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" className="w-[190px] border-b border-[#DCD2EC] pb-3 pr-4 align-bottom">
+                <span className="text-[9px] font-semibold tracking-[0.12em] text-[#8A829E] uppercase">
+                  Operational area
+                </span>
+              </th>
+              {roles.map((role, index) => (
+                <th
+                  key={role}
+                  scope="col"
+                  className="border-b border-[#DCD2EC] px-2 pb-3 text-center align-bottom"
                 >
-                  <span className="font-mono text-[10.5px] text-[var(--ink-muted)]">{entry.time}</span>
-                  <span className="min-w-0">
-                    <span className={`block text-[12.5px] leading-[1.4] ${match ? 'font-medium text-[var(--ink)]' : 'text-[var(--ink-secondary)]'}`}>
-                      {entry.action}
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-[var(--ink-muted)]">
-                      {entry.actor} · {entry.role} · {entry.entity}
-                    </span>
+                  <span className="block text-[11.5px] font-semibold text-[#28233D]">{role}</span>
+                  <span className="mt-0.5 block font-mono text-[8.5px] tracking-[0.06em] text-[#8A829E]">
+                    {roleScopes[index].count} permissions
                   </span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-2 text-[11px] leading-[1.5] text-[var(--ink-muted)]">
-            Synthetic extract. In the application the trail is filterable by actor, action and
-            date, and requires the audit permission.
-          </p>
-        </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.area} className="group">
+                <th scope="row" className="border-b border-[#EEE8F7] py-3 pr-4 align-top">
+                  <span className="block text-[12px] font-semibold text-[#28233D]">{row.area}</span>
+                  <span className="mt-0.5 block text-[9.5px] leading-[1.4] text-[#8A829E]">
+                    {row.note}
+                  </span>
+                </th>
+                {row.cells.map((cell, index) => (
+                  <td
+                    key={`${row.area}-${roles[index]}`}
+                    className="border-b border-[#EEE8F7] px-2 py-3 text-center align-top"
+                  >
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9.5px] font-medium ${
+                        cell.allowed
+                          ? 'bg-[#EEE8F9] text-[#5F4BA8]'
+                          : 'bg-[#F6F3FA] text-[#A39BB4]'
+                      }`}
+                    >
+                      {cell.allowed ? (
+                        <Check size={9} weight="bold" aria-hidden="true" />
+                      ) : (
+                        <Minus size={9} weight="bold" aria-hidden="true" />
+                      )}
+                      {cell.label}
+                    </span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3 border-t border-[#E7DFF2] pt-3 sm:mt-4">
+        <p className="max-w-[62ch] text-[10.5px] leading-[1.6] text-[#77718F]">
+          Access is checked in the server for every request. A hidden control is
+          not a security boundary; the API is.
+        </p>
+        <p className="font-mono text-[8.5px] tracking-[0.12em] text-[#A39BB4] uppercase">
+          Source · permission matrix
+        </p>
       </div>
     </div>
   );

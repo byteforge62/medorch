@@ -29,6 +29,8 @@ const EVIDENCE = path.join(OUT, 'evidence');
 const PROFILE = path.join(ROOT, '.tmp-visual-upgrade-profile');
 const PORT = 9231;
 const BASE = process.env.APP_BASE_URL || 'http://localhost:3000';
+const ONLY_ROLE = process.env.ONLY_ROLE;
+const ONLY_ROUTE = process.env.ONLY_ROUTE;
 
 const CHROME =
   process.env.CHROME_PATH ||
@@ -444,6 +446,32 @@ async function main() {
       const file = path.join(SHOTS, `${role}-${label}-${viewport.width}.png`);
       await capture(cdp, sessionId, file);
 
+      if (process.env.FULL_PAGE && viewport.width === 1440) {
+        const metrics = await cdp.send('Page.getLayoutMetrics', {}, sessionId);
+        await cdp.send(
+          'Emulation.setDeviceMetricsOverride',
+          {
+            width: viewport.width,
+            height: Math.ceil(metrics.cssContentSize.height),
+            deviceScaleFactor: 1,
+            mobile: false,
+          },
+          sessionId,
+        );
+        await delay(500);
+        await capture(cdp, sessionId, file.replace('.png', '-full.png'));
+        await cdp.send(
+          'Emulation.setDeviceMetricsOverride',
+          {
+            width: viewport.width,
+            height: viewport.height,
+            deviceScaleFactor: 1,
+            mobile: false,
+          },
+          sessionId,
+        );
+      }
+
       audit.push({
         role,
         route,
@@ -458,28 +486,34 @@ async function main() {
     }
 
     // Public surfaces first (signed out).
-    for (const viewport of VIEWPORTS) {
-      await cdp.send(
-        'Emulation.setDeviceMetricsOverride',
-        {
-          width: viewport.width,
-          height: viewport.height,
-          deviceScaleFactor: 1,
-          mobile: viewport.mobile,
-        },
-        sessionId,
-      );
-      for (const [label, route] of PUBLIC_ROUTES) {
-        await visit('public', label, route, viewport);
+    if (!ONLY_ROLE) {
+      for (const viewport of VIEWPORTS) {
+        await cdp.send(
+          'Emulation.setDeviceMetricsOverride',
+          {
+            width: viewport.width,
+            height: viewport.height,
+            deviceScaleFactor: 1,
+            mobile: viewport.mobile,
+          },
+          sessionId,
+        );
+        for (const [label, route] of PUBLIC_ROUTES) {
+          await visit('public', label, route, viewport);
+        }
       }
     }
 
     for (const [role, config] of Object.entries(process.env.ONLY_PUBLIC ? {} : ROLES)) {
+      if (ONLY_ROLE && role !== ONLY_ROLE) continue;
+
       const session = await login(cdp, sessionId, config);
       console.log(`Signed in ${role}: ${session.email} (${session.role})`);
 
+      const routes = config.routes.filter(([label]) => !ONLY_ROUTE || label === ONLY_ROUTE);
+
       for (const viewport of VIEWPORTS) {
-        for (const [label, route] of config.routes) {
+        for (const [label, route] of routes) {
           await visit(role, label, route, viewport);
         }
       }

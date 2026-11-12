@@ -36,7 +36,7 @@ export function OperationalActivityFeed({
   onRetry: () => void;
 }) {
   return (
-    <Panel labelledBy="operational-activity">
+    <Panel labelledBy="operational-activity" tone="neutral">
       <PanelHeader
         id="operational-activity"
         title="Operational activity"

@@ -47,7 +47,7 @@ export function AlertDecisionQueue({
   const warning = unread.filter((alert) => alert.severity === 'WARNING').length;
 
   return (
-    <Panel labelledBy="alert-queue" className="flex h-full flex-col">
+    <Panel labelledBy="alert-queue" className="flex h-full flex-col" tone="warning">
       <PanelHeader
         id="alert-queue"
         title="Alerts needing review"

@@ -103,7 +103,7 @@ export function ScheduleConflictPanel({
   return (
     <section
       aria-labelledby="schedule-conflicts-heading"
-      className="border-rule bg-surface overflow-hidden rounded-[var(--radius-panel)] border"
+      className="border-rule bg-surface overflow-hidden border"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">

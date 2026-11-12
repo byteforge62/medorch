@@ -1,40 +1,24 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono, Sora } from 'next/font/google';
+import { IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
-import { SessionProvider } from '@/providers/SessionProvider';
 
 /*======================================================================
-  Typography — three faces, three jobs.
+  Typography — one clinical interface face.
   ======================================================================
-    Sora            structure. Page titles, section titles and the large
-                    operational figures. Geometric, modern, never editorial.
+    IBM Plex Sans   the whole product: page titles, headings, navigation,
+                    labels, body copy, forms, tables, controls and numeric
+                    values. Its humanist, technical character suits clinical
+                    software and stays readable at data-dense sizes.
 
-    Inter           the interface. Navigation, labels, body copy, forms,
-                    buttons, table content. Optimised for scanning.
-
-    JetBrains Mono  machine values only — patient and equipment codes,
-                    timestamps, durations, serial numbers. Never body copy,
-                    never a whole label row.
+  Machine codes use the operating system's monospace stack, so a code is
+  still visibly different from a sentence without adding a second family.
 ====================================================================== */
 
-const sora = Sora({
+const plex = IBM_Plex_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-sora',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
-  variable: '--font-mono-jet',
+  display: 'optional',
+  variable: '--font-plex',
 });
 
 export const metadata: Metadata = {
@@ -45,6 +29,10 @@ export const metadata: Metadata = {
   description:
     'MedOrch is the orchestration layer for the operating theatre: schedules, rooms, clinical teams, equipment and patients in one controlled record.',
   applicationName: 'MedOrch',
+  icons: {
+    icon: [{ url: '/brand/medorch-favicon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/brand/medorch-favicon.svg'],
+  },
 };
 
 export default function RootLayout({
@@ -55,11 +43,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={plex.variable}
       data-scroll-behavior="smooth"
     >
       <body className="bg-paper text-ink font-sans antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        {children}
       </body>
     </html>
   );

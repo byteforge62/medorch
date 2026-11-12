@@ -322,7 +322,7 @@ export function PatientRegistry() {
             Clinical operations
           </p>
 
-          <h1 className="text-ink mt-2 font-[family-name:var(--font-sora)] text-[clamp(1.9rem,3.4vw,2.6rem)] leading-[1.05] tracking-[-0.02em]">
+          <h1 className="text-ink mt-2 font-[family-name:var(--font-display)] text-[clamp(1.9rem,3.4vw,2.6rem)] leading-[1.05] tracking-[-0.02em]">
             Patient index
           </h1>
 
@@ -489,7 +489,7 @@ export function PatientRegistry() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-ink font-[family-name:var(--font-sora)] text-xl leading-tight">
+                    <h2 className="text-ink font-[family-name:var(--font-display)] text-xl leading-tight">
                       {editingPatient ? 'Edit record' : 'Register patient'}
                     </h2>
                     <p className="text-ink-muted mt-1 text-[12px]">
@@ -637,7 +637,7 @@ export function PatientRegistry() {
                     </span>
 
                     <div className="min-w-0">
-                      <h2 className="text-ink truncate font-[family-name:var(--font-sora)] text-[1.35rem] leading-tight">
+                      <h2 className="text-ink truncate font-[family-name:var(--font-display)] text-[1.35rem] leading-tight">
                         {selected.name}
                       </h2>
                       <p className="text-ink-muted mt-1 text-[12px]">
@@ -660,7 +660,7 @@ export function PatientRegistry() {
                       <p className="text-ink-subtle text-[10px] font-semibold tracking-[0.09em] uppercase">
                         {cell.label}
                       </p>
-                      <p className="text-ink mt-1 flex items-baseline gap-1 font-[family-name:var(--font-sora)] text-[15px] font-semibold">
+                      <p className="text-ink mt-1 flex items-baseline gap-1 font-[family-name:var(--font-display)] text-[15px] font-semibold">
                         {cell.value}
                         {cell.unit ? (
                           <span className="text-ink-subtle text-[10px] font-normal">{cell.unit}</span>

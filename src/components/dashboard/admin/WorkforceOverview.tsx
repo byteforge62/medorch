@@ -127,7 +127,7 @@ export function WorkforceOverview({
   const hasBaseError = Boolean(usersError && doctorsError);
 
   return (
-    <Panel labelledBy="clinical-workforce">
+    <Panel labelledBy="clinical-workforce" tone="success">
       <PanelHeader
         id="clinical-workforce"
         title="Clinical workforce"

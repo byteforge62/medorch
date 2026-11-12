@@ -107,7 +107,7 @@ export function EquipmentReadiness({
   }, [details, equipment, filter, now, schedules]);
 
   return (
-    <Panel labelledBy="equipment-readiness">
+    <Panel labelledBy="equipment-readiness" tone="warning">
       <PanelHeader
         id="equipment-readiness"
         title="Equipment readiness"

@@ -1,22 +1,19 @@
 'use client';
 
 import React, { useSyncExternalStore } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import {
-  CaretRight,
-  Clock,
-  List,
-  SignOut,
-} from '@phosphor-icons/react';
+import { CaretRight, Clock, List, SignOut } from '@phosphor-icons/react';
 import { AlertCenter } from '@/components/alerts/AlertCenter';
+import { BrandMark, Wordmark } from '@/components/brand/Brand';
 import { PRIMARY_NAVIGATION_ID } from './Sidebar';
 
 /*======================================================================
   Breadcrumb labels
   ======================================================================
-  Record identifiers are operational data, not navigation copy. The command
-  bar names the record type instead of printing a UUID into the page frame.
+  Record identifiers are operational data, not navigation copy. The
+  command line names the record type instead of printing a UUID.
 ====================================================================== */
 
 const ROUTE_LABELS: Record<string, string> = {
@@ -60,7 +57,7 @@ function breadcrumbLabel(segment: string, index: number, segments: string[]) {
 }
 
 /*======================================================================
-  LiveClock — the instrument's own timebase.
+  LiveClock — the desk timebase.
 ====================================================================== */
 
 const clockStore = {
@@ -89,7 +86,7 @@ function LiveClock() {
 
   return (
     <span
-      className="text-ink-secondary bg-surface-subtle border-rule-soft hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10.5px] font-medium md:inline-flex"
+      className="text-ink-secondary hidden items-center gap-1.5 text-[10.5px] font-medium md:inline-flex"
       aria-label="Local theatre time"
     >
       <Clock size={12} weight="duotone" aria-hidden="true" />
@@ -99,11 +96,10 @@ function LiveClock() {
 }
 
 /*======================================================================
-  Command bar
+  Command line
   ======================================================================
-  A white capsule floating at the top of the lavender working sheet. The
-  breadcrumb says where you are; the right side holds the live timebase,
-  alert register and the signed-in identity.
+  A paper rail, not another floating card. It holds orientation on the left
+  and the day's instruments on the right: time, alert register and identity.
 ====================================================================== */
 
 export function Header({
@@ -119,15 +115,7 @@ export function Header({
   const { data: session } = useSession();
   const user = userOverride ?? session?.user;
   const pathname = usePathname() || '/';
-
   const segments = pathname.split('/').filter(Boolean);
-
-  const roleTone: Record<string, string> = {
-    ADMIN: 'bg-primary-soft text-primary',
-    DOCTOR: 'bg-info-soft text-info',
-    OT_STAFF: 'bg-success-soft text-success',
-    PATIENT: 'bg-warning-soft text-warning',
-  };
 
   const initials = (user?.name || 'User')
     .split(' ')
@@ -139,37 +127,43 @@ export function Header({
   return (
     <header
       data-app-header
-      className="sticky top-0 z-30 px-3 pt-3 sm:px-5 lg:px-6 lg:pr-8"
+      className="border-rule/90 bg-paper/95 sticky top-0 z-30 border-b"
     >
-      <div className="bg-sheet/92 border-rule flex h-[4.35rem] items-center justify-between gap-3 rounded-[20px] border px-3 shadow-[0_8px_28px_rgba(66,48,112,0.07)] backdrop-blur-xl sm:px-4">
+      <div className="mx-auto flex h-[4.45rem] max-w-[96rem] items-center justify-between gap-3 px-3 sm:px-5 lg:px-8">
         <div className="flex min-w-0 items-center gap-2.5">
           <button
             onClick={onToggleSidebar}
-            className="text-ink-secondary bg-surface-subtle hover:bg-pine-soft hover:text-primary flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[13px] transition-colors lg:hidden"
-            aria-label={
-              sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'
-            }
+            className="border-rule text-ink-secondary hover:border-rule-strong hover:bg-sheet flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-[7px] border transition-colors lg:hidden"
+            aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={sidebarOpen}
             aria-controls={PRIMARY_NAVIGATION_ID}
           >
-            <List size={19} weight="bold" aria-hidden="true" />
+            <List size={18} weight="bold" aria-hidden="true" />
           </button>
 
+          <Link
+            href="/dashboard"
+            aria-label="MedOrch dashboard"
+            className="inline-flex shrink-0 items-center sm:hidden lg:hidden"
+          >
+            <BrandMark className="h-8 w-8" />
+          </Link>
+          <span className="hidden shrink-0 sm:block lg:hidden">
+            <Wordmark size="sm" />
+          </span>
+
           <nav aria-label="Breadcrumb" className="min-w-0">
-            <ol className="flex min-w-0 items-center gap-1.5 text-[12.5px]">
+            <ol className="flex min-w-0 items-center gap-1.5 text-[12px]">
               {segments.length === 0 ? (
                 <li className="text-ink font-semibold">MedOrch</li>
               ) : (
                 segments.map((segment, index) => {
                   const isLast = index === segments.length - 1;
                   return (
-                    <li
-                      key={`${segment}-${index}`}
-                      className="flex min-w-0 items-center gap-1.5"
-                    >
+                    <li key={`${segment}-${index}`} className="flex min-w-0 items-center gap-1.5">
                       {index > 0 ? (
                         <CaretRight
-                          size={10}
+                          size={9}
                           weight="bold"
                           className="text-ink-subtle shrink-0"
                           aria-hidden="true"
@@ -177,9 +171,7 @@ export function Header({
                       ) : null}
                       <span
                         className={`truncate ${
-                          isLast
-                            ? 'text-ink font-semibold'
-                            : 'text-ink-muted font-medium'
+                          isLast ? 'text-ink font-semibold' : 'text-ink-muted font-medium'
                         }`}
                         aria-current={isLast ? 'page' : undefined}
                       >
@@ -193,42 +185,34 @@ export function Header({
           </nav>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+        <div className="flex shrink-0 items-center gap-3">
           <LiveClock />
-
           <AlertCenter />
 
           {user ? (
             <>
-              <span
-                className="bg-rule hidden h-6 w-px sm:block"
-                aria-hidden="true"
-              />
+              <span className="bg-rule hidden h-5 w-px sm:block" aria-hidden="true" />
 
-              <div className="border-rule-soft bg-surface-subtle flex items-center gap-1 rounded-full border py-1 pr-1 pl-1">
+              <div className="flex items-center gap-2">
                 <span
-                  className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ring-2 ring-white"
+                  className="bg-rail flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold text-white/90"
                   aria-hidden="true"
                 >
                   {initials}
                 </span>
 
-                <div className="hidden min-w-0 pl-1 xl:block">
-                  <p className="text-ink max-w-[150px] truncate text-[11.5px] leading-tight font-semibold">
+                <div className="hidden min-w-0 xl:block">
+                  <p className="text-ink max-w-[140px] truncate text-[11px] leading-tight font-semibold">
                     {user.name || 'User'}
                   </p>
-                  <p
-                    className={`mt-0.5 inline-flex rounded-full px-1.5 py-px text-[8.5px] font-bold tracking-[0.05em] ${
-                      roleTone[user.role || ''] || 'text-ink-muted'
-                    }`}
-                  >
+                  <p className="text-ink-muted mt-0.5 truncate text-[9px] leading-tight">
                     {user.role?.replaceAll('_', ' ')}
                   </p>
                 </div>
 
                 <button
                   onClick={() => signOut({ callbackUrl: '/login' })}
-                  className="text-ink-muted hover:bg-sheet hover:text-ink flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
+                  className="text-ink-muted hover:bg-sheet hover:text-ink flex h-8 w-8 cursor-pointer items-center justify-center rounded-[7px] transition-colors"
                   title="Sign out"
                   aria-label="Sign out"
                 >

@@ -1,19 +1,39 @@
 import React from 'react';
 import { Warning } from '@phosphor-icons/react';
 
+const panelTones = {
+  primary: { accent: 'var(--primary)', tint: 'color-mix(in srgb, var(--primary) 7%, transparent)' },
+  success: { accent: 'var(--success)', tint: 'color-mix(in srgb, var(--success) 6%, transparent)' },
+  warning: { accent: 'var(--warning)', tint: 'color-mix(in srgb, var(--warning) 7%, transparent)' },
+  danger: { accent: 'var(--danger)', tint: 'color-mix(in srgb, var(--danger) 6%, transparent)' },
+  neutral: { accent: 'var(--ink-subtle)', tint: 'color-mix(in srgb, var(--ink-subtle) 5%, transparent)' },
+} as const;
+
+export type PanelTone = keyof typeof panelTones;
+
 export function Panel({
   children,
   className = '',
   labelledBy,
+  tone = 'primary',
 }: {
   children: React.ReactNode;
   className?: string;
   labelledBy?: string;
+  tone?: PanelTone;
 }) {
+  const colors = panelTones[tone];
+
   return (
     <section
       aria-labelledby={labelledBy}
-      className={`bg-sheet border-rule overflow-hidden rounded-[var(--radius-panel)] border shadow-sm ${className}`}
+      style={
+        {
+          '--panel-accent': colors.accent,
+          '--panel-tint': colors.tint,
+        } as React.CSSProperties
+      }
+      className={`dashboard-panel bg-sheet border-rule overflow-hidden rounded-[18px] border ${className}`}
     >
       {children}
     </section>
@@ -32,14 +52,20 @@ export function PanelHeader({
   aside?: React.ReactNode;
 }) {
   return (
-    <header className="border-rule-soft flex flex-wrap items-start justify-between gap-3 border-b px-4 py-3.5 sm:px-5">
-      <div className="min-w-0">
-        <h2 id={id} className="text-ink text-[14px] leading-tight font-semibold">
-          {title}
-        </h2>
-        {caption ? (
-          <p className="text-ink-muted mt-1 text-[11.5px] leading-snug">{caption}</p>
-        ) : null}
+    <header className="border-rule-soft dashboard-panel-header flex flex-wrap items-start justify-between gap-3 border-b px-4 py-3.5 sm:px-5">
+      <div className="flex min-w-0 items-start gap-2.5">
+        <span
+          aria-hidden="true"
+          className="bg-[var(--panel-accent)] mt-0.5 h-5 w-[3px] shrink-0 rounded-full"
+        />
+        <div className="min-w-0">
+          <h2 id={id} className="text-ink text-[14.5px] leading-tight font-semibold tracking-[-0.01em]">
+            {title}
+          </h2>
+          {caption ? (
+            <p className="text-ink-muted mt-1 text-[11.5px] leading-snug">{caption}</p>
+          ) : null}
+        </div>
       </div>
       {aside ? <div className="shrink-0">{aside}</div> : null}
     </header>

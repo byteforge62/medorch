@@ -39,3 +39,30 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+
+# Generated design-system evidence
+/docs/design-system/**/screenshots/
+/docs/design-system/**/evidence/
+
+# Runtime files
+/logs/
+*.log
+*.pid
+
+# Local agent data
+/.agents/
+/.kilo/
+/.freebuff/
+/.cloud-attachments/
+
+# Build caches
+*.tsbuildinfo
+
+# Local design exploration and generated reports
+/docs/design-system/dashboard-redesign/
+/docs/design-system/landing-performance/
+/docs/design-system/landing-redesign/
+/docs/design-system/product-reconstruction/
+/docs/design-system/unified-identity/

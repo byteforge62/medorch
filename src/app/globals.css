@@ -27,34 +27,34 @@
 
   /* — Lavender clinical palette ------------------------------------- */
   /* — Canvas & surfaces -------------------------------------------- */
-  --paper: #f0ecfa; /* lavender canvas */
-  --paper-deep: #e8e1f7; /* recessed lavender bands */
+  --paper: #f4f0fb; /* lavender canvas */
+  --paper-deep: #eae3f7; /* recessed lavender bands */
   --sheet: #ffffff; /* working surface */
-  --sheet-raised: #fbf9ff;
+  --sheet-raised: #fcfaff;
   --chalk: #ffffff;
-  --surface-subtle: #f5f1fc;
-  --surface-muted: #ece5f8;
-  --surface-inverse: #34295c;
+  --surface-subtle: #f7f3fc;
+  --surface-muted: #ede6f8;
+  --surface-inverse: #29243d;
 
   /* — Type ---------------------------------------------------------- */
-  --ink: #25213b;
-  --ink-secondary: #5f5878;
-  --ink-muted: #6b6483;
-  --ink-subtle: #8a829e; /* decorative metadata only */
+  --ink: #29243d;
+  --ink-secondary: #58516f;
+  --ink-muted: #625a7a;
+  --ink-subtle: #6b6484; /* muted metadata; meets 4.5:1 on paper and sheet */
 
   /* — Structure ----------------------------------------------------- */
-  --rule: #e8e2f2;
-  --rule-soft: #f1ecf9;
-  --rule-strong: #d7cdea;
-  --border-line: #e8e2f2;
-  --surface-border: #e8e2f2;
+  --rule: #e4dcf0;
+  --rule-soft: #f0eaf8;
+  --rule-strong: #d3c7e7;
+  --border-line: #e4dcf0;
+  --surface-border: #e4dcf0;
 
   /* — Primary: lavender violet -------------------------------------- */
-  --pine: #6550b5;
-  --pine-deep: #5541a1;
-  --pine-bright: #7b67ce;
-  --pine-soft: #e7e0f8;
-  --primary-active: #463687;
+  --pine: #7055be;
+  --pine-deep: #5c43a8;
+  --pine-bright: #8875d6;
+  --pine-soft: #eae3f8;
+  --primary-active: #4a378c;
   --primary-ink: #ffffff;
 
   /* — Critical rose, used only for harm ----------------------------- */
@@ -63,39 +63,60 @@
   --vermilion-soft: #fce9ee;
 
   /* — Secondary violet: the accent/working colour ------------------- */
-  --brass: #7c67c7;
-  --brass-soft: #efeafb;
+  --brass: #7358b9;
+  --brass-soft: #eee8fa;
 
   /* — Secondary ------------------------------------------------------ */
-  --secondary: #6e5abf;
-  --secondary-hover: #5d49ab;
-  --secondary-active: #4e3c94;
+  --secondary: #7055be;
+  --secondary-hover: #5c43a8;
+  --secondary-active: #4a378c;
 
   /* — Semantic ------------------------------------------------------- */
-  --success: #208a68;
-  --success-soft: #e8f6f1;
-  --warning: #a66c18;
-  --warning-soft: #fbf1de;
-  --danger: #c53a5d;
-  --danger-soft: #fce9ee;
-  --danger-border: #f0c3cf;
-  --info: #6b57be;
+  --success: #157052;
+  --success-soft: #e7f5f0;
+  --warning: #8a5a12;
+  --warning-soft: #faf0dd;
+  --danger: #bf3858;
+  --danger-soft: #fbe8ed;
+  --danger-border: #eebfcc;
+  --info: #6854b5;
   --info-soft: #eee9fb;
 
-  /* — Inverted plates used by the public/auth boundary ---------------- */
-  --rail: #3a2e5f;
-  --rail-elevated: #4a3b75;
-  --rail-line: #5a4a88;
-  --rail-muted: #cfc5e9;
+  /* — Original MedOrch brand ---------------------------------------- */
+  --brand-mark: #7055be;
+  --brand-mark-soft: #e7e0f7;
+  --brand-mark-lavender: #c9b9f0;
+  --brand-mark-deep: #4a378c;
+  --brand-mark-secondary: #9280d0;
+  --brand-mark-accent: #d9cdf1;
+  --brand-mark-ink: #f7f3ff;
+
+  /* — Bright signal inks for dark plates ---------------------------- */
+  --success-bright: #8fd9c0;
+  --danger-bright: #f5b3c2;
+
+  /* — Shared instrument sizes --------------------------------------- */
+  --icon-xs: 0.75rem;
+  --icon-sm: 1rem;
+  --icon-md: 1.25rem;
+  --icon-lg: 1.5rem;
+  --icon-nav: 1.0625rem;
+  --control-height: 2.5rem;
+  --nav-item-height: 2.5rem;
+  --dialog-width: 42rem;
+  --pattern-grid: 4rem;
+
+  /* — Inverted plates used by the rails and dark theatre spreads ----- */
+  --rail: #29243d;
+  --rail-elevated: #352e4e;
+  --rail-line: #47405f;
+  --rail-muted: #b8aed0;
 
   /* — Elevation: violet-tinted shadow -------------------------------- */
-  --shadow-xs: 0 1px 2px rgba(66, 48, 112, 0.05);
-  --shadow-sm:
-    0 1px 2px rgba(66, 48, 112, 0.04), 0 5px 16px rgba(66, 48, 112, 0.06);
-  --shadow-md:
-    0 2px 6px rgba(66, 48, 112, 0.05), 0 14px 34px rgba(66, 48, 112, 0.1);
-  --shadow-lg:
-    0 8px 18px rgba(66, 48, 112, 0.07), 0 28px 64px rgba(66, 48, 112, 0.16);
+  --shadow-xs: 0 1px 1px rgba(41, 36, 61, 0.03);
+  --shadow-sm: 0 1px 2px rgba(41, 36, 61, 0.04);
+  --shadow-md: 0 8px 24px rgba(41, 36, 61, 0.07);
+  --shadow-lg: 0 20px 52px rgba(41, 36, 61, 0.1);
   --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 
   /* — Texture & apparatus -------------------------------------------- */
@@ -113,6 +134,23 @@
   --gutter: 1.5rem;
   --sheet-max: 104rem;
 
+  /* — Type weights --------------------------------------------------- */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* — Navigation / controls / dialogs -------------------------------- */
+  --nav-active-bg: rgba(255, 255, 255, 0.09);
+  --nav-hover-bg: rgba(255, 255, 255, 0.055);
+  --nav-indicator: var(--brand-mark-lavender);
+  --rail-overlay: rgba(33, 28, 51, 0.62);
+  --button-height-sm: 2.25rem;
+  --button-height-md: 2.5rem;
+  --input-height: 2.5rem;
+  --dialog-radius: 1rem;
+  --dialog-shadow: var(--shadow-lg);
+
   /* — Motion ---------------------------------------------------------- */
   --ease-out-quint: cubic-bezier(0.22, 0.75, 0.2, 1);
   --ease-in-out-soft: cubic-bezier(0.4, 0.1, 0.2, 1);
@@ -125,9 +163,9 @@
 ====================================================================== */
 
 @theme inline {
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-jet), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* New names */
   --color-paper: var(--paper);
@@ -142,6 +180,14 @@
   --color-rule: var(--rule);
   --color-rule-soft: var(--rule-soft);
   --color-rule-strong: var(--rule-strong);
+  --color-brand: var(--brand-mark);
+  --color-brand-soft: var(--brand-mark-soft);
+  --color-brand-lavender: var(--brand-mark-lavender);
+  --color-brand-deep: var(--brand-mark-deep);
+  --color-brand-secondary: var(--brand-mark-secondary);
+  --color-success-bright: var(--success-bright);
+  --color-danger-bright: var(--danger-bright);
+
   --color-pine: var(--pine);
   --color-pine-deep: var(--pine-deep);
   --color-pine-bright: var(--pine-bright);
@@ -212,12 +258,12 @@
 
   /* Real geometry. Soft, generous lavender surfaces; controls remain crisp
      enough for dense scheduling work. */
-  --radius-control: 11px;
-  --radius-panel: 18px;
-  --radius-sm: 8px;
-  --radius-md: 13px;
-  --radius-lg: 18px;
-  --radius-xl: 26px;
+  --radius-control: 8px;
+  --radius-panel: 14px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
 }
 
 /*======================================================================
@@ -237,72 +283,47 @@
 
   body {
     background-color: var(--paper);
-    background-image:
-      radial-gradient(
-        ellipse 46% 38% at 5% 3%,
-        rgba(141, 122, 208, 0.22),
-        transparent 72%
-      ),
-      radial-gradient(
-        ellipse 38% 32% at 98% 22%,
-        rgba(101, 80, 181, 0.13),
-        transparent 74%
-      ),
-      radial-gradient(
-        ellipse 58% 46% at 58% 108%,
-        rgba(232, 225, 247, 0.95),
-        transparent 76%
-      );
-    background-attachment: fixed;
+    background-image: linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0) 46%,
+      rgba(112, 85, 190, 0.035) 100%
+    );
     color: var(--ink);
     font-size: 15px;
     line-height: 1.55;
-    letter-spacing: -0.006em;
+    letter-spacing: -0.005em;
     font-feature-settings:
       'kern' 1,
-      'liga' 1,
-      'ss01' 1;
-    text-rendering: optimizeLegibility;
+      'liga' 1;
     isolation: isolate;
   }
 
-  /* Layered lavender geometry. Fixed, negative-stacked and pointer-inert so
-     it can never sit over a schedule, table cell or control. */
+  /* A fine registration grid, not a decorative blob. Fixed and inert so it
+     never sits above a timetable, form control or dialog. */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background:
-      radial-gradient(
-        circle at 12% 16%,
-        transparent 0 12.4rem,
-        rgba(101, 80, 181, 0.055) 12.45rem 12.52rem,
-        transparent 12.58rem
+    background-image:
+      linear-gradient(
+        to right,
+        rgba(112, 85, 190, 0.032) 1px,
+        transparent 1px
       ),
-      radial-gradient(
-        circle at 91% 76%,
-        transparent 0 19rem,
-        rgba(101, 80, 181, 0.045) 19.05rem 19.13rem,
-        transparent 19.2rem
+      linear-gradient(
+        to bottom,
+        rgba(112, 85, 190, 0.022) 1px,
+        transparent 1px
       );
+    background-size: var(--pattern-grid) var(--pattern-grid);
+    mask-image: linear-gradient(to bottom, black, transparent 85%);
   }
 
   body::after {
-    content: '';
-    position: fixed;
-    z-index: -1;
-    top: -15rem;
-    right: -13rem;
-    width: 36rem;
-    height: 36rem;
-    pointer-events: none;
-    border: 1px solid rgba(101, 80, 181, 0.08);
-    border-radius: 50%;
-    box-shadow:
-      0 0 0 5.5rem rgba(141, 122, 208, 0.035),
-      0 0 0 11rem rgba(141, 122, 208, 0.022);
+    display: none;
   }
 
   ::selection {
@@ -314,10 +335,10 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-    letter-spacing: -0.026em;
-    line-height: 1.15;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
   }
 
   /* Focus: a crisp violet ring with a clean offset, visible on lavender and
@@ -348,34 +369,49 @@
 
 /* Slab label. Deliberately larger and looser than the previous 8-10px
    equivalents, which were the main cause of the terminal feel. */
+/* Field labels are sentence case. Tracked all-caps belongs to machine data,
+   not to every control in the product. */
 .eyebrow {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1.4;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink-secondary);
+  letter-spacing: 0.035em;
+  text-transform: none;
+  color: var(--ink-muted);
 }
 
-/* Display face, set tight and large. Headings balance across lines rather
-   than leaving an orphan on the last row. */
+/* Display face, set with clinical proportion rather than an editorial
+   headline. One humanist sans carries both display and body type. */
 .display {
-  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.032em;
-  line-height: 1.04;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
   text-wrap: balance;
 }
 
-/* No italic serif emphasis: the second clause of a title simply takes the
-   working colour, which is how product headings signal a subject change. */
 .display em {
   font-style: normal;
-  color: var(--brass);
+  color: inherit;
 }
 
-/* Inverted plates use the same accent, lifted for contrast. */
+/*======================================================================
+  Landing display tracking
+  ----------------------------------------------------------------------
+  IBM Plex Sans is the site-wide typeface. The landing only tightens the
+  display tracking so the hero and section hierarchy keep their proportion.
+====================================================================== */
+
+.landing-clinical .display {
+  letter-spacing: -0.042em;
+  line-height: 0.96;
+}
+
+.landing-clinical .display em {
+  font-style: normal;
+}
+
 .bg-ink .display em,
 .bg-rail .display em {
   color: var(--brass);
@@ -383,11 +419,11 @@
 
 /* Section heading — the workhorse for module titles. */
 .section-title {
-  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.1875rem;
+  font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.3rem;
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.024em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
@@ -415,9 +451,9 @@
 
 /* Technical value: codes, serials, timestamps. The only place mono belongs. */
 .tech {
-  font-family: var(--font-mono-jet), ui-monospace, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.75rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
   color: var(--ink-muted);
 }
@@ -431,7 +467,102 @@
   background: var(--sheet);
   border: 1px solid var(--rule);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
+}
+
+/*======================================================================
+  Dashboard control panels
+  ----------------------------------------------------------------------
+  A dashboard card is an instrument, not an empty white rectangle. Each
+  panel carries a narrow coloured identity edge, a tinted header wash and a
+  violet-tinted lift. The tone is supplied by the component, so the board,
+  alerts, resources and audit surfaces are distinguishable at a glance.
+====================================================================== */
+
+.dashboard-panel {
+  position: relative;
+  box-shadow:
+    0 1px 2px rgba(41, 36, 61, 0.05),
+    0 18px 42px -34px rgba(73, 55, 119, 0.55);
+  transition:
+    transform 0.25s var(--ease-out-quint),
+    box-shadow 0.25s var(--ease-out-quint),
+    border-color 0.25s var(--ease-out-quint);
+}
+
+.dashboard-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--panel-accent),
+    color-mix(in srgb, var(--panel-accent) 28%, transparent) 62%,
+    transparent
+  );
+}
+
+.dashboard-panel > .dashboard-panel-header {
+  background: linear-gradient(105deg, var(--panel-tint), transparent 78%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dashboard-panel:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--panel-accent) 20%, var(--rule));
+    box-shadow:
+      0 1px 2px rgba(41, 36, 61, 0.05),
+      0 24px 54px -34px rgba(73, 55, 119, 0.55);
+  }
+}
+
+/* Instrument strip: four tinted tiles that overlap the command plate. */
+.dashboard-stats {
+  isolation: isolate;
+}
+
+.dashboard-stat {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rule-soft);
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--stat-tint), #fff 72%);
+}
+
+.dashboard-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--stat-accent);
+}
+
+.dashboard-stats > :nth-child(1) {
+  --stat-accent: var(--primary);
+  --stat-tint: color-mix(in srgb, var(--primary) 12%, var(--sheet));
+}
+
+.dashboard-stats > :nth-child(2) {
+  --stat-accent: var(--success);
+  --stat-tint: color-mix(in srgb, var(--success) 10%, var(--sheet));
+}
+
+.dashboard-stats > :nth-child(3) {
+  --stat-accent: var(--warning);
+  --stat-tint: color-mix(in srgb, var(--warning) 11%, var(--sheet));
+}
+
+.dashboard-stats > :nth-child(4) {
+  --stat-accent: var(--vermilion);
+  --stat-tint: color-mix(in srgb, var(--vermilion) 9%, var(--sheet));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-panel {
+    transition: none;
+  }
 }
 
 /* A panel that holds a dense table: no inner padding, clips its children. */
@@ -439,7 +570,7 @@
   background: var(--sheet);
   border: 1px solid var(--rule);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   overflow: hidden;
 }
 
@@ -448,7 +579,37 @@
   background: color-mix(in srgb, var(--sheet) 48%, var(--pine-soft));
   border: 1px solid color-mix(in srgb, var(--pine) 14%, var(--rule));
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
+}
+
+/* An open ledger band. Used where a page needs a working surface without
+   turning every group into a floating card. */
+.ledger-band {
+  background: var(--sheet);
+  border-block: 1px solid var(--rule);
+}
+
+.ledger-head rule,
+.ledger-head {
+  border-color: var(--rule);
+}
+
+.ui-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  color: var(--ink-muted);
+}
+
+.ui-kicker::before {
+  content: '';
+  width: 1.25rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
 }
 
 /* Interactive surface — lifts on hover. */
@@ -459,8 +620,8 @@
     transform 0.25s var(--ease-out-quint);
 }
 .panel-hover:hover {
-  box-shadow: var(--shadow-md);
-  border-color: color-mix(in srgb, var(--pine) 32%, var(--rule));
+  box-shadow: var(--shadow-sm);
+  border-color: color-mix(in srgb, var(--pine) 26%, var(--rule));
   transform: translateY(-1px);
 }
 
@@ -836,6 +997,11 @@
 }
 
 /*----------------------------------------------------------------------
+  Legacy specimen palettes.
+  These are not product themes and are never selected by the landing,
+  auth shell or workspace. They exist only for the internal design-system
+  specimen routes so older reference material still renders.
+
   Palette B — Premium Enterprise.
   Warm porcelain, near-black ink, bronze working colour. Deliberately not
   blue: the enterprise register here is printed stationery, not a dashboard.
@@ -1019,6 +1185,15 @@
   background-size: 32px 32px;
 }
 
+/* Below-the-fold landing sections can skip layout and paint until they
+   approach the viewport. This keeps a long editorial page from paying the
+   full layout cost before the hero is interactive. Browsers without
+   content-visibility simply render the section normally. */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1000px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ds-enter {
     animation: none;
@@ -1035,4 +1210,129 @@
   --rule: var(--plate-line);
   --rule-soft: var(--plate-line);
   --rule-strong: var(--plate-line);
+}
+
+/*======================================================================
+  Landing art direction
+  ----------------------------------------------------------------------
+  Purposeful landing-only texture and a single, restrained entrance.
+  No scroll libraries and no client animation loop: the public page stays
+  server-rendered while the hero gains depth and the sections arrive.
+====================================================================== */
+
+.landing-stage-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--primary) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--primary) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 44px 44px;
+}
+
+.landing-dark-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.landing-rise {
+  animation: landing-rise 0.85s var(--ease-out-quint) both;
+}
+
+/* Scroll-linked entrances: compositor-only opacity and transform, with no
+   client observer or animation library. The page is fully visible when the
+   browser does not support view timelines. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-reveal {
+      animation: landing-reveal 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 30%;
+    }
+
+    .landing-reveal-late {
+      animation-range: entry 10% cover 38%;
+    }
+  }
+}
+
+/* A small, deliberate response on the relationship and role cards. */
+@media (hover: hover) and (pointer: fine) {
+  .landing-hover {
+    transition:
+      transform 0.3s var(--ease-out-quint),
+      border-color 0.3s var(--ease-out-quint),
+      box-shadow 0.3s var(--ease-out-quint);
+  }
+
+  .landing-hover:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--primary) 24%, var(--rule));
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.landing-rise-1 {
+  animation-delay: 0.08s;
+}
+
+.landing-rise-2 {
+  animation-delay: 0.18s;
+}
+
+.landing-rise-3 {
+  animation-delay: 0.3s;
+}
+
+.landing-pulse {
+  animation: landing-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-reveal {
+  from {
+    transform: translateY(18px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-rise,
+  .landing-pulse,
+  .landing-reveal {
+    animation: none;
+  }
+
+  .landing-reveal {
+    transform: none;
+  }
 }

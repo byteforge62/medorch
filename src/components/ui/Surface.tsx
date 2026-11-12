@@ -24,13 +24,13 @@ interface SurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
  * decoration: `feature` sits above the page, `inset` below it.
  */
 const variantStyles: Record<SurfaceVariant, string> = {
-  plain: 'border border-border shadow-sm',
-  feature: 'border border-border shadow-md',
+  plain: 'border border-border',
+  feature: 'border border-border shadow-sm',
   interactive:
-    'border border-border shadow-sm transition-[box-shadow,border-color,transform] duration-[var(--dur-base)] ease-[var(--ease-standard)] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md focus-within:border-primary motion-reduce:hover:translate-y-0',
-  metric: 'border border-border shadow-xs',
+    'border border-border transition-[box-shadow,border-color,transform] duration-[var(--dur-base)] ease-[var(--ease-standard)] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-sm focus-within:border-primary motion-reduce:hover:translate-y-0',
+  metric: 'border border-border',
   preview:
-    'overflow-hidden border border-border shadow-lg',
+    'overflow-hidden border border-border shadow-md',
   inset: 'border border-rule-soft',
 };
 

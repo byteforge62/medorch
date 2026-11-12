@@ -245,14 +245,14 @@ export function ScheduleTimeline({
   return (
     <section
       aria-labelledby="theatre-day-heading"
-      className="border-rule bg-surface overflow-hidden rounded-[var(--radius-panel)] border"
+      className="border-rule bg-surface overflow-hidden border"
     >
       <div className="flex flex-wrap items-start justify-between gap-3 px-4 py-3.5 sm:px-5">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2
               id="theatre-day-heading"
-              className="text-ink text-[13px] font-semibold"
+              className="font-display text-ink text-[18px] leading-none font-medium"
             >
               Theatre day
             </h2>
@@ -273,8 +273,8 @@ export function ScheduleTimeline({
 
         <div className="flex flex-col items-end gap-1.5">
           <StatusLegend />
-          <p className="text-ink-subtle text-[9.5px]">
-            Click a procedure to read the case.
+          <p className="text-ink-subtle text-[8.5px]">
+            Select a block to read the case.
           </p>
         </div>
       </div>

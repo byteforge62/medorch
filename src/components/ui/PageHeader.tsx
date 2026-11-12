@@ -15,11 +15,8 @@ interface PageHeaderProps {
 /**
  * PageHeader — the masthead of every screen.
  *
- * A violet signal dot and a tracked kicker, then the display title at a size
- * that actually commands the page, then one line of orientation. The action
- * slot sits on the right and drops below the title on narrow screens rather
- * than crushing it. No heavy rules: the header floats on the sheet, and the
- * panels beneath it carry the structure.
+ * The serif is allowed to carry the page. A single hairline closes the
+ * header; panels beneath it do not repeat the same title/description rhythm.
  */
 export function PageHeader({
   eyebrow,
@@ -29,31 +26,26 @@ export function PageHeader({
   actions,
 }: PageHeaderProps) {
   return (
-    <header className="pb-6 sm:pb-7">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <header className="border-rule mb-6 border-b pb-6 sm:mb-7 sm:pb-7">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="flex items-center gap-2">
-              <span
-                className="bg-primary h-1.5 w-1.5 shrink-0 rounded-full"
-                aria-hidden="true"
-              />
-              <p className="eyebrow">{eyebrow}</p>
-            </span>
-
+            <p className="ui-kicker">{eyebrow}</p>
             {meta ? (
-              <span className="bg-primary-soft text-primary inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide">
+              <span className="border-rule text-ink-muted border-l pl-3 font-mono text-[9px]">
                 {meta}
               </span>
             ) : null}
           </div>
 
-          <h1 className="display text-foreground mt-3 text-[clamp(2rem,3.8vw,2.8rem)] text-balance">
+          <h1 className="display text-ink mt-3 max-w-[18ch] text-[clamp(2.15rem,1.4rem+2.4vw,3.4rem)]">
             {title}
           </h1>
 
           {description ? (
-            <p className="lede mt-3 text-[0.9375rem]">{description}</p>
+            <p className="text-ink-muted mt-3 max-w-[64ch] text-[12px] leading-[1.7]">
+              {description}
+            </p>
           ) : null}
         </div>
 

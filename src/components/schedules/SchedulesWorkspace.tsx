@@ -509,7 +509,7 @@ export function SchedulesWorkspace({
         onSelect={navigateToDate}
       />
 
-      <section className="border-rule bg-surface mb-4 overflow-hidden rounded-[var(--radius-panel)] border">
+      <section className="border-rule bg-surface mb-4 overflow-hidden border-y">
         <ScheduleToolbar
           filters={filters}
           onFilterChange={setFilters}
@@ -593,7 +593,7 @@ export function SchedulesWorkspace({
         </div>
       </div>
 
-      <footer className="border-rule text-ink-subtle mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-[9.5px]">
+      <footer className="border-rule text-ink-subtle mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-[9px]">
         <p>
           {data.scope === 'ASSIGNED'
             ? 'Assigned theatre cases only'

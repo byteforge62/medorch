@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import {
+  ArrowRight,
   BellRinging,
   CalendarCheck,
   DoorOpen,
@@ -11,8 +12,6 @@ import {
 } from '@phosphor-icons/react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Button, buttonClasses } from '@/components/ui/Button';
-import { MedicalOrbit } from '@/components/visual/MedicalOrbit';
 
 import { DashboardSkeleton, Panel, PanelError } from './DashboardPrimitives';
 import { OperationalAttention } from './OperationalAttention';
@@ -283,59 +282,74 @@ export function AdminDashboard() {
     Boolean(errors.audit);
 
   return (
-    <main className="space-y-4">
-      <header className="space-y-4">
-        <div className="border-rule relative overflow-hidden rounded-[22px] border bg-[linear-gradient(120deg,#EFEAF9_0%,#E8E1F7_60%,#DED4F2_100%)] px-5 py-5 sm:px-6 sm:py-6">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
-          >
-            <div className="absolute -top-24 -left-16 h-64 w-64 rounded-full border border-primary/10" />
-            <div className="absolute top-1/2 -left-10 h-40 w-40 rounded-full bg-sheet/35 blur-2xl" />
+    <main className="space-y-3">
+      <header className="space-y-0">
+        <div className="dashboard-command bg-rail relative overflow-hidden px-5 pt-5 pb-11 text-white sm:px-7 sm:pt-6 sm:pb-12">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_100%]" />
+            <div className="absolute -top-32 right-[-7rem] h-80 w-80 rounded-full border border-white/10" />
+            <div className="absolute -top-16 right-[-2rem] h-52 w-52 rounded-full border border-white/[0.06]" />
           </div>
 
-          <div className="relative z-10 max-w-[68%] min-[400px]:max-w-[62%] lg:max-w-[58%]">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-              <p className="text-[10px] font-semibold tracking-[0.1em] text-primary uppercase">
-                Operations control
+          <div className="relative z-10 grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)] xl:items-end">
+            <div>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[8.5px] tracking-[0.08em] text-white/40">
+                <span>OPERATIONS DESK</span>
+                <span className="h-px w-4 bg-white/25" aria-hidden="true" />
+                <span>{dateLabel}</span>
+              </div>
+
+              <h1 className="font-display mt-3 text-[clamp(1.65rem,2.5vw,2.25rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white">
+                Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}.
+              </h1>
+              <p className="mt-2 max-w-[58ch] text-[11.5px] leading-[1.65] text-white/60">
+                The current theatre picture, open cases, resource readiness and the decisions that
+                need you now.
               </p>
-              <span className="bg-primary/20 h-3 w-px" aria-hidden="true" />
-              <p className="text-ink-muted text-[10.5px]">{dateLabel}</p>
-            </div>
-            <h1 className="text-ink mt-2 text-[clamp(1.55rem,3.1vw,2.15rem)] leading-[1.04] font-semibold tracking-[-0.038em]">
-              Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}.
-            </h1>
-            <p className="text-ink-secondary mt-2 max-w-[54ch] text-[12px] leading-[1.65]">
-              The current theatre picture, open cases, resource readiness and the decisions that
-              need you now.
-            </p>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-ink-subtle mr-1 text-[10px]">Updated {timeLabel}</span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                isLoading={refreshing}
-                loadingLabel="Refreshing operations data"
-                onClick={refresh}
-                className="bg-sheet/80"
-              >
-                {refreshing ? 'Refreshing…' : 'Refresh'}
-              </Button>
-              <Link href="/schedules" className={buttonClasses({ size: 'sm' })}>
-                Open schedules
-              </Link>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Link
+                  href="/schedules"
+                  className="text-rail hover:bg-paper inline-flex h-8 items-center gap-1.5 rounded-[7px] bg-white px-3 text-[10.5px] font-semibold transition-colors"
+                >
+                  Open schedules
+                  <ArrowRight size={12} weight="bold" aria-hidden="true" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={refresh}
+                  className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-[7px] border border-white/20 px-3 text-[10.5px] font-semibold text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
+                  disabled={refreshing}
+                >
+                  {refreshing ? 'Refreshing…' : 'Refresh picture'}
+                </button>
+                <span className="font-mono text-[8.5px] text-white/35">UPDATED {timeLabel}</span>
+              </div>
+            </div>
+
+            <div className="hidden border-white/10 xl:block xl:border-l xl:pl-6">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[9px] font-semibold text-white/45">Live picture</p>
+                <span className="flex items-center gap-1.5 font-mono text-[8px] text-white/35">
+                  <span className="bg-success-bright h-1.5 w-1.5 rounded-full" aria-hidden="true" />
+                  CONNECTED
+                </span>
+              </div>
+              <p className="mt-2.5 max-w-[32ch] text-[10px] leading-[1.6] text-white/55">
+                Read directly from the theatre, schedule, equipment and alert services. Missing
+                feeds stay visibly missing.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-2.5 font-mono text-[8px] text-white/40">
+                <span>ROLE-SCOPED</span>
+                <span>NO CLINICAL NOTES</span>
+                <span>LOCAL TIME</span>
+              </div>
             </div>
           </div>
-
-          <MedicalOrbit
-            className="pointer-events-none absolute top-1/2 -right-2 hidden w-[270px] -translate-y-[46%] drop-shadow-[0_18px_32px_rgba(101,80,181,0.10)] lg:block"
-          />
         </div>
 
-        <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+        <dl className="dashboard-stats relative z-10 mx-4 -mt-7 grid grid-cols-2 gap-2 rounded-[16px] border border-rule bg-sheet p-2 shadow-[0_22px_48px_-28px_rgba(41,36,61,0.35)] sm:mx-6 sm:grid-cols-4">
+          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
             <span className="bg-primary-soft text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
               <CalendarCheck size={18} weight="duotone" aria-hidden="true" />
             </span>
@@ -353,7 +367,7 @@ export function AdminDashboard() {
               </dd>
             </div>
           </div>
-          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
             <span className="bg-success-soft text-success flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
               <DoorOpen size={18} weight="duotone" aria-hidden="true" />
             </span>
@@ -371,7 +385,7 @@ export function AdminDashboard() {
               </dd>
             </div>
           </div>
-          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
             <span className="bg-warning-soft text-warning flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
               <BellRinging size={18} weight="duotone" aria-hidden="true" />
             </span>
@@ -389,7 +403,7 @@ export function AdminDashboard() {
               </dd>
             </div>
           </div>
-          <div className="border-rule bg-sheet flex items-center gap-3 rounded-[16px] border px-3.5 py-3 shadow-xs">
+          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
             <span className="bg-vermilion-soft text-vermilion flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
               <FirstAidKit size={18} weight="duotone" aria-hidden="true" />
             </span>
@@ -430,7 +444,7 @@ export function AdminDashboard() {
       ) : null}
 
       {allCoreFailed ? (
-        <Panel>
+        <Panel tone="danger">
           <PanelError
             message="None of the operational feeds returned data. No dashboard conclusion can be drawn."
             onRetry={refresh}
@@ -449,8 +463,8 @@ export function AdminDashboard() {
         onRetry={refresh}
       />
 
-      <div className="grid items-stretch gap-4 xl:grid-cols-12">
-        <div className="order-2 min-w-0 xl:order-1 xl:col-span-8">
+      <div className="grid items-stretch gap-3 lg:grid-cols-12">
+        <div className="order-2 min-w-0 lg:order-1 lg:col-span-8">
           <TheatreOperationsBoard
             rooms={data.rooms}
             schedules={data.schedules}
@@ -459,7 +473,7 @@ export function AdminDashboard() {
             onRetry={refresh}
           />
         </div>
-        <div className="order-1 min-w-0 xl:order-2 xl:col-span-4">
+        <div className="order-1 min-w-0 lg:order-2 lg:col-span-4">
           <AlertDecisionQueue
             alerts={data.alerts}
             error={errors.alerts}

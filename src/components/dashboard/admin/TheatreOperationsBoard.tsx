@@ -138,7 +138,7 @@ export function TheatreOperationsBoard({
   }, [now, rooms, schedules, selectedRoomId]);
 
   return (
-    <Panel labelledBy="theatre-operations" className="h-full">
+    <Panel labelledBy="theatre-operations" className="h-full" tone="primary">
       <PanelHeader
         id="theatre-operations"
         title="Theatre operations"

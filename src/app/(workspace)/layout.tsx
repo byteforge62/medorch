@@ -1,4 +1,5 @@
 import { AppShell } from '@/components/layout/AppShell';
+import { SessionProvider } from '@/providers/SessionProvider';
 import { requireAuth } from '@/lib/auth/authorization';
 
 /*======================================================================
@@ -18,5 +19,9 @@ export default async function WorkspaceLayout({
 }) {
   await requireAuth();
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <SessionProvider>
+      <AppShell>{children}</AppShell>
+    </SessionProvider>
+  );
 }

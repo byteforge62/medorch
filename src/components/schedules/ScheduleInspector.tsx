@@ -185,7 +185,7 @@ export function ScheduleInspector({
           onClose();
         }
       }}
-      className="border-rule bg-surface overflow-hidden rounded-[var(--radius-panel)] border shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="border-rule bg-surface overflow-hidden border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <header className="border-rule relative border-b px-4 pt-4 pb-3.5">
         <div className="flex items-start justify-between gap-3">

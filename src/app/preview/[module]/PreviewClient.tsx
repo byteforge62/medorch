@@ -22,6 +22,7 @@ import Link from 'next/link';
 import type { UserRole } from '@/generated/prisma/client';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { SessionProvider } from '@/providers/SessionProvider';
 
 import { PatientRegistry } from '@/app/(workspace)/patients/PatientRegistry';
 import { DoctorDirectory } from '@/app/(workspace)/doctors/DoctorDirectory';
@@ -142,12 +143,14 @@ export function PreviewClient({ module }: { module: string }) {
   }
 
   return (
-    <AppShell role={entry.role} user={{ ...PREVIEW_USER, role: entry.role }}>
-      <div className="border-danger/35 bg-danger-soft/50 text-danger mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold">
-        Preview · synthetic fixture data — not a clinical record
-      </div>
+    <SessionProvider>
+      <AppShell role={entry.role} user={{ ...PREVIEW_USER, role: entry.role }}>
+        <div className="border-danger/35 bg-danger-soft/50 text-danger mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold">
+          Preview · synthetic fixture data — not a clinical record
+        </div>
 
-      {entry.render()}
-    </AppShell>
+        {entry.render()}
+      </AppShell>
+    </SessionProvider>
   );
 }

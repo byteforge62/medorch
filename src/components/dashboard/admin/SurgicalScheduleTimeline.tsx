@@ -169,7 +169,7 @@ export function SurgicalScheduleTimeline({
   }
 
   return (
-    <Panel labelledBy="surgical-schedule">
+    <Panel labelledBy="surgical-schedule" tone="primary">
       <PanelHeader
         id="surgical-schedule"
         title="Surgical schedule"
