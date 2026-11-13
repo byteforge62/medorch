@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { LandingHero } from './landing-hero';
 import {
   ArrowDown,
   ArrowUpRight,
@@ -68,7 +67,92 @@ export function ClinicalLanding({
 
       <main id="main">
         {/* ——— The stage ——— */}
-        <LandingHero/>
+        <section className="relative overflow-hidden bg-[#f7f5fc]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 hidden w-[54%] border-l border-primary/8 bg-[#eee8f8] xl:block"
+          />
+          <div
+            aria-hidden="true"
+            className="landing-stage-grid pointer-events-none absolute inset-x-0 top-0 h-[34rem] opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)] xl:hidden"
+          />
+
+          <div className="relative mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8">
+            <div className="border-rule/80 flex flex-wrap items-center justify-between gap-2 border-b py-3">
+              <span className="ui-kicker">The operating system for the theatre day</span>
+              <span className="text-ink-subtle hidden font-mono text-[8.5px] tracking-[0.08em] sm:block">
+                ROLE-SCOPED / ATTRIBUTED / SYNTHETIC PREVIEW
+              </span>
+            </div>
+
+            <div className="grid gap-10 py-10 lg:py-14 xl:grid-cols-12 xl:items-center xl:gap-10">
+              <div className="landing-rise xl:col-span-5">
+                <p className="text-ink-subtle flex items-center gap-2 font-mono text-[9px] tracking-[0.16em]">
+                  <span className="bg-primary h-1 w-1 rounded-full" aria-hidden="true" />
+                  OPERATING THEATRE OPERATIONS
+                </p>
+
+                <h1 className="display text-ink mt-5 max-w-[12ch] text-[clamp(2.8rem,1.35rem+4.3vw,5.15rem)] leading-[0.94]">
+                  <span className="block">Every theatre.</span>
+                  <span className="block">Every case.</span>
+                  <span className="text-primary block">One record.</span>
+                </h1>
+
+                <p className="text-ink-secondary mt-6 max-w-[47ch] text-[15px] leading-[1.8] sm:text-[16px]">
+                  MedOrch composes the operating day — schedules, room state, clinical teams,
+                  equipment and patient context — into one role-scoped record.
+                </p>
+
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  <Link href="/register" prefetch={false} className={primaryButton}>
+                    Request access
+                    <ArrowUpRight
+                      size={14}
+                      weight="bold"
+                      className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                  <a href="#platform" className={secondaryButton}>
+                    Walk through the day
+                    <ArrowDown size={13} weight="bold" aria-hidden="true" />
+                  </a>
+                </div>
+
+                <p className="text-ink-muted mt-4 text-[10.5px] leading-relaxed">
+                  Accounts are verified and approved with a role before the first sign-in.
+                </p>
+
+                <div className="border-rule/80 text-ink-subtle mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 border-t pt-4 text-[9.5px]">
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck size={12} aria-hidden="true" />
+                    Verified access
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="bg-success h-1.5 w-1.5 rounded-full" aria-hidden="true" />
+                    Role-scoped record
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CalendarBlank size={12} aria-hidden="true" />
+                    Illustrative schedule
+                  </span>
+                </div>
+              </div>
+
+              <div className="xl:col-span-7">
+                <HeroStage />
+              </div>
+            </div>
+
+            <div className="border-rule/80 text-ink-subtle flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t py-4 font-mono text-[8.5px] tracking-[0.08em]">
+              <span className="flex items-center gap-2">
+                <DoorOpen size={12} aria-hidden="true" />
+                SCHEDULES / ROOMS / TEAMS / EQUIPMENT
+              </span>
+              <span>ONE ROLE-SCOPED RECORD</span>
+            </div>
+          </div>
+        </section>
 
         {/* ——— Scheduling ——— */}
         <section id="platform" className="defer-render scroll-mt-20 bg-[#fbfaff] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
