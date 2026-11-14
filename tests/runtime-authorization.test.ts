@@ -82,6 +82,25 @@ const CREDENTIALS = {
   },
 };
 
+/**
+ * Route handlers answer with the shared `{ success, data }` envelope. This
+ * helper returns the same Response but unwraps successful bodies, so the
+ * assertions below read the resource itself. Error bodies are untouched so
+ * their `message`/`success` fields stay inspectable.
+ */
+function unwrapEnvelope(body: unknown): unknown {
+  if (
+    body &&
+    typeof body === 'object' &&
+    (body as { success?: unknown }).success === true &&
+    'data' in body
+  ) {
+    return (body as { data: unknown }).data;
+  }
+
+  return body;
+}
+
 function authenticatedFetch(
   token: string,
   path: string,
@@ -103,7 +122,13 @@ function authenticatedFetch(
       body: options.body,
       credentials: 'include',
     },
-  );
+  ).then((response) => {
+    const readJson = response.json.bind(response);
+    Object.defineProperty(response, 'json', {
+      value: async () => unwrapEnvelope(await readJson()),
+    });
+    return response;
+  });
 }
 
 type RoleKey = keyof typeof CREDENTIALS;
@@ -258,11 +283,11 @@ describe('runtime authorization', () => {
       { method: 'GET' as const, path: '/api/me/staff-schedules' },
       {
         method: 'GET' as const,
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64',
       },
       {
         method: 'PATCH' as const,
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001/status',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/status',
       },
       { method: 'POST' as const, path: '/api/departments' },
     ] as const;
@@ -427,14 +452,17 @@ describe('runtime authorization', () => {
       { path: '/api/users', method: 'GET' as const },
       { path: '/api/schedules', method: 'POST' as const },
       {
-        path: '/api/users/00000000-0000-0000-0000-000000000001/approve',
+        path: '/api/users/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/approve',
         method: 'POST' as const,
       },
     ];
     const body = JSON.stringify({});
 
     for (const { path, method } of forbidden) {
-      const res = await authenticatedFetch(doctorToken, path, { method, body });
+      const res = await authenticatedFetch(doctorToken, path, {
+        method,
+        ...(method === 'GET' ? {} : { body }),
+      });
       expect(res.status).toBe(403);
     }
   });
@@ -503,12 +531,15 @@ describe('runtime authorization', () => {
     expect(schedules.length).toBeGreaterThan(0);
 
     for (const schedule of schedules) {
-      expect((schedule as { clinicalNotes?: unknown }).clinicalNotes).toBeNull();
+      // OT responses omit the field entirely rather than sending it; both are safe.
+      expect((schedule as { clinicalNotes?: unknown }).clinicalNotes ?? null).toBeNull();
     }
 
+    // Each row is a staff assignment wrapping the schedule it grants access
+    // to, so the detail probe uses the nested schedule id.
     const firstId =
-      (schedules[0] as { id: string }).id ??
-      (schedules[0] as { scheduleId?: string }).scheduleId;
+      (schedules[0] as { schedule?: { id?: string } }).schedule?.id ??
+      (schedules[0] as { id: string }).id;
 
     expect(firstId).toBeDefined();
     if (!firstId) return;
@@ -517,7 +548,7 @@ describe('runtime authorization', () => {
     expect(detailRes.status).toBe(200);
 
     const detail = await detailRes.json();
-    expect((detail as { clinicalNotes?: unknown }).clinicalNotes).toBeNull();
+    expect((detail as { clinicalNotes?: unknown }).clinicalNotes ?? null).toBeNull();
 
     const patient = detail as {
       patient?: {
@@ -539,7 +570,7 @@ describe('runtime authorization', () => {
 
     const unassignedRes = await authenticatedFetch(
       otToken,
-      '/api/schedules/00000000-0000-0000-0000-000000000001',
+      '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64',
     );
     expect(unassignedRes.status).toBe(404);
 
@@ -555,19 +586,19 @@ describe('runtime authorization', () => {
 
     const forbidden = [
       {
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001/status',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/status',
         method: 'PATCH' as const,
       },
       {
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001/notes',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/notes',
         method: 'POST' as const,
       },
       {
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001/staff',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/staff',
         method: 'POST' as const,
       },
       {
-        path: '/api/schedules/00000000-0000-0000-0000-000000000001/equipment',
+        path: '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/equipment',
         method: 'POST' as const,
       },
       { path: '/api/schedules', method: 'POST' as const },
@@ -577,7 +608,11 @@ describe('runtime authorization', () => {
     ];
 
     for (const { path, method } of forbidden) {
-      const res = await authenticatedFetch(otToken, path, { method, body });
+      const res = await authenticatedFetch(otToken, path, {
+        method,
+        // GET/HEAD requests cannot carry a body; only the mutations do.
+        ...(method === 'GET' ? {} : { body }),
+      });
       expect(res.status).toBe(403);
     }
   });
@@ -592,24 +627,38 @@ describe('runtime authorization', () => {
     );
     expect(ownApptsRes.status).toBe(200);
 
-    const ownAppts = (await ownApptsRes.json()) as Array<{
+    // The portal contract is one patient payload containing their schedules;
+    // there is no per-appointment portal endpoint to probe.
+    const ownAppts = (await ownApptsRes.json()) as {
       id: string;
-    }>;
-    expect(ownAppts.length).toBeGreaterThan(0);
+      schedules: Array<{ id: string }>;
+    };
+    expect(ownAppts.schedules.length).toBeGreaterThan(0);
 
-    const ownId = ownAppts[0].id;
+    const ownId = ownAppts.schedules[0].id;
 
-    const ownDetailRes = await authenticatedFetch(
-      patientAToken,
-      `/api/me/appointments/${ownId}`,
-    );
-    expect(ownDetailRes.status).toBe(200);
-
-    const foreignDetailRes = await authenticatedFetch(
+    const foreignApptsRes = await authenticatedFetch(
       patientBToken,
-      `/api/me/appointments/${ownId}`,
+      '/api/me/appointments',
     );
-    expect(foreignDetailRes.status).toBe(404);
+    expect(foreignApptsRes.status).toBe(200);
+
+    const foreignAppts = (await foreignApptsRes.json()) as {
+      id: string;
+      schedules: Array<{ id: string }>;
+    };
+    expect(foreignAppts.id).not.toBe(ownAppts.id);
+    expect(
+      foreignAppts.schedules.some((schedule) => schedule.id === ownId),
+    ).toBe(false);
+
+    // The staff schedule register is closed to patients, including for their
+    // own appointment id.
+    const directSchedule = await authenticatedFetch(
+      patientAToken,
+      `/api/schedules/${ownId}`,
+    );
+    expect(directSchedule.status).toBe(403);
 
     const ownAlertsRes = await authenticatedFetch(
       patientAToken,
@@ -617,8 +666,7 @@ describe('runtime authorization', () => {
     );
     expect(ownAlertsRes.status).toBe(200);
 
-    const body = await ownAlertsRes.json();
-    const ownAlerts = (body as { items?: unknown[] }).items ?? [];
+    const ownAlerts = (await ownAlertsRes.json()) as Array<{ id: string }>;
     if (ownAlerts.length > 0) {
       const alertId = (ownAlerts[0] as { id: string }).id;
 
@@ -692,7 +740,7 @@ describe('runtime authorization', () => {
 
     const unknownRes = await authenticatedFetch(
       adminToken,
-      '/api/schedules/00000000-0000-0000-0000-000000000001',
+      '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64',
     );
     expect(unknownRes.status).toBe(404);
 
@@ -708,7 +756,7 @@ describe('runtime authorization', () => {
 
     const unknownRes = await authenticatedFetch(
       doctorToken,
-      '/api/schedules/00000000-0000-0000-0000-000000000001/status',
+      '/api/schedules/7f3c9b52-8a41-4d6e-9c07-2b5f1e8d3a64/status',
       {
         method: 'PATCH',
         body: JSON.stringify({ status: 'CONFIRMED' }),

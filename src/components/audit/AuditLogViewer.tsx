@@ -239,7 +239,10 @@ export function AuditLogViewer() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <p className="text-primary inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase">
-              <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
+              <span
+                className="bg-primary h-1.5 w-1.5 rounded-full"
+                aria-hidden="true"
+              />
               Security & compliance
             </p>
             <h1 className="display mt-3 text-[clamp(2rem,4vw,2.85rem)]">
@@ -274,7 +277,7 @@ export function AuditLogViewer() {
 
       <section
         aria-labelledby="audit-filter-title"
-        className="border-rule bg-sheet rounded-[18px] border px-5 py-4 shadow-xs"
+        className="border-rule bg-sheet rounded-[var(--radius-panel)] border px-5 py-4 shadow-xs"
       >
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
@@ -483,7 +486,8 @@ export function AuditLogViewer() {
                           data-tone={
                             log.action === 'DELETE' || log.action === 'REJECT'
                               ? 'critical'
-                              : log.action === 'UPDATE' || log.action === 'CANCEL'
+                              : log.action === 'UPDATE' ||
+                                  log.action === 'CANCEL'
                                 ? 'warning'
                                 : log.action === 'CREATE' ||
                                     log.action === 'APPROVE' ||

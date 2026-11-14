@@ -36,8 +36,11 @@ const CHROME =
   process.env.CHROME_PATH ||
   'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
+/* Optional tall desktop capture, used to review panels below the fold. */
+const DESKTOP_HEIGHT = Number(process.env.VIEWPORT_HEIGHT || 0) || 900;
+
 const VIEWPORTS = [
-  { width: 1440, height: 900, mobile: false },
+  { width: 1440, height: DESKTOP_HEIGHT, mobile: false },
   { width: 1024, height: 768, mobile: false },
   { width: 390, height: 844, mobile: true },
 ];
@@ -88,6 +91,7 @@ const ROLES = {
 const PUBLIC_ROUTES = [
   ['landing', '/'],
   ['login', '/login'],
+  ['register', '/register'],
 ];
 
 class CDP {

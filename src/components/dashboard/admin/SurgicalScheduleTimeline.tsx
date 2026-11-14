@@ -372,132 +372,202 @@ export function SurgicalScheduleTimeline({
           </div>
 
           {selected ? (
-            <div className="border-rule-soft bg-surface-subtle/45 border-t px-4 py-4 sm:px-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
+            <div className="border-rule-soft bg-surface-subtle/35 border-t px-4 py-4 sm:px-5">
+              <article className="border-rule bg-sheet overflow-hidden rounded-[14px] border shadow-[0_1px_2px_rgba(41,36,61,0.04)]">
+                <div className="border-rule-soft flex flex-wrap items-start gap-4 border-b p-4">
+                  <div className="border-rule bg-surface-subtle flex h-[4.25rem] w-[4.25rem] shrink-0 flex-col items-center justify-center rounded-[12px] border">
+                    <span className="text-ink font-mono text-[1.45rem] leading-none font-semibold tabular-nums">
+                      {new Date(selected.startTime).getDate()}
+                    </span>
+                    <span className="text-ink-subtle mt-1 text-[9px] font-semibold tracking-[0.12em] uppercase">
+                      {new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(
+                        new Date(selected.startTime),
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`${
+                          SCHEDULE_STATUS[selected.status].tone
+                        } inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9.5px] font-bold tracking-[0.06em] uppercase`}
+                      >
+                        <span
+                          className={`${SCHEDULE_STATUS[selected.status].rail} h-1.5 w-1.5 rounded-full`}
+                          aria-hidden="true"
+                        />
+                        {SCHEDULE_STATUS[selected.status].label}
+                      </span>
+                      <span
+                        className={`text-[10.5px] font-semibold ${PRIORITY[selected.priority].tone}`}
+                      >
+                        {PRIORITY[selected.priority].label}
+                      </span>
+                    </div>
+
+                    <p className="text-ink mt-1.5 text-[15px] leading-snug font-semibold tracking-[-0.01em]">
+                      {selected.procedure}
+                    </p>
+                    <p className="text-ink-muted mt-1 text-[11.5px]">
+                      {formatDayHeading(selected.startTime)} ·{' '}
+                      {formatTimeRange(selected.startTime, selected.endTime)} ·{' '}
+                      {formatDuration(
+                        durationMinutes(selected.startTime, selected.endTime),
+                      )}
+                    </p>
+                  </div>
+
+                  <Link
+                    href={`/schedules/${selected.id}`}
+                    className="bg-primary text-primary-ink hover:bg-primary-hover inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[7px] px-3 text-[11px] font-semibold transition-colors"
+                  >
+                    Open full record
+                    <ArrowRight size={11} weight="bold" aria-hidden="true" />
+                  </Link>
+                </div>
+
+                <div className="border-rule-soft border-b px-4 py-3">
+                  <div className="text-ink-subtle flex items-center justify-between text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                    <span>Case window</span>
+                    <span className="font-mono tracking-normal">
+                      {formatTimeRange(selected.startTime, selected.endTime)}
+                    </span>
+                  </div>
+                  <div className="bg-surface-muted relative mt-1.5 h-2 overflow-hidden rounded-full">
                     <span
-                      className={`${SCHEDULE_STATUS[selected.status].tone} rounded-full px-2 py-0.5 text-[9.5px] font-bold tracking-[0.06em] uppercase`}
-                    >
-                      {SCHEDULE_STATUS[selected.status].label}
-                    </span>
-                    <span className={`text-[10.5px] font-semibold ${PRIORITY[selected.priority].tone}`}>
-                      {PRIORITY[selected.priority].label}
-                    </span>
+                      className="bg-primary absolute inset-y-0 rounded-full"
+                      style={{
+                        left: `${Math.max(
+                          0,
+                          view.axis.pct(minutesOfDay(selected.startTime) ?? 0),
+                        )}%`,
+                        width: `${Math.max(
+                          2,
+                          view.axis.pct(minutesOfDay(selected.endTime) ?? 0) -
+                            view.axis.pct(minutesOfDay(selected.startTime) ?? 0),
+                        )}%`,
+                      }}
+                      aria-hidden="true"
+                    />
                   </div>
-                  <p className="text-ink mt-1.5 text-[13px] leading-snug font-semibold">
-                    {selected.procedure}
-                  </p>
-                  <p className="text-ink-muted mt-1 text-[11px]">
-                    {formatDayHeading(selected.startTime)} ·{' '}
-                    {formatTimeRange(selected.startTime, selected.endTime)} ·{' '}
-                    {formatDuration(
-                      durationMinutes(selected.startTime, selected.endTime),
-                    )}
-                  </p>
                 </div>
 
-                <Link
-                  href={`/schedules/${selected.id}`}
-                  className="text-primary inline-flex items-center gap-1 text-[11px] font-semibold hover:underline"
-                >
-                  Open full record <ArrowRight size={11} weight="bold" aria-hidden="true" />
-                </Link>
-              </div>
-
-              <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 text-[11px] sm:grid-cols-4">
-                <div>
-                  <dt className="text-ink-subtle">Theatre</dt>
-                  <dd className="text-ink mt-0.5 font-medium">
-                    {selected.otRoom?.code ?? 'Unassigned'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-ink-subtle">Department</dt>
-                  <dd className="text-ink mt-0.5 truncate font-medium">
-                    {selected.department?.name ?? 'Unassigned'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-ink-subtle">Surgeon</dt>
-                  <dd className="text-ink mt-0.5 truncate font-medium">
-                    {selected.surgeon?.name ?? 'Unassigned'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-ink-subtle">Staff assigned</dt>
-                  <dd className="text-ink mt-0.5 font-medium">
-                    {selectedDetail ? selectedDetail.staff.length : '—'}
-                  </dd>
-                </div>
-              </dl>
-
-              {detailsError ? (
-                <p className="text-warning mt-3 text-[10.5px]">
-                  Staffing and equipment detail could not be loaded. The schedule above is intact.
-                </p>
-              ) : selectedDetail ? (
-                <div className="mt-3 grid gap-4 border-t border-rule-soft pt-3 sm:grid-cols-2">
+                <dl className="grid grid-cols-2 gap-x-5 gap-y-3 p-4 sm:grid-cols-4">
                   <div>
-                    <p className="text-ink-subtle text-[10px] font-semibold tracking-[0.06em] uppercase">
-                      Assigned staff
-                    </p>
-                    {selectedDetail.staff.length > 0 ? (
-                      <ul className="mt-1.5 space-y-1">
-                        {selectedDetail.staff.map((assignment) => (
-                          <li
-                            key={assignment.id}
-                            className="text-ink-secondary flex items-center justify-between gap-3 text-[10.5px]"
-                          >
-                            <span className="truncate">{assignment.user.name}</span>
-                            <span className="text-ink-subtle shrink-0">
-                              {assignment.role.toLowerCase()}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-warning mt-1.5 text-[10.5px]">
-                        No staff record is assigned to this case.
+                    <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                      Theatre
+                    </dt>
+                    <dd className="text-ink mt-1 font-mono text-[12px] font-semibold">
+                      {selected.otRoom?.code ?? 'Unassigned'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                      Department
+                    </dt>
+                    <dd className="text-ink mt-1 truncate text-[12px] font-medium">
+                      {selected.department?.name ?? 'Unassigned'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                      Surgeon
+                    </dt>
+                    <dd className="text-ink mt-1 truncate text-[12px] font-medium">
+                      {selected.surgeon?.name ?? 'Unassigned'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                      Staff assigned
+                    </dt>
+                    <dd className="text-ink mt-1 text-[12px] font-medium">
+                      {selectedDetail ? selectedDetail.staff.length : '—'}
+                    </dd>
+                  </div>
+                </dl>
+
+                {detailsError ? (
+                  <p className="border-rule-soft text-warning border-t px-4 py-3 text-[11px]">
+                    Staffing and equipment detail could not be loaded. The case record above is
+                    intact.
+                  </p>
+                ) : selectedDetail ? (
+                  <div className="border-rule-soft bg-surface-subtle/40 grid gap-4 border-t p-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                        Assigned staff
                       </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-ink-subtle text-[10px] font-semibold tracking-[0.06em] uppercase">
-                      Equipment assigned
-                    </p>
-                    {selectedDetail.equipment.filter((assignment) => !assignment.releasedAt)
-                      .length > 0 ? (
-                      <ul className="mt-1.5 space-y-1">
-                        {selectedDetail.equipment
-                          .filter((assignment) => !assignment.releasedAt)
-                          .map((assignment) => (
+                      {selectedDetail.staff.length > 0 ? (
+                        <ul className="mt-2 flex flex-wrap gap-1.5">
+                          {selectedDetail.staff.map((assignment) => (
                             <li
                               key={assignment.id}
-                              className="text-ink-secondary flex items-center justify-between gap-3 text-[10.5px]"
+                              className="border-rule bg-sheet inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-2 pl-0.5"
                             >
-                              <span className="truncate">{assignment.equipment.name}</span>
-                              <span className="text-ink-subtle shrink-0">
-                                {assignment.equipment.category}
+                              <span className="bg-primary-soft text-primary grid h-5 w-5 place-items-center rounded-full text-[8.5px] font-semibold">
+                                {assignment.user.name
+                                  .split(' ')
+                                  .filter(Boolean)
+                                  .slice(0, 2)
+                                  .map((part) => part[0]?.toUpperCase())
+                                  .join('')}
+                              </span>
+                              <span className="text-ink-secondary text-[10.5px]">
+                                {assignment.user.name}
+                              </span>
+                              <span className="text-ink-subtle text-[9px]">
+                                {assignment.role.toLowerCase()}
                               </span>
                             </li>
                           ))}
-                      </ul>
-                    ) : (
-                      <p className="text-ink-muted mt-1.5 text-[10.5px]">
-                        No equipment is currently assigned.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : null}
+                        </ul>
+                      ) : (
+                        <p className="text-warning mt-2 text-[11px]">
+                          No staff record is assigned to this case.
+                        </p>
+                      )}
+                    </div>
 
-              {view.conflictIds.has(selected.id) ? (
-                <p className="bg-danger-soft text-danger mt-3 rounded-[var(--radius-sm)] px-2.5 py-2 text-[10.5px]">
-                  This case overlaps another non-cancelled case in the same theatre.
-                </p>
-              ) : null}
+                    <div>
+                      <p className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+                        Equipment assigned
+                      </p>
+                      {selectedDetail.equipment.filter((assignment) => !assignment.releasedAt)
+                        .length > 0 ? (
+                        <ul className="mt-2 flex flex-wrap gap-1.5">
+                          {selectedDetail.equipment
+                            .filter((assignment) => !assignment.releasedAt)
+                            .map((assignment) => (
+                              <li
+                                key={assignment.id}
+                                className="border-rule bg-sheet inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5"
+                              >
+                                <span className="text-ink-secondary text-[10.5px]">
+                                  {assignment.equipment.name}
+                                </span>
+                                <span className="text-ink-subtle text-[9px]">
+                                  {assignment.equipment.category}
+                                </span>
+                              </li>
+                            ))}
+                        </ul>
+                      ) : (
+                        <p className="text-ink-muted mt-2 text-[11px]">
+                          No equipment is currently assigned.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+
+                {view.conflictIds.has(selected.id) ? (
+                  <p className="bg-danger-soft text-danger border-danger/20 border-t px-4 py-2.5 text-[11px] font-medium">
+                    This case overlaps another non-cancelled case in the same theatre.
+                  </p>
+                ) : null}
+              </article>
             </div>
           ) : null}
         </>

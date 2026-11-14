@@ -2,7 +2,13 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from '@phosphor-icons/react';
+import {
+  ClockCountdown,
+  DoorOpen,
+  FirstAidKit,
+  UserCheck,
+  Warning,
+} from '@phosphor-icons/react';
 
 import {
   CountTag,
@@ -11,6 +17,7 @@ import {
   PanelError,
 } from './DashboardPrimitives';
 import { formatClock, formatDay, formatTimeRange } from './format';
+import { AlertCard } from '../cards';
 import type {
   AlertRecord,
   DashboardErrors,
@@ -241,42 +248,49 @@ export function OperationalAttention({
       ) : items.length === 0 ? (
         <PanelError message="No usable operational feed was available, so no urgency conclusion can be drawn." />
       ) : (
-        <ul className="bg-rule-soft grid grid-cols-2 gap-px lg:grid-cols-4">
+        <div className="grid gap-2 p-3 sm:grid-cols-2 xl:grid-cols-4">
           {items.map((item) => {
             const tone = toneStyles[item.tone];
 
             return (
-              <li key={item.id} className="bg-sheet min-w-0">
-                <Link
-                  href={item.href}
-                  className="group hover:bg-surface-subtle relative flex h-full items-start gap-2 px-3.5 py-2.5 transition-colors sm:px-4"
-                >
+              <AlertCard
+                key={item.id}
+                compact
+                icon={
+                  item.source === 'Critical alert' ? (
+                    <Warning size={14} weight="fill" aria-hidden="true" />
+                  ) : item.source === 'Delayed case' ? (
+                    <ClockCountdown size={14} weight="duotone" aria-hidden="true" />
+                  ) : item.source === 'Theatre availability' ? (
+                    <DoorOpen size={14} weight="duotone" aria-hidden="true" />
+                  ) : item.source === 'Equipment readiness' ? (
+                    <FirstAidKit size={14} weight="duotone" aria-hidden="true" />
+                  ) : (
+                    <UserCheck size={14} weight="duotone" aria-hidden="true" />
+                  )
+                }
+                severity={
+                  item.tone === 'critical'
+                    ? 'danger'
+                    : item.tone === 'warning'
+                      ? 'warning'
+                      : 'info'
+                }
+                title={item.title}
+                message={item.detail}
+                meta={
                   <span
-                    className={`${tone.rail} absolute top-0 bottom-0 left-0 w-[3px]`}
-                    aria-hidden="true"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className={`${tone.label} text-[9px] font-semibold tracking-[0.08em] uppercase`}>
-                      {item.source}
-                    </p>
-                    <p className="text-ink mt-0.5 line-clamp-2 text-[11.5px] leading-snug font-semibold">
-                      {item.title}
-                    </p>
-                    <p className="text-ink-muted mt-0.5 line-clamp-1 hidden text-[10px] leading-relaxed lg:block">
-                      {item.detail}
-                    </p>
-                  </div>
-                  <ArrowRight
-                    size={13}
-                    weight="bold"
-                    className="text-ink-subtle group-hover:text-primary mt-1 shrink-0 transition-colors"
-                    aria-hidden="true"
-                  />
-                </Link>
-              </li>
+                    className={`${tone.label} text-[9px] font-semibold tracking-[0.08em] uppercase`}
+                  >
+                    {item.source}
+                  </span>
+                }
+                href={item.href}
+                hrefLabel="Review"
+              />
             );
           })}
-        </ul>
+        </div>
       )}
 
 

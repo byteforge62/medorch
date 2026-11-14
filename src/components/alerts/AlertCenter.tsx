@@ -156,7 +156,7 @@ export function AlertCenter() {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="border-rule bg-sheet fixed top-[5.5rem] right-3 left-3 z-50 overflow-hidden rounded-[20px] border shadow-[0_24px_60px_rgba(66,48,112,0.18)] sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:mt-2 sm:w-96">
+          <div className="border-rule bg-sheet fixed top-[5.5rem] right-3 left-3 z-50 overflow-hidden rounded-[var(--radius-panel)] border shadow-[0_24px_60px_rgba(66,48,112,0.18)] sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:mt-2 sm:w-96">
             <div className="border-border flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center space-x-2">
                 <h4 className="text-foreground text-sm font-semibold">

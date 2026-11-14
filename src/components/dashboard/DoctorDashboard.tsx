@@ -2,11 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { SCHEDULE_STATUS } from '@/lib/operational-status';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import {
+  CalendarCheck,
+  CheckCircle,
+  Heartbeat,
+  Warning,
+} from '@phosphor-icons/react';
+import { MetricCard } from './cards';
 import {
   SchedulePriorityBadge,
   ScheduleStatusBadge,
@@ -38,13 +47,27 @@ interface DoctorSchedule {
 }
 
 const railTone: Record<ScheduleStatus, string> = {
-  IN_PROGRESS: 'bg-danger',
-  DELAYED: 'bg-warning',
-  CONFIRMED: 'bg-primary',
-  SCHEDULED: 'bg-border-strong',
-  COMPLETED: 'bg-success',
-  CANCELLED: 'bg-border-strong/50',
+  IN_PROGRESS: SCHEDULE_STATUS.IN_PROGRESS.rail,
+  DELAYED: SCHEDULE_STATUS.DELAYED.rail,
+  CONFIRMED: SCHEDULE_STATUS.CONFIRMED.rail,
+  SCHEDULED: SCHEDULE_STATUS.SCHEDULED.rail,
+  COMPLETED: SCHEDULE_STATUS.COMPLETED.rail,
+  CANCELLED: SCHEDULE_STATUS.CANCELLED.rail,
 };
+
+interface DoctorProfile {
+  id: string;
+  userId: string;
+  specialization: string | null;
+  licenseNumber: string | null;
+  user: {
+    name: string;
+    email: string;
+    phone: string | null;
+    status: string;
+  };
+  department: { name: string } | null;
+}
 
 function formatDate(value: string) {
   const date = new Date(value);
@@ -91,9 +114,14 @@ function formatTime(value: string) {
  * shares no structure with the administrator control room.
  */
 export function DoctorDashboard({ userName }: { userName: string }) {
+  const { data: session } = useSession();
   const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [profile, setProfile] = useState<DoctorProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState('');
+  const userId = session?.user?.id;
 
   useEffect(() => {
     let cancelled = false;
@@ -127,6 +155,37 @@ export function DoctorDashboard({ userName }: { userName: string }) {
       cancelled = true;
     };
   }, []);
+
+  /* The clinician's own profile, matched inside the directory they are
+     already permitted to read. No other clinician's details are rendered. */
+  useEffect(() => {
+    if (!userId) return;
+
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const doctors = await apiClient.get<DoctorProfile[]>('/api/doctors');
+
+        if (!cancelled) {
+          setProfile(doctors.find((doctor) => doctor.userId === userId) ?? null);
+          setProfileError('');
+        }
+      } catch {
+        if (!cancelled) {
+          setProfileError('Your profile details could not be loaded.');
+        }
+      } finally {
+        if (!cancelled) setProfileLoading(false);
+      }
+    }
+
+    void loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   if (loading) {
     return <LoadingState message="Loading your surgical schedule…" />;
@@ -175,24 +234,107 @@ export function DoctorDashboard({ userName }: { userName: string }) {
         title="Day plan"
         meta={userName}
         description="Your assigned procedures in time order — next case first, finished cases pushed to the foot of the list."
-        actions={
-          <div className="border-border bg-surface flex divide-x divide-border overflow-hidden rounded-[var(--radius-panel)] border shadow-sm">
-            {[
-              { label: 'Upcoming', value: activeSchedules.length },
-              { label: 'In theatre', value: inTheatre },
-              { label: 'Priority', value: urgentCount },
-              { label: 'Done', value: completedCount },
-            ].map((item) => (
-              <div key={item.label} className="px-4 py-2 text-center">
-                <p className="text-foreground font-mono text-xl leading-none font-semibold tabular-nums">
-                  {item.value}
-                </p>
-                <p className="eyebrow mt-1.5">{item.label}</p>
-              </div>
-            ))}
-          </div>
-        }
       />
+
+      <section
+        aria-label="My clinical profile"
+        className="panel px-4 py-3 sm:px-5"
+      >
+        {profileLoading ? (
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="bg-surface-muted h-3 w-40 animate-pulse rounded" />
+            <div className="bg-surface-muted h-3 w-28 animate-pulse rounded" />
+          </div>
+        ) : profileError ? (
+          <p className="text-foreground-muted text-[12px]">{profileError}</p>
+        ) : profile ? (
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="min-w-0">
+              <p className="eyebrow">Clinician</p>
+              <p className="text-foreground mt-1 text-[13px] font-semibold">
+                {profile.user.name}
+                {profile.specialization ? (
+                  <span className="text-foreground-muted font-normal">
+                    {' '}
+                    · {profile.specialization}
+                  </span>
+                ) : null}
+              </p>
+            </div>
+            <div>
+              <p className="eyebrow">Department</p>
+              <p className="text-foreground mt-1 text-[12.5px]">
+                {profile.department?.name ?? 'Unassigned'}
+              </p>
+            </div>
+            <div>
+              <p className="eyebrow">Licence</p>
+              <p className="text-foreground mt-1 font-mono text-[11.5px]">
+                {profile.licenseNumber ?? 'Not recorded'}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p className="eyebrow">Contact</p>
+              <p className="text-foreground mt-1 truncate text-[12px]">
+                {profile.user.email}
+                {profile.user.phone ? ` · ${profile.user.phone}` : ''}
+              </p>
+            </div>
+            <Link
+              href={`/doctors/${profile.id}`}
+              className="text-primary ml-auto text-[11.5px] font-semibold hover:underline"
+            >
+              Open profile →
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-foreground-muted text-[12px]">
+              No clinician profile is linked to your account yet.
+            </p>
+            <Link
+              href="/doctors"
+              className="text-primary text-[11.5px] font-semibold hover:underline"
+            >
+              Clinician directory →
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Open cases"
+          value={activeSchedules.length}
+          unit="assigned"
+          icon={<CalendarCheck size={18} weight="duotone" aria-hidden="true" />}
+          support="Still to complete in your list"
+        />
+        <MetricCard
+          label="In theatre"
+          value={inTheatre}
+          unit={inTheatre === 1 ? 'case' : 'cases'}
+          tone="primary"
+          icon={<Heartbeat size={18} weight="duotone" aria-hidden="true" />}
+          support="Marked in progress now"
+        />
+        <MetricCard
+          label="Priority"
+          value={urgentCount}
+          unit="urgent"
+          tone="warning"
+          icon={<Warning size={18} weight="duotone" aria-hidden="true" />}
+          support="Urgent or emergency priority"
+        />
+        <MetricCard
+          label="Completed"
+          value={completedCount}
+          unit="done"
+          tone="success"
+          icon={<CheckCircle size={18} weight="duotone" aria-hidden="true" />}
+          support="Recorded as completed"
+        />
+      </div>
 
       {/* Focus: the next case, split panel with a spec list */}
       <section aria-labelledby="next-case-title" className="panel-flush">

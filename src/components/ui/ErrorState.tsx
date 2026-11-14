@@ -18,7 +18,7 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="border-danger-border bg-danger-soft rounded-[18px] border p-6 text-center"
+      className="border-danger-border bg-danger-soft rounded-[var(--radius-panel)] border p-6 text-center"
     >
       <div className="bg-danger mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-white">
         <Warning size={20} weight="bold" aria-hidden="true" />

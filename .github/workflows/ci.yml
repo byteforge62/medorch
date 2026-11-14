@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The application database is never touched: every step below points at the
+  # disposable test database. DATABASE_URL exists only because Prisma requires
+  # it, and the test guard refuses to run if it equals TEST_DATABASE_URL.
+  DATABASE_URL: postgresql://medorch:medorch@localhost:5432/medorch
+  TEST_DATABASE_URL: postgresql://medorch:medorch@localhost:5432/medorch_test
+  AUTH_SECRET: ci-only-secret-not-used-in-production
+  NEXTAUTH_URL: http://127.0.0.1:5301
+  AUTH_URL: http://127.0.0.1:5301
+  NEXT_TELEMETRY_DISABLED: '1'
+  E2E_PORT: '5301'
+
+jobs:
+  verify:
+    name: Types, unit, database and browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: medorch
+          POSTGRES_PASSWORD: medorch
+          POSTGRES_DB: medorch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U medorch -d medorch"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Validate Prisma schema
+        run: npm run prisma:validate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Prepare isolated test database
+        run: npm run test:db:prepare
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Production build
+        run: npm run build
+
+      - name: Browser tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+          retention-days: 7
+          if-no-files-found: ignore

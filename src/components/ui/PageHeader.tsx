@@ -15,8 +15,8 @@ interface PageHeaderProps {
 /**
  * PageHeader — the masthead of every screen.
  *
- * The serif is allowed to carry the page. A single hairline closes the
- * header; panels beneath it do not repeat the same title/description rhythm.
+ * IBM Plex Sans carries the page at display scale. A single hairline closes
+ * the header; panels beneath it do not repeat the same title/description rhythm.
  */
 export function PageHeader({
   eyebrow,

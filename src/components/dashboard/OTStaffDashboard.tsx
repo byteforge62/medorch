@@ -3,10 +3,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { EQUIPMENT_STATUS } from '@/lib/operational-status';
+import type { EquipmentStatusValue } from '@/lib/operational-status';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import {
+  CalendarCheck,
+  DoorOpen,
+  Heartbeat,
+  Warning,
+} from '@phosphor-icons/react';
+import { MetricCard, TheatreStatusCard } from './cards';
 import {
   SchedulePriorityBadge,
   ScheduleStatusBadge,
@@ -17,6 +26,32 @@ import type {
 } from '@/components/schedules/ScheduleStatusBadge';
 
 type StaffRole = 'SURGEON' | 'NURSE' | 'ANESTHETIST' | 'TECHNICIAN' | 'OTHER';
+
+interface ScheduleEquipmentDetail {
+  id: string;
+  equipment: Array<{
+    id: string;
+    releasedAt: string | null;
+    equipment: {
+      id: string;
+      name: string;
+      category: string;
+      serialNumber: string;
+      status: EquipmentStatusValue;
+    };
+  }>;
+}
+
+interface TheatreEquipmentRow {
+  assignmentId: string;
+  scheduleId: string;
+  procedure: string;
+  roomCode: string;
+  roomName: string;
+  startTime: string;
+  released: boolean;
+  equipment: ScheduleEquipmentDetail['equipment'][number]['equipment'];
+}
 
 interface StaffAssignment {
   id: string;
@@ -49,30 +84,32 @@ interface StaffAssignment {
 
 type TheatreState = 'live' | 'next' | 'committed' | 'free';
 
+/* A live theatre uses the same violet as an OCCUPIED room elsewhere, so the
+   room reads consistently on the board and in the theatre register. */
 const THEATRE_STATE: Record<
   TheatreState,
   { label: string; dot: string; text: string; soft: string; rail: string }
 > = {
   live: {
     label: 'In theatre',
-    dot: 'bg-danger',
-    text: 'text-danger',
-    soft: 'bg-danger-soft',
-    rail: 'bg-danger',
-  },
-  next: {
-    label: 'Next up',
     dot: 'bg-primary',
     text: 'text-primary',
     soft: 'bg-primary-soft',
     rail: 'bg-primary',
   },
-  committed: {
-    label: 'Booked',
+  next: {
+    label: 'Next up',
     dot: 'bg-warning',
     text: 'text-warning',
     soft: 'bg-warning-soft',
     rail: 'bg-warning',
+  },
+  committed: {
+    label: 'Booked',
+    dot: 'bg-border-strong',
+    text: 'text-ink-muted',
+    soft: 'bg-surface-muted',
+    rail: 'bg-border-strong',
   },
   free: {
     label: 'Free today',
@@ -83,9 +120,11 @@ const THEATRE_STATE: Record<
   },
 };
 
+/* Rails follow the shared schedule contract: in-progress is expected work
+   (warning), a delay is a broken commitment (danger). */
 const ROW_TONE: Record<ScheduleStatus, string> = {
-  IN_PROGRESS: 'bg-danger',
-  DELAYED: 'bg-warning',
+  IN_PROGRESS: 'bg-warning',
+  DELAYED: 'bg-danger',
   CONFIRMED: 'bg-primary',
   SCHEDULED: 'bg-border-strong',
   COMPLETED: 'bg-success',
@@ -175,6 +214,9 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
   const [assignments, setAssignments] = useState<StaffAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [equipmentRows, setEquipmentRows] = useState<TheatreEquipmentRow[]>([]);
+  const [equipmentLoading, setEquipmentLoading] = useState(true);
+  const [equipmentError, setEquipmentError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -237,6 +279,68 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
         ),
     [assignments, todayKey],
   );
+
+  /* Equipment is attached to a case, not to a room record, so each of today's
+     distinct cases is read for its real allocations. Failures are reported as
+     a partial result rather than hidden. */
+  useEffect(() => {
+    const caseIds = [...new Set(today.map((item) => item.schedule.id))].slice(
+      0,
+      12,
+    );
+
+    if (caseIds.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void Promise.allSettled(
+      caseIds.map((id) => apiClient.get<ScheduleEquipmentDetail>(`/api/schedules/${id}`)),
+    ).then((results) => {
+      if (cancelled) return;
+
+      const rows: TheatreEquipmentRow[] = [];
+      let failed = false;
+
+      results.forEach((result, index) => {
+        if (result.status !== 'fulfilled') {
+          failed = true;
+          return;
+        }
+
+        const assignment = today.find(
+          (item) => item.schedule.id === caseIds[index],
+        );
+
+        if (!assignment) return;
+
+        for (const allocated of result.value.equipment ?? []) {
+          rows.push({
+            assignmentId: allocated.id,
+            scheduleId: assignment.schedule.id,
+            procedure: assignment.schedule.procedure,
+            roomCode: assignment.schedule.otRoom.code,
+            roomName: assignment.schedule.otRoom.name,
+            startTime: assignment.schedule.startTime,
+            released: Boolean(allocated.releasedAt),
+            equipment: allocated.equipment,
+          });
+        }
+      });
+
+      rows.sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime));
+      setEquipmentRows(rows);
+      setEquipmentError(
+        failed ? 'Some case equipment could not be loaded.' : '',
+      );
+      setEquipmentLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [today]);
 
   const theatres = useMemo(() => {
     const map = new Map<
@@ -326,26 +430,41 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
         title="Theatre command"
         meta={userName}
         description="Room state first, then the day as one timeline. Every figure below is derived from your assignments."
-        actions={
-          <div className="border-rule bg-sheet flex divide-x divide-rule overflow-hidden rounded-[var(--radius-panel)] border shadow-xs">
-            {[
-              { label: 'Live', value: liveCount },
-              { label: 'Open', value: openCount },
-              { label: 'Priority', value: priorityCount },
-              { label: 'Theatres', value: theatres.length },
-            ].map((item) => (
-              <div key={item.label} className="px-4 py-2.5 text-center">
-                <p className="text-ink font-display text-2xl leading-none">
-                  {item.value}
-                </p>
-                <p className="text-ink-muted mt-1 text-[10px] font-semibold tracking-[0.1em] uppercase">
-                  {item.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        }
       />
+
+      <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Live now"
+          value={liveCount}
+          unit={liveCount === 1 ? 'theatre' : 'theatres'}
+          tone="primary"
+          icon={<Heartbeat size={18} weight="duotone" aria-hidden="true" />}
+          support="Cases marked in progress"
+        />
+        <MetricCard
+          label="Open cases"
+          value={openCount}
+          unit="assigned"
+          icon={<CalendarCheck size={18} weight="duotone" aria-hidden="true" />}
+          support="Not yet completed or cancelled"
+        />
+        <MetricCard
+          label="Priority"
+          value={priorityCount}
+          unit="flagged"
+          tone="warning"
+          icon={<Warning size={18} weight="duotone" aria-hidden="true" />}
+          support="Urgent or emergency cases"
+        />
+        <MetricCard
+          label="Theatres"
+          value={theatres.length}
+          unit="on your list"
+          tone="success"
+          icon={<DoorOpen size={18} weight="duotone" aria-hidden="true" />}
+          support="Rooms holding your assignments"
+        />
+      </div>
 
       {/* Theatre board — the room is the unit of operations */}
       {theatres.length === 0 ? (
@@ -374,65 +493,153 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
               );
 
               return (
-                <article
+                <TheatreStatusCard
                   key={theatre.code}
-                  className="panel relative overflow-hidden p-4"
-                >
-                  <span
-                    className={`absolute inset-x-0 top-0 h-[3px] ${state.rail}`}
-                    aria-hidden="true"
-                  />
+                  code={theatre.code}
+                  name={theatre.name}
+                  statusLabel={state.label}
+                  tone={
+                    theatre.state === 'live'
+                      ? 'primary'
+                      : theatre.state === 'next'
+                        ? 'warning'
+                        : 'neutral'
+                  }
+                  live={theatre.state === 'live'}
+                  primaryLabel={
+                    theatre.state === 'live'
+                      ? 'In theatre'
+                      : theatre.state === 'free'
+                        ? 'Theatre day'
+                        : 'Next case'
+                  }
+                  primaryLine={
+                    theatre.next ? theatre.next.schedule.procedure : 'Nothing booked today'
+                  }
+                  secondaryLine={
+                    theatre.next
+                      ? `${clock(theatre.next.schedule.startTime)}–${clock(
+                          theatre.next.schedule.endTime,
+                        )} · ${roleLabel(theatre.next.role)}`
+                      : undefined
+                  }
+                  descriptor={`${todayItems.length} case${
+                    todayItems.length === 1 ? '' : 's'
+                  } today`}
+                  segments={todayItems.flatMap((assignment) => {
+                    const start = minutesOf(assignment.schedule.startTime);
+                    const end = minutesOf(assignment.schedule.endTime);
+                    if (start === null || end === null) return [];
 
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-ink-muted font-mono text-[11px] tracking-[0.08em]">
-                        {theatre.code}
-                      </p>
-                      <h3 className="text-ink mt-1 text-[15px] leading-tight font-semibold">
-                        {theatre.name}
-                      </h3>
-                    </div>
-
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-semibold ${state.soft} ${state.text}`}
-                    >
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${state.dot}`}
-                        aria-hidden="true"
-                      />
-                      {state.label}
-                    </span>
-                  </div>
-
-                  {theatre.next ? (
-                    <div className="border-rule-soft mt-3 border-t pt-3">
-                      <p className="text-ink text-[13px] leading-snug font-medium">
-                        {theatre.next.schedule.procedure}
-                      </p>
-                      <p className="text-ink-muted mt-1 text-[12px]">
-                        <span className="font-mono">
-                          {clock(theatre.next.schedule.startTime)}–
-                          {clock(theatre.next.schedule.endTime)}
-                        </span>{' '}
-                        · {roleLabel(theatre.next.role)}
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="text-ink-muted border-rule-soft mt-3 border-t pt-3 text-[12px]">
-                      Nothing booked today
-                    </p>
-                  )}
-
-                  <p className="text-ink-subtle mt-3 text-[11px]">
-                    {todayItems.length} case{todayItems.length === 1 ? '' : 's'}{' '}
-                    today
-                  </p>
-                </article>
+                    return [
+                      {
+                        id: assignment.id,
+                        left: ((start - axis.from) / span) * 100,
+                        width: Math.max(2, ((end - start) / span) * 100),
+                        className: ROW_TONE[assignment.schedule.status],
+                        label: `${assignment.schedule.procedure} ${clock(
+                          assignment.schedule.startTime,
+                        )}–${clock(assignment.schedule.endTime)}`,
+                      },
+                    ];
+                  })}
+                />
               );
             })}
           </div>
         </section>
       )}
+
+      {/* Equipment on today's cases */}
+      {today.length > 0 ? (
+        <section
+          aria-labelledby="theatre-equipment-title"
+          className="panel-flush"
+        >
+          <div className="border-rule-soft flex flex-wrap items-end justify-between gap-3 border-b px-5 py-4">
+            <div>
+              <h2 id="theatre-equipment-title" className="section-title text-ink">
+                Equipment in your theatres
+              </h2>
+              <p className="text-ink-muted mt-1 text-[13px]">
+                Units allocated to today&apos;s cases, with their current
+                register status.
+              </p>
+            </div>
+            <Link
+              href="/equipment"
+              className="text-primary text-[11.5px] font-semibold hover:underline"
+            >
+              Equipment register →
+            </Link>
+          </div>
+
+          {equipmentLoading ? (
+            <div className="space-y-2 px-5 py-4">
+              <div className="bg-surface-muted h-9 animate-pulse rounded" />
+              <div className="bg-surface-muted h-9 animate-pulse rounded" />
+            </div>
+          ) : equipmentRows.length === 0 ? (
+            <div className="px-5 py-5">
+              <p className="text-foreground-muted text-[12.5px]">
+                No equipment is allocated to today&apos;s cases yet.
+                {equipmentError ? ` ${equipmentError}` : ''}
+              </p>
+            </div>
+          ) : (
+            <>
+              {equipmentError ? (
+                <p className="text-warning px-5 pt-3 text-[11.5px]">
+                  {equipmentError}
+                </p>
+              ) : null}
+              <ul className="divide-rule-soft divide-y">
+                {equipmentRows.map((row) => {
+                  const meta = EQUIPMENT_STATUS[row.equipment.status];
+
+                  return (
+                    <li
+                      key={row.assignmentId}
+                      className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3"
+                    >
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${meta.dot}`}
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="text-ink block truncate text-[13px] font-medium">
+                          {row.equipment.name}
+                        </span>
+                        <span className="text-ink-muted mt-0.5 block truncate text-[11.5px]">
+                          {row.equipment.category} ·{' '}
+                          {row.equipment.serialNumber} · {row.roomCode} ·{' '}
+                          {row.procedure}
+                        </span>
+                      </span>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${meta.tone} ${meta.text}`}
+                      >
+                        {meta.label}
+                      </span>
+                      <Link
+                        href={`/schedules/${row.scheduleId}`}
+                        className="text-primary shrink-0 text-[11px] font-semibold hover:underline"
+                      >
+                        Case →
+                      </Link>
+                      {row.released ? (
+                        <span className="text-ink-subtle shrink-0 text-[10.5px]">
+                          Released
+                        </span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
+        </section>
+      ) : null}
 
       {/* The day as one axis */}
       {today.length > 0 ? (
@@ -447,14 +654,22 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px]">
+            <div className="flex flex-wrap items-center gap-3 text-[11px]">
               <span className="text-ink-muted inline-flex items-center gap-1.5">
-                <span className="bg-danger h-2 w-2 rounded-full" aria-hidden="true" />
-                Live
+                <span className="bg-warning h-2 w-2 rounded-full" aria-hidden="true" />
+                In progress
               </span>
               <span className="text-ink-muted inline-flex items-center gap-1.5">
                 <span className="bg-primary h-2 w-2 rounded-full" aria-hidden="true" />
                 Confirmed
+              </span>
+              <span className="text-ink-muted inline-flex items-center gap-1.5">
+                <span className="bg-success h-2 w-2 rounded-full" aria-hidden="true" />
+                Completed
+              </span>
+              <span className="text-ink-muted inline-flex items-center gap-1.5">
+                <span className="bg-danger h-2 w-2 rounded-full" aria-hidden="true" />
+                Delayed
               </span>
               <span className="text-ink-muted inline-flex items-center gap-1.5">
                 <span className="bg-border-strong h-2 w-2 rounded-full" aria-hidden="true" />

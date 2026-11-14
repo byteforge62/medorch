@@ -4,6 +4,10 @@ import type {
   WorkspaceStaffRole,
   WorkspaceRoomStatus,
 } from '@/modules/schedules/schedule-workspace.types';
+import {
+  ROOM_STATUS,
+  SCHEDULE_STATUS,
+} from '@/lib/operational-status';
 
 const pad = (value: number) => String(value).padStart(2, '0');
 
@@ -257,31 +261,33 @@ export function buildTimeAxis(
   };
 }
 
+/* Labels and rails come from the product-wide status contract, so a case
+   reads identically here, on the dashboard and in the theatre board. */
 export const SCHEDULE_STATUS_LABEL: Record<WorkspaceScheduleStatus, string> = {
-  SCHEDULED: 'Scheduled',
-  CONFIRMED: 'Confirmed',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled',
-  DELAYED: 'Delayed',
+  SCHEDULED: SCHEDULE_STATUS.SCHEDULED.label,
+  CONFIRMED: SCHEDULE_STATUS.CONFIRMED.label,
+  IN_PROGRESS: SCHEDULE_STATUS.IN_PROGRESS.label,
+  COMPLETED: SCHEDULE_STATUS.COMPLETED.label,
+  CANCELLED: SCHEDULE_STATUS.CANCELLED.label,
+  DELAYED: SCHEDULE_STATUS.DELAYED.label,
 };
 
 export const SCHEDULE_BLOCK_TONE: Record<WorkspaceScheduleStatus, string> = {
   SCHEDULED: 'border-border-strong bg-surface text-ink',
   CONFIRMED: 'border-primary/30 bg-primary-soft text-primary',
-  IN_PROGRESS: 'border-brass/35 bg-brass-soft text-secondary',
+  IN_PROGRESS: 'border-warning/35 bg-warning-soft text-warning',
   COMPLETED: 'border-success/25 bg-success-soft text-success',
   CANCELLED: 'border-border bg-surface-muted text-ink-muted',
-  DELAYED: 'border-warning/35 bg-warning-soft text-warning',
+  DELAYED: 'border-danger/35 bg-danger-soft text-danger',
 };
 
 export const SCHEDULE_RAIL_TONE: Record<WorkspaceScheduleStatus, string> = {
-  SCHEDULED: 'bg-border-strong',
-  CONFIRMED: 'bg-primary',
-  IN_PROGRESS: 'bg-brass',
-  COMPLETED: 'bg-success',
-  CANCELLED: 'bg-border-strong',
-  DELAYED: 'bg-warning',
+  SCHEDULED: SCHEDULE_STATUS.SCHEDULED.rail,
+  CONFIRMED: SCHEDULE_STATUS.CONFIRMED.rail,
+  IN_PROGRESS: SCHEDULE_STATUS.IN_PROGRESS.rail,
+  COMPLETED: SCHEDULE_STATUS.COMPLETED.rail,
+  CANCELLED: SCHEDULE_STATUS.CANCELLED.rail,
+  DELAYED: SCHEDULE_STATUS.DELAYED.rail,
 };
 
 export const PRIORITY_LABEL: Record<WorkspaceSchedulePriority, string> = {
@@ -305,24 +311,24 @@ export const STAFF_ROLE_LABEL: Record<WorkspaceStaffRole, string> = {
 };
 
 export const ROOM_STATUS_LABEL: Record<WorkspaceRoomStatus, string> = {
-  AVAILABLE: 'Available',
-  OCCUPIED: 'Register: in use',
-  MAINTENANCE: 'Maintenance',
-  DISABLED: 'Disabled',
+  AVAILABLE: ROOM_STATUS.AVAILABLE.label,
+  OCCUPIED: ROOM_STATUS.OCCUPIED.label,
+  MAINTENANCE: ROOM_STATUS.MAINTENANCE.label,
+  DISABLED: ROOM_STATUS.DISABLED.label,
 };
 
 export const ROOM_STATUS_TONE: Record<WorkspaceRoomStatus, string> = {
-  AVAILABLE: 'text-success',
-  OCCUPIED: 'text-warning',
-  MAINTENANCE: 'text-warning',
-  DISABLED: 'text-ink-muted',
+  AVAILABLE: ROOM_STATUS.AVAILABLE.text,
+  OCCUPIED: ROOM_STATUS.OCCUPIED.text,
+  MAINTENANCE: ROOM_STATUS.MAINTENANCE.text,
+  DISABLED: ROOM_STATUS.DISABLED.text,
 };
 
 export const ROOM_STATUS_DOT: Record<WorkspaceRoomStatus, string> = {
-  AVAILABLE: 'bg-success',
-  OCCUPIED: 'bg-warning',
-  MAINTENANCE: 'bg-warning',
-  DISABLED: 'bg-ink-subtle',
+  AVAILABLE: ROOM_STATUS.AVAILABLE.dot,
+  OCCUPIED: ROOM_STATUS.OCCUPIED.dot,
+  MAINTENANCE: ROOM_STATUS.MAINTENANCE.dot,
+  DISABLED: ROOM_STATUS.DISABLED.dot,
 };
 
 export function formatMonthDay(key: string): string {

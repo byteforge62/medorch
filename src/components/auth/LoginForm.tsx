@@ -11,16 +11,23 @@ import {
   authLinkClass,
   authNoticeClass,
 } from './auth-styles';
+import { AuthDivider, GoogleAuthButton } from './GoogleAuthButton';
 
 /*======================================================================
   Sign-in form — printed fields, one signal button.
 ====================================================================== */
 
-export function LoginForm() {
+export function LoginForm({
+  initialError = '',
+  googleEnabled,
+}: {
+  initialError?: string;
+  googleEnabled: boolean;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError);
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -63,7 +70,11 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <GoogleAuthButton enabled={googleEnabled} label="Sign in with Google" />
+
+      <AuthDivider />
+
       {error ? (
         <p
           role="alert"

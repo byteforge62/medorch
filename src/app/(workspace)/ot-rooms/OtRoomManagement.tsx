@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Plus } from '@phosphor-icons/react';
+import { ROOM_STATUS } from '@/lib/operational-status';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -63,7 +65,7 @@ const STATUS_OPTIONS: OTRoomStatus[] = [
 ];
 
 function statusLabel(status: OTRoomStatus) {
-  return status.replace('_', ' ');
+  return ROOM_STATUS[status].label;
 }
 
 
@@ -302,17 +304,17 @@ export function OTRoomManagement() {
   }
 
   const statusToneClass: Record<OTRoomStatus, string> = {
-    AVAILABLE: 'bg-success',
-    OCCUPIED: 'bg-primary',
-    MAINTENANCE: 'bg-warning',
-    DISABLED: 'bg-ink-subtle',
+    AVAILABLE: ROOM_STATUS.AVAILABLE.dot,
+    OCCUPIED: ROOM_STATUS.OCCUPIED.dot,
+    MAINTENANCE: ROOM_STATUS.MAINTENANCE.dot,
+    DISABLED: ROOM_STATUS.DISABLED.dot,
   };
 
   const statusSoft: Record<OTRoomStatus, string> = {
-    AVAILABLE: 'bg-success-soft text-success',
-    OCCUPIED: 'bg-primary-soft text-primary',
-    MAINTENANCE: 'bg-warning-soft text-warning',
-    DISABLED: 'bg-surface-muted text-ink-secondary',
+    AVAILABLE: `${ROOM_STATUS.AVAILABLE.soft} ${ROOM_STATUS.AVAILABLE.text}`,
+    OCCUPIED: `${ROOM_STATUS.OCCUPIED.soft} ${ROOM_STATUS.OCCUPIED.text}`,
+    MAINTENANCE: `${ROOM_STATUS.MAINTENANCE.soft} ${ROOM_STATUS.MAINTENANCE.text}`,
+    DISABLED: `${ROOM_STATUS.DISABLED.soft} ${ROOM_STATUS.DISABLED.text}`,
   };
 
   const readiness = (['AVAILABLE', 'OCCUPIED', 'MAINTENANCE', 'DISABLED'] as OTRoomStatus[]).map(
@@ -715,24 +717,36 @@ export function OTRoomManagement() {
                 {casesFor(selected).length === 0 ? (
                   <p className="text-ink-muted mt-1.5 text-[12px]">Nothing booked today.</p>
                 ) : (
-                  <ul className="mt-2 space-y-1.5">
+                  <ul className="mt-2 space-y-1">
                     {casesFor(selected).map((item) => (
-                      <li key={item.id} className="flex items-baseline gap-2">
-                        <span className="text-ink-subtle shrink-0 font-mono text-[10.5px] tabular-nums">
-                          {clockOf(item.startTime)}
-                        </span>
-                        <span className="text-ink-secondary min-w-0 flex-1 truncate text-[11.5px]">
-                          {item.procedure}
-                        </span>
-                        {item.priority === 'EMERGENCY' ? (
-                          <span className="bg-danger-soft text-danger shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold">
-                            EMERG
+                      <li key={item.id}>
+                        <Link
+                          href={`/schedules/${item.id}`}
+                          className="hover:bg-surface-subtle -mx-1 flex items-baseline gap-2 rounded-[5px] px-1 py-1"
+                        >
+                          <span className="text-ink-subtle shrink-0 font-mono text-[10.5px] tabular-nums">
+                            {clockOf(item.startTime)}
                           </span>
-                        ) : null}
+                          <span className="text-ink-secondary min-w-0 flex-1 truncate text-[11.5px]">
+                            {item.procedure}
+                          </span>
+                          {item.priority === 'EMERGENCY' ? (
+                            <span className="bg-danger-soft text-danger shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold">
+                              EMERG
+                            </span>
+                          ) : null}
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 )}
+
+                <Link
+                  href="/schedules"
+                  className="text-primary mt-2.5 inline-block text-[11px] font-semibold hover:underline"
+                >
+                  Open schedule register →
+                </Link>
               </div>
 
               {isAdmin ? (

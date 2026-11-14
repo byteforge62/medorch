@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/Badge";
+import { SCHEDULE_STATUS } from "@/lib/operational-status";
 
 export type ScheduleStatus =
   | "SCHEDULED"
@@ -18,49 +19,32 @@ interface ScheduleStatusBadgeProps {
   className?: string;
 }
 
+/*
+ * One variant per state, matching the shared operational contract:
+ * a cancelled case is withdrawn (neutral), a delayed case is a broken
+ * commitment (danger), and an in-progress case is expected work (warning).
+ */
+const STATUS_VARIANT: Record<
+  ScheduleStatus,
+  "neutral" | "info" | "success" | "warning" | "danger"
+> = {
+  SCHEDULED: "neutral",
+  CONFIRMED: "info",
+  IN_PROGRESS: "warning",
+  COMPLETED: "success",
+  CANCELLED: "neutral",
+  DELAYED: "danger",
+};
+
 export function ScheduleStatusBadge({
   status,
   className = "",
 }: ScheduleStatusBadgeProps) {
-  switch (status) {
-    case "IN_PROGRESS":
-      return (
-        <Badge variant="warning" className={className}>
-          In Progress
-        </Badge>
-      );
-    case "CONFIRMED":
-      return (
-        <Badge variant="info" className={className}>
-          Confirmed
-        </Badge>
-      );
-    case "COMPLETED":
-      return (
-        <Badge variant="success" className={className}>
-          Completed
-        </Badge>
-      );
-    case "CANCELLED":
-      return (
-        <Badge variant="danger" className={className}>
-          Cancelled
-        </Badge>
-      );
-    case "DELAYED":
-      return (
-        <Badge variant="warning" className={className}>
-          Delayed
-        </Badge>
-      );
-    case "SCHEDULED":
-    default:
-      return (
-        <Badge variant="neutral" className={className}>
-          Scheduled
-        </Badge>
-      );
-  }
+  return (
+    <Badge variant={STATUS_VARIANT[status] ?? "neutral"} className={className}>
+      {SCHEDULE_STATUS[status]?.label ?? "Scheduled"}
+    </Badge>
+  );
 }
 
 interface SchedulePriorityBadgeProps {

@@ -18,10 +18,13 @@ test("alert repository mutations and audit records commit or roll back together"
 
   const databaseUrl = new URL(connectionString);
   const databaseName = decodeURIComponent(databaseUrl.pathname.slice(1));
+  // Any disposable local *_test database is acceptable; the shared test-env
+  // loader guarantees TEST_DATABASE_URL is loopback-only and never the
+  // development database.
   assert.ok(
     ["localhost", "127.0.0.1", "[::1]"].includes(databaseUrl.hostname) &&
-      /^medorch_alerts_test_[a-z0-9]+$/.test(databaseName),
-    "Alert repository audit tests require a disposable local medorch_alerts_test_* database.",
+      /^[a-z0-9_]+_test$/.test(databaseName),
+    "Alert repository audit tests require a disposable local *_test database.",
   );
 
   const pool = new Pool({ connectionString, max: 3 });

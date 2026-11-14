@@ -1,41 +1,41 @@
-'use client'
+'use client';
 
-import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { useSession } from 'next-auth/react'
-import { apiClient, ApiClientError } from '@/lib/api/client'
-import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { EmptyState } from '@/components/ui/EmptyState'
-import { ErrorState } from '@/components/ui/ErrorState'
-import { LoadingState } from '@/components/ui/LoadingState'
-import { Button } from '@/components/ui/Button'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
+import { apiClient, ApiClientError } from '@/lib/api/client';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { Button } from '@/components/ui/Button';
+import { PageHeader } from '@/components/ui/PageHeader';
 
-type EquipmentStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED'
+type EquipmentStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED';
 
 interface Equipment {
-  id: string
-  name: string
-  category: string
-  departmentId?: string | null
-  serialNumber?: string | null
-  status: EquipmentStatus
-  maintenanceDueAt?: string | null
-  department?: { id: string; name: string } | null
+  id: string;
+  name: string;
+  category: string;
+  departmentId?: string | null;
+  serialNumber?: string | null;
+  status: EquipmentStatus;
+  maintenanceDueAt?: string | null;
+  department?: { id: string; name: string } | null;
 }
 
 interface DepartmentOption {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface EquipmentForm {
-  name: string
-  category: string
-  serialNumber: string
-  departmentId: string
-  maintenanceDueAt: string
+  name: string;
+  category: string;
+  serialNumber: string;
+  departmentId: string;
+  maintenanceDueAt: string;
 }
 
 const EMPTY_FORM: EquipmentForm = {
@@ -44,69 +44,71 @@ const EMPTY_FORM: EquipmentForm = {
   serialNumber: '',
   departmentId: '',
   maintenanceDueAt: '',
-}
+};
 
 const STATUS_OPTIONS: EquipmentStatus[] = [
   'AVAILABLE',
   'IN_USE',
   'MAINTENANCE',
   'RETIRED',
-]
+];
 
 function formatStatus(status: EquipmentStatus) {
-  return status.replace('_', ' ')
+  return status.replace('_', ' ');
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return '—'
+  if (!value) return '—';
   return new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium' }).format(
     new Date(value),
-  )
+  );
 }
 
 export function EquipmentManagement() {
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.role === 'ADMIN'
-  const [equipment, setEquipment] = useState<Equipment[]>([])
-  const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<EquipmentStatus | 'ALL'>('ALL')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'ADMIN';
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<EquipmentStatus | 'ALL'>('ALL');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [updatingEquipmentId, setUpdatingEquipmentId] = useState<string | null>(
     null,
-  )
-  const [departments, setDepartments] = useState<DepartmentOption[]>([])
-  const [showForm, setShowForm] = useState(false)
+  );
+  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
+  const [showForm, setShowForm] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(
     null,
-  )
-  const [form, setForm] = useState<EquipmentForm>(EMPTY_FORM)
-  const [formError, setFormError] = useState('')
-  const [saving, setSaving] = useState(false)
+  );
+  const [form, setForm] = useState<EquipmentForm>(EMPTY_FORM);
+  const [formError, setFormError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!isAdmin) return
-    let cancelled = false
+    if (!isAdmin) return;
+    let cancelled = false;
     apiClient
       .get<DepartmentOption[]>('/api/departments')
       .then((response) => {
-        if (!cancelled) setDepartments(response)
+        if (!cancelled) setDepartments(response);
       })
       .catch(() => {
-        if (!cancelled) setFormError('Failed to load departments.')
-      })
-    return () => { cancelled = true }
-  }, [isAdmin])
+        if (!cancelled) setFormError('Failed to load departments.');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin]);
 
   function openCreateForm() {
-    setEditingEquipment(null)
-    setForm({ ...EMPTY_FORM })
-    setFormError('')
-    setShowForm(true)
+    setEditingEquipment(null);
+    setForm({ ...EMPTY_FORM });
+    setFormError('');
+    setShowForm(true);
   }
 
   function openEditForm(item: Equipment) {
-    setEditingEquipment(item)
+    setEditingEquipment(item);
     setForm({
       name: item.name,
       category: item.category,
@@ -115,16 +117,16 @@ export function EquipmentManagement() {
       maintenanceDueAt: item.maintenanceDueAt
         ? new Date(item.maintenanceDueAt).toISOString().slice(0, 10)
         : '',
-    })
-    setFormError('')
-    setShowForm(true)
+    });
+    setFormError('');
+    setShowForm(true);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setSaving(true)
-    setFormError('')
-    const common = { name: form.name.trim(), category: form.category.trim() }
+    event.preventDefault();
+    setSaving(true);
+    setFormError('');
+    const common = { name: form.name.trim(), category: form.category.trim() };
     const payload = editingEquipment
       ? {
           ...common,
@@ -134,102 +136,124 @@ export function EquipmentManagement() {
         }
       : {
           ...common,
-          ...(form.serialNumber.trim() ? { serialNumber: form.serialNumber.trim() } : {}),
+          ...(form.serialNumber.trim()
+            ? { serialNumber: form.serialNumber.trim() }
+            : {}),
           ...(form.departmentId ? { departmentId: form.departmentId } : {}),
-          ...(form.maintenanceDueAt ? { maintenanceDueAt: form.maintenanceDueAt } : {}),
-        }
+          ...(form.maintenanceDueAt
+            ? { maintenanceDueAt: form.maintenanceDueAt }
+            : {}),
+        };
     try {
       const saved = editingEquipment
         ? await apiClient.patch<Equipment>(
             `/api/equipment/${editingEquipment.id}`,
             payload,
           )
-        : await apiClient.post<Equipment>('/api/equipment', payload)
+        : await apiClient.post<Equipment>('/api/equipment', payload);
       setEquipment((current) =>
         editingEquipment
-          ? current.map((item) => (item.id === saved.id ? { ...item, ...saved } : item))
+          ? current.map((item) =>
+              item.id === saved.id ? { ...item, ...saved } : item,
+            )
           : [saved, ...current],
-      )
-      setShowForm(false)
-      setEditingEquipment(null)
-      setForm({ ...EMPTY_FORM })
+      );
+      setShowForm(false);
+      setEditingEquipment(null);
+      setForm({ ...EMPTY_FORM });
     } catch (submitError) {
       setFormError(
         submitError instanceof ApiClientError
           ? submitError.message
           : `Failed to ${editingEquipment ? 'update' : 'create'} equipment.`,
-      )
+      );
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
   async function handleStatusChange(id: string, nextStatus: EquipmentStatus) {
-    setUpdatingEquipmentId(id)
-    setError('')
+    setUpdatingEquipmentId(id);
+    setError('');
     try {
       const updated = await apiClient.patch<Equipment>(
         `/api/equipment/${id}/status`,
         { status: nextStatus },
-      )
+      );
       setEquipment((current) =>
-        current.map((item) => (item.id === id ? { ...item, ...updated } : item)),
-      )
+        current.map((item) =>
+          item.id === id ? { ...item, ...updated } : item,
+        ),
+      );
     } catch (updateError) {
       setError(
         updateError instanceof ApiClientError
           ? updateError.message
           : 'Failed to update equipment status.',
-      )
+      );
     } finally {
-      setUpdatingEquipmentId(null)
+      setUpdatingEquipmentId(null);
     }
   }
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     const fetchEquipment = async () => {
       try {
-        const response = await apiClient.get<Equipment[]>('/api/equipment')
-        if (!cancelled) setEquipment(response ?? [])
+        const response = await apiClient.get<Equipment[]>('/api/equipment');
+        if (!cancelled) setEquipment(response ?? []);
       } catch (fetchError) {
-        if (!cancelled) setError(fetchError instanceof ApiClientError ? fetchError.message : 'Failed to load equipment.')
+        if (!cancelled)
+          setError(
+            fetchError instanceof ApiClientError
+              ? fetchError.message
+              : 'Failed to load equipment.',
+          );
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setLoading(false);
       }
-    }
-    void fetchEquipment()
-    return () => { cancelled = true }
-  }, [])
+    };
+    void fetchEquipment();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredEquipment = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = search.trim().toLowerCase();
     return equipment.filter((item) => {
-      const matchesSearch = !normalizedSearch ||
+      const matchesSearch =
+        !normalizedSearch ||
         item.name.toLowerCase().includes(normalizedSearch) ||
         item.category.toLowerCase().includes(normalizedSearch) ||
-        (item.serialNumber?.toLowerCase().includes(normalizedSearch) ?? false) ||
-        (item.department?.name?.toLowerCase().includes(normalizedSearch) ?? false)
-      const matchesStatus = status === 'ALL' || item.status === status
-      return matchesSearch && matchesStatus
-    })
-  }, [equipment, search, status])
+        (item.serialNumber?.toLowerCase().includes(normalizedSearch) ??
+          false) ||
+        (item.department?.name?.toLowerCase().includes(normalizedSearch) ??
+          false);
+      const matchesStatus = status === 'ALL' || item.status === status;
+      return matchesSearch && matchesStatus;
+    });
+  }, [equipment, search, status]);
 
-  const counts = useMemo(() => ({
-    total: equipment.length,
-    available: equipment.filter((item) => item.status === 'AVAILABLE').length,
-    inUse: equipment.filter((item) => item.status === 'IN_USE').length,
-    maintenance: equipment.filter((item) => item.status === 'MAINTENANCE').length,
-  }), [equipment])
+  const counts = useMemo(
+    () => ({
+      total: equipment.length,
+      available: equipment.filter((item) => item.status === 'AVAILABLE').length,
+      inUse: equipment.filter((item) => item.status === 'IN_USE').length,
+      maintenance: equipment.filter((item) => item.status === 'MAINTENANCE')
+        .length,
+    }),
+    [equipment],
+  );
 
-  if (loading) return <LoadingState />
-  if (error && equipment.length === 0) return <ErrorState message={error} />
+  if (loading) return <LoadingState />;
+  if (error && equipment.length === 0) return <ErrorState message={error} />;
 
   const statusOptionsJSX = STATUS_OPTIONS.map((opt) => (
     <option key={opt} value={opt} disabled={opt === 'IN_USE'}>
       {formatStatus(opt)}
     </option>
-  ))
+  ));
 
   return (
     <main className="space-y-6 sm:space-y-8 lg:space-y-10">
@@ -237,44 +261,46 @@ export function EquipmentManagement() {
         eyebrow="Resource registry"
         title="Equipment"
         description="View equipment availability, category, assignment state, and maintenance information."
-        actions={isAdmin ? (
-          <Button type="button" onClick={openCreateForm}>
-            Add equipment
-          </Button>
-        ) : null}
+        actions={
+          isAdmin ? (
+            <Button type="button" onClick={openCreateForm}>
+              Add equipment
+            </Button>
+          ) : null
+        }
       />
       <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
           <div>
-            <div className="border-border rounded-0 bg-primary-soft/20 border-b-2 border-primary p-3">
-              <div className="text-primary font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+            <div className="border-border rounded-0 bg-primary-soft/20 border-primary border-b-2 p-3">
+              <div className="text-primary mb-1 font-mono text-sm font-medium tracking-[0.18em] uppercase">
                 {counts.total}
               </div>
-              <p className="text-xs text-muted-foreground">Total items</p>
+              <p className="text-muted-foreground text-xs">Total items</p>
             </div>
           </div>
           <div>
-            <div className="border-border rounded-0 bg-success-soft/20 border-b-2 border-success p-3">
-              <div className="text-success font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+            <div className="border-border rounded-0 bg-success-soft/20 border-success border-b-2 p-3">
+              <div className="text-success mb-1 font-mono text-sm font-medium tracking-[0.18em] uppercase">
                 {counts.available}
               </div>
-              <p className="text-xs text-muted-foreground">Available</p>
+              <p className="text-muted-foreground text-xs">Available</p>
             </div>
           </div>
           <div>
-            <div className="border-border rounded-0 bg-warning-soft/20 border-b-2 border-warning p-3">
-              <div className="text-warning font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+            <div className="border-border rounded-0 bg-warning-soft/20 border-warning border-b-2 p-3">
+              <div className="text-warning mb-1 font-mono text-sm font-medium tracking-[0.18em] uppercase">
                 {counts.inUse}
               </div>
-              <p className="text-xs text-muted-foreground">In use</p>
+              <p className="text-muted-foreground text-xs">In use</p>
             </div>
           </div>
           <div>
-            <div className="border-border rounded-0 bg-danger-soft/20 border-b-2 border-danger p-3">
-              <div className="text-danger font-medium text-sm font-mono tracking-[0.18em] uppercase mb-1">
+            <div className="border-border rounded-0 bg-danger-soft/20 border-danger border-b-2 p-3">
+              <div className="text-danger mb-1 font-mono text-sm font-medium tracking-[0.18em] uppercase">
                 {counts.maintenance}
               </div>
-              <p className="text-xs text-muted-foreground">Maintenance</p>
+              <p className="text-muted-foreground text-xs">Maintenance</p>
             </div>
           </div>
         </div>
@@ -286,7 +312,7 @@ export function EquipmentManagement() {
               {editingEquipment ? 'Edit equipment' : 'Add equipment'}
             </h2>
             {formError && (
-              <p role="alert" className="text-sm text-[var(--color-danger)]">
+              <p role="alert" className="text-danger text-sm">
                 {formError}
               </p>
             )}
@@ -393,7 +419,7 @@ export function EquipmentManagement() {
       {error && (
         <div
           role="alert"
-          className="border border-[var(--color-danger-border)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]"
+          className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border px-4 py-3 text-sm"
         >
           {error}
         </div>
@@ -408,14 +434,14 @@ export function EquipmentManagement() {
           {filteredEquipment.map((item) => (
             <Card
               key={item.id}
-              className="border border-border-line rounded-0 overflow-hidden"
+              className="border-border-line rounded-0 overflow-hidden border"
             >
               <div className="flex items-start justify-between gap-4 px-4 py-4">
                 <div className="min-w-0 flex-1">
-                  <h2 className="truncate font-semibold text-foreground">
+                  <h2 className="text-foreground truncate font-semibold">
                     {item.name}
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-sm">
                     {item.category}
                   </p>
                 </div>
@@ -476,7 +502,7 @@ export function EquipmentManagement() {
                 <button
                   type="button"
                   onClick={() => openEditForm(item)}
-                  className="mt-3 text-sm font-medium text-primary"
+                  className="text-primary mt-3 text-sm font-medium"
                 >
                   Edit details
                 </button>
@@ -486,5 +512,5 @@ export function EquipmentManagement() {
         </section>
       )}
     </main>
-  )
+  );
 }

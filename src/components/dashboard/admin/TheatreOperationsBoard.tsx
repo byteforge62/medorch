@@ -23,6 +23,7 @@ import {
   ROOM_STATUS,
   SCHEDULE_STATUS,
 } from './format';
+import { TheatreStatusCard } from '../cards';
 import type { Room, Schedule } from './types';
 
 function axisFor(schedules: Schedule[]) {
@@ -180,81 +181,70 @@ export function TheatreOperationsBoard({
             </p>
           </div>
 
-          <div className="grid gap-px bg-rule-soft p-px sm:grid-cols-2 xl:grid-cols-3">
-            {view.roomViews.map(({ room, todayCases, activeCase, nextCase, conflict }) => {
-              const state = ROOM_STATUS[room.isActive ? room.status : 'DISABLED'];
+          <div className="grid gap-2.5 p-3 sm:grid-cols-2 xl:grid-cols-3">
+            {view.roomViews.map(({ room, todayCases, activeCase, nextCase, bookedMinutes, conflict }) => {
+              const roomState = ROOM_STATUS[room.isActive ? room.status : 'DISABLED'];
               const selected = view.selected?.room.id === room.id;
+              const tone =
+                !room.isActive
+                  ? 'neutral'
+                  : room.status === 'AVAILABLE'
+                    ? 'success'
+                    : room.status === 'OCCUPIED'
+                      ? 'primary'
+                      : room.status === 'MAINTENANCE'
+                        ? 'warning'
+                        : 'neutral';
+
+              const segments = todayCases.flatMap((schedule) => {
+                const start = minutesOfDay(schedule.startTime);
+                const end = minutesOfDay(schedule.endTime);
+                if (start === null || end === null) return [];
+
+                const left = Math.max(0, view.axis.pct(start));
+
+                return [
+                  {
+                    id: schedule.id,
+                    left,
+                    width: Math.max(1.5, view.axis.pct(end) - left),
+                    className: SCHEDULE_STATUS[schedule.status].rail,
+                    label: `${schedule.procedure} ${formatTimeRange(
+                      schedule.startTime,
+                      schedule.endTime,
+                    )}`,
+                  },
+                ];
+              });
 
               return (
-                <button
+                <TheatreStatusCard
                   key={room.id}
-                  type="button"
-                  aria-pressed={selected}
-                  aria-controls="theatre-room-detail"
-                  onClick={() => setSelectedRoomId(room.id)}
-                  className={`group relative min-w-0 bg-sheet px-3.5 py-3 text-left transition-colors ${
-                    selected
-                      ? 'bg-primary-soft/55'
-                      : 'hover:bg-surface-subtle'
-                  }`}
-                >
-                  <span
-                    className={`${state.dot} absolute top-0 bottom-0 left-0 w-[3px]`}
-                    aria-hidden="true"
-                  />
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-ink text-[12.5px] leading-tight font-semibold">
-                        {room.code}
-                      </p>
-                      <p className="text-ink-muted mt-0.5 truncate text-[10.5px]">
-                        {room.name}
-                      </p>
-                    </div>
-                    <span className={`${state.text} shrink-0 text-[10px] font-semibold`}>
-                      {room.isActive ? state.label : 'Offline'}
-                    </span>
-                  </div>
-
-                  <div className="border-rule-soft mt-2.5 border-t pt-2">
-                    <p className="text-ink-secondary truncate text-[10.5px]">
-                      {activeCase
-                        ? `${formatClock(activeCase.startTime)} · ${activeCase.procedure}`
-                        : nextCase
-                          ? `Next ${formatClock(nextCase.startTime)} · ${nextCase.procedure}`
-                          : 'No active or upcoming case'}
-                    </p>
-
-                    <div
-                      className="bg-surface-muted relative mt-2 h-1.5 overflow-hidden rounded-full"
-                      aria-hidden="true"
-                    >
-                      {todayCases.map((schedule) => {
-                        const start = minutesOfDay(schedule.startTime);
-                        const end = minutesOfDay(schedule.endTime);
-                        if (start === null || end === null) return null;
-
-                        const left = Math.max(0, view.axis.pct(start));
-                        const width = Math.max(1.5, view.axis.pct(end) - left);
-                        const status = SCHEDULE_STATUS[schedule.status];
-
-                        return (
-                          <span
-                            key={schedule.id}
-                            className={`${status.rail} absolute top-0 bottom-0 rounded-full opacity-90`}
-                            style={{ left: `${left}%`, width: `${width}%` }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {conflict ? (
-                    <p className="text-danger mt-1.5 text-[10px] font-semibold">
-                      Overlap on today&apos;s list
-                    </p>
-                  ) : null}
-                </button>
+                  code={room.code}
+                  name={room.name}
+                  descriptor={`${todayCases.length} case${
+                    todayCases.length === 1 ? '' : 's'
+                  } today`}
+                  statusLabel={room.isActive ? roomState.label : 'Offline'}
+                  tone={tone}
+                  live={Boolean(activeCase)}
+                  primaryLabel={
+                    activeCase ? 'In theatre' : nextCase ? 'Next case' : 'Theatre day'
+                  }
+                  primaryLine={
+                    activeCase
+                      ? `${formatClock(activeCase.startTime)} · ${activeCase.procedure}`
+                      : nextCase
+                        ? `${formatClock(nextCase.startTime)} · ${nextCase.procedure}`
+                        : 'No active or upcoming case'
+                  }
+                  secondaryLine={room.department?.name ?? 'No department recorded'}
+                  bookedLabel={bookedMinutes > 0 ? formatDuration(bookedMinutes) : undefined}
+                  segments={segments}
+                  selected={selected}
+                  onSelect={() => setSelectedRoomId(room.id)}
+                  alert={conflict ? 'Overlap on today’s list' : undefined}
+                />
               );
             })}
           </div>

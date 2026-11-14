@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { FirstAidKit } from '@phosphor-icons/react';
 
 import {
   CountTag,
@@ -17,6 +18,7 @@ import {
   durationMinutes,
   formatTimeRange,
 } from './format';
+import { EquipmentCard } from '../cards';
 import type { Equipment, Schedule, ScheduleDetail } from './types';
 
 type Filter = 'ALL' | 'AVAILABLE' | 'ATTENTION';
@@ -178,73 +180,60 @@ export function EquipmentReadiness({
               description="Change the readiness filter to see the rest of the register."
             />
           ) : (
-            <ul className="divide-rule-soft divide-y">
+            <div className="grid gap-2.5 p-3 sm:grid-cols-2">
               {view.filtered.map(({ item, assignment, overdue, dueSoon }) => {
                 const status = EQUIPMENT_STATUS[item.status];
+                const tone =
+                  item.status === 'AVAILABLE'
+                    ? 'success'
+                    : item.status === 'IN_USE'
+                      ? 'primary'
+                      : item.status === 'MAINTENANCE'
+                        ? 'warning'
+                        : 'neutral';
+
+                const detail = assignment
+                  ? `${assignment.procedure} · ${assignment.otRoom?.code ?? 'Theatre'}`
+                  : item.maintenanceDueAt
+                    ? `${overdue ? 'Overdue' : 'Maintenance due'} ${formatDay(
+                        item.maintenanceDueAt,
+                      )}`
+                    : 'No open-case assignment';
+
+                const note = assignment
+                  ? `Assigned ${formatTimeRange(
+                      assignment.startTime,
+                      assignment.endTime,
+                    )} · ${formatDuration(
+                      durationMinutes(assignment.startTime, assignment.endTime),
+                    )}${
+                      dueSoon && item.maintenanceDueAt
+                        ? ` · maintenance due ${formatDay(item.maintenanceDueAt)}`
+                        : ''
+                    }`
+                  : overdue && item.maintenanceDueAt
+                    ? 'Maintenance is overdue'
+                    : dueSoon && item.maintenanceDueAt
+                      ? 'Maintenance due within seven days'
+                      : item.status === 'IN_USE' && !detailsError
+                        ? 'No open-case assignment found'
+                        : undefined;
 
                 return (
-                  <li key={item.id} className="px-4 py-2.5 sm:px-5">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-ink truncate text-[11.5px] font-semibold">
-                            {item.name}
-                          </span>
-                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold ${status.text}`}>
-                            <span className={`${status.dot} h-1.5 w-1.5 rounded-full`} aria-hidden="true" />
-                            {status.label}
-                          </span>
-                        </div>
-                        <p className="text-ink-muted mt-0.5 truncate text-[10.5px]">
-                          {item.category} · {item.department?.name ?? 'No department'}
-                        </p>
-                      </div>
-
-                      <div className="shrink-0 text-right">
-                        {assignment ? (
-                          <>
-                            <p className="text-ink-secondary max-w-[13rem] truncate text-[10px]">
-                              {assignment.procedure}
-                            </p>
-                            <p className="text-ink-subtle mt-0.5 text-[9.5px]">
-                              {assignment.otRoom?.code ?? 'Theatre'} ·{' '}
-                              {formatTimeRange(assignment.startTime, assignment.endTime)}
-                            </p>
-                          </>
-                        ) : item.status === 'IN_USE' ? (
-                          <p className="text-ink-subtle text-[9.5px]">
-                            {detailsError ? 'Assignment unavailable' : 'No open-case assignment found'}
-                          </p>
-                        ) : (
-                          <p className="text-ink-subtle text-[9.5px]">
-                            {item.maintenanceDueAt
-                              ? `${overdue ? 'Overdue' : 'Due'} ${formatDay(item.maintenanceDueAt)}`
-                              : 'No maintenance date'}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {assignment ? (
-                      <p className="text-ink-subtle mt-1 text-[9.5px]">
-                        Assigned for {formatDuration(durationMinutes(assignment.startTime, assignment.endTime))}
-                        {dueSoon && item.maintenanceDueAt
-                          ? ` · maintenance due ${formatDay(item.maintenanceDueAt)}`
-                          : ''}
-                      </p>
-                    ) : dueSoon && item.maintenanceDueAt ? (
-                      <p className="text-warning mt-1 text-[9.5px] font-semibold">
-                        Maintenance due within seven days · {formatDay(item.maintenanceDueAt)}
-                      </p>
-                    ) : overdue && item.maintenanceDueAt ? (
-                      <p className="text-danger mt-1 text-[9.5px] font-semibold">
-                        Maintenance overdue · {formatDay(item.maintenanceDueAt)}
-                      </p>
-                    ) : null}
-                  </li>
+                  <EquipmentCard
+                    key={item.id}
+                    icon={<FirstAidKit size={16} weight="duotone" aria-hidden="true" />}
+                    name={item.name}
+                    category={item.category}
+                    department={item.department?.name ?? 'No department'}
+                    statusLabel={status.label}
+                    tone={tone}
+                    detail={detail}
+                    note={note}
+                  />
                 );
               })}
-            </ul>
+            </div>
           )}
 
           <p className="border-rule-soft text-ink-subtle border-t px-4 py-2 text-[10px] sm:px-5">

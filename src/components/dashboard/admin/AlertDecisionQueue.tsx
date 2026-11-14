@@ -2,8 +2,10 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
+import { Info, SealWarning, Warning } from '@phosphor-icons/react';
 
 import { Button } from '@/components/ui/Button';
+import { AlertCard } from '../cards';
 import {
   CountTag,
   Panel,
@@ -71,47 +73,47 @@ export function AlertDecisionQueue({
       ) : null}
 
       {!error && unread.length > 0 ? (
-        <ul className="divide-rule-soft flex-1 divide-y">
+        <div className="flex-1 space-y-2 p-3">
           {unread.slice(0, 5).map((alert) => {
             const severity = SEVERITY[alert.severity];
             const busy = busyId === alert.id;
+            const tone =
+              alert.severity === 'CRITICAL'
+                ? 'danger'
+                : alert.severity === 'WARNING'
+                  ? 'warning'
+                  : 'info';
 
             return (
-              <li key={alert.id} className="relative px-4 py-3.5 sm:px-5">
-                <span
-                  className={`${severity.rail} absolute top-0 bottom-0 left-0 w-[3px]`}
-                  aria-hidden="true"
-                />
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`${severity.chip} rounded-full px-2 py-0.5 text-[9.5px] font-bold tracking-[0.06em] uppercase`}
-                  >
-                    {severity.label}
-                  </span>
-                  <span className="text-ink-subtle text-[10.5px]">
-                    {alert.type.toLowerCase()} · {formatRelative(alert.createdAt)}
-                  </span>
-                </div>
-
-                <p className="text-ink mt-1.5 text-[12.5px] leading-snug font-semibold">
-                  {alert.title}
-                </p>
-                <p className="text-ink-muted mt-1 line-clamp-2 text-[11.5px] leading-relaxed">
-                  {alert.message}
-                </p>
-
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                  {alert.schedule ? (
-                    <Link
-                      href={`/schedules/${alert.schedule.id}`}
-                      className="text-primary max-w-full truncate text-[10.5px] font-semibold hover:underline"
-                    >
-                      {alert.schedule.procedure} →
-                    </Link>
+              <AlertCard
+                key={alert.id}
+                icon={
+                  alert.severity === 'CRITICAL' ? (
+                    <Warning size={15} weight="fill" aria-hidden="true" />
+                  ) : alert.severity === 'WARNING' ? (
+                    <SealWarning size={15} weight="duotone" aria-hidden="true" />
                   ) : (
-                    <span className="text-ink-subtle text-[10.5px]">No linked schedule</span>
-                  )}
-
+                    <Info size={15} weight="duotone" aria-hidden="true" />
+                  )
+                }
+                severity={tone}
+                title={alert.title}
+                message={alert.message}
+                meta={
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-[0.06em] uppercase ${severity.chip}`}
+                    >
+                      {severity.label}
+                    </span>
+                    <span className="text-ink-subtle text-[10px]">
+                      {alert.type.toLowerCase()} · {formatRelative(alert.createdAt)}
+                    </span>
+                  </div>
+                }
+                href={alert.schedule ? `/schedules/${alert.schedule.id}` : undefined}
+                hrefLabel={alert.schedule ? 'Case record' : undefined}
+                action={
                   <Button
                     type="button"
                     variant="ghost"
@@ -123,11 +125,11 @@ export function AlertDecisionQueue({
                   >
                     Mark read
                   </Button>
-                </div>
-              </li>
+                }
+              />
             );
           })}
-        </ul>
+        </div>
       ) : null}
 
       {actionError ? (

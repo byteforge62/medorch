@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useId, useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface LandingMobileNavProps {
   navLinks: { label: string; href: string }[];
@@ -18,16 +18,16 @@ export function LandingMobileNav({ navLinks }: LandingMobileNavProps) {
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsOpen(false);
         menuButtonRef.current?.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -39,8 +39,8 @@ export function LandingMobileNav({ navLinks }: LandingMobileNavProps) {
         ref={menuButtonRef}
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border border-[var(--color-border)] text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 md:hidden"
-        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+        className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-control)] border border-[var(--rule)] text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--pine)] focus-visible:ring-offset-2 focus-visible:outline-none md:hidden"
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
         aria-controls={menuId}
       >
@@ -80,7 +80,7 @@ export function LandingMobileNav({ navLinks }: LandingMobileNavProps) {
       {isOpen && (
         <div
           id={menuId}
-          className="absolute top-full right-0 left-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)] p-4 md:hidden"
+          className="absolute top-full right-0 left-0 z-50 border-b border-[var(--rule)] bg-[var(--sheet)] p-4 md:hidden"
         >
           <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
             {navLinks.map((link) => (
@@ -88,21 +88,18 @@ export function LandingMobileNav({ navLinks }: LandingMobileNavProps) {
                 key={link.label}
                 href={link.href}
                 onClick={closeMenu}
-                className="rounded-[var(--radius-control)] px-3 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+                className="rounded-[var(--radius-control)] px-3 py-2.5 text-sm font-medium text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--pine)] focus-visible:outline-none"
               >
                 {link.label}
               </a>
             ))}
 
-            <div
-              className="my-2 h-px bg-[var(--color-border)]"
-              aria-hidden="true"
-            />
+            <div className="my-2 h-px bg-[var(--rule)]" aria-hidden="true" />
 
             <Link
               href="/login"
               onClick={closeMenu}
-              className="rounded-[var(--radius-control)] px-3 py-2.5 text-sm font-medium text-[var(--color-foreground-secondary)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              className="rounded-[var(--radius-control)] px-3 py-2.5 text-sm font-medium text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--pine)] focus-visible:outline-none"
             >
               Sign In
             </Link>
@@ -110,7 +107,7 @@ export function LandingMobileNav({ navLinks }: LandingMobileNavProps) {
             <Link
               href="/login"
               onClick={closeMenu}
-              className="mt-1 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-foreground-inverse transition-colors hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
+              className="text-foreground-inverse mt-1 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[var(--pine)] px-4 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--pine-deep)] focus-visible:ring-2 focus-visible:ring-[var(--pine)] focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               Get Started
             </Link>

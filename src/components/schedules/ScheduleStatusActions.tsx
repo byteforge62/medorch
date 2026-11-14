@@ -24,6 +24,8 @@ export interface ScheduleStatusActionsProps {
   currentStatus: ScheduleStatus;
   onStatusUpdated: (scheduleId: string, newStatus: ScheduleStatus) => void;
   scheduleLabel?: string;
+  /** Remove the surrounding control plate when the caller already provides one. */
+  bare?: boolean;
 }
 
 const STATUS_ACTIONS: Record<ScheduleStatus, StatusAction[]> = {
@@ -242,9 +244,11 @@ export function ScheduleStatusActions({
   currentStatus,
   onStatusUpdated,
   scheduleLabel,
+  bare = false,
 }: ScheduleStatusActionsProps) {
-  const [pendingAction, setPendingAction] =
-    React.useState<StatusAction | null>(null);
+  const [pendingAction, setPendingAction] = React.useState<StatusAction | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
@@ -295,10 +299,7 @@ export function ScheduleStatusActions({
     }
   };
 
-  const activateAction = (
-    action: StatusAction,
-    trigger: HTMLButtonElement,
-  ) => {
+  const activateAction = (action: StatusAction, trigger: HTMLButtonElement) => {
     setError(null);
     triggerRef.current = trigger;
 
@@ -334,7 +335,13 @@ export function ScheduleStatusActions({
   }
 
   return (
-    <fieldset className="border-rule/80 bg-surface/70 rounded-[var(--radius-control)] border p-2.5">
+    <fieldset
+      className={
+        bare
+          ? 'p-0'
+          : 'border-rule/80 bg-surface/70 rounded-[var(--radius-control)] border p-2.5'
+      }
+    >
       <legend className="sr-only">Change procedure status</legend>
       {error ? (
         <div

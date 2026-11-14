@@ -13,6 +13,7 @@ import {
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
 
+import { MetricCard } from '../cards';
 import { DashboardSkeleton, Panel, PanelError } from './DashboardPrimitives';
 import { OperationalAttention } from './OperationalAttention';
 import { TheatreOperationsBoard } from './TheatreOperationsBoard';
@@ -229,11 +230,46 @@ export function AdminDashboard() {
       open: open.length,
       activeRooms: activeRooms.length,
       readyRooms: readyRooms.length,
+      occupiedRooms: activeRooms.filter((room) => room.status === 'OCCUPIED').length,
+      outRooms: activeRooms.filter(
+        (room) => room.status === 'MAINTENANCE' || room.status === 'DISABLED',
+      ).length,
       unread: unread.length,
+      criticalAlerts: unread.filter((alert) => alert.severity === 'CRITICAL').length,
+      warningAlerts: unread.filter((alert) => alert.severity === 'WARNING').length,
+      infoAlerts: unread.filter((alert) => alert.severity === 'INFO').length,
+      inUseEquipment: data.equipment.filter((item) => item.status === 'IN_USE').length,
+      retiredEquipment: data.equipment.filter((item) => item.status === 'RETIRED').length,
       availableEquipment: availableEquipment.length,
+      maintenanceEquipment: data.equipment.filter((item) => item.status === 'MAINTENANCE')
+        .length,
       equipment: data.equipment.length,
     };
   }, [data, now]);
+
+  /* Real caseload per day for the next seven days, counted from the schedule
+     register. No projection or smoothing: a day with no booked case is drawn
+     as an empty column. */
+  const weekLoad = useMemo(() => {
+    const start = startOfDay(now);
+    const days = Array.from({ length: 7 }, (_, index) => addDays(start, index));
+    const counts = days.map(
+      (day) =>
+        data.schedules.filter(
+          (schedule) =>
+            schedule.status !== 'CANCELLED' && dateKey(schedule.startTime) === dateKey(day),
+        ).length,
+    );
+
+    return {
+      days,
+      counts,
+      total: counts.reduce((sum, count) => sum + count, 0),
+      labels: days.map((day) =>
+        new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(day),
+      ),
+    };
+  }, [data.schedules, now]);
 
   async function handleMarkRead(alert: AlertRecord) {
     setBusyAlertId(alert.id);
@@ -284,7 +320,7 @@ export function AdminDashboard() {
   return (
     <main className="space-y-3">
       <header className="space-y-0">
-        <div className="dashboard-command bg-rail relative overflow-hidden px-5 pt-5 pb-11 text-white sm:px-7 sm:pt-6 sm:pb-12">
+        <div className="dashboard-command bg-rail relative overflow-hidden px-5 pt-5 pb-16 text-white sm:px-7 sm:pt-7 sm:pb-20">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_100%]" />
             <div className="absolute -top-32 right-[-7rem] h-80 w-80 rounded-full border border-white/10" />
@@ -302,7 +338,7 @@ export function AdminDashboard() {
               <h1 className="font-display mt-3 text-[clamp(1.65rem,2.5vw,2.25rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white">
                 Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}.
               </h1>
-              <p className="mt-2 max-w-[58ch] text-[11.5px] leading-[1.65] text-white/60">
+              <p className="mt-2.5 max-w-[56ch] text-[12.5px] leading-[1.65] text-white/60">
                 The current theatre picture, open cases, resource readiness and the decisions that
                 need you now.
               </p>
@@ -323,23 +359,23 @@ export function AdminDashboard() {
                 >
                   {refreshing ? 'Refreshing…' : 'Refresh picture'}
                 </button>
-                <span className="font-mono text-[8.5px] text-white/35">UPDATED {timeLabel}</span>
+                <span className="font-mono text-[9px] text-white/35">UPDATED {timeLabel}</span>
               </div>
             </div>
 
             <div className="hidden border-white/10 xl:block xl:border-l xl:pl-6">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-[9px] font-semibold text-white/45">Live picture</p>
-                <span className="flex items-center gap-1.5 font-mono text-[8px] text-white/35">
+                <p className="text-[10.5px] font-semibold text-white/60">Live picture</p>
+                <span className="flex items-center gap-1.5 font-mono text-[9px] text-white/40">
                   <span className="bg-success-bright h-1.5 w-1.5 rounded-full" aria-hidden="true" />
                   CONNECTED
                 </span>
               </div>
-              <p className="mt-2.5 max-w-[32ch] text-[10px] leading-[1.6] text-white/55">
+              <p className="mt-2.5 max-w-[34ch] text-[11.5px] leading-[1.6] text-white/60">
                 Read directly from the theatre, schedule, equipment and alert services. Missing
                 feeds stay visibly missing.
               </p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-2.5 font-mono text-[8px] text-white/40">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-2.5 font-mono text-[9px] text-white/45">
                 <span>ROLE-SCOPED</span>
                 <span>NO CLINICAL NOTES</span>
                 <span>LOCAL TIME</span>
@@ -348,80 +384,128 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <dl className="dashboard-stats relative z-10 mx-4 -mt-7 grid grid-cols-2 gap-2 rounded-[16px] border border-rule bg-sheet p-2 shadow-[0_22px_48px_-28px_rgba(41,36,61,0.35)] sm:mx-6 sm:grid-cols-4">
-          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
-            <span className="bg-primary-soft text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
-              <CalendarCheck size={18} weight="duotone" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
-                Open cases
-              </dt>
-              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-                {errors.schedules ? '—' : stats.open}
-                {!errors.schedules ? (
-                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
-                    {stats.today} today
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          </div>
-          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
-            <span className="bg-success-soft text-success flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
-              <DoorOpen size={18} weight="duotone" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
-                Theatres ready
-              </dt>
-              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-                {errors.rooms ? '—' : `${stats.readyRooms}/${stats.activeRooms}`}
-                {!errors.rooms ? (
-                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
-                    active
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          </div>
-          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
-            <span className="bg-warning-soft text-warning flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
-              <BellRinging size={18} weight="duotone" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
-                Unread alerts
-              </dt>
-              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-                {errors.alerts ? '—' : stats.unread}
-                {!errors.alerts ? (
-                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
-                    on file
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          </div>
-          <div className="dashboard-stat flex items-center gap-3 px-3 py-2.5">
-            <span className="bg-vermilion-soft text-vermilion flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]">
-              <FirstAidKit size={18} weight="duotone" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <dt className="text-ink-muted text-[9.5px] leading-tight font-semibold tracking-[0.04em] uppercase">
-                Equipment
-              </dt>
-              <dd className="text-ink mt-1 flex items-baseline gap-1.5 text-[1.35rem] leading-none font-semibold tracking-[-0.03em] tabular-nums">
-                {errors.equipment ? '—' : `${stats.availableEquipment}/${stats.equipment}`}
-                {!errors.equipment ? (
-                  <span className="text-ink-subtle text-[9.5px] font-medium tracking-normal">
-                    available
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          </div>
-        </dl>
+        <div className="relative z-10 mx-4 -mt-11 grid gap-2.5 sm:mx-6 sm:grid-cols-2 xl:grid-cols-12">
+          <MetricCard
+            feature
+            className="sm:col-span-2 xl:col-span-6"
+            label="Open cases"
+            value={errors.schedules ? '—' : stats.open}
+            unit={errors.schedules ? undefined : 'cases'}
+            icon={<CalendarCheck size={19} weight="duotone" aria-hidden="true" />}
+            support={
+              errors.schedules
+                ? 'The schedule register did not load.'
+                : `${stats.today} scheduled today · ${weekLoad.total} booked in the next seven days`
+            }
+            series={
+              errors.schedules
+                ? undefined
+                : {
+                    values: weekLoad.counts,
+                    labels: weekLoad.labels,
+                    ariaLabel: `Cases booked per day: ${weekLoad.days
+                      .map((day, index) => `${formatDay(day)} ${weekLoad.counts[index]}`)
+                      .join(', ')}`,
+                  }
+            }
+          />
+
+          <MetricCard
+            className="xl:col-span-2"
+            label="Theatres ready"
+            value={errors.rooms ? '—' : `${stats.readyRooms}/${stats.activeRooms}`}
+            unit={errors.rooms ? undefined : 'active'}
+            tone={!errors.rooms && stats.readyRooms === 0 ? 'warning' : 'success'}
+            icon={<DoorOpen size={18} weight="duotone" aria-hidden="true" />}
+            support={
+              errors.rooms ? 'Theatre register unavailable.' : 'Recorded state per theatre'
+            }
+            breakdown={
+              errors.rooms
+                ? undefined
+                : [
+                    { label: 'Ready', value: stats.readyRooms, tone: 'success' as const },
+                    { label: 'In use', value: stats.occupiedRooms, tone: 'primary' as const },
+                    { label: 'Out', value: stats.outRooms, tone: 'neutral' as const },
+                  ]
+            }
+          />
+
+          <MetricCard
+            className="xl:col-span-2"
+            label="Unread alerts"
+            value={errors.alerts ? '—' : stats.unread}
+            unit={errors.alerts ? undefined : 'open'}
+            tone={stats.criticalAlerts > 0 ? 'danger' : 'warning'}
+            icon={<BellRinging size={18} weight="duotone" aria-hidden="true" />}
+            support={
+              errors.alerts
+                ? 'Alert register unavailable.'
+                : stats.unread === 0
+                  ? 'Every alert on file has been read.'
+                  : [
+                      stats.criticalAlerts ? `${stats.criticalAlerts} critical` : '',
+                      stats.warningAlerts ? `${stats.warningAlerts} warning` : '',
+                      stats.infoAlerts ? `${stats.infoAlerts} info` : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')
+            }
+            breakdown={
+              errors.alerts
+                ? undefined
+                : [
+                    {
+                      label: 'Critical',
+                      value: stats.criticalAlerts,
+                      tone: 'danger' as const,
+                    },
+                    {
+                      label: 'Warning',
+                      value: stats.warningAlerts,
+                      tone: 'warning' as const,
+                    },
+                    { label: 'Info', value: stats.infoAlerts, tone: 'info' as const },
+                  ]
+            }
+          />
+
+          <MetricCard
+            className="xl:col-span-2"
+            label="Equipment ready"
+            value={
+              errors.equipment ? '—' : `${stats.availableEquipment}/${stats.equipment}`
+            }
+            unit={errors.equipment ? undefined : 'available'}
+            tone={stats.maintenanceEquipment > 0 ? 'warning' : 'info'}
+            icon={<FirstAidKit size={18} weight="duotone" aria-hidden="true" />}
+            support={
+              errors.equipment ? 'Equipment register unavailable.' : 'Recorded status per item'
+            }
+            breakdown={
+              errors.equipment
+                ? undefined
+                : [
+                    {
+                      label: 'Available',
+                      value: stats.availableEquipment,
+                      tone: 'success' as const,
+                    },
+                    { label: 'In use', value: stats.inUseEquipment, tone: 'primary' as const },
+                    {
+                      label: 'Service',
+                      value: stats.maintenanceEquipment,
+                      tone: 'warning' as const,
+                    },
+                    {
+                      label: 'Retired',
+                      value: stats.retiredEquipment,
+                      tone: 'neutral' as const,
+                    },
+                  ]
+            }
+          />
+        </div>
       </header>
 
       {partialSources.length > 0 ? (
@@ -463,7 +547,7 @@ export function AdminDashboard() {
         onRetry={refresh}
       />
 
-      <div className="grid items-stretch gap-3 lg:grid-cols-12">
+      <div className="grid items-start gap-3 lg:grid-cols-12">
         <div className="order-2 min-w-0 lg:order-1 lg:col-span-8">
           <TheatreOperationsBoard
             rooms={data.rooms}

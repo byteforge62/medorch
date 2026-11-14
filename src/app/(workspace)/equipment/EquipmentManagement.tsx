@@ -3,14 +3,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
-import { Plus } from '@phosphor-icons/react';
+import { FirstAidKit, Plus } from '@phosphor-icons/react';
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Field, Select, TextInput } from '@/components/ui/Input';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { EQUIPMENT_STATUS } from '@/lib/operational-status';
 
 type EquipmentStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'RETIRED';
 
@@ -56,8 +57,16 @@ const STATUS_OPTIONS: EquipmentStatus[] = [
   'RETIRED',
 ];
 
+/* Status reads as a badge even though the control stays editable. */
+const STATUS_TONE: Record<EquipmentStatus, string> = {
+  AVAILABLE: 'border-success/25 bg-success-soft text-success',
+  IN_USE: 'border-primary/25 bg-primary-soft text-primary',
+  MAINTENANCE: 'border-warning/25 bg-warning-soft text-warning',
+  RETIRED: 'border-rule bg-surface-muted text-ink-muted',
+};
+
 function formatStatus(status: EquipmentStatus) {
-  return status.replace('_', ' ');
+  return EQUIPMENT_STATUS[status].label;
 }
 
 function formatDate(value?: string | null) {
@@ -333,20 +342,46 @@ export function EquipmentManagement() {
       />
 
       {showForm && isAdmin && (
-        <Card>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-lg font-semibold">
-              {editingEquipment ? 'Edit equipment' : 'Add equipment'}
-            </h2>
-            {formError && (
-              <p role="alert" className="text-sm text-[var(--color-danger)]">
+        <section
+          className="panel overflow-hidden"
+          aria-labelledby="equipment-form-title"
+        >
+          <div className="border-rule-soft flex items-start justify-between gap-3 border-b px-5 py-3">
+            <div>
+              <p className="text-ink-subtle text-[10px] font-semibold tracking-[0.07em] uppercase">
+                Inventory record
+              </p>
+              <h2
+                id="equipment-form-title"
+                className="text-ink mt-0.5 text-[15px] font-semibold"
+              >
+                {editingEquipment ? 'Edit equipment' : 'Add equipment'}
+              </h2>
+            </div>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => setShowForm(false)}
+              className="text-ink-muted hover:text-ink text-[11.5px] font-semibold disabled:opacity-50"
+            >
+              Close
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4 p-5">
+            {formError ? (
+              <p
+                role="alert"
+                className="border-danger-border bg-danger-soft text-danger rounded-[var(--radius-control)] border px-3 py-2 text-[12.5px]"
+              >
                 {formError}
               </p>
-            )}
+            ) : null}
+
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="space-y-1 text-sm">
-                <span>Name</span>
-                <input
+              <Field label="Name" htmlFor="equipment-name" required>
+                <TextInput
+                  id="equipment-name"
                   required
                   maxLength={150}
                   value={form.name}
@@ -356,12 +391,12 @@ export function EquipmentManagement() {
                       name: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
-              </label>
-              <label className="space-y-1 text-sm">
-                <span>Category</span>
-                <input
+              </Field>
+
+              <Field label="Category" htmlFor="equipment-category" required>
+                <TextInput
+                  id="equipment-category"
                   required
                   maxLength={100}
                   value={form.category}
@@ -371,12 +406,12 @@ export function EquipmentManagement() {
                       category: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
-              </label>
-              <label className="space-y-1 text-sm">
-                <span>Serial number</span>
-                <input
+              </Field>
+
+              <Field label="Serial number" htmlFor="equipment-serial">
+                <TextInput
+                  id="equipment-serial"
                   maxLength={100}
                   value={form.serialNumber}
                   onChange={(event) =>
@@ -385,12 +420,12 @@ export function EquipmentManagement() {
                       serialNumber: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
-              </label>
-              <label className="space-y-1 text-sm">
-                <span>Department</span>
-                <select
+              </Field>
+
+              <Field label="Department" htmlFor="equipment-department">
+                <Select
+                  id="equipment-department"
                   value={form.departmentId}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -398,7 +433,6 @@ export function EquipmentManagement() {
                       departmentId: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 >
                   <option value="">Unassigned</option>
                   {departments.map((department) => (
@@ -406,11 +440,12 @@ export function EquipmentManagement() {
                       {department.name}
                     </option>
                   ))}
-                </select>
-              </label>
-              <label className="space-y-1 text-sm">
-                <span>Maintenance due</span>
-                <input
+                </Select>
+              </Field>
+
+              <Field label="Maintenance due" htmlFor="equipment-maintenance">
+                <TextInput
+                  id="equipment-maintenance"
                   type="date"
                   value={form.maintenanceDueAt}
                   onChange={(event) =>
@@ -419,29 +454,30 @@ export function EquipmentManagement() {
                       maintenanceDueAt: event.target.value,
                     }))
                   }
-                  className="border-border-strong bg-surface text-foreground placeholder:text-foreground-subtle focus:border-primary focus:ring-primary/20 w-full border px-3 py-2 transition outline-none focus:ring-2"
                 />
-              </label>
+              </Field>
             </div>
-            <div className="flex justify-end gap-2">
-              <button
+
+            <div className="border-rule-soft flex justify-end gap-2 border-t pt-4">
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 disabled={saving}
                 onClick={() => setShowForm(false)}
-                className="border-border-strong border px-3 py-2 text-sm"
               >
                 Cancel
-              </button>
-              <Button type="submit" disabled={saving}>
+              </Button>
+              <Button type="submit" size="sm" disabled={saving}>
                 {saving
                   ? 'Saving…'
                   : editingEquipment
                     ? 'Save changes'
-                    : 'Create'}
+                    : 'Create equipment'}
               </Button>
             </div>
           </form>
-        </Card>
+        </section>
       )}
 
       {error && (
@@ -452,7 +488,6 @@ export function EquipmentManagement() {
           {error}
         </div>
       )}
-
 
       <div className="border-rule bg-sheet flex flex-col gap-2 rounded-[15px] border px-4 py-2.5 shadow-xs sm:flex-row sm:items-center sm:gap-4">
         <label htmlFor="equipment-search" className="eyebrow shrink-0">
@@ -507,18 +542,18 @@ export function EquipmentManagement() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[840px] text-left">
               <thead>
-                <tr className="border-border border-b">
-                  <th className="eyebrow px-4 py-2 font-normal">Item</th>
-                  <th className="eyebrow px-4 py-2 font-normal">Category</th>
-                  <th className="eyebrow px-4 py-2 font-normal whitespace-nowrap">
+                <tr className="border-rule bg-surface-subtle border-b">
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Item</th>
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Category</th>
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase whitespace-nowrap">
                     Serial
                   </th>
-                  <th className="eyebrow px-4 py-2 font-normal">Location</th>
-                  <th className="eyebrow px-4 py-2 font-normal whitespace-nowrap">
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Location</th>
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase whitespace-nowrap">
                     Readiness
                   </th>
-                  <th className="eyebrow px-4 py-2 font-normal">State</th>
-                  <th className="eyebrow px-4 py-2 text-right font-normal">
+                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">State</th>
+                  <th className="text-ink-muted px-4 py-2.5 text-right text-[10px] font-semibold tracking-[0.09em] uppercase">
                     Manage
                   </th>
                 </tr>
@@ -534,9 +569,17 @@ export function EquipmentManagement() {
                       className="hover:bg-surface-subtle transition-colors"
                     >
                       <td className="px-4 py-3.5 align-baseline">
-                        <p className="text-[14px] leading-tight font-medium">
-                          {item.name}
-                        </p>
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            aria-hidden="true"
+                            className="bg-primary-soft text-primary grid h-8 w-8 shrink-0 place-items-center rounded-[8px]"
+                          >
+                            <FirstAidKit size={15} weight="duotone" />
+                          </span>
+                          <p className="text-ink text-[13.5px] leading-tight font-semibold">
+                            {item.name}
+                          </p>
+                        </div>
                       </td>
 
                       <td className="text-foreground-secondary px-4 py-3.5 align-baseline text-[13px]">
@@ -575,7 +618,7 @@ export function EquipmentManagement() {
                                 event.target.value as EquipmentStatus,
                               )
                             }
-                            className="border-border-strong bg-surface text-foreground focus:border-primary h-8 rounded-[var(--radius-control)] border px-2 text-[12px] transition outline-none disabled:opacity-50"
+                            className={`h-8 rounded-full border px-2.5 text-[10px] font-semibold tracking-[0.04em] uppercase transition-colors outline-none disabled:opacity-50 ${STATUS_TONE[item.status]}`}
                           >
                             {STATUS_OPTIONS.map((option) => (
                               <option

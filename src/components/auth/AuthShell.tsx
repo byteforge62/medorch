@@ -1,47 +1,47 @@
 import React from 'react';
 import Link from 'next/link';
-import { Fingerprint, ShieldCheck } from '@phosphor-icons/react/dist/ssr';
+import {
+  Fingerprint,
+  FirstAidKit,
+  ShieldCheck,
+  Stethoscope,
+  UserCircle,
+} from '@phosphor-icons/react/dist/ssr';
 import { Wordmark } from '@/components/brand/Brand';
 
 /*======================================================================
-  AuthShell — the theatre front desk.
+  AuthShell — the access card
   ======================================================================
-  The left plate is a dark instrument panel with an architectural plan
-  line, not an illustration floating in blur. The form sits directly on
-  lavender paper and is not wrapped in another white card.
+  A single floating card on the theatre's dark ground: an identity plate
+  on the left carrying the product's four access boundaries, and a paper
+  panel on the right carrying exactly one task.
+
+  The plate is not decoration with a headline floating in it — it states
+  who the product is for, and the form states what this screen does.
 ====================================================================== */
 
-function DeskPlan() {
-  return (
-    <svg
-      viewBox="0 0 520 420"
-      fill="none"
-      className="h-auto w-full text-white/55"
-      aria-hidden="true"
-    >
-      <g stroke="currentColor" strokeWidth="1">
-        <rect x="64" y="68" width="392" height="284" strokeOpacity="0.25" />
-        <rect x="64" y="68" width="76" height="284" strokeOpacity="0.16" />
-        <rect x="140" y="68" width="206" height="284" strokeOpacity="0.2" />
-        <rect x="346" y="68" width="110" height="284" strokeOpacity="0.16" />
-        <path d="M64 262h76M140 156h206M346 216h110" strokeOpacity="0.12" />
-        <rect x="191" y="157" width="104" height="110" rx="20" strokeOpacity="0.65" />
-        <path d="M243 157v110M191 212h104" strokeOpacity="0.28" strokeDasharray="3 6" />
-        <circle cx="112" cy="118" r="18" strokeOpacity="0.35" />
-        <circle cx="112" cy="118" r="7" strokeOpacity="0.6" />
-        <circle cx="408" cy="304" r="18" strokeOpacity="0.35" />
-        <path d="M64 334h26M64 340v-12M430 68h26M430 62v12" strokeOpacity="0.45" />
-      </g>
-      <g fill="currentColor" fontFamily="ui-monospace, monospace" fontSize="7.5" letterSpacing="1.1">
-        <text x="80" y="58" fillOpacity="0.4">ANAESTHESIA</text>
-        <text x="214" y="58" fillOpacity="0.4">LAMINAR FIELD</text>
-        <text x="372" y="58" fillOpacity="0.4">STERILE</text>
-        <text x="80" y="380" fillOpacity="0.4">THEATRE 01 / SCHEMATIC</text>
-        <text x="420" y="380" fillOpacity="0.25">N</text>
-      </g>
-    </svg>
-  );
-}
+const ACCESS_ROLES = [
+  {
+    label: 'Administrator',
+    scope: 'Records, approvals, theatre and equipment registers',
+    icon: <ShieldCheck size={15} weight="duotone" aria-hidden="true" />,
+  },
+  {
+    label: 'Clinician',
+    scope: 'Own surgical list, patients and case records',
+    icon: <Stethoscope size={15} weight="duotone" aria-hidden="true" />,
+  },
+  {
+    label: 'Theatre staff',
+    scope: 'Assigned cases, room state and instruments',
+    icon: <FirstAidKit size={15} weight="duotone" aria-hidden="true" />,
+  },
+  {
+    label: 'Patient',
+    scope: 'Own appointments only, in plain language',
+    icon: <UserCircle size={15} weight="duotone" aria-hidden="true" />,
+  },
+];
 
 export function AuthShell({
   plate,
@@ -59,65 +59,72 @@ export function AuthShell({
   asideNote?: string;
 }) {
   return (
-    <main className="bg-paper text-ink min-h-screen lg:p-3">
-      <div className="bg-rail mx-auto min-h-screen overflow-hidden lg:grid lg:min-h-[calc(100vh-1.5rem)] lg:max-w-[1480px] lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)]">
-        <aside className="relative hidden min-h-[calc(100vh-1.5rem)] flex-col overflow-hidden px-10 py-9 text-white lg:flex xl:px-14 xl:py-11">
+    <main className="bg-rail relative min-h-screen overflow-hidden px-3 py-3 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:56px_56px]" />
+        <div className="bg-primary/25 absolute -top-40 -left-32 h-[30rem] w-[30rem] rounded-full blur-[130px]" />
+        <div className="bg-brand-lavender/15 absolute -right-40 -bottom-48 h-[34rem] w-[34rem] rounded-full blur-[140px]" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[74rem] overflow-hidden rounded-[22px] border border-white/10 bg-sheet shadow-[0_50px_130px_-50px_rgba(12,8,26,0.85)] lg:grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        {/* Identity plate */}
+        <aside className="bg-rail relative flex flex-col overflow-hidden px-6 pt-7 pb-8 text-white sm:px-9 lg:px-11 lg:py-10">
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:64px_64px]"
+            className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.06),transparent_55%)]"
           />
           <div
             aria-hidden="true"
-            className="absolute -top-40 right-[-10rem] h-[32rem] w-[32rem] rounded-full border border-white/10"
+            className="absolute -top-24 -right-24 h-64 w-64 rounded-full border border-white/10"
           />
 
-          <div className="relative z-10">
-            <Wordmark
-              href="/"
-              subtitle="Theatre operations"
-              tone="chalk"
-              size="md"
-            />
-          </div>
+          <div className="relative">
+            <Wordmark href="/" subtitle="Theatre operations" tone="chalk" size="md" />
 
-          <div className="relative z-10 mt-14 max-w-[32rem]">
-            <p className="flex items-center gap-2 font-mono text-[8.5px] tracking-[0.1em] text-white/40">
-              <span className="h-px w-5 bg-white/30" aria-hidden="true" />
+            <p className="mt-9 flex items-center gap-2 font-mono text-[9px] tracking-[0.12em] text-white/40">
+              <span aria-hidden="true" className="h-px w-5 bg-white/30" />
               {plate}
             </p>
-            <h2 className="font-display mt-5 max-w-[15ch] text-[clamp(2.3rem,3.6vw,3.5rem)] leading-[0.98] font-medium text-white">
-              The operating day,
-              <br />
-              in one record.
+
+            <h2 className="mt-4 max-w-[15ch] text-[clamp(1.9rem,2.6vw,2.6rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-white">
+              The operating day, in one record.
             </h2>
-            <p className="mt-5 max-w-[36ch] text-[11.5px] leading-[1.8] text-white/55">
+
+            <p className="mt-4 max-w-[38ch] text-[12px] leading-[1.75] text-white/55">
               {asideNote ??
                 'Schedules, rooms, teams, equipment and patient context — one calm operational record, authorised by role and attributed by event.'}
             </p>
           </div>
 
-          <div className="relative z-10 my-8 flex min-h-0 flex-1 items-center px-3">
-            <DeskPlan />
-          </div>
-
-          <div className="relative z-10 grid grid-cols-2 border-t border-white/10 pt-4">
-            {[
-              ['Role-scoped', 'Four access boundaries'],
-              ['Attributed', 'Every action recorded'],
-            ].map(([label, detail]) => (
-              <div key={label}>
-                <p className="text-[10px] font-semibold text-white/85">{label}</p>
-                <p className="mt-0.5 text-[9px] text-white/40">{detail}</p>
-              </div>
+          <ul className="relative mt-8 hidden space-y-2 sm:block">
+            {ACCESS_ROLES.map((role) => (
+              <li
+                key={role.label}
+                className="flex items-start gap-3 rounded-[10px] border border-white/[0.07] bg-white/[0.035] px-3 py-2.5"
+              >
+                <span className="text-brand-lavender grid h-7 w-7 shrink-0 place-items-center rounded-[8px] bg-white/[0.08]">
+                  {role.icon}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[11.5px] leading-tight font-semibold text-white/90">
+                    {role.label}
+                  </p>
+                  <p className="mt-0.5 text-[10px] leading-snug text-white/45">{role.scope}</p>
+                </div>
+              </li>
             ))}
+          </ul>
+
+          <div className="relative mt-8 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-3 font-mono text-[8.5px] tracking-[0.09em] text-white/35 lg:mt-auto lg:pt-6">
+            <span>ROLE-SCOPED</span>
+            <span>ATTRIBUTED</span>
+            <span>AUDITED</span>
           </div>
         </aside>
 
-        <section className="bg-paper relative flex min-h-screen flex-col lg:min-h-[calc(100vh-1.5rem)]">
-          <div className="flex h-[4.6rem] shrink-0 items-center justify-between px-5 sm:px-8 lg:px-12">
-            <div className="lg:hidden">
-              <Wordmark size="sm" href="/" />
-            </div>
+        {/* Working panel */}
+        <section className="bg-paper relative flex flex-col px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
+          <div className="flex items-center justify-between gap-3">
             <Link
               href="/"
               className="text-ink-muted hover:text-ink ml-auto text-[10.5px] font-semibold transition-colors"
@@ -126,35 +133,38 @@ export function AuthShell({
             </Link>
           </div>
 
-          <div className="flex flex-1 items-start px-5 pt-3 pb-12 sm:px-8 lg:items-center lg:px-12 lg:py-10 xl:px-16">
-            <div className="mx-auto w-full max-w-[27rem]">
-              <div className="border-rule bg-sheet flex h-10 w-10 items-center justify-center border">
-                <Fingerprint size={21} weight="duotone" className="text-primary" aria-hidden="true" />
-              </div>
-
-              <p className="ui-kicker mt-6">{plate}</p>
-              <h1 className="display text-ink mt-3 text-[clamp(2.1rem,3.5vw,2.75rem)]">
-                {title}
-              </h1>
-              {description ? (
-                <p className="text-ink-secondary mt-3.5 max-w-[42ch] text-[12px] leading-[1.75]">
-                  {description}
-                </p>
-              ) : null}
-
-              <div className="mt-7">{children}</div>
-
-              {footer ? (
-                <div className="border-rule text-ink-muted mt-7 border-t pt-5 text-[10.5px] leading-relaxed">
-                  {footer}
-                </div>
-              ) : null}
-
-              <p className="text-ink-subtle mt-6 flex items-center gap-1.5 text-[9.5px]">
-                <ShieldCheck size={12} weight="duotone" aria-hidden="true" />
-                Protected clinical workspace · access is checked server-side
+          <div className="mx-auto flex w-full max-w-[25rem] flex-1 flex-col justify-center py-7 lg:py-8">
+            <div className="flex items-center gap-2.5">
+              <span className="border-rule bg-sheet text-primary grid h-9 w-9 place-items-center rounded-[10px] border shadow-[var(--shadow-xs)]">
+                <Fingerprint size={18} weight="duotone" aria-hidden="true" />
+              </span>
+              <p className="text-ink-muted text-[9.5px] font-semibold tracking-[0.13em] uppercase">
+                {plate}
               </p>
             </div>
+
+            <h1 className="text-ink mt-5 text-[clamp(1.9rem,2.9vw,2.4rem)] leading-[1.04] font-semibold tracking-[-0.035em] [&_em]:text-primary [&_em]:not-italic">
+              {title}
+            </h1>
+
+            {description ? (
+              <p className="text-ink-muted mt-3 max-w-[44ch] text-[12.5px] leading-[1.7]">
+                {description}
+              </p>
+            ) : null}
+
+            <div className="mt-6">{children}</div>
+
+            {footer ? (
+              <div className="border-rule text-ink-muted mt-6 border-t pt-4 text-[10.5px] leading-relaxed">
+                {footer}
+              </div>
+            ) : null}
+
+            <p className="text-ink-subtle mt-5 flex items-center gap-1.5 text-[9.5px]">
+              <ShieldCheck size={12} weight="duotone" aria-hidden="true" />
+              Protected clinical workspace · access is checked server-side
+            </p>
           </div>
         </section>
       </div>
