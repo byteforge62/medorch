@@ -4,7 +4,7 @@ This document is for future ChatGPT sessions and coding agents. Its purpose is t
 
 ## Before changing code
 
-1. Read `PROJECT_CONTEXT.md`, `PROJECT_STATUS.md`, and the relevant section of `docs/roadmap.md`.
+1. Read `docs/product-overview.md`, `docs/architecture.md`, and the relevant section of `docs/roadmap.md`.
 2. Inspect the **current local file**, not just a previous chat or uploaded archive.
 3. Trace the full feature path as applicable: page/component → API route → authorization → Zod schema → service → repository → Prisma model/migration → tests.
 4. Search for every caller of a changed service/function and every alternate API path exposing the same resource.
@@ -50,7 +50,7 @@ The final response must include:
 5. Whether the task's acceptance criteria are met.
 6. The next single task.
 
-Update `PROJECT_STATUS.md` and relevant docs only after implementation and verification. Keep the next task explicit. Do not end by asking the user to paste a file already available in the current working repository/snapshot.
+Update `docs/roadmap.md` and the relevant docs only after implementation and verification. Keep the next task explicit. Do not end by asking the user to paste a file already available in the current working repository/snapshot.
 
 ## Context across chats
 

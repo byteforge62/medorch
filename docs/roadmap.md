@@ -7,7 +7,7 @@ This roadmap prioritizes confidence and completion over starting more features. 
 **Goal:** Keep project status, architecture, API map and agent instructions aligned with source.
 
 Acceptance criteria:
-- [ ] Updated `PROJECT_CONTEXT.md` and `PROJECT_STATUS.md` are in the repository.
+- [ ] The documentation in `docs/` reflects the current source.
 - [ ] Page/API/file index matches the current tree.
 - [ ] Workflows and domain constraints are documented.
 - [ ] Each later phase has an explicit exit criterion.
@@ -24,7 +24,7 @@ Tasks:
 - [ ] Test role and ownership boundaries for schedule mutations, alerts, patients, users and account recovery.
 - [ ] Verify malformed JSON and known Prisma/domain errors map to intended status codes.
 - [ ] Run typecheck, lint, focused tests and production build on the same revision.
-- [ ] Update `PROJECT_STATUS.md` with observed results and remaining policy decisions.
+- [ ] Record observed results and remaining policy decisions in `docs/decisions.md`.
 
 Exit criteria: database-backed schedule tests and concurrency test pass; permission/redaction tests cover recent changes; all available checks pass or blockers are precisely documented.
 

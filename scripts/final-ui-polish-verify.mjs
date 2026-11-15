@@ -7,9 +7,9 @@
  *
  * What it produces
  * ----------------
- *   docs/design-system/final-ui-polish/screenshots/<role>-<route>-<w>.png
+ *   test-results/design-verification/final-ui-polish/screenshots/<role>-<route>-<w>.png
  *     Exact viewport captures at 1440x900, 1024x768 and 390x844.
- *   docs/design-system/final-ui-polish/evidence/browser-audit.json
+ *   test-results/design-verification/final-ui-polish/evidence/browser-audit.json
  *     Per-page width, overflow, image count, broken images, missing alt
  *     text, console errors and the rendered h1.
  *
@@ -23,7 +23,7 @@ import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const ROOT = process.cwd();
-const OUT = path.join(ROOT, 'docs/design-system/final-ui-polish');
+const OUT = path.join(ROOT, 'test-results/design-verification/final-ui-polish');
 const SHOTS = path.join(OUT, 'screenshots');
 const EVIDENCE = path.join(OUT, 'evidence');
 const PROFILE = path.join(ROOT, '.tmp-final-ui-polish-profile');
