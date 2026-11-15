@@ -1,16 +1,16 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Wordmark } from '@/components/brand/Brand';
+import { Wordmark } from '@/components/shared/Brand';
 import { buttonClasses } from '@/components/ui/Button';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { PlaygroundSection } from './_components/specimen';
-import { TokenSpecimens, TypeSpecimens } from './_components/tokens';
-import { ButtonSpecimens } from './_components/buttons';
-import { NavigationSpecimens } from './_components/navigation';
-import { SurfaceSpecimens } from './_components/surfaces';
-import { DataSpecimens } from './_components/data';
-import { InputSpecimens } from './_components/inputs';
+import { PlaygroundSection } from '@/app/design-system/_components/specimen';
+import { TokenSpecimens, TypeSpecimens } from '@/app/design-system/_components/tokens';
+import { ButtonSpecimens } from '@/app/design-system/_components/buttons';
+import { NavigationSpecimens } from '@/app/design-system/_components/navigation';
+import { SurfaceSpecimens } from '@/app/design-system/_components/surfaces';
+import { DataSpecimens } from '@/app/design-system/_components/data';
+import { InputSpecimens } from '@/app/design-system/_components/inputs';
 
 export const metadata: Metadata = {
   title: 'Design system playground',

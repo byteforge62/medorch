@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
+import { recordVerificationEmailRequest } from "@/server/repositories/user.repository";
 import { NextResponse } from "next/server";
-import { verifyPatientEmailToken } from "@/modules/users/user.service";
+import { verifyPatientEmailToken } from "@/server/services/user.service";
 
 export async function POST(request: Request) {
   let body: unknown;

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { Pool } from "pg";
-import { approvePatient } from "@/modules/users/user.service";
+import { approvePatient } from "@/server/services/user.service";
 
 type ApprovalFixture = {
   pool: Pool;

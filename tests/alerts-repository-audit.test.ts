@@ -10,7 +10,7 @@ import {
   markAlertAsRead,
   markAllAlertsAsReadForUser,
   updateAlert,
-} from "@/modules/alerts/alerts.repository";
+} from "@/server/repositories/alerts.repository";
 
 test("alert repository mutations and audit records commit or roll back together", async (t) => {
   const connectionString = process.env.DATABASE_URL;

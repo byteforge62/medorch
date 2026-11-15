@@ -1,7 +1,7 @@
 import React from 'react';
-import { Wordmark } from '@/components/brand/Brand';
+import { Wordmark } from '@/components/shared/Brand';
 import { SiteNav } from '@/components/ui/SiteNav';
-import { Row, Specimen } from './specimen';
+import { Row, Specimen } from '@/app/design-system/_components/specimen';
 
 /*======================================================================
   Navigation specimens — the same component, four treatments.

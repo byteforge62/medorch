@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { patientRegistrationSchema } from "@/modules/users/user.validation";
-import { registerPatient } from "@/modules/users/user.service";
+import { patientRegistrationSchema } from "@/server/validation/user.validation";
+import { registerPatient } from "@/server/services/user.service";
 import { createHash } from "node:crypto";
-import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
+import { recordVerificationEmailRequest } from "@/server/repositories/user.repository";
 
 const REGISTRATION_MESSAGE =
   "If registration can be completed, a verification email will be sent to the provided address.";

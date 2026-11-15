@@ -1,9 +1,9 @@
 
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getRequestId } from "@/lib/api/request-id";
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { approvePatient } from "@/modules/users/user.service";
-import { userIdSchema } from "@/modules/users/user.validation";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getRequestId } from "@/server/api/request-id";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { approvePatient } from "@/server/services/user.service";
+import { userIdSchema } from "@/server/validation/user.validation";
 
 type RouteContext = {
   params: Promise<{ id: string }>;

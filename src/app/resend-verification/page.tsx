@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
-import { AuthShell } from '@/components/auth/AuthShell';
+import { AuthShell } from '@/features/auth/components/AuthShell';
 import {
   authButtonClass,
   authFieldClass,
   authLabelClass,
   authLinkClass,
   authNoticeClass,
-} from '@/components/auth/auth-styles';
+} from '@/features/auth/components/auth-styles';
 
 export default function ResendVerificationPage() {
   const [email, setEmail] = useState('');

@@ -1,7 +1,7 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { markAllAlertsAsRead } from "@/modules/alerts/alerts.service";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { markAllAlertsAsRead } from "@/server/services/alerts.service";
 import { z } from "zod";
 
 const readAllSchema = z.object({

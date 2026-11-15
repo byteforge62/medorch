@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { AccessBoundary } from '@/components/auth/AuthShell';
+import { AccessBoundary } from '@/features/auth/components/AuthShell';
 import { buttonClasses } from '@/components/ui/Button';
 
 export default function Error({

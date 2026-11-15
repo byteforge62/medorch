@@ -142,9 +142,10 @@ Authorization is enforced in route handlers and services, not only in the UI.
 
 ```text
 src/app/          Pages, layouts and API route handlers
-src/components/   Shared UI, dashboards and module interfaces
-src/modules/      Domain services, repositories and validation
-src/lib/          Auth, API and database infrastructure
+src/features/     Feature UI and client-side domain logic
+src/components/   Shared UI, layout, navigation and visual primitives
+src/server/       Services, repositories, validation, auth, database and API infrastructure
+src/lib/          Browser API client, shared domain constants and environment helpers
 prisma/           Schema, migrations and synthetic seed data
 tests/            Unit, integration and fixture suites
 e2e/              Playwright journeys and authorization checks

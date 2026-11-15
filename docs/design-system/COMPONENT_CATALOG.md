@@ -195,7 +195,7 @@ and are shared by all three directions.
 
 ## Not part of the system
 
-`src/components/landing/LandingHero.tsx` and `LandingMobileNav.tsx` are legacy
+`src/features/landing/components/LandingHero.tsx` and `LandingMobileNav.tsx` are legacy
 and no longer imported anywhere. They are left untouched in this phase and are
 **retire candidates** once a direction ships — deleting them now would edit
 files this phase does not own.

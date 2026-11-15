@@ -1,19 +1,19 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
 import {
   canReadIndividualSchedule,
-} from "@/modules/schedules/schedule-access";
+} from "@/server/auth/schedule-access";
 import {
   assignScheduleEquipmentById,
   getScheduleEquipment,
   isScheduleAssignedToUser,
-} from "@/modules/schedules/schedule.service";
+} from "@/server/services/schedule.service";
 import {
   assignScheduleEquipmentSchema,
   scheduleIdSchema,
-} from "@/modules/schedules/schedule.validation";
+} from "@/server/validation/schedule.validation";
 
 type RouteContext = {
   params: Promise<{

@@ -1,0 +1,253 @@
+import { createUserRecord, findUserById, findUserByEmail, findUsers, createPatientRegistrationRecord, verifyPatientEmail, approvePendingPatient, createPatientResendVerificationToken, recordVerificationEmailRequest, createPasswordResetToken, resetPasswordWithToken } from "@/server/repositories/user.repository";
+import type { UserRole, UserStatus } from "@/generated/prisma/enums";
+import { hashPassword } from "@/server/auth/password";
+import { recordAudit } from "@/server/services/audit.service";
+import { generateEmailVerificationToken, hashEmailVerificationToken, getEmailVerificationExpiry } from "@/server/auth/email-verification";
+import type { PatientRegistrationInput } from "@/server/validation/user.validation";
+import { sendVerificationEmail } from "@/server/email/send-verification-email";
+import { createHash } from "node:crypto";
+import { generatePasswordResetToken, hashPasswordResetToken, getPasswordResetExpiry } from "@/server/auth/password-reset";
+import { sendPasswordResetEmail } from "@/server/email/send-password-reset-email";
+import { prisma } from "@/server/db/prisma";
+import { createAuditLog } from "@/server/repositories/audit.repository";
+
+export async function getUsers() {
+  return findUsers();
+}
+
+export async function getUserById(id: string) {
+  return findUserById(id);
+}
+
+export async function getUserByEmail(email: string) {
+  return findUserByEmail(email);
+}
+
+export async function createUser(
+  data: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    role: UserRole;
+    status?: UserStatus;
+  },
+  actorUserId: string,
+) {
+  const passwordHash = await hashPassword(data.password);
+
+  const user = await createUserRecord({
+    name: data.name,
+    email: data.email,
+    passwordHash,
+    phone: data.phone,
+    role: data.role,
+    status: data.status,
+  });
+
+  await recordAudit({
+    userId: actorUserId,
+    action: "CREATE",
+    entity: "User",
+    entityId: user.id,
+    description: `User "${user.email}" was created.`,
+    metadata: {
+      role: user.role,
+      status: user.status,
+    },
+  });
+
+  return user;
+}
+
+export async function registerPatient(input: PatientRegistrationInput) {
+  const passwordHash = await hashPassword(input.password);
+
+  const token = generateEmailVerificationToken();
+  const tokenHash = hashEmailVerificationToken(token);
+  const expiresAt = getEmailVerificationExpiry();
+
+  const user = await createPatientRegistrationRecord({
+    name: input.name,
+    email: input.email,
+    passwordHash,
+    phone: input.phone,
+    tokenHash,
+    expiresAt,
+  });
+
+  let emailSent = true;
+
+  try {
+    await sendVerificationEmail(user.email, user.name, token);
+  } catch (error) {
+    emailSent = false;
+    console.error("Registration verification email failed:", error);
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    status: user.status,
+    emailSent,
+    message: emailSent
+      ? "Registration successful. Check your email to verify your account."
+      : "Registration successful, but the verification email could not be sent. Please request another verification email.",
+  };
+}
+
+export async function verifyPatientEmailToken(token: string) {
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return { verified: false };
+  }
+
+  const tokenHash = hashEmailVerificationToken(token);
+  const verified = await verifyPatientEmail(tokenHash);
+
+  return { verified };
+}
+
+export async function approvePatient(
+  patientUserId: string,
+  actorUserId: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const patient = await approvePendingPatient(tx, patientUserId);
+
+    await createAuditLog(
+      {
+        userId: actorUserId,
+        action: "UPDATE",
+        entity: "User",
+        entityId: patient.id,
+        description: `Patient "${patient.email}" was approved.`,
+        metadata: {
+          role: patient.role,
+          status: patient.status,
+          approvedAt: patient.approvedAt?.toISOString() ?? null,
+        },
+      },
+      tx,
+    );
+
+    return patient;
+  });
+}
+
+export async function resendPatientVerificationEmail(
+  email: string,
+  ipAddress: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true, rateLimited: false };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress || "unknown")
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "EMAIL_VERIFICATION",
+  );
+
+  if (!allowed) {
+    return {
+      accepted: true,
+      rateLimited: true,
+    };
+  }
+
+  const token = generateEmailVerificationToken();
+  const tokenHash = hashEmailVerificationToken(token);
+  const expiresAt = getEmailVerificationExpiry();
+
+  const user = await createPatientResendVerificationToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    try {
+      await sendVerificationEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Resend verification email failed:", error);
+    }
+  }
+
+  return { accepted: true, rateLimited: false };
+}
+
+
+export async function requestPasswordReset(
+  email: string,
+  ipAddress: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || normalizedEmail.length > 254) {
+    return { accepted: true, rateLimited: false };
+  }
+
+  const emailHash = createHash("sha256")
+    .update(normalizedEmail)
+    .digest("hex");
+
+  const ipHash = createHash("sha256")
+    .update(ipAddress || "unknown")
+    .digest("hex");
+
+  const allowed = await recordVerificationEmailRequest(
+    emailHash,
+    ipHash,
+    "PASSWORD_RESET",
+  );
+
+  if (!allowed) {
+    return { accepted: true, rateLimited: true };
+  }
+
+  const token = generatePasswordResetToken();
+  const tokenHash = hashPasswordResetToken(token);
+  const expiresAt = getPasswordResetExpiry();
+
+  const user = await createPasswordResetToken(
+    normalizedEmail,
+    tokenHash,
+    expiresAt,
+  );
+
+  if (user) {
+    try {
+      await sendPasswordResetEmail(user.email, user.name, token);
+    } catch (error) {
+      console.error("Failed to send password reset email:", error);
+    }
+  }
+
+  return { accepted: true, rateLimited: false };
+}
+
+export async function completePasswordReset(
+  token: string,
+  newPassword: string,
+) {
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return { reset: false };
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  const tokenHash = hashPasswordResetToken(token);
+
+  const reset = await resetPasswordWithToken(tokenHash, passwordHash);
+
+  return { reset };
+}

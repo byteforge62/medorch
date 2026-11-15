@@ -1,5 +1,5 @@
-import { AuthShell } from '@/components/auth/AuthShell';
-import { LoginForm } from '@/components/auth/LoginForm';
+import { AuthShell } from '@/features/auth/components/AuthShell';
+import { LoginForm } from '@/features/auth/components/LoginForm';
 
 /* Messages returned by the Google sign-in callback, and by NextAuth itself. */
 const OAUTH_ERRORS: Record<string, string> = {

@@ -8,7 +8,7 @@ import {
   Textarea,
   Toggle,
 } from '@/components/ui/Input';
-import { Specimen } from './specimen';
+import { Specimen } from '@/app/design-system/_components/specimen';
 
 /*======================================================================
   Form specimens

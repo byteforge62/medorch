@@ -8,7 +8,7 @@ import {
   ScheduleStatusBadge,
   type SchedulePriority,
   type ScheduleStatus,
-} from '@/components/schedules/ScheduleStatusBadge';
+} from '@/features/schedules/components/ScheduleStatusBadge';
 import { SCHEDULE_STATUS } from '@/lib/operational-status';
 
 const STATUSES: ScheduleStatus[] = [

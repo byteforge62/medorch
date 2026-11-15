@@ -7,8 +7,8 @@ import { PathnameContext } from "next/dist/shared/lib/hooks-client-context.share
 
 import { Header } from "@/components/layout/Header";
 import { PRIMARY_NAVIGATION_ID, Sidebar } from "@/components/layout/Sidebar";
-import { ScheduleCard, ScheduleItem } from "@/components/schedules/ScheduleCard";
-import { ScheduleStatusActions } from "@/components/schedules/ScheduleStatusActions";
+import { ScheduleCard, ScheduleItem } from "@/features/schedules/components/ScheduleCard";
+import { ScheduleStatusActions } from "@/features/schedules/components/ScheduleStatusActions";
 
 const session = {
   user: { name: "QA Tester", email: "qa@example.com", role: "ADMIN" },

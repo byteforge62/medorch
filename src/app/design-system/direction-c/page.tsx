@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DirectionC } from '@/components/landing/system/directions/direction-c';
+import { DirectionC } from '@/features/landing/components/system/directions/direction-c';
 
 export const metadata: Metadata = {
   title: 'Direction C — Operational Intelligence',

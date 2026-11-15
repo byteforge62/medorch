@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { UserRole } from '@/generated/prisma/client';
-import { Header } from './Header';
-import { Sidebar } from './Sidebar';
+import { Header } from '@/components/layout/Header';
+import { Sidebar } from '@/components/layout/Sidebar';
 
 /*======================================================================
   AppShell — a control rail beside a lavender daybook.

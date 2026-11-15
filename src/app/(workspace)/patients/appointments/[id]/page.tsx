@@ -1,5 +1,5 @@
-import { requirePermission } from '@/lib/auth/authorization';
-import { AppointmentDetail } from './AppointmentDetail';
+import { requirePermission } from '@/server/auth/authorization';
+import { AppointmentDetail } from '@/features/patients/components/AppointmentDetail';
 
 interface AppointmentDetailPageProps {
   params: Promise<{

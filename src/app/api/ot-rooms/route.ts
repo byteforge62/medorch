@@ -1,9 +1,9 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { getOTRooms, createOTRoom } from "@/modules/ot-rooms/ot-room.service";
-import { createOTRoomSchema } from "@/modules/ot-rooms/ot-room.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { getOTRooms, createOTRoom } from "@/server/services/ot-room.service";
+import { createOTRoomSchema } from "@/server/validation/ot-room.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CaseJourneyConcept } from '@/components/landing/system/concepts/case-journey';
+import { CaseJourneyConcept } from '@/features/landing/components/system/concepts/case-journey';
 
 export const metadata: Metadata = {
   title: 'Concept B — Surgical case journey',

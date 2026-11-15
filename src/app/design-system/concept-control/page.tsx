@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ControlRoomConcept } from '@/components/landing/system/concepts/control-room';
+import { ControlRoomConcept } from '@/features/landing/components/system/concepts/control-room';
 
 export const metadata: Metadata = {
   title: 'Concept A — Theatre control room',

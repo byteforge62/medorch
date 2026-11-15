@@ -1,8 +1,8 @@
-import { apiError } from '@/lib/api/response';
-import { getRequestId } from '@/lib/api/request-id';
-import { getApiSession } from '@/lib/auth/authorization';
-import { handlePatientAppointments } from '@/lib/api/me-read-handlers';
-import { getPatientPortalData } from '@/modules/patients/patient.service';
+import { apiError } from '@/server/api/response';
+import { getRequestId } from '@/server/api/request-id';
+import { getApiSession } from '@/server/auth/authorization';
+import { handlePatientAppointments } from '@/server/api/me-read-handlers';
+import { getPatientPortalData } from '@/server/services/patient.service';
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

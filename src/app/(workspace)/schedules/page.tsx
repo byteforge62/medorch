@@ -1,6 +1,6 @@
-import { requireRole } from '@/lib/auth/authorization';
-import { getScheduleWorkspace } from '@/modules/schedules/schedule-workspace.service';
-import { SchedulesWorkspace } from '@/components/schedules/SchedulesWorkspace';
+import { requireRole } from '@/server/auth/authorization';
+import { getScheduleWorkspace } from '@/server/services/schedule-workspace.service';
+import { SchedulesWorkspace } from '@/features/schedules/components/SchedulesWorkspace';
 
 interface SchedulesPageProps {
   searchParams: Promise<{

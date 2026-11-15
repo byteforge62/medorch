@@ -2,8 +2,8 @@ import React from 'react';
 import { Surface } from '@/components/ui/Surface';
 import { MetricIndicator } from '@/components/ui/Indicators';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { ProductPreview } from '@/components/landing/system/preview';
-import { Specimen } from './specimen';
+import { ProductPreview } from '@/features/landing/components/system/preview';
+import { Specimen } from '@/app/design-system/_components/specimen';
 
 /*======================================================================
   Surface specimens

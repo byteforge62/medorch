@@ -2,7 +2,7 @@
 
 import React, { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
-import { buttonClasses } from './Button';
+import { buttonClasses } from '@/components/ui/Button';
 
 export interface NavLink {
   label: string;

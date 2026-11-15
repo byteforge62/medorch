@@ -15,7 +15,7 @@ import {
   isUpcomingStatus,
   minutesOfDay,
   startOfDay,
-} from '@/components/dashboard/admin/format';
+} from '@/features/dashboard/components/admin/format';
 
 const at = (iso: string) => new Date(iso);
 

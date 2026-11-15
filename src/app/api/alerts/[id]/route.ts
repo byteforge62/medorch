@@ -1,16 +1,16 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
 import {
   getAlertById,
   updateAlertById,
   deleteAlertById,
-} from "@/modules/alerts/alerts.service";
+} from "@/server/services/alerts.service";
 import {
   alertIdSchema,
   updateAlertSchema,
-} from "@/modules/alerts/alerts.validation";
+} from "@/server/validation/alerts.validation";
 
 type RouteContext = {
   params: Promise<{

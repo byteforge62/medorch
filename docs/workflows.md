@@ -11,7 +11,7 @@ This document describes the intended/source-observed path across layers. The exa
 5. On subsequent JWT callback execution, the current database user is checked. Missing/inactive users or a mismatched session version invalidate the token/session.
 6. Login/logout audit events are attempted; failures are logged and do not replace the auth result.
 
-Related files: `src/auth.ts`, `src/lib/auth/password.ts`, `src/lib/auth/authorization.ts`, `src/lib/auth/permission.ts`, `src/modules/audit/`.
+Related files: `src/auth.ts`, `src/server/auth/password.ts`, `src/server/auth/authorization.ts`, `src/lib/auth/permission.ts`, `src/server/services/` and `src/server/repositories/` (audit).
 
 ## 2. Patient registration and account recovery
 
@@ -24,7 +24,7 @@ Related files: `src/auth.ts`, `src/lib/auth/password.ts`, `src/lib/auth/authoriz
 
 ## 3. Create a schedule
 
-1. UI: `src/components/schedules/SchedulePage.tsx` and `ScheduleForm.tsx` submit to `POST /api/schedules`.
+1. UI: `src/features/schedules/components/SchedulePage.tsx` and `ScheduleForm.tsx` submit to `POST /api/schedules`.
 2. Route: checks `schedules:create`, parses JSON, validates with `createScheduleSchema`.
 3. Service: `createScheduleWithValidation` checks patient, active department, room existence/active/status/department, active doctor surgeon, and `endTime > startTime`.
 4. Service conflict lookup checks room, surgeon and patient intervals and maps the conflict to a domain error.

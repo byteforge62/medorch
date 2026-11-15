@@ -1,15 +1,15 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
 import {
   deleteScheduleNoteById,
   updateScheduleNoteById,
-} from "@/modules/schedules/schedule.service";
+} from "@/server/services/schedule.service";
 import {
   scheduleNoteIdSchema,
   scheduleIdSchema,
   updateScheduleNoteSchema,
-} from "@/modules/schedules/schedule.validation";
+} from "@/server/validation/schedule.validation";
 
 type RouteContext = {
   params: Promise<{

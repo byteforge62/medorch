@@ -1,9 +1,9 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { deactivateDepartment, getDepartmentById, updateExistingDepartment} from "@/modules/departments/department.service";
-import { departmentIdSchema, updateDepartmentSchema } from "@/modules/departments/department.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { deactivateDepartment, getDepartmentById, updateExistingDepartment} from "@/server/services/department.service";
+import { departmentIdSchema, updateDepartmentSchema } from "@/server/validation/department.validation";
 
 type RouteContext = {
   params: Promise<{

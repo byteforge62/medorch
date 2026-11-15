@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AuthShell } from '@/components/auth/AuthShell';
+import { AuthShell } from '@/features/auth/components/AuthShell';
 import {
   authButtonClass,
   authLinkClass,
   authNoticeClass,
-} from '@/components/auth/auth-styles';
+} from '@/features/auth/components/auth-styles';
 
 type VerificationState = 'idle' | 'loading' | 'success' | 'error';
 

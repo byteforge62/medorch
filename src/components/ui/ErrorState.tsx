@@ -1,6 +1,6 @@
 import React from 'react';
 import { Warning } from '@phosphor-icons/react';
-import { Button } from './Button';
+import { Button } from '@/components/ui/Button';
 
 interface ErrorStateProps {
   title?: string;

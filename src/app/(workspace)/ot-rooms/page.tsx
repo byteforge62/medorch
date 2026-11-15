@@ -1,5 +1,5 @@
-import { requireRole } from '@/lib/auth/authorization';
-import { OTRoomManagement } from './OtRoomManagement';
+import { requireRole } from '@/server/auth/authorization';
+import { OTRoomManagement } from '@/features/operating-rooms/components/OtRoomManagement';
 
 export default async function OtRoomsPage() {
   await requireRole(['ADMIN', 'DOCTOR', 'OT_STAFF']);

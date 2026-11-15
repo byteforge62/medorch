@@ -12,7 +12,7 @@
   carries a banner so a screenshot can never be mistaken for a real record.
 ====================================================================== */
 
-import { installPreviewFetch } from '@/lib/preview/fixtures';
+import { installPreviewFetch } from '@/features/preview/data/fixtures';
 
 // Installed at import time, before any mounted component's effect issues a
 // request. Guarded internally so a second import is a no-op.
@@ -24,18 +24,18 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SessionProvider } from '@/providers/SessionProvider';
 
-import { PatientRegistry } from '@/app/(workspace)/patients/PatientRegistry';
-import { DoctorDirectory } from '@/app/(workspace)/doctors/DoctorDirectory';
-import { OTRoomManagement } from '@/app/(workspace)/ot-rooms/OtRoomManagement';
-import { EquipmentManagement } from '@/app/(workspace)/equipment/EquipmentManagement';
-import { SchedulePage } from '@/components/schedules/SchedulePage';
-import { AuditLogViewer } from '@/components/audit/AuditLogViewer';
-import { UserList } from '@/components/users/UserList';
+import { PatientRegistry } from '@/features/patients/components/PatientRegistry';
+import { DoctorDirectory } from '@/features/doctors/components/DoctorDirectory';
+import { OTRoomManagement } from '@/features/operating-rooms/components/OtRoomManagement';
+import { EquipmentManagement } from '@/features/equipment/components/EquipmentManagement';
+import { SchedulePage } from '@/features/schedules/components/SchedulePage';
+import { AuditLogViewer } from '@/features/audit-logs/components/AuditLogViewer';
+import { UserList } from '@/features/users/components/UserList';
 
-import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
-import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
-import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
-import { AdminDashboard } from '@/components/dashboard/admin/AdminDashboard';
+import { DoctorDashboard } from '@/features/dashboard/components/DoctorDashboard';
+import { OTStaffDashboard } from '@/features/dashboard/components/OTStaffDashboard';
+import { PatientDashboard } from '@/features/dashboard/components/PatientDashboard';
+import { AdminDashboard } from '@/features/dashboard/components/admin/AdminDashboard';
 
 const PREVIEW_USER = {
   name: 'Preview Operator',

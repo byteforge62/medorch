@@ -19,7 +19,7 @@ import {
   type IconProps,
 } from '@phosphor-icons/react';
 import type { UserRole } from '@/generated/prisma/client';
-import { Wordmark } from '@/components/brand/Brand';
+import { Wordmark } from '@/components/shared/Brand';
 
 /** Stable id shared with the Header toggle so `aria-controls` resolves. */
 export const PRIMARY_NAVIGATION_ID = 'primary-navigation';

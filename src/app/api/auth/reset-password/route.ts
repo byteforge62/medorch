@@ -3,10 +3,10 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { createHash } from "node:crypto";
-import { recordVerificationEmailRequest } from "@/modules/users/user.repository";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { completePasswordReset } from "@/modules/users/user.service";
+import { recordVerificationEmailRequest } from "@/server/repositories/user.repository";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { completePasswordReset } from "@/server/services/user.service";
 
 const resetPasswordSchema = z.object({
   token: z.string().regex(/^[a-f0-9]{64}$/i),

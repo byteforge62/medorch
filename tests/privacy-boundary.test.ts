@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import test from 'node:test';
 import { Pool } from 'pg';
-import { getPatientPortalData } from '@/modules/patients/patient.service';
-import { getSchedulesForStaff } from '@/modules/schedules/schedule.service';
+import { getPatientPortalData } from '@/server/services/patient.service';
+import { getSchedulesForStaff } from '@/server/services/schedule.service';
 
 test('staff and patient schedule reads are scoped and return limited fields', async () => {
   const connectionString = process.env.DATABASE_URL;

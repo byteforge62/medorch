@@ -3,11 +3,11 @@ import { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { createHash, randomUUID } from "node:crypto";
-import { isLoginAttemptAllowed, recordVerificationEmailRequest } from "./modules/users/user.repository";
-import { prisma } from "@/lib/db/prisma";
-import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { isLoginAttemptAllowed, recordVerificationEmailRequest } from "@/server/repositories/user.repository";
+import { prisma } from "@/server/db/prisma";
+import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { UserRole, UserStatus } from "@/generated/prisma/enums";
-import { recordAudit } from "./modules/audit/audit.service";
+import { recordAudit } from "@/server/services/audit.service";
 
 class EmailNotVerifiedError extends CredentialsSignin {
     code = "email_not_verified";

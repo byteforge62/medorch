@@ -1,8 +1,8 @@
 
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getSchedulesForSurgeon } from "@/modules/schedules/schedule.service";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getSchedulesForSurgeon } from "@/server/services/schedule.service";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

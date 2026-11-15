@@ -1,6 +1,6 @@
 import { AppShell } from '@/components/layout/AppShell';
 import { SessionProvider } from '@/providers/SessionProvider';
-import { requireAuth } from '@/lib/auth/authorization';
+import { requireAuth } from '@/server/auth/authorization';
 
 /*======================================================================
   Authenticated workspace boundary

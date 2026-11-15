@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ClinicalLanding } from '@/components/landing/clinical/clinical-landing';
+import { ClinicalLanding } from '@/features/landing/components/clinical/clinical-landing';
 
 export const metadata: Metadata = {
   title: 'Clinical direction',

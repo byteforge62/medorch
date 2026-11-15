@@ -1,5 +1,5 @@
-import { requirePermission } from '@/lib/auth/authorization';
-import { DepartmentManagement } from '@/components/departments/DepartmentManagement';
+import { requirePermission } from '@/server/auth/authorization';
+import { DepartmentManagement } from '@/features/departments/components/DepartmentManagement';
 
 export default async function DepartmentsPage() {
   await requirePermission('departments:read');

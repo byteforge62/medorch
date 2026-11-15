@@ -7,7 +7,7 @@ import { Pool } from "pg";
 import {
   updateSchedule,
   updateScheduleStatus,
-} from "@/modules/schedules/schedule.repository";
+} from "@/server/repositories/schedule.repository";
 
 test("schedule repository writes audit logs atomically", async (t) => {
   const connectionString = process.env.DATABASE_URL;

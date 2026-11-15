@@ -13,13 +13,13 @@ import {
   EQUIPMENT_STATUS as DASHBOARD_EQUIPMENT_STATUS,
   ROOM_STATUS as DASHBOARD_ROOM_STATUS,
   SCHEDULE_STATUS as DASHBOARD_SCHEDULE_STATUS,
-} from '@/components/dashboard/admin/format';
+} from '@/features/dashboard/components/admin/format';
 import {
   ROOM_STATUS_DOT,
   ROOM_STATUS_LABEL,
   SCHEDULE_RAIL_TONE as WORKSPACE_RAIL_TONE,
   SCHEDULE_STATUS_LABEL as WORKSPACE_STATUS_LABEL,
-} from '@/components/schedules/schedule-workspace-format';
+} from '@/features/schedules/components/schedule-workspace-format';
 
 const SCHEDULE_STATES = [
   'SCHEDULED',

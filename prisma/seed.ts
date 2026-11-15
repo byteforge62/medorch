@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { hashPassword } from "@/lib/auth/password";
+import { hashPassword } from "@/server/auth/password";
 
 import { DEMO_SEED_CONFIG } from "./demo-data";
 

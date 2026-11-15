@@ -6,7 +6,7 @@ import {
   isScheduleStatusTransitionAllowed,
   redactScheduleDetailsForOT,
   redactScheduleClinicalNotes,
-} from "../src/modules/schedules/schedule-access";
+} from "@/server/auth/schedule-access";
 
 test("schedule status transitions allow valid next states and reject skipped states", () => {
   assert.equal(

@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getAuditLogs, getAuditLogCount } from "@/modules/audit/audit.service";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getAuditLogs, getAuditLogCount } from "@/server/services/audit.service";
 import type { AuditAction } from "@/generated/prisma/client";
 
 const auditQuerySchema = z.object({

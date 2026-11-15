@@ -1,8 +1,8 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { markAlertAsReadById } from "@/modules/alerts/alerts.service";
-import { alertIdSchema } from "@/modules/alerts/alerts.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { markAlertAsReadById } from "@/server/services/alerts.service";
+import { alertIdSchema } from "@/server/validation/alerts.validation";
 
 type RouteContext = {
   params: Promise<{

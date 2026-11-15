@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SuitePlanConcept } from '@/components/landing/system/concepts/suite-plan';
+import { SuitePlanConcept } from '@/features/landing/components/system/concepts/suite-plan';
 
 export const metadata: Metadata = {
   title: 'Concept C — Interactive hospital suite',

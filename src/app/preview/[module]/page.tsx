@@ -1,4 +1,4 @@
-import { PreviewClient } from './PreviewClient';
+import { PreviewClient } from '@/app/preview/[module]/PreviewClient';
 
 /*
  * Isolated visual preview route.

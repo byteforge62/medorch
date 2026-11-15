@@ -1,14 +1,14 @@
-import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
+import { getScheduleConstraintConflictMessage } from "@/server/errors/schedule-conflict-error";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
 import {
   updateScheduleStatusById,
-} from "@/modules/schedules/schedule.service";
+} from "@/server/services/schedule.service";
 import {
   scheduleIdSchema,
   updateScheduleStatusSchema,
-} from "@/modules/schedules/schedule.validation";
+} from "@/server/validation/schedule.validation";
 
 type RouteContext = {
   params: Promise<{

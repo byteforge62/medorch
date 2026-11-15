@@ -1,10 +1,10 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { getDoctors } from "@/modules/doctors/doctor.service";
-import { createDoctor } from "@/modules/doctors/doctor.service";
-import { createDoctorSchema } from "@/modules/doctors/doctor.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { getDoctors } from "@/server/services/doctor.service";
+import { createDoctor } from "@/server/services/doctor.service";
+import { createDoctorSchema } from "@/server/validation/doctor.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

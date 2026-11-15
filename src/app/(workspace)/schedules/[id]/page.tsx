@@ -1,5 +1,5 @@
-import { requireRole } from '@/lib/auth/authorization';
-import { ScheduleDetail } from './ScheduleDetails';
+import { requireRole } from '@/server/auth/authorization';
+import { ScheduleDetail } from '@/features/schedules/components/ScheduleDetails';
 
 interface ScheduleDetailPageProps {
   params: Promise<{

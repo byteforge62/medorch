@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { Pool } from "pg";
-import { updateScheduleStatus } from "@/modules/schedules/schedule.repository";
+import { updateScheduleStatus } from "@/server/repositories/schedule.repository";
 
 test("concurrent status updates from the same initial state allow only one winner", async () => {
   const connectionString = process.env.DATABASE_URL;

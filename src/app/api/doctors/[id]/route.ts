@@ -1,15 +1,15 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
 import {
   getDoctorById,
   updateDoctor,
-} from "@/modules/doctors/doctor.service";
+} from "@/server/services/doctor.service";
 import {
   doctorIdSchema,
   updateDoctorSchema,
-} from "@/modules/doctors/doctor.validation";
+} from "@/server/validation/doctor.validation";
 
 type RouteContext = {
   params: Promise<{

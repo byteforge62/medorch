@@ -1,9 +1,9 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { getEquipment, createEquipment } from "@/modules/equipment/equipment.service";
-import { createEquipmentSchema } from "@/modules/equipment/equipment.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { getEquipment, createEquipment } from "@/server/services/equipment.service";
+import { createEquipmentSchema } from "@/server/validation/equipment.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

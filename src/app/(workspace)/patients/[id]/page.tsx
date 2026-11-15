@@ -1,6 +1,6 @@
-import { requirePermission } from '@/lib/auth/authorization';
+import { requirePermission } from '@/server/auth/authorization';
 
-import { PatientDetail } from './PatientDetail';
+import { PatientDetail } from '@/features/patients/components/PatientDetail';
 
 interface PatientDetailPageProps {
   params: Promise<{ id: string }>;

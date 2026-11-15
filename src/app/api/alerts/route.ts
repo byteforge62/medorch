@@ -1,12 +1,12 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { getAlerts, createAlert } from "@/modules/alerts/alerts.service";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { getAlerts, createAlert } from "@/server/services/alerts.service";
 import {
   createAlertSchema,
   getAlertsQuerySchema,
-} from "@/modules/alerts/alerts.validation";
+} from "@/server/validation/alerts.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

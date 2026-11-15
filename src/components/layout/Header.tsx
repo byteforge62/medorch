@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { CaretRight, Clock, List, SignOut } from '@phosphor-icons/react';
-import { AlertCenter } from '@/components/alerts/AlertCenter';
-import { BrandMark, Wordmark } from '@/components/brand/Brand';
-import { PRIMARY_NAVIGATION_ID } from './Sidebar';
+import { AlertCenter } from '@/features/alerts/components/AlertCenter';
+import { BrandMark, Wordmark } from '@/components/shared/Brand';
+import { PRIMARY_NAVIGATION_ID } from '@/components/layout/Sidebar';
 
 /*======================================================================
   Breadcrumb labels

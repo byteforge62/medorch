@@ -8,14 +8,14 @@ This index is an orientation map for the current uploaded snapshot. Use `Get-Chi
 |---|---|---|
 | `/` | `src/app/page.tsx` | Public landing page. |
 | `/dashboard` | `src/app/dashboard/page.tsx` | Role-aware operational dashboard. |
-| `/login` | `src/app/login/page.tsx`, `src/components/auth/LoginForm.tsx` | Credentials login. |
+| `/login` | `src/app/login/page.tsx`, `src/features/auth/components/LoginForm.tsx` | Credentials login. |
 | `/register` | `src/app/register/page.tsx` | Patient registration. |
 | `/verify-email` | `src/app/verify-email/page.tsx` | Email verification. |
 | `/resend-verification` | `src/app/resend-verification/page.tsx` | Request verification email again. |
 | `/forgot-password` | `src/app/forgot-password/page.tsx` | Request reset instructions. |
 | `/reset-password` | `src/app/reset-password/page.tsx` | Reset with token. |
 | `/unauthorized` | `src/app/unauthorized/page.tsx` | Permission-denied destination. |
-| `/schedules` | `src/app/schedules/page.tsx`, `src/components/schedules/SchedulePage.tsx` | Schedule listing, filters and create/edit interactions. |
+| `/schedules` | `src/app/schedules/page.tsx`, `src/features/schedules/components/SchedulePage.tsx` | Schedule listing, filters and create/edit interactions. |
 | `/schedules/[id]` | `src/app/schedules/[id]/page.tsx`, `ScheduleDetails.tsx` | Schedule detail UI. |
 | `/patients` | `src/app/patients/page.tsx`, `PatientRegistry.tsx` | Patient registry. |
 | `/patients/[id]` | `src/app/patients/[id]/page.tsx`, `PatientDetail.tsx` | Patient detail. |
@@ -72,30 +72,30 @@ Other:
 
 | Module | Key files | Main responsibilities |
 |---|---|---|
-| Auth | `src/auth.ts`, `src/lib/auth/*`, `src/lib/api/auth.ts` | Credential verification, session validity, page/API authorization. |
-| Schedules | `src/modules/schedules/schedule.validation.ts`, `schedule.service.ts`, `schedule.repository.ts`, `schedule-access.ts`, `schedule-conflict-error.ts` | Schedule rules, status transitions, conflict handling, staff/equipment/note operations and response access helpers. |
-| Patients | `src/modules/patients/patient.validation.ts`, `patient.service.ts`, `patient.repository.ts` | Patient input validation and data access. |
-| Doctors | `src/modules/doctors/doctor.validation.ts`, `doctor.service.ts`, `doctor.repository.ts` | Doctor profiles and status. |
-| Departments | `src/modules/departments/department.validation.ts`, `department.service.ts`, `department.repository.ts` | Department records. |
-| OT rooms | `src/modules/ot-rooms/ot-room.validation.ts`, `ot-room.service.ts`, `ot-room.repository.ts` | Room inventory, status and activation. |
-| Equipment | `src/modules/equipment/equipment.validation.ts`, `equipment.service.ts`, `equipment.repository.ts` | Equipment inventory and lifecycle. |
-| Users | `src/modules/users/user.validation.ts`, `user.service.ts`, `user.repository.ts` | User records and account operations. |
-| Alerts | `src/modules/alerts/alerts.validation.ts`, `alerts.service.ts`, `alerts.repository.ts` | User-scoped alert operations. |
-| Audit | `src/modules/audit/audit.service.ts`, `audit.repository.ts` | Audit event writes and reads. |
+| Auth | `src/auth.ts`, `src/lib/auth/*`, `src/server/api/auth.ts` | Credential verification, session validity, page/API authorization. |
+| Schedules | `src/server/validation/schedule.validation.ts`, `schedule.service.ts`, `schedule.repository.ts`, `schedule-access.ts`, `schedule-conflict-error.ts` | Schedule rules, status transitions, conflict handling, staff/equipment/note operations and response access helpers. |
+| Patients | `src/server/validation/patient.validation.ts`, `patient.service.ts`, `patient.repository.ts` | Patient input validation and data access. |
+| Doctors | `src/server/validation/doctor.validation.ts`, `doctor.service.ts`, `doctor.repository.ts` | Doctor profiles and status. |
+| Departments | `src/server/validation/department.validation.ts`, `department.service.ts`, `department.repository.ts` | Department records. |
+| OT rooms | `src/server/validation/ot-room.validation.ts`, `ot-room.service.ts`, `ot-room.repository.ts` | Room inventory, status and activation. |
+| Equipment | `src/server/validation/equipment.validation.ts`, `equipment.service.ts`, `equipment.repository.ts` | Equipment inventory and lifecycle. |
+| Users | `src/server/validation/user.validation.ts`, `user.service.ts`, `user.repository.ts` | User records and account operations. |
+| Alerts | `src/server/validation/alerts.validation.ts`, `alerts.service.ts`, `alerts.repository.ts` | User-scoped alert operations. |
+| Audit | `src/server/services/audit.service.ts`, `audit.repository.ts` | Audit event writes and reads. |
 
 ## Shared infrastructure
 
-- `src/lib/api/response.ts`: response envelopes.
-- `src/lib/api/validation.ts`: malformed JSON handling and Zod parsing helper.
-- `src/lib/api/request-id.ts`: request correlation ID.
-- `src/lib/api/error.ts`: Prisma/domain error message mapping utilities.
+- `src/server/api/response.ts`: response envelopes.
+- `src/server/api/validation.ts`: malformed JSON handling and Zod parsing helper.
+- `src/server/api/request-id.ts`: request correlation ID.
+- `src/server/api/error.ts`: Prisma/domain error message mapping utilities.
 - `src/lib/api/client.ts`: browser-side API client.
-- `src/lib/db/prisma.ts`: Prisma singleton.
+- `src/server/db/prisma.ts`: Prisma singleton.
 - `src/lib/env.ts`: environment validation.
 - `src/components/layout/`: `AppShell`, `Header`, `Sidebar`.
 - `src/components/dashboard/`: dashboards and operational widgets.
-- `src/components/schedules/`: schedule calendar, card, filters, form, list, status actions/badge.
-- `src/components/alerts/AlertCenter.tsx`: alert drawer/center.
+- `src/features/schedules/components/`: schedule calendar, card, filters, form, list, status actions/badge.
+- `src/features/alerts/components/AlertCenter.tsx`: alert drawer/center.
 - `src/components/ui/`: shared buttons, badges, cards, empty/error/loading states.
 
 ## Tests

@@ -5,7 +5,7 @@ import { UserRole } from '@/generated/prisma/enums';
 import {
   handlePatientAppointments,
   handleStaffSchedules,
-} from '@/lib/api/me-read-handlers';
+} from '@/server/api/me-read-handlers';
 
 function createSession(role: UserRole, id: string) {
   return {

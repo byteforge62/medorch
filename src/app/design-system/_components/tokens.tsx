@@ -1,5 +1,5 @@
 import React from 'react';
-import { Specimen } from './specimen';
+import { Specimen } from '@/app/design-system/_components/specimen';
 
 /*======================================================================
   Token specimens — the three palettes, radius, type ladder

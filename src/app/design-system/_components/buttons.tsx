@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, Plus, Trash, DownloadSimple } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/Button';
-import { Row, Specimen } from './specimen';
+import { Row, Specimen } from '@/app/design-system/_components/specimen';
 
 /*======================================================================
   Button specimens

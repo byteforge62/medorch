@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
-import { AuthShell } from '@/components/auth/AuthShell';
+import { AuthShell } from '@/features/auth/components/AuthShell';
 import {
   authButtonClass,
   authFieldClass,
   authLabelClass,
   authLinkClass,
   authNoticeClass,
-} from '@/components/auth/auth-styles';
+} from '@/features/auth/components/auth-styles';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();

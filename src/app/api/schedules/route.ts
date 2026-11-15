@@ -1,9 +1,9 @@
-import { getScheduleConstraintConflictMessage } from "@/modules/schedules/schedule-conflict-error";
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getSchedules, createScheduleWithValidation, getSchedulesForStaff } from "@/modules/schedules/schedule.service";
-import { createScheduleSchema } from "@/modules/schedules/schedule.validation";
+import { getScheduleConstraintConflictMessage } from "@/server/errors/schedule-conflict-error";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getSchedules, createScheduleWithValidation, getSchedulesForStaff } from "@/server/services/schedule.service";
+import { createScheduleSchema } from "@/server/validation/schedule.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

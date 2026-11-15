@@ -34,7 +34,7 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000). The current seed script creates or updates `admin@medorch.local` with the password `MedOrch@Dev123!`. It resets the password each time it runs; keep this behavior confined to local development. See [Security and project boundaries](./security-and-limitations.md#local-development-credentials).
 
-`NEXTAUTH_URL` must match the origin the dev server actually listens on. Sign-out resolves its callback through it, and `src/lib/email/send-verification-email.ts` builds verification and reset links from it, so running the server on any other port (for example `npm run dev -- -p 3210` while `NEXTAUTH_URL` is `http://localhost:3000`) makes sign-out request a dead origin and would send links pointing at the wrong one. If you change the port, change `NEXTAUTH_URL` to match.
+`NEXTAUTH_URL` must match the origin the dev server actually listens on. Sign-out resolves its callback through it, and `src/server/email/send-verification-email.ts` builds verification and reset links from it, so running the server on any other port (for example `npm run dev -- -p 3210` while `NEXTAUTH_URL` is `http://localhost:3000`) makes sign-out request a dead origin and would send links pointing at the wrong one. If you change the port, change `NEXTAUTH_URL` to match.
 
 Seeded `PATIENT` accounts cannot sign in by default: `src/auth.ts` requires a populated `emailVerifiedAt` for the `PATIENT` role, and `prisma/seed.ts` does not set it. For development-only patient-role testing you have two options:
 

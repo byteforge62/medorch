@@ -1,8 +1,8 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getUserById } from "@/modules/users/user.service";
-import { userIdSchema } from "@/modules/users/user.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getUserById } from "@/server/services/user.service";
+import { userIdSchema } from "@/server/validation/user.validation";
 
 type RouteContext = {
   params: Promise<{

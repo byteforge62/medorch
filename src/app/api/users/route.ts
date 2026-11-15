@@ -1,8 +1,8 @@
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { getRequestId } from "@/lib/api/request-id";
-import { authorizeApiPermission } from "@/lib/api/auth";
-import {createUser ,getUsers } from "@/modules/users/user.service";
-import { createUserSchema } from "@/modules/users/user.validation";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { getRequestId } from "@/server/api/request-id";
+import { authorizeApiPermission } from "@/server/api/auth";
+import {createUser ,getUsers } from "@/server/services/user.service";
+import { createUserSchema } from "@/server/validation/user.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

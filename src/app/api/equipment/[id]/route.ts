@@ -1,9 +1,9 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { equipmentIdSchema, updateEquipmentSchema } from "@/modules/equipment/equipment.validation";
-import { getEquipmentById,updateEquipmentById } from "@/modules/equipment/equipment.service";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { equipmentIdSchema, updateEquipmentSchema } from "@/server/validation/equipment.validation";
+import { getEquipmentById,updateEquipmentById } from "@/server/services/equipment.service";
 
 type RouteContext = {
   params: Promise<{

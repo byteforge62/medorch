@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
-import { requireAuth } from '@/lib/auth/authorization';
-import { AdminDashboard } from '@/components/dashboard/admin/AdminDashboard';
-import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
-import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
-import { OTStaffDashboard } from '@/components/dashboard/OTStaffDashboard';
+import { requireAuth } from '@/server/auth/authorization';
+import { AdminDashboard } from '@/features/dashboard/components/admin/AdminDashboard';
+import { PatientDashboard } from '@/features/dashboard/components/PatientDashboard';
+import { DoctorDashboard } from '@/features/dashboard/components/DoctorDashboard';
+import { OTStaffDashboard } from '@/features/dashboard/components/OTStaffDashboard';
 
 /* Each role gets its own composed workspace. The ADMIN branch is a light
    clinical operations surface; clinicians and patients keep their clinical

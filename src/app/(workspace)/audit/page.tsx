@@ -1,5 +1,5 @@
-import { requireRole } from '@/lib/auth/authorization';
-import { AuditLogViewer } from '@/components/audit/AuditLogViewer';
+import { requireRole } from '@/server/auth/authorization';
+import { AuditLogViewer } from '@/features/audit-logs/components/AuditLogViewer';
 
 export default async function AuditPage() {
   await requireRole('ADMIN');

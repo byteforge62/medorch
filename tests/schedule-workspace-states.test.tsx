@@ -3,8 +3,8 @@ import test from "node:test";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import SchedulesError from "../src/app/(workspace)/schedules/error";
-import SchedulesLoading from "../src/app/(workspace)/schedules/loading";
+import SchedulesError from "@/app/(workspace)/schedules/error";
+import SchedulesLoading from "@/app/(workspace)/schedules/loading";
 
 test("the schedule loading boundary exposes an accessible busy state", () => {
   const html = renderToStaticMarkup(<SchedulesLoading />);

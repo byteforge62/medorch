@@ -35,12 +35,15 @@ Not every module uses precisely the same helper path. Use the individual route a
 | Location | Responsibility |
 | --- | --- |
 | `src/app/` | App Router pages, layouts, error states, and API Route Handlers. |
-| `src/components/` | Dashboard, schedule, alert, user, layout, and shared interface components. |
-| `src/lib/auth/` | Credential verification, session access, role checks, and permission definitions. |
-| `src/lib/api/` | Request authorization helper, response envelope, validation helper, request identifier, and browser API client. |
-| `src/lib/db/` | Prisma client configured with the PostgreSQL adapter. |
-| `src/modules/<domain>/` | Domain validation, service rules, and repository access for a feature area. |
-| `src/modules/audit/` | Audit record service and persistence access. |
+| `src/features/<domain>/components/` | Feature-specific interfaces for dashboards, schedules, patients, doctors, rooms, equipment, alerts, users, audit and auth. |
+| `src/components/ui/`, `layout/`, `shared/` | Shared primitives, application shell, navigation and cross-feature visuals. |
+| `src/server/services/` | Business rules and multi-step operations for each domain. |
+| `src/server/repositories/` | Reusable Prisma queries and persistence access. |
+| `src/server/validation/` | Zod schemas used by Route Handlers and services. |
+| `src/server/auth/` | Credential verification, sessions, role checks and schedule access rules. |
+| `src/server/api/` | Request authorization, response envelope, validation helper and request identifier. |
+| `src/server/db/` | Prisma client configured with the PostgreSQL adapter. |
+| `src/lib/` | Browser API client, permission map, shared status definitions and environment validation. |
 | `src/generated/prisma/` | Generated Prisma client and model types. |
 | `prisma/` | Prisma schema, SQL migrations, and development seed. |
 

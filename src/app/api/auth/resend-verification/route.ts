@@ -2,9 +2,9 @@
 import { NextRequest } from "next/server";
 import { ZodError, z } from "zod";
 
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { resendPatientVerificationEmail } from "@/modules/users/user.service";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { resendPatientVerificationEmail } from "@/server/services/user.service";
 
 const resendVerificationSchema = z.object({
     email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),

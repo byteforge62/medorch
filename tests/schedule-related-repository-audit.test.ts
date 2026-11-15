@@ -12,7 +12,7 @@ import {
   createScheduleNote,
   updateScheduleNote,
   deleteScheduleNote,
-} from "@/modules/schedules/schedule.repository";
+} from "@/server/repositories/schedule.repository";
 
 test("schedule staff, equipment, and note repositories audit atomically", async (t) => {
   const connectionString = process.env.DATABASE_URL;

@@ -1,9 +1,9 @@
-import { authorizeApiPermission } from "@/lib/api/auth";
-import { getRequestId } from "@/lib/api/request-id";
-import { apiError, apiSuccess } from "@/lib/api/response";
-import { readJsonBody } from "@/lib/api/validation";
-import { createNewDepartment, getDepartments } from "@/modules/departments/department.service";
-import { createDepartmentSchema } from "@/modules/departments/department.validation";
+import { authorizeApiPermission } from "@/server/api/auth";
+import { getRequestId } from "@/server/api/request-id";
+import { apiError, apiSuccess } from "@/server/api/response";
+import { readJsonBody } from "@/server/api/validation";
+import { createNewDepartment, getDepartments } from "@/server/services/department.service";
+import { createDepartmentSchema } from "@/server/validation/department.validation";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);

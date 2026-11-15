@@ -29,13 +29,13 @@ The checkpoint preserves the original committed tree; this audit remains uncommi
 
 ### Direct source reads
 
-- Authentication/session: `src/auth.ts`, `src/lib/auth/authorization.ts`, `src/lib/auth/permission.ts`, `src/lib/auth/password.ts`, `src/lib/auth/password-reset.ts`, `src/lib/auth/email-verification.ts`, `src/types/next-auth.d.ts`.
-- API foundations: `src/lib/api/auth.ts`, `src/lib/api/response.ts`, `src/lib/api/request-id.ts`, `src/lib/api/client.ts`, `src/lib/api/error.ts`, `src/lib/api/validation.ts`.
-- Configuration/database: `src/lib/env.ts`, `src/lib/db/prisma.ts`, `next.config.ts`, `prisma/schema.prisma`.
-- User/email flows: `src/modules/users/user.service.ts`, `src/modules/users/user.repository.ts`, `src/modules/users/user.validation.ts`, the five non-Auth.js `src/app/api/auth/**/route.ts` handlers, and user creation/approval handlers.
-- Alerts: `src/modules/alerts/alerts.service.ts`, `src/modules/alerts/alerts.repository.ts`, `src/modules/alerts/alerts.validation.ts`, and the alert Route Handlers.
+- Authentication/session: `src/auth.ts`, `src/server/auth/authorization.ts`, `src/lib/auth/permission.ts`, `src/server/auth/password.ts`, `src/server/auth/password-reset.ts`, `src/server/auth/email-verification.ts`, `src/types/next-auth.d.ts`.
+- API foundations: `src/server/api/auth.ts`, `src/server/api/response.ts`, `src/server/api/request-id.ts`, `src/lib/api/client.ts`, `src/server/api/error.ts`, `src/server/api/validation.ts`.
+- Configuration/database: `src/lib/env.ts`, `src/server/db/prisma.ts`, `next.config.ts`, `prisma/schema.prisma`.
+- User/email flows: `src/server/services/user.service.ts`, `src/server/repositories/user.repository.ts`, `src/server/validation/user.validation.ts`, the five non-Auth.js `src/app/api/auth/**/route.ts` handlers, and user creation/approval handlers.
+- Alerts: `src/server/services/alerts.service.ts`, `src/server/repositories/alerts.repository.ts`, `src/server/validation/alerts.validation.ts`, and the alert Route Handlers.
 - Authorization/data domains: patient service/repository and handlers; doctor service/repository/validation and status handlers; audit service/repository and `src/app/api/audit/route.ts`.
-- Scheduling: `src/modules/schedules/schedule.service.ts`, `src/modules/schedules/schedule.repository.ts`, `src/modules/schedules/schedule.validation.ts`, schedule and self-service handlers, the schedule detail page/component, and the overlap-constraint migration/test.
+- Scheduling: `src/server/services/schedule.service.ts`, `src/server/repositories/schedule.repository.ts`, `src/server/validation/schedule.validation.ts`, schedule and self-service handlers, the schedule detail page/component, and the overlap-constraint migration/test.
 - Frontend failure handling: login, forgot/reset password, verification/resend pages, and the shared API client.
 - Existing tests and documentation: `tests/permissions.test.ts`, `tests/schedule-constraints.test.ts`, `docs/api-reference.md`, and `docs/security-and-limitations.md`.
 

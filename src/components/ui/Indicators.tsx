@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StatusTone } from './StatusPill';
+import type { StatusTone } from '@/components/ui/StatusPill';
 
 /*======================================================================
   Data presentation

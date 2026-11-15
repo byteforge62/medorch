@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { readJsonBody } from "../src/lib/api/validation";
+import { readJsonBody } from "@/server/api/validation";
 
 test("readJsonBody returns parsed JSON", async () => {
   const result = await readJsonBody(

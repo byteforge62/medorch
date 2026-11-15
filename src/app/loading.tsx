@@ -1,4 +1,4 @@
-import { BrandMark } from '@/components/brand/Brand';
+import { BrandMark } from '@/components/shared/Brand';
 
 export default function Loading() {
   return (

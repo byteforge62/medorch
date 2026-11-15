@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DirectionB } from '@/components/landing/system/directions/direction-b';
+import { DirectionB } from '@/features/landing/components/system/directions/direction-b';
 
 export const metadata: Metadata = {
   title: 'Direction B — Premium Enterprise',

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getAlertsQuerySchema } from "../src/modules/alerts/alerts.validation";
-import { createUserSchema } from "../src/modules/users/user.validation";
+import { getAlertsQuerySchema } from "@/server/validation/alerts.validation";
+import { createUserSchema } from "@/server/validation/user.validation";
 
 test("alert read-state query accepts only true or false", () => {
   assert.equal(getAlertsQuerySchema.parse({ isRead: "true" }).isRead, true);

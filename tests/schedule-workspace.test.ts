@@ -4,9 +4,9 @@ import test from "node:test";
 import {
   detectScheduleConflicts,
   schedulesOverlap,
-} from "../src/modules/schedules/schedule-conflicts";
-import type { WorkspaceSchedule } from "../src/modules/schedules/schedule-workspace.types";
-import { buildTimeAxis } from "../src/components/schedules/schedule-workspace-format";
+} from "@/features/schedules/lib/schedule-conflicts";
+import type { WorkspaceSchedule } from "@/types/schedule-workspace.types";
+import { buildTimeAxis } from "@/features/schedules/components/schedule-workspace-format";
 
 function makeSchedule(
   overrides: Partial<WorkspaceSchedule> = {},
