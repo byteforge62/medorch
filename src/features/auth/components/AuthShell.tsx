@@ -68,7 +68,7 @@ export function AuthShell({
 
       <div className="relative mx-auto w-full max-w-[74rem] overflow-hidden rounded-[22px] border border-white/10 bg-sheet shadow-[0_50px_130px_-50px_rgba(12,8,26,0.85)] lg:grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         {/* Identity plate */}
-        <aside className="bg-rail relative flex flex-col overflow-hidden px-6 pt-7 pb-8 text-white sm:px-9 lg:px-11 lg:py-10">
+        <aside className="bg-rail relative flex flex-col overflow-hidden px-5 pt-5 pb-6 text-white sm:px-9 sm:pt-7 sm:pb-8 lg:px-11 lg:py-10">
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.06),transparent_55%)]"
@@ -81,16 +81,16 @@ export function AuthShell({
           <div className="relative">
             <Wordmark href="/" subtitle="Theatre operations" tone="chalk" size="md" />
 
-            <p className="mt-9 flex items-center gap-2 font-mono text-[9px] tracking-[0.12em] text-white/40">
+            <p className="mt-6 flex items-center gap-2 font-mono text-[9px] tracking-[0.12em] text-white/40 sm:mt-9">
               <span aria-hidden="true" className="h-px w-5 bg-white/30" />
               {plate}
             </p>
 
-            <h2 className="mt-4 max-w-[15ch] text-[clamp(1.9rem,2.6vw,2.6rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-white">
+            <h2 className="mt-3 max-w-[15ch] text-[1.65rem] leading-[1.02] font-semibold tracking-[-0.035em] text-white sm:mt-4 sm:text-[clamp(1.9rem,2.6vw,2.6rem)]">
               The operating day, in one record.
             </h2>
 
-            <p className="mt-4 max-w-[38ch] text-[12px] leading-[1.75] text-white/55">
+            <p className="mt-3 hidden max-w-[38ch] text-[12px] leading-[1.75] text-white/55 sm:mt-4 sm:block">
               {asideNote ??
                 'Schedules, rooms, teams, equipment and patient context — one calm operational record, authorised by role and attributed by event.'}
             </p>
@@ -115,7 +115,7 @@ export function AuthShell({
             ))}
           </ul>
 
-          <div className="relative mt-8 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-3 font-mono text-[8.5px] tracking-[0.09em] text-white/35 lg:mt-auto lg:pt-6">
+          <div className="relative mt-5 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-3 font-mono text-[8.5px] tracking-[0.09em] text-white/35 sm:mt-8 lg:mt-auto lg:pt-6">
             <span>ROLE-SCOPED</span>
             <span>ATTRIBUTED</span>
             <span>AUDITED</span>
@@ -123,7 +123,7 @@ export function AuthShell({
         </aside>
 
         {/* Working panel */}
-        <section className="bg-paper relative flex flex-col px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
+        <section className="bg-paper relative flex flex-col px-5 py-5 sm:px-8 sm:py-7 lg:px-12 lg:py-10">
           <div className="flex items-center justify-between gap-3">
             <Link
               href="/"
@@ -133,7 +133,7 @@ export function AuthShell({
             </Link>
           </div>
 
-          <div className="mx-auto flex w-full max-w-[25rem] flex-1 flex-col justify-center py-7 lg:py-8">
+          <div className="mx-auto flex w-full max-w-[25rem] flex-1 flex-col justify-center py-4 sm:py-7 lg:py-8">
             <div className="flex items-center gap-2.5">
               <span className="border-rule bg-sheet text-primary grid h-9 w-9 place-items-center rounded-[10px] border shadow-[var(--shadow-xs)]">
                 <Fingerprint size={18} weight="duotone" aria-hidden="true" />
@@ -143,7 +143,7 @@ export function AuthShell({
               </p>
             </div>
 
-            <h1 className="text-ink mt-5 text-[clamp(1.9rem,2.9vw,2.4rem)] leading-[1.04] font-semibold tracking-[-0.035em] [&_em]:text-primary [&_em]:not-italic">
+            <h1 className="text-ink mt-4 text-[1.7rem] leading-[1.04] font-semibold tracking-[-0.035em] [&_em]:text-primary [&_em]:not-italic sm:mt-5 sm:text-[clamp(1.9rem,2.9vw,2.4rem)]">
               {title}
             </h1>
 

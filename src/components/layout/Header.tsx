@@ -160,12 +160,17 @@ export function Header({
                 segments.map((segment, index) => {
                   const isLast = index === segments.length - 1;
                   return (
-                    <li key={`${segment}-${index}`} className="flex min-w-0 items-center gap-1.5">
+                    <li
+                      key={`${segment}-${index}`}
+                      className={`${
+                        isLast ? 'flex' : 'hidden sm:flex'
+                      } min-w-0 items-center gap-1.5`}
+                    >
                       {index > 0 ? (
                         <CaretRight
                           size={9}
                           weight="bold"
-                          className="text-ink-subtle shrink-0"
+                          className="text-ink-subtle hidden shrink-0 sm:block"
                           aria-hidden="true"
                         />
                       ) : null}

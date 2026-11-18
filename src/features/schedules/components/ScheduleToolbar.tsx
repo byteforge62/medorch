@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import React, { useState } from 'react';
+import { Funnel, MagnifyingGlass, X } from '@phosphor-icons/react';
 
 import type {
   WorkspaceDepartmentRef,
@@ -44,6 +44,7 @@ export function ScheduleToolbar({
   resultCount: number;
   totalCount: number;
 }) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const activeCount = Object.values(filters).filter(
     (value) => value.trim().length > 0,
   ).length;
@@ -83,23 +84,46 @@ export function ScheduleToolbar({
           </span>
         </div>
 
-        {activeCount > 0 ? (
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => onFilterChange(EMPTY_SCHEDULE_FILTERS)}
-            className="text-primary inline-flex items-center gap-1 text-[11px] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            aria-controls="schedule-filter-fields"
+            className="border-rule text-ink-secondary hover:bg-sheet inline-flex min-h-8 items-center gap-1.5 rounded-[6px] border px-2.5 text-[10.5px] font-semibold transition-colors sm:hidden"
           >
-            <X size={11} weight="bold" aria-hidden="true" />
-            Clear {activeCount} filter{activeCount === 1 ? '' : 's'}
+            <Funnel size={12} weight="bold" aria-hidden="true" />
+            {filtersOpen ? 'Hide filters' : 'Filters'}
+            {activeCount > 0 ? (
+              <span className="bg-primary text-primary-ink grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] tabular-nums">
+                {activeCount}
+              </span>
+            ) : null}
           </button>
-        ) : (
-          <span className="text-ink-subtle font-mono text-[10px] uppercase">
-            All accessible cases
-          </span>
-        )}
+
+          {activeCount > 0 ? (
+            <button
+              type="button"
+              onClick={() => onFilterChange(EMPTY_SCHEDULE_FILTERS)}
+              className="text-primary inline-flex items-center gap-1 text-[11px] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <X size={11} weight="bold" aria-hidden="true" />
+              Clear {activeCount} filter{activeCount === 1 ? '' : 's'}
+            </button>
+          ) : (
+            <span className="text-ink-subtle hidden font-mono text-[10px] uppercase sm:inline">
+              All accessible cases
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2.5 px-4 pb-3.5 sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))]">
+      <div
+        id="schedule-filter-fields"
+        className={`grid-cols-1 gap-2.5 px-4 pb-3.5 sm:grid sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))] ${
+          filtersOpen ? 'grid' : 'hidden'
+        }`}
+      >
         <label className="relative block min-w-0 sm:col-span-2 xl:col-span-1">
           <span className="sr-only">Search procedures</span>
           <MagnifyingGlass

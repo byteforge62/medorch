@@ -86,13 +86,13 @@ export function ClinicalLanding({
             </div>
 
             <div className="grid gap-10 py-10 lg:py-14 xl:grid-cols-12 xl:items-center xl:gap-10">
-              <div className="landing-rise xl:col-span-5">
+              <div className="landing-rise min-w-0 xl:col-span-5">
                 <p className="text-ink-subtle flex items-center gap-2 font-mono text-[9px] tracking-[0.16em]">
                   <span className="bg-primary h-1 w-1 rounded-full" aria-hidden="true" />
                   OPERATING THEATRE OPERATIONS
                 </p>
 
-                <h1 className="display text-ink mt-5 max-w-[12ch] text-[clamp(2.8rem,1.35rem+4.3vw,5.15rem)] leading-[0.94]">
+                <h1 className="display text-ink mt-5 max-w-[13ch] text-[clamp(2.25rem,1rem+5.6vw,5.15rem)] leading-[0.94]">
                   <span className="block">Every theatre.</span>
                   <span className="block">Every case.</span>
                   <span className="text-primary block">One record.</span>
@@ -139,7 +139,7 @@ export function ClinicalLanding({
                 </div>
               </div>
 
-              <div className="xl:col-span-7">
+              <div className="min-w-0 xl:col-span-7">
                 <HeroStage />
               </div>
             </div>

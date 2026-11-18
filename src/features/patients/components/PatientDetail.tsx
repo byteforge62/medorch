@@ -254,8 +254,11 @@ export function PatientDetail({ patientId }: { patientId: string }) {
             </dl>
 
             <div className="border-rule-soft bg-surface-subtle border-t px-5 py-3">
-              <p className="text-ink-subtle font-mono text-[9.5px] break-all">
-                RECORD {patient.id} · UPDATED {formatDate(patient.updatedAt)}
+              <p className="text-ink-subtle flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-[9.5px]">
+                <span className="break-all">RECORD {patient.id}</span>
+                <span className="whitespace-nowrap">
+                  · UPDATED {formatDate(patient.updatedAt)}
+                </span>
               </p>
             </div>
           </section>

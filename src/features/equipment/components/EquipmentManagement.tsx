@@ -539,7 +539,112 @@ export function EquipmentManagement() {
             </p>
           </header>
 
-          <div className="overflow-x-auto">
+          <ul className="divide-rule-soft divide-y md:hidden">
+            {filteredEquipment.map((item) => {
+              const readiness = readinessFor(item.maintenanceDueAt);
+
+              return (
+                <li key={item.id} className="px-4 py-3.5">
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="bg-primary-soft text-primary grid h-9 w-9 shrink-0 place-items-center rounded-[8px]"
+                    >
+                      <FirstAidKit size={16} weight="duotone" />
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-ink text-[13.5px] leading-tight font-semibold">
+                        {item.name}
+                      </p>
+                      <p className="text-ink-muted mt-0.5 truncate text-[11px]">
+                        {item.category}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0">
+                      {isAdmin ? (
+                        <select
+                          aria-label={`Status for ${item.name}`}
+                          value={item.status}
+                          disabled={updatingEquipmentId === item.id}
+                          onChange={(event) =>
+                            void handleStatusChange(
+                              item.id,
+                              event.target.value as EquipmentStatus,
+                            )
+                          }
+                          className={`h-8 max-w-[7.5rem] rounded-full border px-2 text-[9.5px] font-semibold tracking-[0.04em] uppercase transition-colors outline-none disabled:opacity-50 ${STATUS_TONE[item.status]}`}
+                        >
+                          {STATUS_OPTIONS.map((option) => (
+                            <option
+                              key={option}
+                              value={option}
+                              disabled={option === 'IN_USE'}
+                            >
+                              {formatStatus(option)}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span
+                          className={`inline-flex h-8 items-center rounded-full border px-2 text-[9.5px] font-semibold tracking-[0.04em] uppercase ${STATUS_TONE[item.status]}`}
+                        >
+                          {formatStatus(item.status)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <dl className="border-rule-soft mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-2.5">
+                    <div className="min-w-0">
+                      <dt className="text-ink-subtle text-[9px] font-semibold tracking-[0.08em] uppercase">
+                        Serial
+                      </dt>
+                      <dd className="text-ink-muted mt-0.5 truncate font-mono text-[10.5px] tabular-nums">
+                        {item.serialNumber ?? '—'}
+                      </dd>
+                    </div>
+
+                    <div className="min-w-0">
+                      <dt className="text-ink-subtle text-[9px] font-semibold tracking-[0.08em] uppercase">
+                        Location
+                      </dt>
+                      <dd className="text-ink-muted mt-0.5 truncate font-mono text-[9.5px] tracking-[0.1em] uppercase">
+                        {item.department?.name ?? 'Unassigned'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt className="text-ink-subtle text-[9px] font-semibold tracking-[0.08em] uppercase">
+                        Readiness
+                      </dt>
+                      <dd
+                        className={`mt-0.5 font-mono text-[10.5px] tabular-nums ${readiness.className}`}
+                      >
+                        {readiness.label}
+                      </dd>
+                      <dd className="text-ink-subtle font-mono text-[9.5px] tabular-nums">
+                        {formatDate(item.maintenanceDueAt)}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {isAdmin ? (
+                    <button
+                      type="button"
+                      onClick={() => openEditForm(item)}
+                      className="text-primary mt-3 inline-flex min-h-8 items-center text-[12px] font-semibold"
+                    >
+                      Edit record
+                    </button>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[840px] text-left">
               <thead>
                 <tr className="border-rule bg-surface-subtle border-b">

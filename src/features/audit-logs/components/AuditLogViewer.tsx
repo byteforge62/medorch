@@ -149,6 +149,7 @@ export function AuditLogViewer() {
     hasMore: false,
   });
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -279,7 +280,7 @@ export function AuditLogViewer() {
         aria-labelledby="audit-filter-title"
         className="border-rule bg-sheet rounded-[var(--radius-panel)] border px-5 py-4 shadow-xs"
       >
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2
               id="audit-filter-title"
@@ -291,15 +292,37 @@ export function AuditLogViewer() {
               Applied on the server across the full retained history.
             </p>
           </div>
-          {filterCount > 0 ? (
-            <span className="text-pine text-[11px] font-medium">
-              {filterCount} filter{filterCount === 1 ? '' : 's'} active
-            </span>
-          ) : null}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setFiltersOpen((open) => !open)}
+              aria-expanded={filtersOpen}
+              aria-controls="audit-filter-fields"
+              className="border-rule text-ink-secondary hover:bg-paper inline-flex min-h-8 items-center gap-1.5 rounded-[6px] border px-2.5 text-[10.5px] font-semibold transition-colors sm:hidden"
+            >
+              <Funnel size={12} weight="bold" aria-hidden="true" />
+              {filtersOpen ? 'Hide filters' : 'Filters'}
+              {filterCount > 0 ? (
+                <span className="bg-pine text-primary-ink grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] tabular-nums">
+                  {filterCount}
+                </span>
+              ) : null}
+            </button>
+
+            {filterCount > 0 ? (
+              <span className="text-pine text-[11px] font-medium">
+                {filterCount} filter{filterCount === 1 ? '' : 's'} active
+              </span>
+            ) : null}
+          </div>
         </div>
 
-        <form onSubmit={applyFilters} className="mt-4">
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <form
+          id="audit-filter-fields"
+          onSubmit={applyFilters}
+          className={`mt-4 ${filtersOpen ? 'block' : 'hidden'} sm:block`}
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
             <label className="block">
               <span className="text-ink-secondary text-[11px] font-medium">
                 Action
