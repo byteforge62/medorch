@@ -282,7 +282,7 @@ export function ScheduleForm({
         aria-labelledby="schedule-form-title"
         aria-describedby="schedule-form-description"
         onKeyDown={handleDialogKeyDown}
-        className="border-border-strong bg-surface max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
+        className="border-ice-border bg-sheet modal-panel-enter max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
       >
         <div className="border-border flex items-start justify-between gap-4 border-b pb-4">
           <div className="min-w-0">
@@ -308,7 +308,7 @@ export function ScheduleForm({
             type="button"
             onClick={onClose}
             aria-label="Close schedule form"
-            className="border-border-strong text-foreground-muted hover:bg-surface-muted hover:text-foreground focus-visible:outline-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="border-ice-border text-ink-subtle hover:border-cobalt/30 hover:text-cobalt flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
           >
             <X size={15} weight="bold" aria-hidden="true" />
           </button>
@@ -336,7 +336,7 @@ export function ScheduleForm({
               placeholder="e.g. Laparoscopic cholecystectomy"
               value={procedure}
               onChange={(e) => setProcedure(e.target.value)}
-              className="border-border-strong bg-surface text-foreground placeholder-foreground-muted focus-visible:border-primary focus-visible:outline-primary block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="border-ice-border bg-white text-ink placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-cobalt block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-[13px] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             />
           </div>
 
@@ -349,7 +349,7 @@ export function ScheduleForm({
                 required
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               >
                 <option value="">Select patient</option>
                 {patients.map((p) => (
@@ -369,7 +369,7 @@ export function ScheduleForm({
                 required
                 value={surgeonId}
                 onChange={(e) => setSurgeonId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               >
                 <option value="">Select surgeon</option>
                 {doctors.map((doc) => {
@@ -393,7 +393,7 @@ export function ScheduleForm({
                 required
                 value={departmentId}
                 onChange={(e) => handleDepartmentChange(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               >
                 <option value="">Select department</option>
                 {departments.map((d) => (
@@ -412,7 +412,7 @@ export function ScheduleForm({
                 required
                 value={otRoomId}
                 onChange={(e) => setOtRoomId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
                 disabled={isSubmitting || availableOtRooms.length === 0}
               >
                 <option value="">Select OT room</option>
@@ -447,7 +447,7 @@ export function ScheduleForm({
                 required
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               />
             </div>
 
@@ -460,7 +460,7 @@ export function ScheduleForm({
                 required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               />
             </div>
 
@@ -473,7 +473,7 @@ export function ScheduleForm({
                 required
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               />
             </div>
           </div>
@@ -485,7 +485,7 @@ export function ScheduleForm({
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as SchedulePriority)}
-              className="block min-h-10 w-full min-w-0 rounded-md border border-border-strong bg-surface text-foreground px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
             >
               <option value="ELECTIVE">Elective</option>
               <option value="URGENT">Urgent</option>
@@ -503,7 +503,7 @@ export function ScheduleForm({
               placeholder="Additional medical instructions, precautions, or procedure notes..."
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              className="border-border-strong bg-surface text-foreground placeholder-foreground-muted focus-visible:border-primary focus-visible:outline-primary block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="border-ice-border bg-white text-ink placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-cobalt block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-[13px] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             />
           </div>
 

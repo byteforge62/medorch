@@ -159,7 +159,7 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
   return (
     <Link
       href={`/patients/appointments/${appointment.id}`}
-      className="hover:border-border-strong hover:bg-surface-subtle group flex items-center gap-4 rounded-[12px] border border-transparent px-3 py-3 transition-colors"
+      className="hover:border-cobalt/25 hover:bg-cobalt-soft/20 group flex items-center gap-4 rounded-[var(--radius-md)] border border-transparent px-3 py-3 transition-colors"
     >
       <span className="bg-surface-muted flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-[9px]">
         <span className="text-ink-subtle text-[9px] leading-none font-semibold tracking-[0.08em]">
@@ -363,7 +363,7 @@ export function PatientDashboard({ userName }: { userName?: string }) {
         actions={
           <Link
             href="/patients/appointments"
-            className="border-border-strong text-foreground hover:bg-surface-subtle inline-flex items-center gap-1.5 rounded-[8px] border px-3.5 py-2 text-[12px] font-semibold"
+            className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[12px] font-semibold shadow-xs transition-colors"
           >
             <CalendarBlank size={15} aria-hidden="true" />
             All my appointments
@@ -388,7 +388,7 @@ export function PatientDashboard({ userName }: { userName?: string }) {
             <button
               type="button"
               onClick={() => void loadAppointments()}
-              className="border-border-strong text-foreground hover:bg-surface-subtle mt-4 rounded-[8px] border px-3.5 py-2 text-[12px] font-semibold"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt mt-4 inline-flex items-center rounded-full border px-4 py-2 text-[12px] font-semibold shadow-xs transition-colors"
             >
               Try again
             </button>

@@ -4,31 +4,28 @@ import Link from 'next/link';
 /*======================================================================
   MedOrch brand
   ======================================================================
-  The symbol is a continuous clinical path: one theatre day carried
-  through the M, with a recorded case node at the end. It is deliberately
-  not a medical cross. The same geometry is shipped as:
+  A rounded cobalt plate carrying a white medical cross intersected by a
+  bio-teal ECG pulse. The same geometry is shipped as:
     public/brand/medorch-symbol.svg
     public/brand/medorch-logo.svg
     public/brand/medorch-favicon.svg
 
-  Two fixed colourways keep the mark legible on paper and on the
-  aubergine rail without inventing a second logo.
+  Two fixed colourways keep the mark legible on porcelain and on the
+  midnight rail without inventing a second logo.
 ====================================================================== */
 
 const mark = {
   light: {
     plate: 'var(--brand-mark)',
-    inset: 'var(--brand-mark-ink)',
-    accent: 'var(--brand-mark-accent)',
-    node: 'var(--brand-mark-soft)',
-    edge: 'var(--brand-mark-soft)',
+    glyph: 'var(--brand-mark-ink)',
+    pulse: 'var(--brand-mark-lavender)',
+    edge: 'rgba(255,255,255,0.16)',
   },
   dark: {
     plate: 'var(--brand-mark-soft)',
-    inset: 'var(--brand-mark-deep)',
-    accent: 'var(--brand-mark-secondary)',
-    node: 'var(--chalk)',
-    edge: 'var(--brand-mark)',
+    glyph: 'var(--brand-mark-deep)',
+    pulse: 'var(--brand-mark)',
+    edge: 'rgba(29,78,216,0.18)',
   },
 } as const;
 
@@ -54,30 +51,35 @@ export function BrandMark({
       {title ? <title>{title}</title> : null}
       <rect width="48" height="48" rx="13" fill={colors.plate} />
       <rect
-        x="0.65"
-        y="0.65"
-        width="46.7"
-        height="46.7"
-        rx="12.35"
+        x="0.75"
+        y="0.75"
+        width="46.5"
+        height="46.5"
+        rx="12.25"
         stroke={colors.edge}
-        strokeOpacity="0.5"
-        strokeWidth="1.3"
+        strokeWidth="1.5"
       />
+      {/* Medical cross */}
       <path
-        d="M13 33.5V17.5c0-2.7 3.2-4 5.1-2.1L24 21.3l5.9-5.9c1.9-1.9 5.1-.6 5.1 2.1v16"
-        stroke={colors.inset}
-        strokeWidth="4"
+        d="M21 11.5h6v7.2h7.2v6H27v7.2h-6v-7.2h-7.2v-6H21z"
+        fill={colors.glyph}
+      />
+      {/* ECG pulse crossing the plate */}
+      <path
+        d="M6 30.5h7.6l2.9-6.2 3.9 12 3.4-8.6 2.4 2.8h5.4"
+        stroke={colors.pulse}
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M13 21.8c4.1 0 7.4-1.9 11-5.3"
-        stroke={colors.accent}
-        strokeWidth="1.6"
+        d="M31.5 30.5h4.2l2.1-3.4 2.7 3.4h1.5"
+        stroke={colors.pulse}
+        strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.8"
+        strokeLinejoin="round"
+        opacity="0.75"
       />
-      <circle cx="35.5" cy="35.5" r="2.2" fill={colors.node} />
     </svg>
   );
 }
@@ -85,9 +87,9 @@ export function BrandMark({
 /*======================================================================
   Wordmark
   ======================================================================
-  A two-tone sans lockup, not a display serif. The mark carries the
-  clinical geometry; the wordmark stays quiet enough for a navigation
-  rail and compact enough for a 320px viewport.
+  A two-tone sans lockup. The mark carries the clinical geometry; the
+  wordmark stays quiet enough for a navigation rail and compact enough
+  for a 320px viewport.
 ====================================================================== */
 
 export function Wordmark({
@@ -115,15 +117,20 @@ export function Wordmark({
 
   const content = (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <BrandMark tone={tone === 'chalk' ? 'dark' : 'light'} className={`${markSize} shrink-0`} />
+      <BrandMark
+        tone={tone === 'chalk' ? 'dark' : 'light'}
+        className={`${markSize} shrink-0`}
+      />
       <span className="flex min-w-0 flex-col">
         <span
-          className={`font-sans leading-none font-bold tracking-[-0.045em] ${wordSize} ${
+          className={`font-display leading-none font-extrabold tracking-[-0.045em] ${wordSize} ${
             tone === 'chalk' ? 'text-white' : 'text-ink'
           }`}
         >
           Med
-          <span className={tone === 'chalk' ? 'text-brand-lavender' : 'text-primary'}>Orch</span>
+          <span className={tone === 'chalk' ? 'text-teal-soft' : 'text-cobalt'}>
+            Orch
+          </span>
         </span>
         {subtitle ? (
           <span

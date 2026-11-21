@@ -59,8 +59,8 @@ const ROLE_META: Record<
     label: 'Administrator',
     scope:
       'Full operational record: accounts, schedules, theatres, equipment, departments, audit history and approvals.',
-    tone: 'bg-pine-soft text-pine',
-    dot: 'bg-pine',
+    tone: 'bg-cobalt-soft text-cobalt',
+    dot: 'bg-cobalt',
   },
   DOCTOR: {
     label: 'Doctor',
@@ -337,14 +337,11 @@ export function UserList() {
       <header className="border-rule border-b pb-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-primary inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase">
-              <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
-              Access & identity
-            </p>
-            <h1 className="display mt-3 text-[clamp(2rem,4vw,2.85rem)]">
+            <p className="ui-kicker">Access &amp; identity</p>
+            <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
               Who can enter MedOrch
             </h1>
-            <p className="lede mt-3 text-[14px]">
+            <p className="lede mt-3 text-[13px]">
               Every account, its role and its approval state. Access is granted
               by role on the server; this register is the administrative record.
             </p>
@@ -382,7 +379,7 @@ export function UserList() {
           </dl>
 
           <div>
-            <div className="bg-surface-muted flex h-2 overflow-hidden rounded-[2px]">
+            <div className="bg-surface-muted flex h-2 overflow-hidden rounded-full">
               {roleCounts.map((entry) => (
                 <span
                   key={entry.role}
@@ -435,7 +432,7 @@ export function UserList() {
           className="panel overflow-hidden"
           aria-labelledby="create-account-title"
         >
-          <div className="border-rule-soft bg-surface-subtle flex items-start justify-between gap-3 border-b px-5 py-3">
+          <div className="border-rule-soft bg-surface-subtle flex flex-col gap-1.5 border-b px-5 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
             <div>
               <p className="text-ink-subtle text-[10px] font-medium tracking-[0.08em] uppercase">
                 Provision account
@@ -447,7 +444,7 @@ export function UserList() {
                 Create a MedOrch identity
               </h2>
             </div>
-            <p className="text-ink-muted max-w-[42ch] text-[11.5px] leading-relaxed">
+            <p className="text-ink-muted max-w-[42ch] text-[11.5px] leading-relaxed sm:text-right">
               Patient accounts still follow verification and approval. Staff
               accounts are granted by role at creation.
             </p>
@@ -602,7 +599,7 @@ export function UserList() {
             <label htmlFor="user-search" className="sr-only">
               Search accounts
             </label>
-            <div className="control flex h-10 items-center gap-2 px-3">
+            <div className="control flex h-10 items-center gap-2 rounded-full px-3.5">
               <MagnifyingGlass
                 size={14}
                 className="text-ink-subtle shrink-0"
@@ -626,7 +623,7 @@ export function UserList() {
                   onChange={(event) =>
                     setRole(event.target.value as UserRole | 'ALL')
                   }
-                  className="control text-ink-secondary h-9 w-full px-2 text-[11.5px] outline-none"
+                  className="control text-ink-secondary h-9 w-full rounded-full px-3 text-[11.5px] outline-none"
                 >
                   <option value="ALL">All roles</option>
                   {ROLE_OPTIONS.map((option) => (
@@ -644,7 +641,7 @@ export function UserList() {
                   onChange={(event) =>
                     setStatus(event.target.value as UserStatus | 'ALL')
                   }
-                  className="control text-ink-secondary h-9 w-full px-2 text-[11.5px] outline-none"
+                  className="control text-ink-secondary h-9 w-full rounded-full px-3 text-[11.5px] outline-none"
                 >
                   <option value="ALL">All statuses</option>
                   {STATUS_OPTIONS.map((option) => (
@@ -677,13 +674,13 @@ export function UserList() {
                       onClick={() => setSelectedId(user.id)}
                       aria-pressed={active}
                       className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors ${
-                        active ? 'bg-pine-soft' : 'hover:bg-surface-subtle'
+                        active ? 'bg-cobalt-soft/45' : 'hover:bg-porcelain'
                       }`}
                     >
                       <span
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
                           active
-                            ? 'bg-pine text-white'
+                            ? 'bg-cobalt text-white'
                             : 'bg-surface-muted text-ink-secondary'
                         }`}
                         aria-hidden="true"
@@ -736,7 +733,7 @@ export function UserList() {
             <div className="border-rule-soft border-b px-5 py-4 sm:px-6">
               <div className="flex items-start gap-4">
                 <span
-                  className="bg-pine flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white"
+                  className="bg-cobalt flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[14px] font-semibold text-white shadow-[0_10px_22px_-14px_rgba(29,78,216,0.85)]"
                   aria-hidden="true"
                 >
                   {initials(selected.name)}

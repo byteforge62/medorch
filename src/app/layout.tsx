@@ -1,24 +1,30 @@
 import type { Metadata } from 'next';
-import { IBM_Plex_Sans } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 
 /*======================================================================
-  Typography — one clinical interface face.
+  Typography — two faces, one clinical register.
   ======================================================================
-    IBM Plex Sans   the whole product: page titles, headings, navigation,
-                    labels, body copy, forms, tables, controls and numeric
-                    values. Its humanist, technical character suits clinical
-                    software and stays readable at data-dense sizes.
+    Plus Jakarta Sans  display voice: page titles, module headings, the
+                       landing hero. Tight tracking, confident weight.
+    Inter              the working face: body copy, labels, forms, tables,
+                       controls, and every tabular figure.
 
   Machine codes use the operating system's monospace stack, so a code is
-  still visibly different from a sentence without adding a second family.
+  still visibly different from a sentence without adding a third family.
 ====================================================================== */
 
-const plex = IBM_Plex_Sans({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'optional',
-  variable: '--font-plex',
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-jakarta',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -43,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={plex.variable}
+      className={`${jakarta.variable} ${inter.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="bg-paper text-ink font-sans antialiased">

@@ -7,13 +7,12 @@ import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 
 /*======================================================================
-  AppShell — a control rail beside a lavender daybook.
+  AppShell — the cobalt rail beside a porcelain daybook.
   ======================================================================
-  The old shell nested a white command bar, a white navigation card and a
-  white content sheet inside one another. Here the rail is the constant:
-  a dark aubergine spine, a paper command line, and content that sits
-  directly on the lavender canvas. Individual modules own their working
-  surfaces, so the shell no longer turns every screen into one giant card.
+  The rail is the constant: a midnight spine with the same cobalt/teal
+  signal language as the public site. The command line is porcelain, and
+  content sits directly on the canvas — individual modules own their
+  working surfaces, so no screen becomes one giant nested card.
 
   Navigation state and the page transition survive client navigation; only
   the working content is re-keyed.
@@ -32,7 +31,7 @@ export function AppShell({
   const pathname = usePathname();
 
   return (
-    <div data-workspace="lavender" data-app-shell="lavender" className="text-ink min-h-screen">
+    <div data-workspace="cobalt" data-app-shell="cobalt" className="text-ink min-h-screen">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

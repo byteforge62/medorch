@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/Button';
 import {
   formatDateLong,
-  formatDateShort,
   formatDayHeading,
 } from '@/features/schedules/components/schedule-workspace-format';
 
@@ -30,7 +29,7 @@ function BriefMetric({
   label,
   value,
   note,
-  tone = 'text-ink',
+  tone = 'text-midnight',
 }: {
   label: string;
   value: string;
@@ -38,12 +37,12 @@ function BriefMetric({
   tone?: string;
 }) {
   return (
-    <div className="border-rule-soft border-r px-3 py-3 last:border-r-0 sm:px-4">
-      <dt className="text-ink-subtle text-[9px] font-medium">{label}</dt>
-      <dd className={`font-display mt-1 text-[22px] leading-none tabular-nums ${tone}`}>
+    <div className="border-rule-soft border-r px-3 py-3.5 last:border-r-0 sm:px-4">
+      <dt className="text-ink-subtle text-[10px] font-medium">{label}</dt>
+      <dd className={`font-display mt-1.5 text-[22px] leading-none tabular-nums ${tone}`}>
         {value}
         {note ? (
-          <span className="text-ink-subtle ml-1.5 font-sans text-[8.5px] font-medium">
+          <span className="text-ink-subtle ml-1.5 font-sans text-[9px] font-medium">
             {note}
           </span>
         ) : null}
@@ -51,6 +50,9 @@ function BriefMetric({
     </div>
   );
 }
+
+const dayControlClass =
+  'flex h-9 items-center justify-center gap-1.5 rounded-full border border-ice-border bg-white px-3 text-[11.5px] font-semibold text-ink-secondary shadow-xs transition-colors hover:border-cobalt/30 hover:text-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt';
 
 export function ScheduleDayHeader({
   dateKey,
@@ -83,24 +85,34 @@ export function ScheduleDayHeader({
     <header className="pb-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <p className="ui-kicker">Theatre scheduling / day desk</p>
+          <p className="ui-kicker">Theatre scheduling · day desk</p>
 
-          <h1 className="display text-ink mt-3 text-[clamp(2.5rem,1.6rem+2.8vw,4.1rem)]">
-            {formatDayHeading(dateKey, todayKey)}
+          {/* "Today · 21 Nov" becomes two lines on a phone, so the separator
+              never dangles at the end of the first line. */}
+          <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
+            {formatDayHeading(dateKey, todayKey)
+              .split(' · ')
+              .map((part, index) => (
+                <span key={`${part}-${index}`} className="block sm:inline">
+                  {index > 0 ? (
+                    <span className="text-ink-subtle hidden sm:inline" aria-hidden="true">
+                      ·{' '}
+                    </span>
+                  ) : null}
+                  {part}
+                </span>
+              ))}
           </h1>
 
-          <p className="text-ink-secondary mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
-            <span>{formatDateLong(dateKey)}</span>
-            <span className="text-ink-subtle" aria-hidden="true">·</span>
-            <span className="text-ink-muted">Local theatre time</span>
-            <span className="text-ink-subtle" aria-hidden="true">·</span>
-            <span className="text-ink-muted">{formatDateShort(dateKey)}</span>
+          <p className="text-ink-secondary mt-2.5 max-w-[62ch] text-[13px] leading-[1.7]">
+            {formatDateLong(dateKey)} · local theatre time. Blocks are
+            positioned by the recorded start and end of every case.
           </p>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={onRefresh}
             isLoading={refreshing}
@@ -119,32 +131,35 @@ export function ScheduleDayHeader({
         </div>
       </div>
 
-      <div className="border-rule mt-5 border-y">
-        <div className="flex flex-wrap items-center gap-2 py-2.5">
+      <section
+        aria-label="Selected theatre day"
+        className="border-ice-border bg-sheet shadow-xs mt-5 overflow-hidden rounded-[var(--radius-panel)] border"
+      >
+        <div className="border-rule-soft bg-porcelain/60 flex flex-wrap items-center gap-2 border-b px-3 py-2.5 sm:px-4">
           <button
             type="button"
             onClick={onPreviousDay}
-            className="border-rule text-ink-secondary hover:bg-sheet hover:border-rule-strong flex h-8 w-8 items-center justify-center rounded-[6px] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className={`${dayControlClass} w-9 px-0`}
             aria-label="Previous day"
           >
             <CaretLeft size={13} weight="bold" aria-hidden="true" />
           </button>
 
-          <label className="border-rule bg-sheet flex min-h-8 min-w-0 items-center gap-2 rounded-[6px] border px-2.5">
-            <CalendarDots size={13} className="text-ink-subtle shrink-0" aria-hidden="true" />
+          <label className="border-ice-border bg-sheet shadow-xs flex h-9 min-w-0 items-center gap-2 rounded-full border px-3 focus-within:border-cobalt">
+            <CalendarDots size={13} className="text-cobalt shrink-0" aria-hidden="true" />
             <span className="sr-only">Selected theatre date</span>
             <input
               type="date"
               value={dateKey}
               onChange={(event) => onDateChange(event.target.value || todayKey)}
-              className="text-ink min-h-7 min-w-[8.5rem] bg-transparent text-[11px] font-semibold tabular-nums outline-none"
+              className="text-midnight min-h-7 min-w-[8.5rem] bg-transparent text-[11.5px] font-semibold tabular-nums outline-none"
             />
           </label>
 
           <button
             type="button"
             onClick={onNextDay}
-            className="border-rule text-ink-secondary hover:bg-sheet hover:border-rule-strong flex h-8 w-8 items-center justify-center rounded-[6px] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className={`${dayControlClass} w-9 px-0`}
             aria-label="Next day"
           >
             <CaretRight size={13} weight="bold" aria-hidden="true" />
@@ -154,21 +169,21 @@ export function ScheduleDayHeader({
             type="button"
             onClick={onToday}
             aria-pressed={isToday}
-            className={`min-h-8 rounded-[6px] border px-2.5 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+            className={`${dayControlClass} ${
               isToday
-                ? 'border-primary/25 bg-primary-soft text-primary'
-                : 'border-rule text-ink-secondary hover:bg-sheet'
+                ? 'border-cobalt/25 bg-cobalt-soft text-cobalt'
+                : ''
             }`}
           >
             Today
           </button>
 
-          <span className="text-ink-subtle ml-auto hidden font-mono text-[8px] sm:inline">
+          <span className="text-ink-subtle ml-auto hidden font-mono text-[9px] tracking-[0.08em] sm:inline">
             DAY SHIFT · 08:00–18:00
           </span>
         </div>
 
-        <dl className="border-rule grid grid-cols-3 border-t sm:grid-cols-5">
+        <dl className="grid grid-cols-3 sm:grid-cols-5">
           <BriefMetric
             label="Procedures"
             value={`${brief.procedures}`}
@@ -183,13 +198,13 @@ export function ScheduleDayHeader({
             label={isToday ? 'In use now' : 'In use'}
             value={isToday ? `${brief.inUseTheatres}` : '—'}
             note={isToday ? 'live' : 'not today'}
-            tone={brief.inUseTheatres > 0 && isToday ? 'text-primary' : 'text-ink'}
+            tone={brief.inUseTheatres > 0 && isToday ? 'text-cobalt' : 'text-midnight'}
           />
           <BriefMetric
             label="Pending"
             value={`${brief.pending}`}
             note="unconfirmed"
-            tone={brief.pending > 0 ? 'text-warning' : 'text-ink'}
+            tone={brief.pending > 0 ? 'text-warning' : 'text-midnight'}
           />
           <BriefMetric
             label="Flags"
@@ -198,7 +213,7 @@ export function ScheduleDayHeader({
             tone={brief.conflicts > 0 ? 'text-danger' : 'text-success'}
           />
         </dl>
-      </div>
+      </section>
     </header>
   );
 }

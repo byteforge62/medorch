@@ -139,7 +139,7 @@ export function AlertCenter() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="border-rule-soft bg-surface-subtle text-ink-secondary hover:bg-pine-soft hover:text-primary relative flex h-10 w-10 items-center justify-center rounded-[13px] border transition-colors"
+        className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/30 hover:bg-cobalt-soft/40 hover:text-cobalt relative flex h-10 w-10 items-center justify-center rounded-full border shadow-xs transition-colors"
         aria-label="Alerts"
       >
         <Bell size={18} weight="regular" aria-hidden="true" />

@@ -557,7 +557,7 @@ export function AlertsWorkspace() {
               </div>
             </div>
 
-            <p className="text-ink-subtle font-mono text-[10px] tracking-[0.08em] uppercase">
+            <p className="text-ink-subtle text-[11px]">
               {isAdmin ? 'All recipients' : 'Assigned to you'} · newest first
             </p>
           </header>
@@ -741,14 +741,14 @@ export function AlertsWorkspace() {
                 closeComposer();
               }
             }}
-            className="border-border-strong bg-surface max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
+            className="border-ice-border bg-sheet modal-panel-enter max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
           >
-            <div className="border-rule flex items-start justify-between gap-4 border-b pb-4">
+            <div className="border-rule-soft flex items-start justify-between gap-4 border-b pb-4">
               <div className="min-w-0">
-                <p className="eyebrow">Alert desk</p>
+                <p className="ui-kicker">Alert desk</p>
                 <h2
                   id="alert-composer-title"
-                  className="text-ink mt-1 text-lg font-semibold"
+                  className="font-display text-midnight mt-1.5 text-lg font-bold tracking-[-0.02em]"
                 >
                   {composerMode === 'edit' ? 'Edit alert' : 'Dispatch alert'}
                 </h2>
@@ -763,7 +763,7 @@ export function AlertsWorkspace() {
                 onClick={closeComposer}
                 disabled={saving}
                 aria-label="Close alert form"
-                className="border-rule text-ink-subtle hover:bg-surface-subtle hover:text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors disabled:opacity-50"
+                className="border-ice-border bg-sheet text-ink-subtle hover:border-cobalt/30 hover:text-cobalt flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-50"
               >
                 <X size={14} weight="bold" aria-hidden="true" />
               </button>

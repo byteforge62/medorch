@@ -185,16 +185,16 @@ export function ScheduleInspector({
           onClose();
         }
       }}
-      className="border-rule bg-surface overflow-hidden border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="border-ice-border bg-sheet shadow-xs overflow-hidden rounded-[var(--radius-panel)] border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
     >
-      <header className="border-rule relative border-b px-4 pt-4 pb-3.5">
+      <header className="border-rule-soft bg-porcelain/50 relative border-b px-4 pt-4 pb-3.5">
         <div className="flex items-start justify-between gap-3">
-          <p className="eyebrow">Case brief</p>
+          <p className="ui-kicker">Case brief</p>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close case brief"
-            className="border-rule text-ink-subtle hover:bg-surface-subtle hover:text-ink -mt-1 -mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="border-ice-border bg-sheet text-ink-subtle hover:border-cobalt/30 hover:text-cobalt -mt-1 -mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
           >
             <X size={14} weight="bold" aria-hidden="true" />
           </button>
@@ -202,7 +202,7 @@ export function ScheduleInspector({
 
         <h2
           id="schedule-inspector-heading"
-          className="text-ink mt-2 text-[15px] leading-snug font-semibold tracking-[-0.01em]"
+          className="font-display text-midnight mt-2 text-[17px] leading-snug font-bold tracking-[-0.02em]"
         >
           {schedule.procedure}
         </h2>
@@ -216,7 +216,7 @@ export function ScheduleInspector({
         </p>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
-          <span className="border-rule text-ink-secondary inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[9.5px] font-semibold">
+          <span className="border-ice-border bg-sheet text-ink-secondary shadow-xs inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold">
             <span
               className={`${SCHEDULE_RAIL_TONE[schedule.status]} h-1.5 w-1.5 rounded-full`}
               aria-hidden="true"
@@ -231,7 +231,7 @@ export function ScheduleInspector({
         </div>
       </header>
 
-      <div className="divide-rule divide-y">
+      <div className="divide-rule-soft divide-y">
         <section className="px-4 py-3.5">
           <SectionLabel icon={<CalendarBlank size={11} aria-hidden="true" />}>
             Case facts
@@ -319,7 +319,7 @@ export function ScheduleInspector({
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <span
-                      className="bg-primary-soft text-primary flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold"
+                      className="bg-teal-soft text-teal-ink flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold"
                       aria-hidden="true"
                     >
                       {assignment.user.name.slice(0, 1).toUpperCase()}
@@ -405,8 +405,8 @@ export function ScheduleInspector({
           )}
         </section>
 
-        <section className="bg-surface-subtle/35 px-4 py-3.5">
-          <p className="text-ink-secondary text-[9px] font-semibold tracking-[0.08em] uppercase">
+        <section className="bg-porcelain/60 px-4 py-3.5">
+          <p className="text-ink-secondary text-[10px] font-semibold tracking-[0.08em] uppercase">
             {capabilities.canManageStatus
               ? 'Case status'
               : 'Status & record'}
@@ -432,7 +432,7 @@ export function ScheduleInspector({
           <div className="mt-3 flex flex-wrap gap-2">
             <Link
               href={`/schedules/${schedule.id}`}
-              className="border-rule bg-surface text-ink-secondary hover:border-border-strong hover:text-ink inline-flex min-h-8 items-center gap-1.5 rounded-[var(--radius-control)] border px-2.5 text-[10.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt inline-flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold shadow-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
             >
               <ArrowSquareOut size={12} aria-hidden="true" />
               Open case file
@@ -442,7 +442,7 @@ export function ScheduleInspector({
               <button
                 type="button"
                 onClick={() => onEdit(schedule)}
-                className="bg-primary text-primary-ink hover:bg-primary-hover inline-flex min-h-8 items-center gap-1.5 rounded-[var(--radius-control)] px-2.5 text-[10.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="bg-cobalt text-white hover:bg-cobalt-hover inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold shadow-[0_8px_18px_-10px_rgba(29,78,216,0.8)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
               >
                 <PencilSimple size={12} aria-hidden="true" />
                 Edit schedule

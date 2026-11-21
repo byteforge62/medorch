@@ -145,7 +145,7 @@ export function ScheduleCard({
             <Link
               href={`/schedules/${schedule.id}`}
               aria-label={`View details for ${schedule.procedure}`}
-              className="border-border-strong text-foreground-secondary hover:bg-surface-subtle inline-flex min-h-9 items-center justify-center border px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt inline-flex min-h-9 items-center justify-center rounded-full border px-4 text-[12.5px] font-semibold shadow-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
             >
               View details
             </Link>

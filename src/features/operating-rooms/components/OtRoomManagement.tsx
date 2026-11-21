@@ -11,6 +11,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 
 type OTRoomStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
 
@@ -376,16 +377,13 @@ export function OTRoomManagement() {
     <main className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-ink-muted inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.09em] uppercase">
-            <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
-            Infrastructure
-          </p>
+          <p className="ui-kicker">Infrastructure</p>
 
-          <h1 className="display text-ink mt-2 text-[clamp(1.8rem,3vw,2.4rem)]">
+          <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
             Theatre floor
           </h1>
 
-          <p className="text-ink-muted mt-2 max-w-[58ch] text-[14px]">
+          <p className="text-ink-muted mt-2.5 max-w-[58ch] text-[13px] leading-[1.7]">
             Select a theatre to inspect its state, capacity and the cases booked into it
             today.
           </p>
@@ -399,12 +397,38 @@ export function OTRoomManagement() {
         ) : null}
       </header>
 
-      {showForm && isAdmin ? (
-        <section className="panel px-5 py-5">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-ink text-[15px] font-semibold">
-              {editingRoom ? 'Edit operating theatre' : 'Add operating theatre'}
-            </h2>
+      <Drawer
+        open={showForm && isAdmin}
+        onClose={() => {
+          setShowForm(false);
+          setEditingRoom(null);
+        }}
+        title={editingRoom ? 'Edit operating theatre' : 'Add operating theatre'}
+        description="Room identity, ownership and capacity belong to the theatre."
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setShowForm(false);
+                setEditingRoom(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="ot-room-form"
+              isLoading={saving}
+              disabled={departments.length === 0}
+            >
+              {editingRoom ? 'Save changes' : 'Create theatre'}
+            </Button>
+          </div>
+        }
+      >
+          <form id="ot-room-form" onSubmit={handleSubmit} className="space-y-4">
 
             {departmentError ? (
               <p role="alert" className="text-danger text-[13px]">
@@ -490,22 +514,8 @@ export function OTRoomManagement() {
               </label>
             </div>
 
-            <div className="border-rule-soft flex justify-end gap-2 border-t pt-4">
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => setShowForm(false)}
-                className="control text-ink-secondary hover:bg-surface-subtle cursor-pointer px-3.5 py-2 text-[13px] font-semibold"
-              >
-                Cancel
-              </button>
-              <Button type="submit" disabled={saving || departments.length === 0}>
-                {saving ? 'Saving…' : editingRoom ? 'Save changes' : 'Create'}
-              </Button>
-            </div>
           </form>
-        </section>
-      ) : null}
+      </Drawer>
 
       {error ? (
         <div
@@ -525,14 +535,14 @@ export function OTRoomManagement() {
         <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
           {/* Spatial theatre plan — an illustrative arrangement, labelled as such */}
           <section aria-label="Theatre plan" className="panel overflow-hidden">
-            <div className="border-rule-soft flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2.5">
-              <h2 className="text-ink text-[13px] font-semibold">Theatre plan</h2>
+            <div className="border-rule-soft bg-porcelain/60 flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+              <h2 className="ui-kicker">Theatre plan</h2>
 
               <div className="flex flex-wrap items-center gap-3">
                 {readiness.map((entry) => (
                   <span key={entry.key} className="flex items-center gap-1.5">
                     <span
-                      className={`${entry.tone} h-2 w-2 rounded-[2px]`}
+                      className={`${entry.tone} h-2 w-2 rounded-full`}
                       aria-hidden="true"
                     />
                     <span className="text-ink-subtle text-[10.5px]">
@@ -546,7 +556,7 @@ export function OTRoomManagement() {
               </div>
             </div>
 
-            <div className="bg-surface-subtle p-4 sm:p-5">
+            <div className="cobalt-dots bg-[#F8FBFF] p-4 sm:p-5">
               <div className="grid grid-cols-1 gap-3 sm:auto-rows-fr sm:grid-cols-3">
                 {rooms.map((room, index) => {
                   const active = selected?.id === room.id;
@@ -560,10 +570,10 @@ export function OTRoomManagement() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => setSelectedRoomId(room.id)}
-                      className={`group relative flex flex-col overflow-hidden rounded-[10px] border bg-[var(--sheet)] p-3.5 text-left transition-[box-shadow,border-color,transform] duration-200 ease-out motion-reduce:transition-none ${featured ? 'sm:row-span-2 sm:min-h-[11rem]' : ''} ${
+                      className={`group relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border bg-white p-4 text-left shadow-xs transition-[box-shadow,border-color,transform] duration-200 ease-out motion-reduce:transition-none ${
                         active
-                          ? 'border-primary shadow-[var(--shadow-md)]'
-                          : 'border-rule hover:border-rule-strong hover:shadow-[var(--shadow-sm)]'
+                          ? 'border-cobalt shadow-[var(--shadow-md)]'
+                          : 'border-ice-border hover:-translate-y-0.5 hover:border-cobalt/35 hover:shadow-[var(--shadow-sm)]'
                       } ${room.isActive ? '' : 'opacity-65'}`}
                     >
                       <span
@@ -573,10 +583,10 @@ export function OTRoomManagement() {
 
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="text-ink-subtle font-mono text-[10px] tracking-[0.12em]">
+                          <p className="text-cobalt font-mono text-[10px] tracking-[0.1em]">
                             {room.code}
                           </p>
-                          <p className="text-ink mt-0.5 truncate text-[14px] font-semibold">
+                          <p className="font-display text-midnight mt-1 text-[15px] leading-snug font-bold tracking-[-0.02em]">
                             {room.name}
                           </p>
                         </div>
@@ -635,7 +645,9 @@ export function OTRoomManagement() {
                               <span
                                 key={item.id}
                                 className={`absolute inset-y-0 rounded-full ${
-                                  item.priority === 'EMERGENCY' ? 'bg-danger' : 'bg-primary/70'
+                                  item.priority === 'EMERGENCY'
+                                    ? 'bg-danger'
+                                    : 'bg-gradient-to-r from-cobalt to-teal'
                                 }`}
                                 style={{ left: `${from}%`, width: `${Math.max(2, to - from)}%` }}
                               />
@@ -722,7 +734,7 @@ export function OTRoomManagement() {
                       <li key={item.id}>
                         <Link
                           href={`/schedules/${item.id}`}
-                          className="hover:bg-surface-subtle -mx-1 flex items-baseline gap-2 rounded-[5px] px-1 py-1"
+                          className="hover:bg-cobalt-soft/30 -mx-1 flex items-baseline gap-2 rounded-[9px] px-2 py-1.5 transition-colors"
                         >
                           <span className="text-ink-subtle shrink-0 font-mono text-[10.5px] tabular-nums">
                             {clockOf(item.startTime)}
@@ -731,7 +743,7 @@ export function OTRoomManagement() {
                             {item.procedure}
                           </span>
                           {item.priority === 'EMERGENCY' ? (
-                            <span className="bg-danger-soft text-danger shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold">
+                            <span className="bg-danger-soft text-danger shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold">
                               EMERG
                             </span>
                           ) : null}
@@ -743,7 +755,7 @@ export function OTRoomManagement() {
 
                 <Link
                   href="/schedules"
-                  className="text-primary mt-2.5 inline-block text-[11px] font-semibold hover:underline"
+                  className="text-cobalt hover:text-cobalt-hover mt-3 inline-flex items-center gap-1 text-[11.5px] font-semibold"
                 >
                   Open schedule register →
                 </Link>
@@ -765,7 +777,7 @@ export function OTRoomManagement() {
                           event.target.value as OTRoomStatus,
                         )
                       }
-                      className="control text-ink mt-1 w-full px-2 py-1.5 text-[12px] outline-none disabled:opacity-50"
+                      className="control text-ink mt-1.5 w-full rounded-full px-3 py-2 text-[12px] outline-none disabled:opacity-50"
                     >
                       {STATUS_OPTIONS.map((status) => (
                         <option key={status} value={status}>
@@ -779,7 +791,7 @@ export function OTRoomManagement() {
                     <button
                       type="button"
                       onClick={() => openEditForm(selected)}
-                      className="text-primary cursor-pointer text-[11.5px] font-semibold"
+                      className="border-ice-border bg-sheet text-ink-secondary shadow-xs hover:border-cobalt/35 hover:text-cobalt cursor-pointer rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition-colors"
                     >
                       Edit theatre
                     </button>
@@ -787,7 +799,7 @@ export function OTRoomManagement() {
                       type="button"
                       disabled={updatingRoomId === selected.id}
                       onClick={() => void handleActiveChange(selected)}
-                      className="text-ink-subtle hover:text-ink cursor-pointer text-[11.5px] disabled:opacity-50"
+                      className="text-ink-subtle hover:text-ink cursor-pointer rounded-full px-2 py-1.5 text-[11.5px] disabled:opacity-50"
                     >
                       {selected.isActive ? 'Take offline' : 'Bring online'}
                     </button>

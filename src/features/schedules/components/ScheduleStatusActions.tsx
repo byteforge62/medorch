@@ -200,7 +200,7 @@ function ConfirmDialog({
             first.focus();
           }
         }}
-        className="border-border-strong bg-surface w-full max-w-sm rounded-[var(--radius-panel)] border p-5 shadow-xl"
+        className="border-ice-border bg-sheet modal-panel-enter w-full max-w-sm rounded-[var(--radius-panel)] border p-5 shadow-xl"
       >
         <p className="eyebrow">Case status</p>
         <h3

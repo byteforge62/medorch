@@ -122,9 +122,9 @@ function initialsOf(name?: string | null) {
 /*======================================================================
   The control rail
   ======================================================================
-  A deep aubergine spine instead of a floating white navigation card. It
-  gives the product a fixed point of reference and keeps the working
-  canvas lavender. Navigation labels stay visible at all desktop widths.
+  A midnight spine carrying the same cobalt-to-teal signal as the public
+  page: the active destination is a soft pill with a gradient edge, not a
+  grey block. Navigation labels stay visible at all desktop widths.
 ====================================================================== */
 
 export function Sidebar({
@@ -182,12 +182,12 @@ export function Sidebar({
             subtitle="Theatre operations"
           />
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close navigation menu"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
-          >
+                      <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close navigation menu"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-white/55 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
+            >
             <X size={18} weight="bold" aria-hidden="true" />
           </button>
         </div>
@@ -223,29 +223,33 @@ export function Sidebar({
                           href={item.href}
                           onClick={onClose}
                           aria-current={active ? 'page' : undefined}
-                          className={`group relative flex h-10 items-center gap-3 rounded-[7px] px-3 transition-colors duration-200 ${
+                          className={`group relative flex h-10 items-center gap-3 rounded-[11px] px-3 transition-colors duration-200 ${
                             active
-                              ? 'bg-[var(--nav-active-bg)] text-white'
+                              ? 'bg-white/[0.08] text-white ring-1 ring-inset ring-white/10'
                               : 'text-white/62 hover:bg-[var(--nav-hover-bg)] hover:text-white'
                           }`}
                         >
                           {active ? (
                             <span
                               aria-hidden="true"
-                              className="bg-[var(--nav-indicator)] absolute top-1/2 left-0 h-4 w-[2px] -translate-y-1/2 rounded-full"
+                              className="absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-[#60A5FA] to-[#2DD4BF]"
                             />
                           ) : null}
                           <IconComponent
                             size={17}
                             weight={active ? 'fill' : 'regular'}
-                            className={active ? 'text-brand-lavender' : 'text-white/45 group-hover:text-white/75'}
+                            className={
+                              active
+                                ? 'text-[#5EEAD4]'
+                                : 'text-white/45 group-hover:text-white/75'
+                            }
                             aria-hidden="true"
                           />
                           <span className={`min-w-0 flex-1 truncate text-[12.5px] ${active ? 'font-semibold' : 'font-medium'}`}>
                             {item.name}
                           </span>
                           {active ? (
-                            <span className="h-1 w-1 rounded-full bg-white/50" aria-hidden="true" />
+                            <span className="bg-[#5EEAD4] h-1 w-1 rounded-full" aria-hidden="true" />
                           ) : null}
                         </Link>
                       </li>

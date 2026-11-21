@@ -212,7 +212,7 @@ export function DoctorDetail({ doctorId }: { doctorId: string }) {
               {initials(doctor.user.name)}
             </span>
             <div className="min-w-0">
-              <p className="text-pine text-[11px] font-semibold">
+              <p className="text-cobalt text-[11px] font-semibold">
                 Clinician record
               </p>
               <h1 className="display mt-1 text-[clamp(1.9rem,4vw,2.6rem)]">

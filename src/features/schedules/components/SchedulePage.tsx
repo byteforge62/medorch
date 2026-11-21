@@ -17,6 +17,7 @@ import {
 } from '@/features/schedules/components/ScheduleForm';
 import { ScheduleCalendar } from '@/features/schedules/components/ScheduleCalendar';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Tabs } from '@/components/ui/Tabs';
 
 type StatusCount = { status: string; count: number };
 
@@ -302,36 +303,15 @@ export function SchedulePage() {
         description="Every procedure the role can access, with room allocation and status. Filter the board, then open a case to manage it."
         actions={
           <>
-            <div
-              role="group"
-              aria-label="Schedule view"
-              className="border-border bg-surface inline-flex border"
-            >
-              <button
-                type="button"
-                aria-pressed={viewMode === 'list'}
-                onClick={() => setViewMode('list')}
-                className={`border-border -ml-px border-l px-3.5 py-2 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors first:border-l-0 ${
-                  viewMode === 'list'
-                    ? 'bg-foreground text-foreground-inverse'
-                    : 'text-foreground-muted hover:bg-surface-subtle hover:text-foreground'
-                }`}
-              >
-                List
-              </button>
-              <button
-                type="button"
-                aria-pressed={viewMode === 'calendar'}
-                onClick={() => setViewMode('calendar')}
-                className={`border-border -ml-px border-l px-3.5 py-2 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase transition-colors first:border-l-0 ${
-                  viewMode === 'calendar'
-                    ? 'bg-foreground text-foreground-inverse'
-                    : 'text-foreground-muted hover:bg-surface-subtle hover:text-foreground'
-                }`}
-              >
-                Calendar
-              </button>
-            </div>
+            <Tabs
+              items={[
+                { id: 'calendar', label: 'Calendar' },
+                { id: 'list', label: 'List' },
+              ]}
+              value={viewMode}
+              onChange={(id) => setViewMode(id as 'list' | 'calendar')}
+              label="Schedule view"
+            />
 
             <Button
               variant="outline"

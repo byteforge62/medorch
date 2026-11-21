@@ -746,7 +746,7 @@ export function OTStaffDashboard({ userName }: { userName: string }) {
                           <Link
                             key={assignment.id}
                             href={`/schedules/${assignment.schedule.id}`}
-                            className="border-rule bg-sheet-raised absolute top-0.5 bottom-0.5 overflow-hidden rounded-[6px] border px-1.5 py-1 shadow-xs transition-shadow hover:shadow-sm"
+                            className="border-ice-border bg-white absolute top-0.5 bottom-0.5 overflow-hidden rounded-[10px] border px-1.5 py-1 shadow-xs transition-shadow hover:border-cobalt/30 hover:shadow-sm"
                             style={{ left: `${left}%`, width: `${width}%` }}
                             title={`${assignment.schedule.procedure} · ${clock(
                               assignment.schedule.startTime,

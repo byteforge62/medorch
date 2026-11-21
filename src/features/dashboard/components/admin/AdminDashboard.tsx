@@ -346,7 +346,7 @@ export function AdminDashboard() {
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link
                   href="/schedules"
-                  className="text-rail hover:bg-paper inline-flex h-8 items-center gap-1.5 rounded-[7px] bg-white px-3 text-[10.5px] font-semibold transition-colors"
+                  className="text-rail hover:bg-paper inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3.5 text-[10.5px] font-semibold shadow-xs transition-colors"
                 >
                   Open schedules
                   <ArrowRight size={12} weight="bold" aria-hidden="true" />
@@ -354,7 +354,7 @@ export function AdminDashboard() {
                 <button
                   type="button"
                   onClick={refresh}
-                  className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-[7px] border border-white/20 px-3 text-[10.5px] font-semibold text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
+                  className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-white/20 px-3.5 text-[10.5px] font-semibold text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
                   disabled={refreshing}
                 >
                   {refreshing ? 'Refreshing…' : 'Refresh picture'}

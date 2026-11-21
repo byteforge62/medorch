@@ -489,8 +489,8 @@ export function EquipmentManagement() {
         </div>
       )}
 
-      <div className="border-rule bg-sheet flex flex-col gap-2 rounded-[15px] border px-4 py-2.5 shadow-xs sm:flex-row sm:items-center sm:gap-4">
-        <label htmlFor="equipment-search" className="eyebrow shrink-0">
+      <div className="border-ice-border bg-sheet shadow-xs flex flex-col gap-2 rounded-[var(--radius-panel)] border px-4 py-3 sm:flex-row sm:items-center sm:gap-4">
+        <label htmlFor="equipment-search" className="text-ink-subtle shrink-0 text-[11px] font-semibold">
           Find item
         </label>
 
@@ -500,7 +500,7 @@ export function EquipmentManagement() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Name, category, serial number, department"
-          className="text-foreground placeholder:text-foreground-subtle w-full min-w-0 border-0 bg-transparent px-0 py-1 text-sm sm:flex-1"
+          className="text-ink placeholder:text-ink-subtle w-full min-w-0 border-0 bg-transparent px-0 py-1 text-[12.5px] outline-none sm:flex-1"
         />
 
         <label htmlFor="equipment-status" className="sr-only">
@@ -513,7 +513,7 @@ export function EquipmentManagement() {
           onChange={(event) =>
             setStatus(event.target.value as EquipmentStatus | 'ALL')
           }
-          className="border-border-strong bg-surface text-foreground focus:border-primary h-8 shrink-0 rounded-[var(--radius-control)] border px-2 font-mono text-[11px] tracking-[0.08em] uppercase outline-none"
+          className="border-ice-border bg-sheet text-ink-secondary focus:border-cobalt h-9 shrink-0 rounded-full border px-3 text-[11.5px] font-semibold outline-none"
         >
           <option value="ALL">All states</option>
           {STATUS_OPTIONS.map((option) => (
@@ -531,10 +531,10 @@ export function EquipmentManagement() {
         />
       ) : (
         <section className="panel-flush">
-          <header className="border-rule bg-surface-subtle/60 flex flex-wrap items-baseline justify-between gap-2 border-b px-4 py-2.5">
-            <h2 className="eyebrow">Inventory register</h2>
+          <header className="border-rule-soft bg-porcelain/60 flex flex-wrap items-baseline justify-between gap-2 border-b px-4 py-3">
+            <h2 className="ui-kicker">Inventory register</h2>
 
-            <p className="text-foreground-muted font-mono text-[11px] tabular-nums">
+            <p className="text-ink-subtle text-[11px] tabular-nums">
               {filteredEquipment.length} of {equipment.length} items
             </p>
           </header>
@@ -548,7 +548,7 @@ export function EquipmentManagement() {
                   <div className="flex items-start gap-3">
                     <span
                       aria-hidden="true"
-                      className="bg-primary-soft text-primary grid h-9 w-9 shrink-0 place-items-center rounded-[8px]"
+                      className="bg-cobalt-soft text-cobalt grid h-9 w-9 shrink-0 place-items-center rounded-[11px]"
                     >
                       <FirstAidKit size={16} weight="duotone" />
                     </span>
@@ -634,7 +634,7 @@ export function EquipmentManagement() {
                     <button
                       type="button"
                       onClick={() => openEditForm(item)}
-                      className="text-primary mt-3 inline-flex min-h-8 items-center text-[12px] font-semibold"
+                      className="text-cobalt hover:text-cobalt-hover mt-3 inline-flex min-h-8 items-center text-[12px] font-semibold"
                     >
                       Edit record
                     </button>
@@ -647,18 +647,18 @@ export function EquipmentManagement() {
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[840px] text-left">
               <thead>
-                <tr className="border-rule bg-surface-subtle border-b">
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Item</th>
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Category</th>
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase whitespace-nowrap">
+                <tr className="border-rule-soft bg-porcelain border-b">
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold">Item</th>
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold">Category</th>
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold whitespace-nowrap">
                     Serial
                   </th>
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">Location</th>
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase whitespace-nowrap">
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold">Location</th>
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold whitespace-nowrap">
                     Readiness
                   </th>
-                  <th className="text-ink-muted px-4 py-2.5 text-[10px] font-semibold tracking-[0.09em] uppercase">State</th>
-                  <th className="text-ink-muted px-4 py-2.5 text-right text-[10px] font-semibold tracking-[0.09em] uppercase">
+                  <th className="text-ink-subtle px-4 py-3 text-[10.5px] font-semibold">State</th>
+                  <th className="text-ink-subtle px-4 py-3 text-right text-[10.5px] font-semibold">
                     Manage
                   </th>
                 </tr>
@@ -671,17 +671,17 @@ export function EquipmentManagement() {
                   return (
                     <tr
                       key={item.id}
-                      className="hover:bg-surface-subtle transition-colors"
+                      className="hover:bg-cobalt-soft/20 transition-colors"
                     >
                       <td className="px-4 py-3.5 align-baseline">
                         <div className="flex items-center gap-2.5">
                           <span
                             aria-hidden="true"
-                            className="bg-primary-soft text-primary grid h-8 w-8 shrink-0 place-items-center rounded-[8px]"
+                            className="bg-cobalt-soft text-cobalt grid h-9 w-9 shrink-0 place-items-center rounded-[11px]"
                           >
-                            <FirstAidKit size={15} weight="duotone" />
+                            <FirstAidKit size={16} weight="duotone" />
                           </span>
-                          <p className="text-ink text-[13.5px] leading-tight font-semibold">
+                          <p className="text-midnight text-[13px] leading-tight font-semibold">
                             {item.name}
                           </p>
                         </div>
@@ -695,7 +695,7 @@ export function EquipmentManagement() {
                         {item.serialNumber ?? '—'}
                       </td>
 
-                      <td className="text-foreground-muted px-4 py-3.5 align-baseline font-mono text-[10px] tracking-[0.12em] uppercase">
+                      <td className="text-ink-secondary px-4 py-3.5 align-baseline text-[12px]">
                         {item.department?.name ?? 'Unassigned'}
                       </td>
 
@@ -747,7 +747,7 @@ export function EquipmentManagement() {
                           <button
                             type="button"
                             onClick={() => openEditForm(item)}
-                            className="text-primary link-draw text-[13px] font-medium"
+                            className="text-cobalt hover:text-cobalt-hover text-[12.5px] font-semibold"
                           >
                             Edit
                           </button>

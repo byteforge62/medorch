@@ -289,7 +289,7 @@ export function SurgicalScheduleTimeline({
                               )}, ${schedule.otRoom?.code ?? 'theatre unassigned'}, ${
                                 status.label
                               }`}
-                              className={`${status.tone} absolute overflow-hidden rounded-[5px] border px-2 py-1 text-left transition-[box-shadow,border-color] ${
+                              className={`${status.tone} absolute overflow-hidden rounded-[10px] border px-2 py-1 text-left shadow-xs transition-[box-shadow,border-color] ${
                                 active
                                   ? 'border-primary shadow-md ring-1 ring-primary/25'
                                   : 'border-transparent hover:border-primary/45'
@@ -420,7 +420,7 @@ export function SurgicalScheduleTimeline({
 
                   <Link
                     href={`/schedules/${selected.id}`}
-                    className="bg-primary text-primary-ink hover:bg-primary-hover inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[7px] px-3 text-[11px] font-semibold transition-colors"
+                    className="bg-cobalt text-white hover:bg-cobalt-hover inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold shadow-[0_8px_18px_-10px_rgba(29,78,216,0.8)] transition-colors"
                   >
                     Open full record
                     <ArrowRight size={11} weight="bold" aria-hidden="true" />

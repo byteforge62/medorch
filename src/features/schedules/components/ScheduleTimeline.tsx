@@ -459,7 +459,7 @@ export function ScheduleTimeline({
                           ? ` · ${schedule.patient.name}`
                           : ''
                       }`}
-                      className={`${SCHEDULE_BLOCK_TONE[schedule.status]} absolute top-2 z-20 flex h-[4.3rem] overflow-hidden rounded-[5px] border text-left shadow-xs transition-[box-shadow,border-color] focus-visible:z-30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                      className={`${SCHEDULE_BLOCK_TONE[schedule.status]} absolute top-2 z-20 flex h-[4.3rem] overflow-hidden rounded-[10px] border text-left shadow-xs transition-[box-shadow,border-color] focus-visible:z-30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt ${
                         selected
                           ? 'ring-primary ring-2 ring-offset-1 ring-offset-white'
                           : ''

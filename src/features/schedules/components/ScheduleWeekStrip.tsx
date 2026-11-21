@@ -25,13 +25,13 @@ export function ScheduleWeekStrip({
   return (
     <section aria-label="Week at a glance" className="hidden pb-5 sm:block">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <p className="text-ink-subtle text-[9px] font-medium">Week at a glance</p>
+        <p className="ui-kicker">Week at a glance</p>
         <p className="text-ink-subtle font-mono text-[8.5px] tabular-nums">
           {first === last ? first : `${first} — ${last}`}
         </p>
       </div>
 
-      <div className="border-rule grid grid-cols-7 overflow-hidden border">
+      <div className="border-ice-border bg-sheet shadow-xs grid grid-cols-7 overflow-hidden rounded-[var(--radius-panel)] border">
         {dates.map((key) => {
           const selected = key === dateKey;
           const today = key === todayKey;
@@ -47,20 +47,20 @@ export function ScheduleWeekStrip({
               aria-label={`${key}, ${count} procedure${count === 1 ? '' : 's'}${
                 selected ? ', selected' : ''
               }`}
-              className={`group border-rule relative min-w-0 border-r px-1.5 py-2.5 text-center transition-colors last:border-r-0 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary sm:px-2.5 ${
-                selected ? 'bg-sheet' : 'bg-sheet/35 hover:bg-sheet/80'
+              className={`group border-rule-soft relative min-w-0 cursor-pointer border-r px-1.5 py-3 text-center transition-colors last:border-r-0 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-cobalt sm:px-2.5 ${
+                selected ? 'bg-cobalt-soft/45' : 'hover:bg-porcelain'
               }`}
             >
               <span
-                className={`block text-[8px] font-semibold ${
-                  selected ? 'text-primary' : 'text-ink-subtle'
+                className={`block text-[9px] font-semibold tracking-[0.06em] uppercase ${
+                  selected ? 'text-cobalt' : 'text-ink-subtle'
                 }`}
               >
                 {formatWeekday(key)}
               </span>
               <span
-                className={`mt-1 block font-display text-[18px] leading-none font-medium tabular-nums ${
-                  selected ? 'text-ink' : 'text-ink-secondary'
+                className={`mt-1 block font-display text-[19px] leading-none font-bold tracking-[-0.02em] tabular-nums ${
+                  selected ? 'text-midnight' : 'text-ink-secondary'
                 }`}
               >
                 {dayNumber}
@@ -77,7 +77,10 @@ export function ScheduleWeekStrip({
                 {count > 0 ? count : '–'}
               </span>
               {selected ? (
-                <span className="bg-primary absolute inset-x-0 top-0 h-[2px]" aria-hidden="true" />
+                <span
+                  className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-cobalt to-teal"
+                  aria-hidden="true"
+                />
               ) : null}
               {today ? (
                 <span

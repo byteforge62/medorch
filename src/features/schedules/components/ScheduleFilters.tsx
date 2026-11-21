@@ -65,7 +65,7 @@ export function ScheduleFilters({
   const labelClassName = 'eyebrow mb-1.5 block';
 
   const controlClassName =
-    'block min-h-9 w-full min-w-0 border border-border-strong bg-surface-subtle text-foreground px-2.5 py-2 text-sm outline-none transition-colors placeholder:text-foreground-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+    'block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2 text-[12.5px] shadow-xs outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt';
 
   const availableRoomsCount = otRooms.filter(
     (room) =>
@@ -75,27 +75,29 @@ export function ScheduleFilters({
   return (
     <section
       aria-label="Filter schedules"
-      className="border-border bg-surface min-w-0 border"
+      className="border-ice-border bg-sheet shadow-xs min-w-0 overflow-hidden rounded-[var(--radius-panel)] border"
     >
-      <div className="border-border flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2.5 sm:px-5">
-        <h2 className="eyebrow">Filter the board</h2>
+      <div className="border-rule-soft bg-porcelain/60 flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 sm:px-5">
+        <h2 className="ui-kicker">Filter the board</h2>
 
-        <span className="text-foreground-muted font-mono text-[10px] tracking-[0.14em] uppercase">
-          {hasActiveFilters ? 'Filters active' : 'No filters'}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-ink-subtle text-[11px]">
+            {hasActiveFilters ? 'Filters active' : 'No filters applied'}
+          </span>
 
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="text-primary focus-visible:outline-ring text-[11px] font-semibold tracking-[0.1em] uppercase underline-offset-4 hover:underline focus-visible:outline-2"
-          >
-            Reset
-          </button>
-        )}
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="text-cobalt hover:text-cobalt-hover focus-visible:outline-cobalt rounded-full border border-ice-border bg-white px-2.5 py-1 text-[11px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-3 px-4 py-3.5 sm:grid-cols-2 sm:px-5 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-3 px-4 py-4 sm:grid-cols-2 sm:px-5 lg:grid-cols-3 xl:grid-cols-6">
         <div className="min-w-0 xl:col-span-2">
           <label htmlFor="schedule-search" className={labelClassName}>
             Search
@@ -106,7 +108,7 @@ export function ScheduleFilters({
             value={filters.search}
             onChange={(e) => handleChange('search', e.target.value)}
             placeholder="Procedure, patient, or surgeon"
-            className={controlClassName}
+            className={`${controlClassName} rounded-[var(--radius-pill)] px-3.5`}
           />
         </div>
 
@@ -207,7 +209,7 @@ export function ScheduleFilters({
       </div>
 
       {availableRoomsCount === 0 && filters.departmentId !== '' && (
-        <p className="border-border border-t px-4 py-2.5 text-sm text-danger sm:px-5">
+        <p className="border-rule-soft text-danger border-t px-4 py-2.5 text-[12px] sm:px-5">
           No OT rooms are configured for the selected department.
         </p>
       )}

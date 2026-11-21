@@ -93,7 +93,7 @@ const actionStyles: Record<AuditAction, string> = {
   APPROVE: 'bg-success-soft text-success',
   REJECT: 'bg-danger-soft text-danger',
   CANCEL: 'bg-warning-soft text-warning',
-  COMPLETE: 'bg-pine-soft text-pine',
+  COMPLETE: 'bg-cobalt-soft text-cobalt',
 };
 
 function formatAction(action: AuditAction) {
@@ -239,17 +239,11 @@ export function AuditLogViewer() {
       <header className="border-rule border-b pb-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-primary inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase">
-              <span
-                className="bg-primary h-1.5 w-1.5 rounded-full"
-                aria-hidden="true"
-              />
-              Security & compliance
-            </p>
-            <h1 className="display mt-3 text-[clamp(2rem,4vw,2.85rem)]">
+            <p className="ui-kicker">Security &amp; compliance</p>
+            <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
               Audit ledger
             </h1>
-            <p className="lede mt-3 text-[14px]">
+            <p className="lede mt-3 text-[13px]">
               A chronological record of who acted, what changed and when.
               Entries are immutable and read in server-side order.
             </p>
@@ -260,7 +254,7 @@ export function AuditLogViewer() {
               <p className="text-ink-muted text-[10.5px] font-medium">
                 Matching events
               </p>
-              <p className="text-ink mt-1 font-mono text-[26px] leading-none tabular-nums">
+              <p className="font-display text-midnight mt-1.5 text-[27px] leading-none font-extrabold tracking-[-0.02em] tabular-nums">
                 {pagination.total.toLocaleString()}
               </p>
             </div>
@@ -268,7 +262,7 @@ export function AuditLogViewer() {
               <p className="text-ink-muted text-[10.5px] font-medium">
                 Current page
               </p>
-              <p className="text-ink mt-1 font-mono text-[26px] leading-none tabular-nums">
+              <p className="font-display text-midnight mt-1.5 text-[27px] leading-none font-extrabold tracking-[-0.02em] tabular-nums">
                 {Math.floor(offset / PAGE_SIZE) + 1}
               </p>
             </div>
@@ -298,19 +292,19 @@ export function AuditLogViewer() {
               onClick={() => setFiltersOpen((open) => !open)}
               aria-expanded={filtersOpen}
               aria-controls="audit-filter-fields"
-              className="border-rule text-ink-secondary hover:bg-paper inline-flex min-h-8 items-center gap-1.5 rounded-[6px] border px-2.5 text-[10.5px] font-semibold transition-colors sm:hidden"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/30 hover:text-cobalt shadow-xs inline-flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition-colors sm:hidden"
             >
               <Funnel size={12} weight="bold" aria-hidden="true" />
               {filtersOpen ? 'Hide filters' : 'Filters'}
               {filterCount > 0 ? (
-                <span className="bg-pine text-primary-ink grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] tabular-nums">
+                <span className="bg-cobalt grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] text-white tabular-nums">
                   {filterCount}
                 </span>
               ) : null}
             </button>
 
             {filterCount > 0 ? (
-              <span className="text-pine text-[11px] font-medium">
+              <span className="text-cobalt text-[11px] font-medium">
                 {filterCount} filter{filterCount === 1 ? '' : 's'} active
               </span>
             ) : null}
@@ -462,7 +456,7 @@ export function AuditLogViewer() {
               type="button"
               onClick={() => setRetryCount((count) => count + 1)}
               disabled={loading}
-              className="text-ink-muted hover:text-ink text-[11.5px] font-semibold disabled:opacity-50"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/30 hover:text-cobalt shadow-xs rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:opacity-50"
             >
               Refresh ledger
             </button>
@@ -500,7 +494,7 @@ export function AuditLogViewer() {
                       aria-pressed={isSelected}
                       aria-label={`Inspect ${formatAction(log.action)} event for ${log.entity}`}
                       className={`relative grid w-full cursor-pointer grid-cols-[3.4rem_minmax(0,1fr)] gap-3 px-4 py-3 text-left transition-colors sm:grid-cols-[3.8rem_minmax(0,1fr)_auto] ${
-                        isSelected ? 'bg-pine-soft' : 'hover:bg-surface-subtle'
+                        isSelected ? 'bg-cobalt-soft/45' : 'hover:bg-porcelain'
                       }`}
                     >
                       <div className="border-rule-soft relative flex flex-col items-start border-r pr-3">
@@ -534,7 +528,7 @@ export function AuditLogViewer() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
-                            className={`rounded-[3px] px-1.5 py-0.5 text-[9.5px] font-semibold ${actionStyles[log.action]}`}
+                            className={`rounded-full px-2 py-0.5 text-[9.5px] font-semibold ${actionStyles[log.action]}`}
                           >
                             {formatAction(log.action)}
                           </span>
@@ -583,7 +577,7 @@ export function AuditLogViewer() {
                     setOffset((current) => Math.max(0, current - PAGE_SIZE))
                   }
                   disabled={offset === 0}
-                  className="control text-ink-secondary hover:bg-surface-subtle h-8 px-3 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="control text-ink-secondary hover:border-cobalt/30 hover:text-cobalt h-8 rounded-full px-3.5 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -592,7 +586,7 @@ export function AuditLogViewer() {
                   type="button"
                   onClick={() => setOffset((current) => current + PAGE_SIZE)}
                   disabled={!pagination.hasMore}
-                  className="control text-ink-secondary hover:bg-surface-subtle h-8 px-3 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="control text-ink-secondary hover:border-cobalt/30 hover:text-cobalt h-8 rounded-full px-3.5 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
                 </button>

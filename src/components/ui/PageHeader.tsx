@@ -38,12 +38,12 @@ export function PageHeader({
             ) : null}
           </div>
 
-          <h1 className="display text-ink mt-3 max-w-[18ch] text-[clamp(2.15rem,1.4rem+2.4vw,3.4rem)]">
+          <h1 className="display text-midnight mt-3 max-w-[20ch] text-[clamp(2rem,1.35rem+2.2vw,3.15rem)]">
             {title}
           </h1>
 
           {description ? (
-            <p className="text-ink-muted mt-3 max-w-[64ch] text-[12px] leading-[1.7]">
+            <p className="text-ink-muted mt-3 max-w-[64ch] text-[13px] leading-[1.7]">
               {description}
             </p>
           ) : null}

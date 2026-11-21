@@ -133,7 +133,7 @@ export function Header({
         <div className="flex min-w-0 items-center gap-2.5">
           <button
             onClick={onToggleSidebar}
-            className="border-rule text-ink-secondary hover:border-rule-strong hover:bg-sheet flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-[7px] border transition-colors lg:hidden"
+            className="border-ice-border text-ink-secondary hover:border-cobalt/35 hover:bg-sheet hover:text-cobalt flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border bg-white/60 shadow-xs transition-colors lg:hidden"
             aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={sidebarOpen}
             aria-controls={PRIMARY_NAVIGATION_ID}
@@ -217,7 +217,7 @@ export function Header({
 
                 <button
                   onClick={() => signOut({ callbackUrl: '/login' })}
-                  className="text-ink-muted hover:bg-sheet hover:text-ink flex h-8 w-8 cursor-pointer items-center justify-center rounded-[7px] transition-colors"
+                  className="text-ink-muted hover:bg-sheet hover:text-ink flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors"
                   title="Sign out"
                   aria-label="Sign out"
                 >

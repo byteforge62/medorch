@@ -221,7 +221,7 @@ export function AppointmentDetail({
           aria-labelledby="visit-sheet-title"
         >
           <div className="grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
-            <div className="relative flex flex-col justify-between overflow-hidden bg-[linear-gradient(150deg,#7C67C7_0%,#6550B5_48%,#4E3A94_100%)] px-5 py-5 text-white">
+            <div className="relative flex flex-col justify-between overflow-hidden bg-[linear-gradient(150deg,#2563EB_0%,#1D4ED8_48%,#1E3A8A_100%)] px-5 py-5 text-white">
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full border border-white/15"
@@ -320,8 +320,8 @@ export function AppointmentDetail({
             </dl>
           </div>
 
-          <div className="border-rule-soft bg-pine-soft border-t px-5 py-4">
-            <p className="text-pine text-[11.5px] leading-relaxed">
+          <div className="border-rule-soft bg-cobalt-soft/35 border-t px-5 py-4">
+            <p className="text-cobalt text-[11.5px] leading-relaxed">
               If these details look wrong, contact the hospital&apos;s theatre
               coordination desk and quote visit reference{' '}
               <span className="font-mono text-[10.5px]">

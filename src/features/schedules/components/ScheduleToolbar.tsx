@@ -27,7 +27,7 @@ export const EMPTY_SCHEDULE_FILTERS: ScheduleWorkspaceFilters = {
 };
 
 const controlClass =
-  'block min-h-9 w-full min-w-0 rounded-[var(--radius-control)] border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-ink-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+  'block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white px-3 py-2 text-[12.5px] text-ink shadow-xs outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt';
 
 export function ScheduleToolbar({
   filters,
@@ -73,12 +73,12 @@ export function ScheduleToolbar({
   return (
     <section
       aria-label="Filter the theatre day"
-      className="border-border bg-surface border-b"
+      className="border-ice-border bg-sheet shadow-xs overflow-hidden rounded-[var(--radius-panel)] border"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 sm:px-5">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="eyebrow">Lens</p>
-          <span className="text-ink-subtle font-mono text-[10px] tabular-nums">
+      <div className="border-rule-soft bg-porcelain/60 flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 sm:px-5">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <p className="ui-kicker">Lens</p>
+          <span className="text-ink-subtle text-[11px] tabular-nums">
             {resultCount} of {totalCount}{' '}
             {totalCount === 1 ? 'procedure' : 'procedures'}
           </span>
@@ -90,7 +90,7 @@ export function ScheduleToolbar({
             onClick={() => setFiltersOpen((open) => !open)}
             aria-expanded={filtersOpen}
             aria-controls="schedule-filter-fields"
-            className="border-rule text-ink-secondary hover:bg-sheet inline-flex min-h-8 items-center gap-1.5 rounded-[6px] border px-2.5 text-[10.5px] font-semibold transition-colors sm:hidden"
+            className="border-ice-border text-ink-secondary hover:border-cobalt/30 hover:text-cobalt inline-flex min-h-8 items-center gap-1.5 rounded-full border bg-white px-3 text-[11px] font-semibold shadow-xs transition-colors sm:hidden"
           >
             <Funnel size={12} weight="bold" aria-hidden="true" />
             {filtersOpen ? 'Hide filters' : 'Filters'}
@@ -111,7 +111,7 @@ export function ScheduleToolbar({
               Clear {activeCount} filter{activeCount === 1 ? '' : 's'}
             </button>
           ) : (
-            <span className="text-ink-subtle hidden font-mono text-[10px] uppercase sm:inline">
+            <span className="text-ink-subtle hidden text-[11px] sm:inline">
               All accessible cases
             </span>
           )}
@@ -120,7 +120,7 @@ export function ScheduleToolbar({
 
       <div
         id="schedule-filter-fields"
-        className={`grid-cols-1 gap-2.5 px-4 pb-3.5 sm:grid sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))] ${
+        className={`grid-cols-1 gap-2.5 px-4 pt-3.5 pb-3.5 sm:grid sm:grid-cols-2 sm:px-5 xl:grid-cols-[minmax(12rem,1.5fr)_repeat(4,minmax(0,1fr))] ${
           filtersOpen ? 'grid' : 'hidden'
         }`}
       >
@@ -136,7 +136,7 @@ export function ScheduleToolbar({
             value={filters.search}
             onChange={(event) => update('search', event.target.value)}
             placeholder="Procedure, patient, surgeon"
-            className={`${controlClass} pl-8`}
+            className={`${controlClass} rounded-[var(--radius-pill)] pl-9`}
           />
         </label>
 

@@ -468,12 +468,12 @@ export function DoctorDirectory() {
   const isAdmin = session?.user?.role === 'ADMIN';
 
   const BAND_TONES = [
-    'bg-primary',
-    'bg-primary/75',
-    'bg-primary/55',
-    'bg-primary/40',
-    'bg-primary/28',
-    'bg-primary/18',
+    'bg-cobalt',
+    'bg-cobalt/80',
+    'bg-teal',
+    'bg-teal/70',
+    'bg-cobalt/45',
+    'bg-teal/40',
   ];
 
   const statusMeta: Record<
@@ -544,7 +544,7 @@ export function DoctorDirectory() {
           <div className="flex items-start gap-3">
             <span
               aria-hidden="true"
-              className="bg-primary text-white flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] font-mono text-[13px] font-semibold"
+              className="bg-cobalt flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] font-mono text-[13px] font-semibold text-white shadow-[0_10px_22px_-14px_rgba(29,78,216,0.85)]"
             >
               {initials}
             </span>
@@ -553,7 +553,7 @@ export function DoctorDirectory() {
               <p className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.14em] uppercase">
                 Clinician profile
               </p>
-              <h2 className="text-ink mt-0.5 text-[17px] leading-tight font-semibold">
+              <h2 className="font-display text-midnight mt-0.5 text-[18px] leading-tight font-bold tracking-[-0.02em]">
                 {name}
               </h2>
               <p className="text-ink-muted mt-0.5 text-[12px]">
@@ -647,10 +647,10 @@ export function DoctorDirectory() {
                     disabled={current || updatingDoctorId === doctor.id}
                     aria-pressed={current}
                     onClick={() => void handleStatusChange(doctor.id, option)}
-                    className={`rounded-[5px] border px-2 py-1 text-[11px] font-medium transition-colors duration-150 ${
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors duration-150 ${
                       current
-                        ? 'border-rule bg-surface-subtle text-ink-muted'
-                        : 'border-rule text-ink-secondary hover:border-rule-strong hover:text-ink cursor-pointer'
+                        ? 'border-ice-border bg-porcelain text-ink-subtle'
+                        : 'border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt cursor-pointer'
                     } disabled:cursor-not-allowed`}
                   >
                     {optionMeta.action}
@@ -663,7 +663,7 @@ export function DoctorDirectory() {
               <button
                 type="button"
                 onClick={() => startEditingDoctor(doctor)}
-                className="text-primary cursor-pointer text-[11.5px] font-semibold"
+                className="text-cobalt hover:text-cobalt-hover cursor-pointer text-[11.5px] font-semibold"
               >
                 Edit clinical profile
               </button>
@@ -696,33 +696,30 @@ export function DoctorDirectory() {
       {/* Masthead — editorial title paired with an approval ledger */}
       <header className="border-rule-soft grid gap-6 border-b pb-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
-          <p className="text-ink-muted inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.16em] uppercase">
-            <span className="bg-primary h-px w-6" aria-hidden="true" />
-            Medical staff office
-          </p>
+          <p className="ui-kicker">Medical staff office</p>
 
-          <h1 className="display text-ink mt-3 text-[clamp(2.1rem,4.2vw,3.1rem)] leading-[1.02]">
-            Clinical Workforce
+          <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
+            Clinical workforce
           </h1>
 
-          <p className="text-ink-muted mt-3 max-w-[62ch] text-[14px] leading-relaxed">
+          <p className="text-ink-muted mt-3 max-w-[62ch] text-[13px] leading-relaxed">
             The hospital&apos;s medical staff, arranged by specialty. Select a clinician to
             review their credentials, department and account standing.
           </p>
         </div>
 
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4 lg:gap-x-7">
+        <dl className="border-ice-border bg-rule-soft shadow-xs grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-panel)] border sm:grid-cols-4">
           {[
             { term: 'Profiles', value: counts.total },
             { term: 'Approved', value: counts.active },
             { term: 'Awaiting review', value: counts.pending },
             { term: 'Restricted', value: restricted },
           ].map((item) => (
-            <div key={item.term} className="border-rule-soft border-l pl-3">
-              <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.12em] uppercase">
+            <div key={item.term} className="bg-sheet px-3.5 py-3">
+              <dt className="text-ink-subtle text-[10px] font-medium">
                 {item.term}
               </dt>
-              <dd className="text-ink mt-1 font-mono text-[22px] leading-none tabular-nums">
+              <dd className="font-display text-midnight mt-1.5 text-[24px] leading-none font-extrabold tracking-[-0.02em] tabular-nums">
                 {item.value}
               </dd>
             </div>
@@ -733,9 +730,7 @@ export function DoctorDirectory() {
       {/* Specialty composition — proportional, interactive legend */}
       <section aria-label="Specialty composition">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-ink text-[12px] font-semibold tracking-[0.06em] uppercase">
-            Specialty composition
-          </h2>
+          <h2 className="ui-kicker">Specialty composition</h2>
           <p className="text-ink-subtle text-[11.5px]">
             {specialtyGroups.length}{' '}
             {specialtyGroups.length === 1 ? 'specialty' : 'specialties'} across{' '}
@@ -744,7 +739,7 @@ export function DoctorDirectory() {
         </div>
 
         <div
-          className="bg-surface-muted mt-2.5 flex h-2.5 w-full gap-[2px] overflow-hidden rounded-[2px]"
+          className="bg-surface-muted mt-3 flex h-2.5 w-full gap-[2px] overflow-hidden rounded-full"
           role="img"
           aria-label="Proportional distribution of clinicians by specialty"
         >
@@ -812,7 +807,7 @@ export function DoctorDirectory() {
               setCreateError('');
               setCreateOpen((current) => !current);
             }}
-            className="control text-ink hover:bg-surface-subtle cursor-pointer px-3 py-1.5 text-[12px] font-semibold"
+            className="border-ice-border bg-sheet text-ink-secondary shadow-xs hover:border-cobalt/35 hover:text-cobalt cursor-pointer rounded-full border px-4 py-2 text-[12px] font-semibold transition-colors"
           >
             {createOpen ? 'Close new profile form' : 'Create doctor profile'}
           </button>
@@ -1032,14 +1027,14 @@ export function DoctorDirectory() {
       {/* Discovery workspace: specialty rail · clinician index · profile */}
       <section
         aria-label="Clinician directory"
-        className="border-rule overflow-hidden rounded-[12px] border bg-[var(--sheet)]"
+        className="border-ice-border bg-sheet shadow-xs overflow-hidden rounded-[var(--radius-panel)] border"
       >
         <div className="grid lg:grid-cols-[10.5rem_minmax(0,1fr)_18rem]">
           <nav
             aria-label="Filter by specialty"
-            className="border-rule-soft bg-surface-subtle min-w-0 border-b px-2 py-2 lg:border-r lg:border-b-0 lg:py-3"
+            className="border-rule-soft bg-porcelain/60 min-w-0 border-b px-2 py-2 lg:border-r lg:border-b-0 lg:py-3"
           >
-            <p className="text-ink-subtle hidden px-2 pb-2 text-[9.5px] font-semibold tracking-[0.14em] uppercase lg:block">
+            <p className="text-ink-subtle hidden px-2 pb-2 text-[10px] font-semibold tracking-[0.06em] uppercase lg:block">
               Specialty
             </p>
 
@@ -1049,10 +1044,10 @@ export function DoctorDirectory() {
                   type="button"
                   onClick={() => setSpecialty('ALL')}
                   aria-pressed={specialty === 'ALL'}
-                  className={`w-full cursor-pointer rounded-[5px] px-2 py-1.5 text-left text-[11.5px] whitespace-nowrap transition-colors duration-150 ${
+                  className={`w-full cursor-pointer rounded-full px-3 py-1.5 text-left text-[11.5px] whitespace-nowrap transition-colors duration-150 ${
                     specialty === 'ALL'
-                      ? 'bg-[var(--sheet)] text-ink font-semibold shadow-[var(--shadow-sm)]'
-                      : 'text-ink-muted hover:text-ink'
+                      ? 'bg-cobalt-soft/50 text-cobalt font-semibold shadow-xs'
+                      : 'text-ink-muted hover:bg-white/70 hover:text-ink'
                   }`}
                 >
                   All clinicians
@@ -1067,10 +1062,10 @@ export function DoctorDirectory() {
                       setSpecialty((current) => (current === group.name ? 'ALL' : group.name))
                     }
                     aria-pressed={specialty === group.name}
-                    className={`flex w-full cursor-pointer items-baseline justify-between gap-3 rounded-[5px] px-2 py-1.5 text-left text-[11.5px] whitespace-nowrap transition-colors duration-150 ${
+                    className={`flex w-full cursor-pointer items-baseline justify-between gap-3 rounded-full px-3 py-1.5 text-left text-[11.5px] whitespace-nowrap transition-colors duration-150 ${
                       specialty === group.name
-                        ? 'bg-[var(--sheet)] text-ink font-semibold shadow-[var(--shadow-sm)]'
-                        : 'text-ink-muted hover:text-ink'
+                        ? 'bg-cobalt-soft/50 text-cobalt font-semibold shadow-xs'
+                        : 'text-ink-muted hover:bg-white/70 hover:text-ink'
                     }`}
                   >
                     <span className="truncate">{group.name}</span>
@@ -1083,7 +1078,7 @@ export function DoctorDirectory() {
 
           <div className="min-w-0 border-rule-soft border-b lg:border-r lg:border-b-0">
             <div className="border-rule-soft flex flex-wrap items-center gap-2 border-b px-3 py-2.5">
-              <div className="well flex min-w-0 flex-1 items-center px-2.5 py-1.5">
+              <div className="control flex min-w-0 flex-1 items-center rounded-full px-3.5 py-1.5">
                 <label htmlFor="doctor-search" className="sr-only">
                   Search clinicians
                 </label>
@@ -1104,7 +1099,7 @@ export function DoctorDirectory() {
                 id="doctor-status"
                 value={status}
                 onChange={(event) => setStatus(event.target.value as DoctorStatus | 'ALL')}
-                className="control text-ink px-2 py-1.5 text-[12px] outline-none"
+                className="control text-ink rounded-full px-3 py-1.5 text-[12px] outline-none"
               >
                 <option value="ALL">All statuses</option>
                 {STATUS_OPTIONS.map((option) => (
@@ -1133,7 +1128,7 @@ export function DoctorDirectory() {
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="text-primary mt-3 cursor-pointer text-[12px] font-semibold"
+                    className="text-cobalt mt-3 cursor-pointer text-[12px] font-semibold"
                   >
                     Clear filters
                   </button>
@@ -1154,8 +1149,8 @@ export function DoctorDirectory() {
                         aria-pressed={active}
                         className={`group grid w-full cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-3 border-l-2 px-3.5 py-3 text-left transition-colors duration-150 ${
                           active
-                            ? 'border-primary bg-surface-subtle'
-                            : 'hover:bg-surface-subtle/70 border-transparent'
+                            ? 'border-cobalt bg-cobalt-soft/35'
+                            : 'hover:bg-porcelain border-transparent'
                         }`}
                       >
                         <span className="text-ink-subtle self-start pt-0.5 font-mono text-[10.5px] tabular-nums">
@@ -1254,7 +1249,7 @@ export function DoctorDirectory() {
             role="dialog"
             aria-modal="true"
             aria-label={`Profile for ${activeDoctor.user.name?.trim() || activeDoctor.user.email}`}
-            className="workforce-sheet-enter absolute inset-x-0 bottom-0 max-h-[86vh] overflow-y-auto rounded-t-[14px] bg-[var(--sheet)] shadow-[var(--shadow-lg)]"
+                                        className="workforce-sheet-enter absolute inset-x-0 bottom-0 max-h-[86vh] overflow-y-auto rounded-t-[24px] bg-[var(--sheet)] shadow-[var(--shadow-lg)]"
           >
             <div className="border-rule-soft flex items-center justify-between border-b px-4 py-2">
               <span className="text-ink-subtle font-mono text-[10px] tracking-[0.12em] uppercase">

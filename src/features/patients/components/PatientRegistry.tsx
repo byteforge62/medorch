@@ -317,16 +317,13 @@ export function PatientRegistry() {
       {/* Masthead — the registry states its size before you search */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-ink-muted inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase">
-            <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
-            Clinical operations
-          </p>
+          <p className="ui-kicker">Clinical operations</p>
 
-          <h1 className="text-ink mt-2 font-[family-name:var(--font-display)] text-[clamp(1.9rem,3.4vw,2.6rem)] leading-[1.05] tracking-[-0.02em]">
+          <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
             Patient index
           </h1>
 
-          <p className="text-ink-muted mt-2 max-w-[52ch] text-[14px]">
+          <p className="text-ink-muted mt-2.5 max-w-[52ch] text-[13px] leading-[1.7]">
             {patients.length} records on file, {contactable} with a contact
             number. Select a person to open their plate.
           </p>
@@ -373,7 +370,7 @@ export function PatientRegistry() {
                 Search patients
               </label>
 
-              <div className="well mt-2 flex items-center gap-2 px-2.5 py-1.5">
+              <div className="control mt-2.5 flex items-center gap-2 rounded-full px-3.5 py-1.5">
                 <MagnifyingGlass
                   size={14}
                   className="text-ink-subtle shrink-0"
@@ -436,16 +433,16 @@ export function PatientRegistry() {
                         setEditingPatient(null);
                       }}
                       aria-current={active ? 'true' : undefined}
-                      className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors ${
+                      className={`flex w-full cursor-pointer items-center gap-4 px-4 py-3.5 text-left transition-colors ${
                         active
-                          ? 'bg-primary-soft'
-                          : 'hover:bg-surface-subtle'
+                          ? 'bg-cobalt-soft/45'
+                          : 'hover:bg-porcelain'
                       }`}
                     >
                       <span
                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${
                           active
-                            ? 'bg-primary text-white'
+                            ? 'bg-cobalt text-white'
                             : 'bg-surface-muted text-ink-secondary'
                         }`}
                         aria-hidden="true"
@@ -630,7 +627,7 @@ export function PatientRegistry() {
                 <div className="border-rule-soft border-b p-5">
                   <div className="flex items-start gap-3">
                     <span
-                      className="bg-primary text-white flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold"
+                                              className="bg-cobalt flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold text-white shadow-[0_10px_22px_-14px_rgba(29,78,216,0.85)]"
                       aria-hidden="true"
                     >
                       {monogram(selected.name)}
@@ -709,7 +706,7 @@ export function PatientRegistry() {
                   {canOpenRecord ? (
                     <Link
                       href={`/patients/${selected.id}`}
-                      className="bg-primary hover:bg-primary-hover rounded-[var(--radius-control)] px-3.5 py-2 text-[13px] font-semibold text-white shadow-sm transition-colors"
+                      className="bg-cobalt hover:bg-cobalt-hover inline-flex h-10 items-center rounded-full px-4 text-[12.5px] font-semibold text-white shadow-[0_8px_18px_-10px_rgba(29,78,216,0.8)] transition-colors"
                     >
                       Open full record
                     </Link>

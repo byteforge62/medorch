@@ -222,10 +222,10 @@ export function MyAppointments() {
         </p>
         <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="display text-[clamp(2rem,4vw,2.85rem)]">
+            <h1 className="display text-midnight text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
               Your theatre visits
             </h1>
-            <p className="lede mt-3 text-[14px]">
+            <p className="lede mt-3 text-[13px]">
               {patient.name}, these are the operating-theatre appointments held
               against your patient record.
             </p>
@@ -243,7 +243,7 @@ export function MyAppointments() {
           className="panel overflow-hidden"
         >
           <div className="grid md:grid-cols-[9.5rem_minmax(0,1fr)_auto]">
-            <div className="relative flex flex-col justify-between overflow-hidden bg-[linear-gradient(150deg,#7C67C7_0%,#6550B5_48%,#4E3A94_100%)] px-6 py-5 text-white md:px-5">
+            <div className="relative flex flex-col justify-between overflow-hidden bg-[linear-gradient(150deg,#2563EB_0%,#1D4ED8_48%,#1E3A8A_100%)] px-6 py-5 text-white md:px-5">
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full border border-white/15"

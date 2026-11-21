@@ -338,14 +338,11 @@ export function DepartmentManagement() {
       <header className="border-rule border-b pb-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-primary inline-flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase">
-              <span className="bg-primary h-1.5 w-1.5 rounded-full" aria-hidden="true" />
-              Organisation
-            </p>
-            <h1 className="display mt-3 text-[clamp(2rem,4vw,2.85rem)]">
+            <p className="ui-kicker">Organisation</p>
+            <h1 className="display text-midnight mt-3 text-[clamp(1.9rem,1.3rem+2.2vw,3rem)]">
               Clinical divisions
             </h1>
-            <p className="lede mt-3 text-[14px]">
+            <p className="lede mt-3 text-[13px]">
               The hospital&apos;s operating structure, the clinician who leads
               each division, and the people, theatres and equipment it holds.
             </p>
@@ -359,18 +356,18 @@ export function DepartmentManagement() {
           ) : null}
         </div>
 
-        <dl className="border-rule-soft bg-rule mt-6 grid grid-cols-2 gap-px border-y sm:grid-cols-4">
+        <dl className="border-ice-border bg-rule-soft shadow-xs mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-panel)] border sm:grid-cols-4">
           {[
             { term: 'Divisions', value: counts.total },
             { term: 'Operating', value: counts.active },
             { term: 'Paused', value: counts.inactive },
             { term: 'Clinicians', value: counts.doctors },
           ].map((item) => (
-            <div key={item.term} className="bg-sheet px-4 py-3">
-              <dt className="text-ink-muted text-[11px] font-medium">
+            <div key={item.term} className="bg-sheet px-4 py-3.5">
+              <dt className="text-ink-subtle text-[10.5px] font-medium">
                 {item.term}
               </dt>
-              <dd className="text-ink mt-1 font-mono text-[22px] leading-none tabular-nums">
+              <dd className="font-display text-midnight mt-1.5 text-[24px] leading-none font-extrabold tracking-[-0.02em] tabular-nums">
                 {item.value}
               </dd>
             </div>
@@ -539,7 +536,7 @@ export function DepartmentManagement() {
             <label htmlFor="department-search" className="sr-only">
               Search departments
             </label>
-            <div className="control flex h-10 items-center gap-2 px-3">
+            <div className="control flex h-10 items-center gap-2 rounded-full px-3.5">
               <MagnifyingGlass
                 size={14}
                 className="text-ink-subtle shrink-0"
@@ -577,8 +574,8 @@ export function DepartmentManagement() {
                     aria-pressed={active}
                     className={`cursor-pointer rounded-full px-2.5 py-1 text-[11.5px] font-semibold transition-colors ${
                       active
-                        ? 'bg-pine text-white'
-                        : 'text-ink-secondary hover:bg-surface-subtle'
+                        ? 'bg-cobalt text-white shadow-[0_6px_14px_-8px_rgba(29,78,216,0.7)]'
+                        : 'text-ink-secondary hover:bg-cobalt-soft/40 hover:text-cobalt'
                     }`}
                   >
                     {option.label}
@@ -615,14 +612,14 @@ export function DepartmentManagement() {
                       onClick={() => setSelectedId(department.id)}
                       aria-pressed={active}
                       className={`group relative flex w-full cursor-pointer gap-3 px-4 py-3.5 text-left transition-colors ${
-                        active ? 'bg-pine-soft' : 'hover:bg-surface-subtle'
+                        active ? 'bg-cobalt-soft/45' : 'hover:bg-porcelain'
                       }`}
                     >
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">
                           <span
                             className={`truncate text-[13.5px] font-semibold ${
-                              active ? 'text-pine' : 'text-ink'
+                              active ? 'text-cobalt' : 'text-ink'
                             }`}
                           >
                             {department.name}
@@ -709,7 +706,7 @@ export function DepartmentManagement() {
                   <button
                     type="button"
                     onClick={() => openEdit(selected)}
-                    className="bg-pine hover:bg-pine-deep h-8 rounded-[var(--radius-control)] px-3 text-[12px] font-semibold text-white transition-colors"
+                    className="bg-cobalt hover:bg-cobalt-hover inline-flex h-9 items-center rounded-full px-4 text-[12px] font-semibold text-white shadow-[0_8px_18px_-10px_rgba(29,78,216,0.8)] transition-colors"
                   >
                     Edit division
                   </button>
@@ -727,7 +724,7 @@ export function DepartmentManagement() {
               ) : null}
             </div>
 
-            <div className="border-rule-soft bg-rule grid gap-px border-b sm:grid-cols-2">
+            <div className="border-rule-soft bg-rule-soft grid gap-px border-b sm:grid-cols-2">
               <div className="bg-sheet px-5 py-4 sm:px-6">
                 <p className="text-ink-subtle text-[10.5px] font-medium">
                   Department head
@@ -735,7 +732,7 @@ export function DepartmentManagement() {
                 {selected.headDoctor ? (
                   <div className="mt-2 flex items-center gap-3">
                     <span
-                      className="bg-pine-soft text-pine flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+                      className="bg-teal-soft text-teal-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
                       aria-hidden="true"
                     >
                       {initials(selected.headDoctor.user.name)}
@@ -743,7 +740,7 @@ export function DepartmentManagement() {
                     <div className="min-w-0">
                       <Link
                         href={`/doctors/${selected.headDoctor.id}`}
-                        className="text-ink hover:text-pine block truncate text-[13px] font-semibold"
+                        className="text-ink hover:text-cobalt block truncate text-[13px] font-semibold"
                       >
                         {selected.headDoctor.user.name}
                       </Link>
@@ -791,7 +788,7 @@ export function DepartmentManagement() {
                 </p>
               </div>
 
-              <dl className="border-rule bg-rule mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-control)] border sm:grid-cols-4">
+              <dl className="border-ice-border bg-rule-soft mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-md)] border sm:grid-cols-4">
                 {[
                   {
                     term: 'Clinicians',
@@ -818,7 +815,7 @@ export function DepartmentManagement() {
                     <dt className="text-ink-muted text-[10.5px]">
                       {item.term}
                     </dt>
-                    <dd className="text-ink mt-1 font-mono text-[21px] leading-none tabular-nums">
+                    <dd className="font-display text-midnight mt-1.5 text-[22px] leading-none font-extrabold tracking-[-0.02em] tabular-nums">
                       {item.value}
                     </dd>
                     <dd className="text-ink-subtle mt-1 text-[10px]">

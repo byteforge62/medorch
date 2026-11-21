@@ -1,5 +1,5 @@
-import { ClinicalLanding } from '@/features/landing/components/clinical/clinical-landing';
+import { CobaltLanding } from '@/features/landing/components/cobalt/cobalt-landing';
 
 export default function HomePage() {
-  return <ClinicalLanding production />;
+  return <CobaltLanding />;
 }
