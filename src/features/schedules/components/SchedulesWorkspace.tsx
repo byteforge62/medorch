@@ -146,9 +146,9 @@ function EmptyInspector({
         <h2 className="text-ink mt-2 text-[15px] leading-snug font-semibold tracking-[-0.01em]">
           Select a procedure
         </h2>
-        <p className="text-ink-muted mt-1.5 text-[11px] leading-relaxed">
-          Choose a block on the theatre timeline or a row in the day agenda to
-          read the patient reference, team, equipment and status controls.
+        <p className="text-ink-secondary mt-1.5 text-[12.5px] leading-relaxed">
+          Choose a block on the theatre timeline to read the patient reference,
+          team, equipment and status controls.
         </p>
       </div>
 
@@ -162,10 +162,8 @@ function EmptyInspector({
             key={row.term}
             className="flex items-baseline justify-between gap-3 px-4 py-2.5"
           >
-            <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.07em] uppercase">
-              {row.term}
-            </dt>
-            <dd className="text-ink text-[12px] font-semibold tabular-nums">
+            <dt className="text-ink-secondary text-[12px]">{row.term}</dt>
+            <dd className="text-ink text-[13px] font-semibold tabular-nums">
               {row.value}
             </dd>
           </div>
@@ -173,7 +171,7 @@ function EmptyInspector({
       </dl>
 
       <div className="border-rule bg-surface-subtle/35 border-t px-4 py-3.5">
-        <p className="text-ink-muted text-[10px] leading-relaxed">
+        <p className="text-ink-muted text-[11.5px] leading-relaxed">
           The timeline plots actual recorded start and end times. Nothing is
           positioned by assumed duration.
         </p>
@@ -181,7 +179,7 @@ function EmptyInspector({
           <button
             type="button"
             onClick={onNewSchedule}
-            className="text-primary mt-2 text-[10.5px] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="text-primary focus-visible:outline-primary mt-2 text-[12px] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             Create a schedule
           </button>
@@ -525,7 +523,7 @@ export function SchedulesWorkspace({
         aria-live="polite"
         className={
           notice
-            ? 'border-rule bg-surface text-ink-secondary mb-3 flex items-start gap-2 rounded-[var(--radius-control)] border px-3 py-2 text-[11px]'
+            ? 'border-rule bg-surface text-ink-secondary mb-3 flex items-start gap-2 rounded-[var(--radius-control)] border px-3.5 py-2.5 text-[12.5px]'
             : 'sr-only'
         }
       >
@@ -593,15 +591,15 @@ export function SchedulesWorkspace({
         </div>
       </div>
 
-      <footer className="border-rule text-ink-subtle mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-[9px]">
+      <footer className="border-rule text-ink-subtle mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-[11px]">
         <p>
           {data.scope === 'ASSIGNED'
             ? 'Assigned theatre cases only'
             : 'All accessible theatre cases'}{' '}
           · local browser time · {formatDateShort(selectedDateKey)}
         </p>
-        <p className="font-mono tabular-nums">
-          Prisma read {formatClock(data.generatedAt)} · {schedules.length}{' '}
+        <p className="tabular-nums">
+          Read {formatClock(data.generatedAt)} · {schedules.length}{' '}
           cases loaded in range
         </p>
       </footer>

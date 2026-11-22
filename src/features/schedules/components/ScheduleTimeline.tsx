@@ -117,7 +117,7 @@ function StatusLegend() {
       {LEGEND.map((status) => (
         <span
           key={status}
-          className="text-ink-muted inline-flex items-center gap-1.5 text-[9.5px]"
+          className="text-ink-muted inline-flex items-center gap-1.5 text-[11px]"
         >
           <span
             className={`${SCHEDULE_RAIL_TONE[status]} h-1.5 w-1.5 rounded-full`}
@@ -141,12 +141,12 @@ function EmptyBand({
 }) {
   return (
     <div className="border-rule bg-surface-subtle/35 border-b px-4 py-3 sm:px-5">
-      <p className="text-ink text-[11.5px] font-medium">
+      <p className="text-ink text-[12.5px] font-medium">
         {dayCount === 0
           ? 'No procedures are booked on this date.'
           : `${visibleCount} of ${dayCount} procedures match the current lens.`}
       </p>
-      <p className="text-ink-muted mt-0.5 text-[10.5px]">
+      <p className="text-ink-muted mt-1 text-[11.5px] leading-relaxed">
         {dayCount === 0
           ? 'The theatre lanes remain visible so availability is still readable. Use the date controls to move through the week.'
           : 'Clear or change the theatre, department, status, priority or search controls to broaden the view.'}
@@ -256,7 +256,7 @@ export function ScheduleTimeline({
             >
               Theatre day
             </h2>
-            <span className="text-ink-subtle font-mono text-[9.5px] uppercase">
+            <span className="text-ink-subtle text-[11px] tabular-nums">
               {lanes.length} theatres ·{' '}
               {schedules.length === allDaySchedules.length
                 ? schedules.length
@@ -264,8 +264,8 @@ export function ScheduleTimeline({
               {schedules.length === 1 ? 'procedure' : 'procedures'}
             </span>
           </div>
-          <p className="text-ink-muted mt-1 flex items-center gap-1.5 text-[10.5px]">
-            <Clock size={11} aria-hidden="true" />
+          <p className="text-ink-muted mt-1 flex items-center gap-1.5 text-[12px]">
+            <Clock size={12} aria-hidden="true" />
             Local theatre time · blocks are positioned by recorded start and
             end.
           </p>
@@ -273,7 +273,7 @@ export function ScheduleTimeline({
 
         <div className="flex flex-col items-end gap-1.5">
           <StatusLegend />
-          <p className="text-ink-subtle text-[8.5px]">
+          <p className="text-ink-subtle text-[11px]">
             Select a block to read the case.
           </p>
         </div>
@@ -300,7 +300,7 @@ export function ScheduleTimeline({
       >
         <div className="min-w-[760px] pb-1">
           <div className="border-rule grid grid-cols-[10.5rem_minmax(0,1fr)] border-b">
-            <div className="text-ink-subtle flex items-end px-4 pb-2 text-[9px] font-semibold tracking-[0.08em] uppercase">
+            <div className="text-ink-subtle flex items-end px-4 pb-2 text-[10.5px] font-semibold tracking-[0.04em] uppercase">
               Theatre / local
             </div>
             <div className="relative h-8">
@@ -324,7 +324,7 @@ export function ScheduleTimeline({
                     />
                     {showLabel ? (
                       <span
-                        className="text-ink-subtle absolute bottom-1.5 -translate-x-1/2 font-mono text-[9px] tabular-nums"
+                        className="text-ink-subtle absolute bottom-1.5 -translate-x-1/2 font-mono text-[10px] tabular-nums"
                         style={{
                           left: `${Math.min(97, Math.max(3, pct))}%`,
                         }}
@@ -342,7 +342,7 @@ export function ScheduleTimeline({
                   style={{ left: `${nowPct}%` }}
                   aria-hidden="true"
                 >
-                  <span className="bg-danger text-foreground-inverse absolute top-0 left-1 rounded-sm px-1 py-0.5 font-mono text-[8px] leading-none whitespace-nowrap tabular-nums">
+                  <span className="bg-danger text-foreground-inverse absolute top-0 left-1 rounded-sm px-1 py-0.5 font-mono text-[9.5px] leading-none whitespace-nowrap tabular-nums">
                     Now {formatClock(now)}
                   </span>
                 </span>
@@ -366,18 +366,18 @@ export function ScheduleTimeline({
                     className={`${state.dot} h-1.5 w-1.5 shrink-0 rounded-full`}
                     aria-hidden="true"
                   />
-                  <p className="text-ink truncate font-mono text-[10.5px] font-semibold">
+                  <p className="text-ink truncate font-mono text-[12px] font-semibold">
                     {room.code}
                   </p>
                 </div>
-                <p className="text-ink-secondary mt-0.5 truncate text-[10.5px] font-medium">
+                <p className="text-ink-secondary mt-0.5 truncate text-[11.5px] font-medium">
                   {room.name}
                 </p>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <span className={`text-[9px] font-semibold ${state.tone}`}>
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <span className={`text-[10.5px] font-semibold ${state.tone}`}>
                     {state.label}
                   </span>
-                  <span className="text-ink-subtle text-[9px]">
+                  <span className="text-ink-subtle text-[10.5px]">
                     {allCases.length} case{allCases.length === 1 ? '' : 's'}
                   </span>
                 </div>
@@ -408,7 +408,7 @@ export function ScheduleTimeline({
                 ) : null}
 
                 {cases.length === 0 ? (
-                  <p className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[9.5px]">
+                  <p className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[11px]">
                     {state.unavailable
                       ? 'Theatre unavailable'
                       : allCases.length > 0
@@ -480,17 +480,17 @@ export function ScheduleTimeline({
                         aria-hidden="true"
                       />
                       <span className="min-w-0 pl-2.5 pr-1.5 py-1">
-                        <span className="block truncate text-[10px] leading-tight font-semibold">
+                        <span className="block truncate text-[11.5px] leading-tight font-semibold">
                           {schedule.procedure}
                         </span>
-                        <span className="mt-1 block truncate font-mono text-[8.5px] leading-tight tabular-nums opacity-80">
+                        <span className="mt-1 block truncate font-mono text-[10px] leading-tight tabular-nums opacity-80">
                           {formatTimeRange(
                             schedule.startTime,
                             schedule.endTime,
                           )}{' '}
                           · {formatDuration(duration)}
                         </span>
-                        <span className="mt-0.5 block truncate text-[9px] leading-tight font-medium opacity-80">
+                        <span className="mt-0.5 block truncate text-[10.5px] leading-tight font-medium opacity-80">
                           {SCHEDULE_STATUS_LABEL[schedule.status]}
                           {schedule.priority !== 'ELECTIVE'
                             ? ` · ${PRIORITY_LABEL[schedule.priority]}`
@@ -528,11 +528,11 @@ export function ScheduleTimeline({
                   <p className="text-ink truncate font-mono text-[10.5px] font-semibold">
                     {room.code}
                   </p>
-                  <p className="text-ink-muted truncate text-[10px]">
+                  <p className="text-ink-muted truncate text-[11.5px]">
                     {room.name}
                   </p>
                 </div>
-                <span className={`text-[9px] font-semibold ${state.tone}`}>
+                <span className={`text-[10.5px] font-semibold ${state.tone}`}>
                   {state.label}
                 </span>
               </div>
@@ -586,7 +586,7 @@ export function ScheduleTimeline({
               </div>
 
               {cases.length === 0 ? (
-                <p className="text-ink-subtle mt-1 text-[9.5px]">
+                <p className="text-ink-subtle mt-1 text-[11px]">
                   {state.unavailable
                     ? 'Theatre unavailable'
                     : allCases.length > 0
@@ -601,7 +601,7 @@ export function ScheduleTimeline({
         <div className="border-rule border-t">
           <div className="flex items-center justify-between px-4 py-2.5">
             <p className="eyebrow">Day agenda</p>
-            <span className="text-ink-subtle font-mono text-[9.5px] tabular-nums">
+            <span className="text-ink-subtle text-[11px] tabular-nums">
               {schedules.length} case{schedules.length === 1 ? '' : 's'}
             </span>
           </div>
@@ -628,7 +628,7 @@ export function ScheduleTimeline({
                           : 'hover:bg-surface-subtle/60'
                       }`}
                     >
-                      <span className="text-ink-secondary w-[4.4rem] shrink-0 pt-0.5 font-mono text-[10px] leading-snug tabular-nums">
+                      <span className="text-ink-secondary w-[4.6rem] shrink-0 pt-0.5 font-mono text-[11px] leading-snug tabular-nums">
                         {formatTimeRange(
                           schedule.startTime,
                           schedule.endTime,
@@ -636,7 +636,7 @@ export function ScheduleTimeline({
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-start gap-1.5">
-                          <span className="text-ink block min-w-0 truncate text-[11.5px] font-semibold">
+                          <span className="text-ink block min-w-0 truncate text-[12.5px] font-semibold">
                             {schedule.procedure}
                           </span>
                           {conflict ? (
@@ -646,8 +646,8 @@ export function ScheduleTimeline({
                             />
                           ) : null}
                         </span>
-                        <span className="text-ink-muted mt-0.5 flex items-center gap-1.5 text-[10px]">
-                          <MapPin size={10} aria-hidden="true" />
+                        <span className="text-ink-muted mt-1 flex items-center gap-1.5 text-[11.5px]">
+                          <MapPin size={11} aria-hidden="true" />
                           {schedule.otRoom?.code ?? 'Unassigned'} ·{' '}
                           {SCHEDULE_STATUS_LABEL[schedule.status]}
                         </span>

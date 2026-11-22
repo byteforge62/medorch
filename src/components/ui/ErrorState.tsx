@@ -18,23 +18,32 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="border-danger-border bg-danger-soft rounded-[var(--radius-panel)] border p-6 text-center"
+      className="border-danger-border bg-danger-soft/70 rounded-[var(--radius-control)] border px-4 py-4 sm:px-5"
     >
-      <div className="bg-danger mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-white">
-        <Warning size={20} weight="bold" aria-hidden="true" />
-      </div>
-      <h4 className="text-danger mt-3 text-sm font-semibold">{title}</h4>
-      <p className="text-foreground-secondary mt-1 text-sm">{message}</p>
-      {onRetry || action ? (
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          {action}
-          {onRetry ? (
-            <Button variant="outline" size="sm" onClick={onRetry}>
-              Try Again
-            </Button>
+      <div className="flex items-start gap-3">
+        <Warning
+          size={18}
+          weight="bold"
+          className="text-danger mt-0.5 shrink-0"
+          aria-hidden="true"
+        />
+        <div className="min-w-0 flex-1">
+          <h4 className="text-danger text-[13.5px] font-semibold">{title}</h4>
+          <p className="text-ink-secondary mt-1 text-[12.5px] leading-relaxed">
+            {message}
+          </p>
+          {onRetry || action ? (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {onRetry ? (
+                <Button variant="outline" size="sm" onClick={onRetry}>
+                  Try again
+                </Button>
+              ) : null}
+              {action}
+            </div>
           ) : null}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }

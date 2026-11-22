@@ -131,7 +131,7 @@ export function SparkBars({
               </div>
 
               {showLabels ? (
-                <span className="text-ink-subtle truncate text-center text-[9px]">
+                <span className="text-ink-subtle truncate text-center text-[10.5px]">
                   {labels[index] ?? ''}
                 </span>
               ) : null}
@@ -188,12 +188,10 @@ export function MetricCard({
       className={`metric-card group bg-sheet border-rule relative flex h-full min-w-0 flex-col overflow-hidden rounded-[16px] border ${className}`}
       style={{ '--metric-accent': palette.accent } as React.CSSProperties}
     >
-      <span aria-hidden="true" className="metric-card__rail" />
-
       <div className="relative flex h-full flex-col justify-between gap-3 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-ink-muted text-[10.5px] leading-tight font-semibold tracking-[0.09em] uppercase">
+            <p className="text-ink-secondary text-[12.5px] leading-tight font-medium">
               {label}
             </p>
             <p
@@ -203,17 +201,14 @@ export function MetricCard({
             >
               {value}
               {unit ? (
-                <span className="text-ink-subtle text-[11px] font-medium tracking-normal">
+                <span className="text-ink-subtle text-[12px] font-medium tracking-normal">
                   {unit}
                 </span>
               ) : null}
             </p>
           </div>
 
-          <span
-            aria-hidden="true"
-            className={`grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-transform duration-300 group-hover:scale-[1.06] ${palette.icon}`}
-          >
+          <span aria-hidden="true" className={`shrink-0 ${palette.text}`}>
             {icon}
           </span>
         </div>
@@ -246,7 +241,7 @@ export function MetricCard({
               {breakdown.map((slice) => (
                 <li
                   key={slice.label}
-                  className="text-ink-muted flex items-center gap-1 text-[9.5px]"
+                  className="text-ink-muted flex items-center gap-1 text-[11.5px]"
                 >
                   <span
                     aria-hidden="true"

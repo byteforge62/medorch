@@ -38,11 +38,11 @@ function BriefMetric({
 }) {
   return (
     <div className="border-rule-soft border-r px-3 py-3.5 last:border-r-0 sm:px-4">
-      <dt className="text-ink-subtle text-[10px] font-medium">{label}</dt>
+      <dt className="text-ink-secondary text-[12px] font-medium">{label}</dt>
       <dd className={`font-display mt-1.5 text-[22px] leading-none tabular-nums ${tone}`}>
         {value}
         {note ? (
-          <span className="text-ink-subtle ml-1.5 font-sans text-[9px] font-medium">
+          <span className="text-ink-subtle ml-1.5 font-sans text-[11px] font-medium">
             {note}
           </span>
         ) : null}
@@ -104,9 +104,9 @@ export function ScheduleDayHeader({
               ))}
           </h1>
 
-          <p className="text-ink-secondary mt-2.5 max-w-[62ch] text-[13px] leading-[1.7]">
-            {formatDateLong(dateKey)} · local theatre time. Blocks are
-            positioned by the recorded start and end of every case.
+          <p className="text-ink-secondary mt-2.5 max-w-[68ch] text-[13px] leading-[1.65]">
+            {formatDateLong(dateKey)} · local theatre time. Every block is
+            positioned by the recorded start and end of the case.
           </p>
         </div>
 
@@ -178,9 +178,7 @@ export function ScheduleDayHeader({
             Today
           </button>
 
-          <span className="text-ink-subtle ml-auto hidden font-mono text-[9px] tracking-[0.08em] sm:inline">
-            DAY SHIFT · 08:00–18:00
-          </span>
+
         </div>
 
         <dl className="grid grid-cols-3 sm:grid-cols-5">

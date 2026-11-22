@@ -43,31 +43,29 @@ function ConflictRow({
         }`}
       >
         <span
-          className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-            confirmed
-              ? 'bg-danger-soft text-danger'
-              : 'bg-warning-soft text-warning'
+          className={`mt-0.5 shrink-0 ${
+            confirmed ? 'text-danger' : 'text-warning'
           }`}
           aria-hidden="true"
         >
           {confirmed ? (
-            <WarningCircle size={14} weight="bold" />
+            <WarningCircle size={16} weight="bold" />
           ) : (
-            <Warning size={14} weight="bold" />
+            <Warning size={16} weight="bold" />
           )}
         </span>
 
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
             <span
-              className={`text-[11.5px] font-semibold ${
+              className={`text-[12.5px] font-semibold ${
                 confirmed ? 'text-danger' : 'text-warning'
               }`}
             >
               {conflict.title}
             </span>
             <span
-              className={`rounded-full px-1.5 py-0.5 text-[8.5px] font-bold tracking-[0.06em] uppercase ${
+              className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${
                 confirmed
                   ? 'bg-danger-soft text-danger'
                   : 'bg-warning-soft text-warning'
@@ -76,10 +74,10 @@ function ConflictRow({
               {confirmed ? 'Confirmed' : 'Warning'}
             </span>
           </span>
-          <span className="text-ink-secondary mt-1 block text-[11px] leading-relaxed">
+          <span className="text-ink-secondary mt-1 block text-[12px] leading-relaxed">
             {conflict.detail}
           </span>
-          <span className="text-primary mt-1.5 block text-[10px] font-semibold opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+          <span className="text-primary mt-1.5 block text-[11.5px] font-medium group-hover:underline">
             {first ? `Open ${first.procedure}` : 'Open affected case'}
           </span>
         </span>
@@ -109,16 +107,14 @@ export function ScheduleConflictPanel({
         <div className="flex items-center gap-2">
           <h2
             id="schedule-conflicts-heading"
-            className="text-ink text-[12px] font-semibold"
+            className="text-ink text-[13px] font-semibold"
           >
             Coordination notes
           </h2>
-          <span className="text-ink-subtle font-mono text-[9.5px] uppercase">
-            selected day
-          </span>
+          <span className="text-ink-subtle text-[11px]">Selected day</span>
         </div>
 
-        <div className="flex items-center gap-3 text-[10px] font-semibold">
+        <div className="flex items-center gap-3 text-[11.5px] font-medium">
           <span
             className={
               confirmed.length > 0 ? 'text-danger' : 'text-success'
@@ -147,10 +143,10 @@ export function ScheduleConflictPanel({
             aria-hidden="true"
           />
           <div>
-            <p className="text-ink text-[11.5px] font-medium">
+            <p className="text-ink text-[12.5px] font-medium">
               No resource conflicts found for this day.
             </p>
-            <p className="text-ink-muted mt-0.5 text-[10.5px] leading-relaxed">
+            <p className="text-ink-muted mt-1 text-[11.5px] leading-relaxed">
               Theatre, surgeon and patient ranges are database-constrained.
               Staff and equipment checks here are advisory, not a server
               reservation rule.
@@ -170,7 +166,7 @@ export function ScheduleConflictPanel({
         </ul>
       )}
 
-      <p className="border-rule text-ink-subtle border-t px-4 py-2 text-[9.5px] leading-relaxed sm:px-5">
+      <p className="border-rule text-ink-subtle border-t px-4 py-2.5 text-[11px] leading-relaxed sm:px-5">
         Confirmed = overlapping active allocations or invalid recorded time.
         Warning = operational risk in the loaded record. Staff/equipment
         overlaps are not blocked by the current API.

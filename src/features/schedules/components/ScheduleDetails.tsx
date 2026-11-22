@@ -546,33 +546,27 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Link
           href="/schedules"
-          className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12px] font-medium"
+          className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-[12.5px] font-medium"
         >
           <span aria-hidden="true">←</span>
           Theatre schedule
         </Link>
-        <span className="text-ink-subtle font-mono text-[9.5px] tracking-[0.08em]">
-          CASE {schedule.id.slice(0, 8).toUpperCase()}
+        <span className="text-ink-subtle text-[11px] tabular-nums">
+          Case {schedule.id.slice(0, 8).toUpperCase()}
         </span>
       </div>
 
       <header className="dashboard-command bg-rail relative overflow-hidden rounded-[18px] px-5 pt-5 pb-5 text-white sm:px-6">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_100%]"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -top-24 -right-20 h-64 w-64 rounded-full border border-white/10"
+          className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_100%]"
         />
 
         <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <p className="font-mono text-[9px] tracking-[0.1em] text-white/45">
-              THEATRE CASE
-            </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] text-white/50">
+            <p>Theatre case</p>
             <span className="h-px w-5 bg-white/25" aria-hidden="true" />
-            <span className="font-mono text-[9px] text-white/45">
+            <span>
               {schedule.otRoom?.code ?? 'OT'} ·{' '}
               {formatDate(schedule.scheduledDate)}
             </span>
@@ -585,7 +579,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <ScheduleStatusBadge status={schedule.status} />
             <SchedulePriorityBadge priority={schedule.priority} />
-            <span className="font-mono text-[10px] text-white/45">
+            <span className="text-[12px] text-white/55">
               {schedule.patient?.name ??
                 schedule.patient?.patientCode ??
                 'Patient'}
@@ -610,10 +604,10 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               },
             ].map((item) => (
               <div key={item.term}>
-                <p className="text-[9px] font-semibold tracking-[0.08em] text-white/40 uppercase">
+                <p className="text-[11px] text-white/50">
                   {item.term}
                 </p>
-                <p className="mt-1.5 text-[12.5px] leading-snug font-medium text-white/85">
+                <p className="mt-1.5 text-[13px] leading-snug font-medium text-white/90">
                   {item.value}
                 </p>
               </div>
@@ -645,13 +639,13 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 >
                   Case facts
                 </h2>
-                <p className="text-ink-muted mt-0.5 text-[11px]">
-                  The recorded identity, assignment and timing of this case.
-                </p>
+                                  <p className="text-ink-muted mt-0.5 text-[12px]">
+                    The recorded identity, assignment and timing of this case.
+                  </p>
               </div>
-              <span className="text-ink-subtle font-mono text-[9.5px]">
-                {schedule.otRoom?.code ?? 'OT'}
-              </span>
+                              <span className="text-ink-subtle text-[11px] tabular-nums">
+                  {schedule.otRoom?.code ?? 'OT'}
+                </span>
             </div>
 
             <dl className="divide-rule-soft grid divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0">
@@ -691,10 +685,10 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 },
               ].map((row) => (
                 <div key={row.term} className="min-w-0 px-4 py-3 sm:px-5">
-                  <dt className="text-ink-subtle text-[9.5px] font-semibold tracking-[0.06em] uppercase">
+                  <dt className="text-ink-secondary text-[11.5px] font-medium">
                     {row.term}
                   </dt>
-                  <dd className="text-ink mt-1 text-[13px] font-medium break-words">
+                  <dd className="text-ink mt-1 text-[13.5px] font-medium break-words">
                     {row.href ? (
                       <Link
                         href={row.href}
@@ -707,7 +701,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                     )}
                   </dd>
                   {row.meta && row.meta !== row.value ? (
-                    <dd className="text-ink-subtle mt-0.5 truncate font-mono text-[9.5px]">
+                    <dd className="text-ink-subtle mt-0.5 truncate text-[11px]">
                       {row.meta}
                     </dd>
                   ) : null}
@@ -729,11 +723,11 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                   >
                     Clinical notes
                   </h2>
-                  <p className="text-ink-muted mt-0.5 text-[11px]">
+                  <p className="text-ink-muted mt-0.5 text-[12px]">
                     The recorded clinical context for this procedure.
                   </p>
                 </div>
-                <span className="bg-danger-soft text-danger rounded-full px-2 py-0.5 text-[9px] font-semibold">
+                <span className="bg-danger-soft text-danger rounded-full px-2 py-0.5 text-[10.5px] font-semibold">
                   Restricted
                 </span>
               </div>
@@ -755,11 +749,11 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 >
                   Case notes
                 </h2>
-                <p className="text-ink-muted mt-0.5 text-[11px]">
-                  Operational notes attached to this schedule.
-                </p>
+                                  <p className="text-ink-muted mt-0.5 text-[12px]">
+                    Operational notes attached to this schedule.
+                  </p>
               </div>
-              <span className="text-ink-subtle font-mono text-[9.5px]">
+              <span className="text-ink-subtle text-[11px]">
                 {schedule.notes.length} on file
               </span>
             </div>
@@ -776,7 +770,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                       <p className="text-ink text-[12px] font-semibold">
                         {note.author.name}
                       </p>
-                      <p className="text-ink-subtle font-mono text-[9.5px]">
+                      <p className="text-ink-subtle text-[11px] tabular-nums">
                         {formatDateTime(note.createdAt)}
                       </p>
                     </div>
@@ -836,7 +830,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                             setEditingNote(note);
                             setEditingNoteContent(note.content);
                           }}
-                          className="text-primary text-[11px] font-semibold disabled:opacity-50"
+                          className="text-primary text-[11.5px] font-semibold disabled:opacity-50"
                         >
                           Edit
                         </button>
@@ -844,7 +838,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                           type="button"
                           disabled={actionLoading}
                           onClick={() => void handleDeleteNote(note)}
-                          className="text-danger text-[11px] font-semibold disabled:opacity-50"
+                          className="text-danger text-[11.5px] font-semibold disabled:opacity-50"
                         >
                           Delete
                         </button>
@@ -859,7 +853,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
               <div className="border-rule-soft space-y-2 border-t px-4 py-4 sm:px-5">
                 <label
                   htmlFor="case-note"
-                  className="text-ink-secondary block text-[11px] font-semibold"
+                  className="text-ink-secondary block text-[12px] font-semibold"
                 >
                   Add a note
                 </label>
@@ -900,7 +894,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 >
                   Case controls
                 </h2>
-                <p className="text-ink-muted mt-0.5 text-[11px]">
+                <p className="text-ink-muted mt-0.5 text-[12px]">
                   Change the record or move the case through its lifecycle.
                 </p>
               </div>
@@ -955,14 +949,14 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 >
                   Theatre team
                 </h2>
-                <p className="text-ink-muted mt-0.5 text-[10.5px]">
+                <p className="text-ink-muted mt-0.5 text-[11.5px]">
                   {schedule.staff.length} assigned
                 </p>
               </div>
             </div>
 
             {schedule.staff.length === 0 ? (
-              <p className="text-ink-muted px-4 py-4 text-[11.5px]">
+              <p className="text-ink-muted px-4 py-4 text-[12px]">
                 No staff assigned.
               </p>
             ) : (
@@ -973,10 +967,10 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                     className="flex items-start justify-between gap-3 px-4 py-2.5"
                   >
                     <div className="min-w-0">
-                      <p className="text-ink truncate text-[12px] font-medium">
+                      <p className="text-ink truncate text-[12.5px] font-medium">
                         {staff.user.name}
                       </p>
-                      <p className="text-ink-subtle mt-0.5 truncate text-[10.5px]">
+                      <p className="text-ink-subtle mt-0.5 truncate text-[11px]">
                         {formatLabel(staff.role)} · {staff.user.email}
                       </p>
                     </div>
@@ -986,7 +980,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                         type="button"
                         disabled={actionLoading}
                         onClick={() => void handleRemoveStaff(staff.id)}
-                        className="text-danger shrink-0 text-[10.5px] font-semibold disabled:opacity-50"
+                        className="text-danger shrink-0 text-[11.5px] font-semibold disabled:opacity-50"
                       >
                         Remove
                       </button>
@@ -1055,21 +1049,21 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                 >
                   Equipment
                 </h2>
-                <p className="text-ink-muted mt-0.5 text-[10.5px]">
+                <p className="text-ink-muted mt-0.5 text-[11.5px]">
                   {schedule.equipment.filter((item) => !item.releasedAt).length}{' '}
                   active assignments
                 </p>
               </div>
               <Link
                 href="/equipment"
-                className="text-primary shrink-0 text-[10.5px] font-semibold hover:underline"
+                className="text-primary shrink-0 text-[11.5px] font-semibold hover:underline"
               >
                 Register →
               </Link>
             </div>
 
             {schedule.equipment.length === 0 ? (
-              <p className="text-ink-muted px-4 py-4 text-[11.5px]">
+              <p className="text-ink-muted px-4 py-4 text-[12px]">
                 No equipment assigned.
               </p>
             ) : (
@@ -1080,16 +1074,16 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                     className="flex items-start justify-between gap-3 px-4 py-2.5"
                   >
                     <div className="min-w-0">
-                      <p className="text-ink truncate text-[12px] font-medium">
+                      <p className="text-ink truncate text-[12.5px] font-medium">
                         {assignment.equipment.name}
                       </p>
-                      <p className="text-ink-subtle mt-0.5 text-[10.5px]">
+                      <p className="text-ink-subtle mt-0.5 text-[11px]">
                         {assignment.equipment.category}
                         {assignment.equipment.serialNumber
                           ? ` · ${assignment.equipment.serialNumber}`
                           : ''}
                       </p>
-                      <p className="text-ink-subtle mt-0.5 text-[9.5px]">
+                      <p className="text-ink-subtle mt-0.5 text-[11px]">
                         {assignment.releasedAt
                           ? `Released ${formatDateTime(assignment.releasedAt)}`
                           : `Assigned ${formatDateTime(assignment.assignedAt)}`}
@@ -1103,7 +1097,7 @@ export function ScheduleDetail({ scheduleId }: { scheduleId: string }) {
                         onClick={() =>
                           void handleReleaseEquipment(assignment.equipmentId)
                         }
-                        className="text-danger shrink-0 text-[10.5px] font-semibold disabled:opacity-50"
+                        className="text-danger shrink-0 text-[11.5px] font-semibold disabled:opacity-50"
                       >
                         Release
                       </button>

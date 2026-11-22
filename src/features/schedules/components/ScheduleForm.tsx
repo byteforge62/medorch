@@ -65,6 +65,60 @@ interface ScheduleFormProps {
   onSuccess: () => void;
 }
 
+/* One control surface for the whole form: same height, border, radius and
+   focus ring as the shared Input primitives, so a select never looks like a
+   different kind of control from a text field. */
+const fieldLabel =
+  'mb-2 block text-[12.5px] font-semibold text-ink-secondary';
+
+const fieldControl =
+  'block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-sheet px-3 py-2 text-[13px] text-ink shadow-xs outline-none transition-[border-color,box-shadow] placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:text-ink-muted';
+
+function FieldLabel({
+  htmlFor,
+  required,
+  children,
+}: {
+  htmlFor: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label htmlFor={htmlFor} className={fieldLabel}>
+      {children}
+      {required ? (
+        <span className="text-danger ml-1" aria-hidden="true">
+          *
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="border-rule-soft border-b px-5 py-4 last:border-b-0 sm:px-6">
+      <div className="mb-3">
+        <h3 className="text-ink text-[13px] font-semibold">{title}</h3>
+        {description ? (
+          <p className="text-ink-muted mt-0.5 text-[11.5px] leading-relaxed">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export function ScheduleForm({
   initialSchedule,
   defaultDate,
@@ -268,7 +322,7 @@ export function ScheduleForm({
 
   return (
     <div
-      className="bg-foreground/45 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
+      className="bg-foreground/45 fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !isSubmitting) {
           onClose();
@@ -282,246 +336,284 @@ export function ScheduleForm({
         aria-labelledby="schedule-form-title"
         aria-describedby="schedule-form-description"
         onKeyDown={handleDialogKeyDown}
-        className="border-ice-border bg-sheet modal-panel-enter max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-panel)] border p-5 shadow-xl sm:p-6"
+        className="border-ice-border bg-sheet modal-panel-enter flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[var(--radius-panel)] border shadow-xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-[var(--radius-panel)]"
       >
-        <div className="border-border flex items-start justify-between gap-4 border-b pb-4">
+        <div className="border-rule flex shrink-0 items-start justify-between gap-4 border-b px-5 py-4 sm:px-6">
           <div className="min-w-0">
-            <p className="eyebrow">
-              {isEditing ? 'Case record' : 'Theatre day'}
-            </p>
             <h2
               id="schedule-form-title"
-              className="text-foreground mt-1 text-lg font-semibold"
+              className="font-display text-midnight text-[19px] leading-tight font-bold tracking-[-0.02em]"
             >
               {isEditing ? 'Edit schedule' : 'Create schedule'}
             </h2>
             <p
               id="schedule-form-description"
-              className="text-foreground-muted mt-1 text-sm"
+              className="text-ink-muted mt-1 text-[12.5px] leading-relaxed"
             >
               {isEditing
-                ? 'Update the procedure, date, time, and assignments.'
-                : 'Schedule a new surgical procedure in an available theatre.'}
+                ? 'Update the procedure, theatre time and assignments for this case.'
+                : 'Book a surgical procedure into an available theatre.'}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close schedule form"
-            className="border-ice-border text-ink-subtle hover:border-cobalt/30 hover:text-cobalt flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
+            className="border-ice-border text-ink-subtle hover:border-cobalt/30 hover:text-cobalt focus-visible:outline-cobalt flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            <X size={15} weight="bold" aria-hidden="true" />
+            <X size={16} weight="bold" aria-hidden="true" />
           </button>
         </div>
 
-        {error && (
-          <div
-            className="border-danger-border bg-danger-soft text-danger mt-4 rounded-[var(--radius-control)] border p-3 text-sm font-medium"
-            role="alert"
-          >
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-foreground">
-              Procedure {isEditing ? 'update' : 'details'}
-            </label>
-            <input
-              type="text"
-              name="procedure"
-              required
-              maxLength={200}
-              placeholder="e.g. Laparoscopic cholecystectomy"
-              value={procedure}
-              onChange={(e) => setProcedure(e.target.value)}
-              className="border-ice-border bg-white text-ink placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-cobalt block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-[13px] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Patient {isEditing ? 'update' : 'details'}
-              </label>
-              <select
-                required
-                value={patientId}
-                onChange={(e) => setPatientId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
+        <form
+          onSubmit={handleSubmit}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="thin-scroll min-h-0 flex-1 overflow-y-auto">
+            {error && (
+              <div
+                className="border-danger-border bg-danger-soft text-danger mx-5 mt-4 rounded-[var(--radius-control)] border px-3.5 py-2.5 text-[12.5px] font-medium sm:mx-6"
+                role="alert"
               >
-                <option value="">Select patient</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}{' '}
-                    {p.patientCode ? `(${p.patientCode})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {error}
+              </div>
+            )}
 
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Surgeon {isEditing ? 'update' : 'details'}
-              </label>
-              <select
-                required
-                value={surgeonId}
-                onChange={(e) => setSurgeonId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-              >
-                <option value="">Select surgeon</option>
-                {doctors.map((doc) => {
-                  const targetUserId = doc.user?.id ?? doc.userId;
-                  return (
-                    <option key={doc.id} value={targetUserId}>
-                      {doc.user?.name ?? doc.name ?? 'Doctor'}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Department {isEditing ? 'update' : 'details'}
-              </label>
-              <select
-                required
-                value={departmentId}
-                onChange={(e) => handleDepartmentChange(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-              >
-                <option value="">Select department</option>
-                {departments.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                OT room {isEditing ? 'update' : 'details'}
-              </label>
-              <select
-                required
-                value={otRoomId}
-                onChange={(e) => setOtRoomId(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-                disabled={isSubmitting || availableOtRooms.length === 0}
-              >
-                <option value="">Select OT room</option>
-                {availableOtRooms.map((r) => {
-                  const unavailable =
-                    r.isActive === false ||
-                    r.status === 'MAINTENANCE' ||
-                    r.status === 'DISABLED';
-
-                  return (
-                    <option
-                      key={r.id}
-                      value={r.id}
-                      disabled={unavailable}
-                    >
-                      {r.name} {r.code ? `[${r.code}]` : ''}
-                      {unavailable ? ` — ${r.status?.toLowerCase() ?? 'offline'}` : ''}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Theatre date {isEditing ? 'update' : 'details'}
-              </label>
-              <input
-                type="date"
-                required
-                value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                Start time {isEditing ? 'update' : 'details'}
-              </label>
-              <input
-                type="time"
-                required
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-foreground">
-                End time {isEditing ? 'update' : 'details'}
-              </label>
-              <input
-                type="time"
-                required
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-foreground">
-              Priority
-            </label>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as SchedulePriority)}
-              className="block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border border-ice-border bg-white text-ink px-3 py-2.5 text-[13px] outline-none transition-colors placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
+            <FormSection
+              title="Procedure"
+              description="What is being performed, and how soon it must run."
             >
-              <option value="ELECTIVE">Elective</option>
-              <option value="URGENT">Urgent</option>
-              <option value="EMERGENCY">Emergency</option>
-            </select>
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                <div>
+                  <FieldLabel htmlFor="schedule-procedure" required>
+                    Procedure name
+                  </FieldLabel>
+                  <input
+                    id="schedule-procedure"
+                    type="text"
+                    name="procedure"
+                    required
+                    maxLength={200}
+                    placeholder="e.g. Laparoscopic cholecystectomy"
+                    value={procedure}
+                    onChange={(e) => setProcedure(e.target.value)}
+                    className={fieldControl}
+                  />
+                </div>
+
+                <div>
+                  <FieldLabel htmlFor="schedule-priority" required>
+                    Priority
+                  </FieldLabel>
+                  <select
+                    id="schedule-priority"
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as SchedulePriority)}
+                    className={fieldControl}
+                  >
+                    <option value="ELECTIVE">Elective</option>
+                    <option value="URGENT">Urgent</option>
+                    <option value="EMERGENCY">Emergency</option>
+                  </select>
+                </div>
+              </div>
+            </FormSection>
+
+            <FormSection
+              title="Patient and surgical team"
+              description="The patient on the list and the surgeon responsible for the case."
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <FieldLabel htmlFor="schedule-patient" required>
+                    Patient
+                  </FieldLabel>
+                  <select
+                    id="schedule-patient"
+                    required
+                    value={patientId}
+                    onChange={(e) => setPatientId(e.target.value)}
+                    className={fieldControl}
+                  >
+                    <option value="">Select patient</option>
+                    {patients.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}{' '}
+                        {p.patientCode ? `(${p.patientCode})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <FieldLabel htmlFor="schedule-surgeon" required>
+                    Surgeon
+                  </FieldLabel>
+                  <select
+                    id="schedule-surgeon"
+                    required
+                    value={surgeonId}
+                    onChange={(e) => setSurgeonId(e.target.value)}
+                    className={fieldControl}
+                  >
+                    <option value="">Select surgeon</option>
+                    {doctors.map((doc) => {
+                      const targetUserId = doc.user?.id ?? doc.userId;
+                      return (
+                        <option key={doc.id} value={targetUserId}>
+                          {doc.user?.name ?? doc.name ?? 'Doctor'}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+            </FormSection>
+
+            <FormSection
+              title="Theatre and time"
+              description="The department owns the theatre list. Only theatres in the selected department can be booked."
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <FieldLabel htmlFor="schedule-department" required>
+                    Department
+                  </FieldLabel>
+                  <select
+                    id="schedule-department"
+                    required
+                    value={departmentId}
+                    onChange={(e) => handleDepartmentChange(e.target.value)}
+                    className={fieldControl}
+                  >
+                    <option value="">Select department</option>
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <FieldLabel htmlFor="schedule-room" required>
+                    Operating theatre
+                  </FieldLabel>
+                  <select
+                    id="schedule-room"
+                    required
+                    value={otRoomId}
+                    onChange={(e) => setOtRoomId(e.target.value)}
+                    className={fieldControl}
+                    disabled={isSubmitting || availableOtRooms.length === 0}
+                  >
+                    <option value="">Select OT room</option>
+                    {availableOtRooms.map((r) => {
+                      const unavailable =
+                        r.isActive === false ||
+                        r.status === 'MAINTENANCE' ||
+                        r.status === 'DISABLED';
+
+                      return (
+                        <option
+                          key={r.id}
+                          value={r.id}
+                          disabled={unavailable}
+                        >
+                          {r.name} {r.code ? `[${r.code}]` : ''}
+                          {unavailable ? ` — ${r.status?.toLowerCase() ?? 'offline'}` : ''}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {departmentId && availableOtRooms.length === 0 ? (
+                    <p className="text-danger mt-1.5 text-[11.5px]">
+                      No theatre is configured for this department.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div>
+                  <FieldLabel htmlFor="schedule-date" required>
+                    Theatre date
+                  </FieldLabel>
+                  <input
+                    id="schedule-date"
+                    type="date"
+                    required
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    className={fieldControl}
+                  />
+                </div>
+
+                <div>
+                  <FieldLabel htmlFor="schedule-start" required>
+                    Start time
+                  </FieldLabel>
+                  <input
+                    id="schedule-start"
+                    type="time"
+                    required
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className={fieldControl}
+                  />
+                </div>
+
+                <div>
+                  <FieldLabel htmlFor="schedule-end" required>
+                    End time
+                  </FieldLabel>
+                  <input
+                    id="schedule-end"
+                    type="time"
+                    required
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className={fieldControl}
+                  />
+                </div>
+              </div>
+
+              <p className="text-ink-muted mt-2.5 text-[11.5px] leading-relaxed">
+                Dates and times are interpreted in local theatre time. Theatre,
+                surgeon and patient overlaps are rejected by the schedule API.
+              </p>
+            </FormSection>
+
+            <FormSection
+              title="Clinical notes"
+              description="Optional context stored with the case record."
+            >
+              <label htmlFor="schedule-notes" className="sr-only">
+                Clinical notes
+              </label>
+              <textarea
+                id="schedule-notes"
+                rows={3}
+                maxLength={5000}
+                placeholder="Precautions, equipment needs or instructions for the theatre team."
+                value={clinicalNotes}
+                onChange={(e) => setClinicalNotes(e.target.value)}
+                className={`${fieldControl} min-h-24 resize-y py-2.5`}
+              />
+            </FormSection>
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-foreground">
-              Clinical notes
-            </label>
-            <textarea
-              rows={3}
-              maxLength={5000}
-              placeholder="Additional medical instructions, precautions, or procedure notes..."
-              value={clinicalNotes}
-              onChange={(e) => setClinicalNotes(e.target.value)}
-              className="border-ice-border bg-white text-ink placeholder:text-ink-subtle focus-visible:border-cobalt focus-visible:outline-cobalt block min-h-10 w-full min-w-0 rounded-[var(--radius-control)] border px-3 py-2.5 text-[13px] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
-            />
-          </div>
-
-          <p className="text-ink-subtle text-[10px] leading-relaxed">
-            Dates and times are interpreted in local theatre time. Theatre,
-            surgeon and patient overlaps are rejected by the schedule API.
-          </p>
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+          <div className="border-rule bg-surface-subtle/60 flex shrink-0 flex-col-reverse items-stretch justify-end gap-2 border-t px-5 py-3.5 sm:flex-row sm:items-center sm:px-6">
             <Button
               type="button"
               variant="secondary"
+              size="sm"
               onClick={onClose}
               disabled={isSubmitting}
             >
               {isEditing ? 'Cancel changes' : 'Cancel'}
             </Button>
-            <Button type="submit" isLoading={isSubmitting}>
+            <Button type="submit" size="sm" isLoading={isSubmitting}>
               {isEditing ? 'Save changes' : 'Create schedule'}
             </Button>
           </div>

@@ -26,7 +26,7 @@ export function ScheduleWeekStrip({
     <section aria-label="Week at a glance" className="hidden pb-5 sm:block">
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="ui-kicker">Week at a glance</p>
-        <p className="text-ink-subtle font-mono text-[8.5px] tabular-nums">
+        <p className="text-ink-subtle text-[11px] tabular-nums">
           {first === last ? first : `${first} — ${last}`}
         </p>
       </div>
@@ -52,21 +52,21 @@ export function ScheduleWeekStrip({
               }`}
             >
               <span
-                className={`block text-[9px] font-semibold tracking-[0.06em] uppercase ${
+                className={`block text-[11.5px] font-medium ${
                   selected ? 'text-cobalt' : 'text-ink-subtle'
                 }`}
               >
                 {formatWeekday(key)}
               </span>
               <span
-                className={`mt-1 block font-display text-[19px] leading-none font-bold tracking-[-0.02em] tabular-nums ${
+                className={`mt-1 block font-display text-[19px] leading-none font-semibold tracking-[-0.02em] tabular-nums ${
                   selected ? 'text-midnight' : 'text-ink-secondary'
                 }`}
               >
                 {dayNumber}
               </span>
               <span
-                className={`mt-1.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 font-mono text-[8px] font-semibold tabular-nums ${
+                className={`mt-1.5 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10.5px] font-semibold tabular-nums ${
                   count > 0
                     ? selected
                       ? 'bg-primary text-primary-ink'
@@ -78,8 +78,8 @@ export function ScheduleWeekStrip({
               </span>
               {selected ? (
                 <span
-                  className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-cobalt to-teal"
                   aria-hidden="true"
+                  className="bg-cobalt absolute inset-x-0 top-0 h-[3px]"
                 />
               ) : null}
               {today ? (

@@ -169,10 +169,6 @@ export function Sidebar({
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 right-0 w-px bg-white/10"
         />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-32 -left-24 h-72 w-72 rounded-full border border-white/[0.055]"
-        />
 
         <div className="relative flex h-[5.6rem] shrink-0 items-center justify-between px-5">
           <Wordmark
@@ -192,23 +188,14 @@ export function Sidebar({
           </button>
         </div>
 
-        <div className="relative mx-5 mb-5 flex items-center gap-2 border-y border-white/10 py-2.5">
-          <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-            <span className="bg-success-bright absolute inline-flex h-full w-full animate-ping rounded-full opacity-40" />
-            <span className="bg-success-bright relative inline-flex h-1.5 w-1.5 rounded-full" />
-          </span>
-          <p className="text-[10.5px] font-medium text-white/55">Theatre day open</p>
-          <span className="ml-auto font-mono text-[9.5px] text-white/30">ORCH</span>
-        </div>
-
-        <nav className="thin-scroll relative flex-1 overflow-y-auto px-3 pb-4">
+        <nav className="thin-scroll relative flex-1 overflow-y-auto px-3 pt-4 pb-4">
           {groups.map((group) => {
             const items = allowed.filter((item) => item.group === group);
             if (items.length === 0) return null;
 
             return (
               <div key={group} className="mb-5">
-                <p className="mb-2 px-3 text-[10px] font-medium tracking-[0.025em] text-white/35">
+                <p className="mb-2 px-3 text-[11px] font-medium text-white/45">
                   {groupLabels[group]}
                 </p>
 
@@ -232,7 +219,7 @@ export function Sidebar({
                           {active ? (
                             <span
                               aria-hidden="true"
-                              className="absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-[#60A5FA] to-[#2DD4BF]"
+                              className="bg-brand-lavender absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-full"
                             />
                           ) : null}
                           <IconComponent
@@ -245,7 +232,7 @@ export function Sidebar({
                             }
                             aria-hidden="true"
                           />
-                          <span className={`min-w-0 flex-1 truncate text-[12.5px] ${active ? 'font-semibold' : 'font-medium'}`}>
+                          <span className={`min-w-0 flex-1 truncate text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}>
                             {item.name}
                           </span>
                           {active ? (
@@ -264,23 +251,20 @@ export function Sidebar({
         <div className="relative shrink-0 border-t border-white/10 px-4 py-4">
           <div className="flex items-center gap-3">
             <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.07] text-[10px] font-bold text-white/85"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.07] text-[11px] font-semibold text-white/85"
               aria-hidden="true"
             >
               {initialsOf(session?.user?.name)}
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-[11.5px] font-semibold text-white/90">
+              <span className="block truncate text-[12.5px] font-semibold text-white/90">
                 {session?.user?.name ?? 'Signed in'}
               </span>
-              <span className="mt-0.5 block truncate text-[9.5px] font-medium text-white/40">
+              <span className="mt-0.5 block truncate text-[11px] font-medium text-white/45">
                 {role.replaceAll('_', ' ')}
               </span>
             </span>
           </div>
-          <p className="mt-3 font-mono text-[8.5px] tracking-[0.08em] text-white/25">
-            MEDORCH / THEATRE DESK
-          </p>
         </div>
       </aside>
     </>

@@ -45,10 +45,10 @@ function Fact({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="text-ink-subtle text-[9px] font-semibold tracking-[0.07em] uppercase">
+      <dt className="text-ink-secondary text-[11.5px] font-medium">
         {term}
       </dt>
-      <dd className="text-ink mt-1 min-w-0 text-[11.5px] leading-snug font-medium">
+      <dd className="text-ink mt-1 min-w-0 text-[12.5px] leading-snug font-medium">
         {children}
       </dd>
     </div>
@@ -66,12 +66,12 @@ function SectionLabel({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <h3 className="text-ink-secondary flex items-center gap-1.5 text-[9.5px] font-semibold tracking-[0.08em] uppercase">
+      <h3 className="text-ink-secondary flex items-center gap-1.5 text-[11.5px] font-semibold tracking-[0.04em] uppercase">
         {icon}
         {children}
       </h3>
       {typeof count === 'number' ? (
-        <span className="text-ink-subtle font-mono text-[9px] tabular-nums">
+        <span className="text-ink-subtle text-[11px] tabular-nums">
           {count}
         </span>
       ) : null}
@@ -82,9 +82,9 @@ function SectionLabel({
 function CaseConflictNotice({ conflicts }: { conflicts: ScheduleConflict[] }) {
   if (conflicts.length === 0) {
     return (
-      <p className="text-success flex items-start gap-1.5 text-[10px] leading-relaxed">
+      <p className="text-success flex items-start gap-1.5 text-[12px] leading-relaxed">
         <CheckCircle
-          size={12}
+          size={13}
           weight="bold"
           className="mt-0.5 shrink-0"
           aria-hidden="true"
@@ -108,20 +108,20 @@ function CaseConflictNotice({ conflicts }: { conflicts: ScheduleConflict[] }) {
             }`}
           >
             <p
-              className={`flex items-start gap-1.5 text-[10.5px] font-semibold ${
+              className={`flex items-start gap-1.5 text-[12px] font-semibold ${
                 confirmed ? 'text-danger' : 'text-warning'
               }`}
             >
               {confirmed ? (
                 <WarningCircle
-                  size={12}
+                  size={13}
                   weight="bold"
                   className="mt-0.5 shrink-0"
                   aria-hidden="true"
                 />
               ) : (
                 <Warning
-                  size={12}
+                  size={13}
                   weight="bold"
                   className="mt-0.5 shrink-0"
                   aria-hidden="true"
@@ -129,7 +129,7 @@ function CaseConflictNotice({ conflicts }: { conflicts: ScheduleConflict[] }) {
               )}
               {conflict.title}
             </p>
-            <p className="text-ink-secondary mt-1 text-[10px] leading-relaxed">
+            <p className="text-ink-secondary mt-1 text-[11.5px] leading-relaxed">
               {conflict.detail}
             </p>
           </div>
@@ -207,7 +207,7 @@ export function ScheduleInspector({
           {schedule.procedure}
         </h2>
 
-        <p className="text-ink-secondary mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10.5px] tabular-nums">
+        <p className="text-ink-secondary mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] tabular-nums">
           <span>{formatTimeRange(schedule.startTime, schedule.endTime)}</span>
           <span className="text-ink-subtle">·</span>
           <span>{formatDuration(duration)}</span>
@@ -216,7 +216,7 @@ export function ScheduleInspector({
         </p>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
-          <span className="border-ice-border bg-sheet text-ink-secondary shadow-xs inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold">
+          <span className="border-ice-border bg-sheet text-ink-secondary shadow-xs inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] font-medium">
             <span
               className={`${SCHEDULE_RAIL_TONE[schedule.status]} h-1.5 w-1.5 rounded-full`}
               aria-hidden="true"
@@ -224,7 +224,7 @@ export function ScheduleInspector({
             {SCHEDULE_STATUS_LABEL[schedule.status]}
           </span>
           <span
-            className={`text-[9.5px] font-semibold ${PRIORITY_TONE[schedule.priority]}`}
+            className={`text-[11.5px] font-semibold ${PRIORITY_TONE[schedule.priority]}`}
           >
             {PRIORITY_LABEL[schedule.priority]} priority
           </span>
@@ -242,7 +242,7 @@ export function ScheduleInspector({
               {schedule.patient ? (
                 <>
                   <span className="block truncate">{schedule.patient.name}</span>
-                  <span className="text-ink-subtle mt-0.5 block font-mono text-[9.5px] font-normal">
+                  <span className="text-ink-subtle mt-0.5 block text-[11px] font-normal">
                     {schedule.patient.patientCode}
                   </span>
                 </>
@@ -268,7 +268,7 @@ export function ScheduleInspector({
                   <span className="block truncate">
                     {schedule.otRoom.name}
                   </span>
-                  <span className="text-ink-subtle mt-0.5 block font-mono text-[9.5px] font-normal">
+                  <span className="text-ink-subtle mt-0.5 block text-[11px] font-normal">
                     {schedule.otRoom.code}
                   </span>
                 </>
@@ -304,7 +304,7 @@ export function ScheduleInspector({
           </SectionLabel>
 
           {staff.length === 0 ? (
-            <p className="text-ink-muted mt-2.5 text-[10.5px] leading-relaxed">
+            <p className="text-ink-muted mt-2.5 text-[12px] leading-relaxed">
               No additional staff assigned.
               {capabilities.canManageStaff
                 ? ' Open the case file to assign the team.'
@@ -319,16 +319,16 @@ export function ScheduleInspector({
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <span
-                      className="bg-teal-soft text-teal-ink flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold"
+                      className="bg-teal-soft text-teal-ink flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
                       aria-hidden="true"
                     >
                       {assignment.user.name.slice(0, 1).toUpperCase()}
                     </span>
-                    <span className="text-ink min-w-0 truncate text-[10.5px] font-medium">
+                    <span className="text-ink min-w-0 truncate text-[12px] font-medium">
                       {assignment.user.name}
                     </span>
                   </span>
-                  <span className="text-ink-subtle shrink-0 text-[9px]">
+                  <span className="text-ink-subtle shrink-0 text-[11px]">
                     {STAFF_ROLE_LABEL[assignment.role]}
                   </span>
                 </li>
@@ -346,7 +346,7 @@ export function ScheduleInspector({
           </SectionLabel>
 
           {equipment.length === 0 ? (
-            <p className="text-ink-muted mt-2.5 text-[10.5px] leading-relaxed">
+            <p className="text-ink-muted mt-2.5 text-[12px] leading-relaxed">
               No equipment allocated.
               {capabilities.canManageEquipment
                 ? ' Open the case file to allocate equipment.'
@@ -360,10 +360,10 @@ export function ScheduleInspector({
                   className="flex items-start justify-between gap-3"
                 >
                   <span className="min-w-0">
-                    <span className="text-ink block truncate text-[10.5px] font-medium">
+                    <span className="text-ink block truncate text-[12px] font-medium">
                       {assignment.equipment.name}
                     </span>
-                    <span className="text-ink-subtle block truncate text-[9px]">
+                    <span className="text-ink-subtle block truncate text-[11px]">
                       {assignment.equipment.category}
                       {assignment.equipment.serialNumber
                         ? ` · ${assignment.equipment.serialNumber}`
@@ -371,7 +371,7 @@ export function ScheduleInspector({
                     </span>
                   </span>
                   <span
-                    className={`shrink-0 text-[8.5px] font-semibold ${
+                    className={`shrink-0 text-[10.5px] font-semibold ${
                       assignment.releasedAt
                         ? 'text-ink-subtle'
                         : 'text-success'
@@ -390,23 +390,23 @@ export function ScheduleInspector({
             Clinical notes
           </SectionLabel>
           {role === 'OT_STAFF' ? (
-            <p className="text-ink-muted mt-2.5 flex items-start gap-1.5 text-[10px] leading-relaxed">
+            <p className="text-ink-muted mt-2.5 flex items-start gap-1.5 text-[12px] leading-relaxed">
               <LockKey
-                size={11}
+                size={12}
                 className="mt-0.5 shrink-0"
                 aria-hidden="true"
               />
               Clinical notes are not shown to the OT staff role.
             </p>
           ) : (
-            <p className="text-ink-secondary mt-2.5 text-[10.5px] leading-relaxed whitespace-pre-wrap">
+            <p className="text-ink-secondary mt-2.5 text-[12.5px] leading-relaxed whitespace-pre-wrap">
               {schedule.clinicalNotes || 'No clinical notes recorded.'}
             </p>
           )}
         </section>
 
         <section className="bg-porcelain/60 px-4 py-3.5">
-          <p className="text-ink-secondary text-[10px] font-semibold tracking-[0.08em] uppercase">
+          <p className="text-ink-secondary text-[11.5px] font-semibold tracking-[0.04em] uppercase">
             {capabilities.canManageStatus
               ? 'Case status'
               : 'Status & record'}
@@ -422,7 +422,7 @@ export function ScheduleInspector({
               />
             </div>
           ) : (
-            <p className="text-ink-muted mt-2 text-[10px] leading-relaxed">
+            <p className="text-ink-muted mt-2 text-[11.5px] leading-relaxed">
               {terminal
                 ? 'This case is closed. Status changes and edits are not available.'
                 : 'Status changes are restricted to authorised clinical schedulers.'}
@@ -432,9 +432,9 @@ export function ScheduleInspector({
           <div className="mt-3 flex flex-wrap gap-2">
             <Link
               href={`/schedules/${schedule.id}`}
-              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt inline-flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold shadow-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
+              className="border-ice-border bg-sheet text-ink-secondary hover:border-cobalt/35 hover:text-cobalt focus-visible:outline-cobalt inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12px] font-semibold shadow-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             >
-              <ArrowSquareOut size={12} aria-hidden="true" />
+              <ArrowSquareOut size={13} aria-hidden="true" />
               Open case file
             </Link>
 
@@ -442,16 +442,16 @@ export function ScheduleInspector({
               <button
                 type="button"
                 onClick={() => onEdit(schedule)}
-                className="bg-cobalt text-white hover:bg-cobalt-hover inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold shadow-[0_8px_18px_-10px_rgba(29,78,216,0.8)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt"
+                className="bg-cobalt hover:bg-cobalt-hover focus-visible:outline-cobalt inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold text-white shadow-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
               >
-                <PencilSimple size={12} aria-hidden="true" />
+                <PencilSimple size={13} aria-hidden="true" />
                 Edit schedule
               </button>
             ) : null}
           </div>
 
           {role === 'OT_STAFF' ? (
-            <p className="text-ink-subtle mt-2 text-[9px] leading-relaxed">
+            <p className="text-ink-subtle mt-2 text-[11px] leading-relaxed">
               You are viewing the cases assigned to you. Schedule editing and
               status changes require an ADMIN or DOCTOR role.
             </p>

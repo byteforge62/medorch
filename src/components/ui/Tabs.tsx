@@ -99,7 +99,7 @@ export function Tabs({
               <motion.span
                 layoutId="clinical-tab-pill"
                 aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-cobalt shadow-[0_6px_16px_-8px_rgba(29,78,216,0.7)]"
+                className="bg-cobalt absolute inset-0 rounded-full"
                 transition={
                   reduceMotion
                     ? { duration: 0 }

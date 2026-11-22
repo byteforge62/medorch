@@ -86,11 +86,11 @@ function LiveClock() {
 
   return (
     <span
-      className="text-ink-secondary hidden items-center gap-1.5 text-[10.5px] font-medium md:inline-flex"
+      className="text-ink-secondary hidden items-center gap-1.5 text-[11.5px] font-medium md:inline-flex"
       aria-label="Local theatre time"
     >
-      <Clock size={12} weight="duotone" aria-hidden="true" />
-      <span className="tnum font-mono text-[10.5px] tabular-nums">{time}</span>
+      <Clock size={13} aria-hidden="true" />
+      <span className="tnum font-mono text-[11.5px] tabular-nums">{time}</span>
     </span>
   );
 }
@@ -200,17 +200,17 @@ export function Header({
 
               <div className="flex items-center gap-2">
                 <span
-                  className="bg-rail flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold text-white/90"
+                  className="bg-rail flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white/90"
                   aria-hidden="true"
                 >
                   {initials}
                 </span>
 
                 <div className="hidden min-w-0 xl:block">
-                  <p className="text-ink max-w-[140px] truncate text-[11px] leading-tight font-semibold">
+                  <p className="text-ink max-w-[160px] truncate text-[12.5px] leading-tight font-semibold">
                     {user.name || 'User'}
                   </p>
-                  <p className="text-ink-muted mt-0.5 truncate text-[9px] leading-tight">
+                  <p className="text-ink-muted mt-0.5 truncate text-[11px] leading-tight">
                     {user.role?.replaceAll('_', ' ')}
                   </p>
                 </div>

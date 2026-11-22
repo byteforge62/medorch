@@ -321,16 +321,15 @@ export function AdminDashboard() {
     <main className="space-y-3">
       <header className="space-y-0">
         <div className="dashboard-command bg-rail relative overflow-hidden px-5 pt-5 pb-16 text-white sm:px-7 sm:pt-7 sm:pb-20">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_100%]" />
-            <div className="absolute -top-32 right-[-7rem] h-80 w-80 rounded-full border border-white/10" />
-            <div className="absolute -top-16 right-[-2rem] h-52 w-52 rounded-full border border-white/[0.06]" />
-          </div>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_100%]"
+          />
 
           <div className="relative z-10 grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)] xl:items-end">
             <div>
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[8.5px] tracking-[0.08em] text-white/40">
-                <span>OPERATIONS DESK</span>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-medium tracking-[0.04em] text-white/50">
+                <span>Operations desk</span>
                 <span className="h-px w-4 bg-white/25" aria-hidden="true" />
                 <span>{dateLabel}</span>
               </div>
@@ -338,7 +337,7 @@ export function AdminDashboard() {
               <h1 className="font-display mt-3 text-[clamp(1.65rem,2.5vw,2.25rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white">
                 Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}.
               </h1>
-              <p className="mt-2.5 max-w-[56ch] text-[12.5px] leading-[1.65] text-white/60">
+              <p className="mt-2.5 max-w-[58ch] text-[13px] leading-[1.6] text-white/65">
                 The current theatre picture, open cases, resource readiness and the decisions that
                 need you now.
               </p>
@@ -346,39 +345,41 @@ export function AdminDashboard() {
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link
                   href="/schedules"
-                  className="text-rail hover:bg-paper inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3.5 text-[10.5px] font-semibold shadow-xs transition-colors"
+                  className="text-rail hover:bg-paper inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-4 text-[12px] font-semibold shadow-xs transition-colors"
                 >
                   Open schedules
-                  <ArrowRight size={12} weight="bold" aria-hidden="true" />
+                  <ArrowRight size={13} weight="bold" aria-hidden="true" />
                 </Link>
                 <button
                   type="button"
                   onClick={refresh}
-                  className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-white/20 px-3.5 text-[10.5px] font-semibold text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
+                  className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-white/20 px-4 text-[12px] font-semibold text-white/75 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
                   disabled={refreshing}
                 >
                   {refreshing ? 'Refreshing…' : 'Refresh picture'}
                 </button>
-                <span className="font-mono text-[9px] text-white/35">UPDATED {timeLabel}</span>
+                <span className="text-[11px] text-white/45 tabular-nums">
+                  Updated {timeLabel}
+                </span>
               </div>
             </div>
 
             <div className="hidden border-white/10 xl:block xl:border-l xl:pl-6">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-[10.5px] font-semibold text-white/60">Live picture</p>
-                <span className="flex items-center gap-1.5 font-mono text-[9px] text-white/40">
+                <p className="text-[12px] font-semibold text-white/70">Live picture</p>
+                <span className="flex items-center gap-1.5 text-[11px] text-white/50">
                   <span className="bg-success-bright h-1.5 w-1.5 rounded-full" aria-hidden="true" />
-                  CONNECTED
+                  Connected
                 </span>
               </div>
-              <p className="mt-2.5 max-w-[34ch] text-[11.5px] leading-[1.6] text-white/60">
+              <p className="mt-2.5 max-w-[38ch] text-[12.5px] leading-[1.6] text-white/65">
                 Read directly from the theatre, schedule, equipment and alert services. Missing
                 feeds stay visibly missing.
               </p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-2.5 font-mono text-[9px] text-white/45">
-                <span>ROLE-SCOPED</span>
-                <span>NO CLINICAL NOTES</span>
-                <span>LOCAL TIME</span>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-2.5 text-[11px] text-white/50">
+                <span>Role-scoped</span>
+                <span>No clinical notes</span>
+                <span>Local time</span>
               </div>
             </div>
           </div>
@@ -618,7 +619,7 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      <p className="text-ink-subtle flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 text-[10px]">
+      <p className="text-ink-subtle flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 text-[11.5px]">
         <span>Source: MedOrch theatre, schedule, equipment, alert, workforce and audit APIs.</span>
         <span aria-hidden="true">·</span>
         <span>{formatDay(now, 'long')}</span>

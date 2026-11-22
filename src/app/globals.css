@@ -327,18 +327,10 @@
     isolation: isolate;
   }
 
-  /* A fine registration grid, not a decorative blob. Fixed and inert so it
-     never sits above a timetable, form control or dialog. */
+  /* No texture behind working data. A schedule, table or form is read on a
+     clean porcelain field; the tonal wash above is the only surface signal. */
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: radial-gradient(var(--dot-grid) 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.55;
-    mask-image: linear-gradient(to bottom, black, transparent 72%);
+    display: none;
   }
 
   body::after {
@@ -392,10 +384,10 @@
    not to every control in the product. */
 .eyebrow {
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.4;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
   color: var(--ink-muted);
 }
@@ -518,31 +510,18 @@
     border-color 0.25s var(--ease-out-quint);
 }
 
-.dashboard-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 1;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--panel-accent),
-    color-mix(in srgb, var(--panel-accent) 28%, transparent) 62%,
-    transparent
-  );
-}
-
+/* The header wash is the panel's only tonal signal; panels are containers for
+   data, so they carry a hairline instead of a decorative accent strip. */
 .dashboard-panel > .dashboard-panel-header {
-  background: linear-gradient(105deg, var(--panel-tint), transparent 78%);
+  background: var(--panel-tint);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .dashboard-panel:hover {
-    transform: translateY(-1px);
-    border-color: color-mix(in srgb, var(--panel-accent) 20%, var(--rule));
+    border-color: color-mix(in srgb, var(--panel-accent) 18%, var(--rule));
     box-shadow:
       0 1px 2px rgba(15, 23, 42, 0.04),
-      0 24px 54px -34px rgba(15, 23, 42, 0.3);
+      0 18px 40px -34px rgba(15, 23, 42, 0.26);
   }
 }
 
@@ -565,31 +544,7 @@
     border-color 0.28s var(--ease-out-quint);
 }
 
-.metric-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 1;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--metric-accent),
-    color-mix(in srgb, var(--metric-accent) 24%, transparent) 58%,
-    transparent
-  );
-}
 
-.metric-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    118% 88% at 100% 0%,
-    color-mix(in srgb, var(--metric-accent) 9%, transparent),
-    transparent 62%
-  );
-}
 
 .spark-bar {
   transform-origin: bottom;
@@ -624,17 +579,15 @@
 
 @media (hover: hover) and (pointer: fine) {
   .metric-card:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--metric-accent) 26%, var(--rule));
+    border-color: color-mix(in srgb, var(--metric-accent) 22%, var(--rule));
     box-shadow:
       0 1px 2px rgba(15, 23, 42, 0.04),
-      0 30px 58px -34px rgba(15, 23, 42, 0.3);
+      0 24px 48px -34px rgba(15, 23, 42, 0.26);
   }
 
   .status-card:hover,
   .equipment-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 18px 38px -32px rgba(15, 23, 42, 0.28);
+    box-shadow: 0 16px 34px -30px rgba(15, 23, 42, 0.24);
   }
 
   .alert-card:hover {
@@ -656,6 +609,7 @@
   .status-card:hover,
   .equipment-card:hover {
     transform: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   }
 
   .spark-bar {
@@ -698,19 +652,19 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
   color: var(--pine);
 }
 
 .ui-kicker::before {
   content: '';
-  width: 1.1rem;
+  width: 0.875rem;
   height: 2px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--pine), var(--brass));
+  background: var(--pine);
 }
 
 /* Interactive surface — lifts on hover. */

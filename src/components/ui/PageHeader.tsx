@@ -32,7 +32,7 @@ export function PageHeader({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <p className="ui-kicker">{eyebrow}</p>
             {meta ? (
-              <span className="border-rule text-ink-muted border-l pl-3 font-mono text-[9px]">
+              <span className="border-rule text-ink-muted border-l pl-3 text-[11.5px] tabular-nums">
                 {meta}
               </span>
             ) : null}
@@ -43,7 +43,7 @@ export function PageHeader({
           </h1>
 
           {description ? (
-            <p className="text-ink-muted mt-3 max-w-[64ch] text-[13px] leading-[1.7]">
+            <p className="text-ink-secondary mt-3 max-w-[70ch] text-[13.5px] leading-[1.65]">
               {description}
             </p>
           ) : null}

@@ -62,7 +62,7 @@ export function Field({
     <div className={className}>
       <label
         htmlFor={children.props.id ?? inputId}
-        className="text-ink-secondary mb-1.5 flex items-baseline gap-1 text-[11px] font-semibold tracking-[0.1em] uppercase"
+        className="text-ink-secondary mb-2 flex items-baseline gap-1 text-[12.5px] font-semibold"
       >
         {label}
         {required ? (
@@ -73,7 +73,7 @@ export function Field({
       </label>
       {control}
       {hint && !error ? (
-        <p id={hintId} className="text-ink-muted mt-1.5 text-[0.75rem]">
+        <p id={hintId} className="text-ink-muted mt-1.5 text-[12px]">
           {hint}
         </p>
       ) : null}
@@ -81,7 +81,7 @@ export function Field({
         <p
           id={errorId}
           role="alert"
-          className="text-danger mt-1.5 text-[0.75rem] font-medium"
+          className="text-danger mt-1.5 text-[12px] font-medium"
         >
           {error}
         </p>
